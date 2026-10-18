@@ -1,12 +1,14 @@
 # End-to-end case and report processing
 
-**18 October 2026 · U8/D16: agreed design; contracts/persistence implementation in this change.**
-The frontend remains a mock client. HTTP, live models/search/scraping, LangGraph
-execution and PDF rendering are subsequent integrations, not working features.
+**18 October 2026 · Integrated implementation; live deployment still pending.**
+HTTP frontend/API, LangGraph, reasoning/retrieval adapters and PDF are implemented.
+See [integration evidence and remaining gates](../team/INTEGRATION.md). Synthetic
+cross-lane tests do not establish model quality or a working shared-host deployment.
 This document owns the processing stages; [architecture](ARCHITECTURE.md) owns
 pack content, [physical schema](../data/RELATIONAL_SCHEMA.md) owns storage.
 
-Schema contract v1 is finalized at migration 0005. Corpus/retrieval agents start
+Schema contract v1 was finalized at 0005; additive runtime/UI changes advance head
+to `0007_frontend_lifecycle`. Corpus/retrieval agents start
 with the [data handoff](../data/INGESTION_RETRIEVAL_HANDOFF.md); use the
 [exact field reference](../data/SCHEMA_REFERENCE.md) for queries. The pack owns
 match output; reason selections own editorial review; durable stage outputs own
@@ -58,7 +60,7 @@ query plans and retrieval observations.
 9. **Export:** all cards reviewed and at least one kept; freeze an accepted review
    of the exact result hash and selection hash. PDF first, editable PowerPoint
    later with challenge-only assets. Include kept claims, sources and material
-   caveats. A future renderer uses no model or retrieval to add facts.
+   caveats. The deterministic renderer uses no model or retrieval to add facts.
 
 ## Model boundaries and contracts
 
@@ -72,7 +74,7 @@ and the [EmbeddingGemma 2 reference](../data/EMBEDDING_DEPLOYMENT.md); exact rev
 compatible runtimes and authenticated limits remain open. Embeddings/reranking use their
 own compatible models/tokenizers.
 
-LangGraph coordinates every future agentic branch, join, tool budget, revision
+LangGraph coordinates every agentic branch, join, tool budget, revision
 and interruption; LangChain provides model/structured-output/tool adapters.
 Apertus tool-selection calls use non-thinking mode: the current model card says
 thinking mode cannot be combined with tool calling. Benchmark on representative
@@ -83,8 +85,8 @@ assessment. `DraftReason` links a headline/line and entries to claim IDs.
 `ReportEvidencePack` contains attributed intent, supported claims, matches,
 argument candidates, gaps/actions, coverage and pinned configuration references.
 References must resolve to accessible evidence in its snapshot/manifest. Keeping
-raw structured fields does not establish semantic truth: validators are adapters
-still to implement; persistence records their explicit assessments.
+raw structured fields does not establish semantic truth; model-backed assessment
+adapters record explicit assessments whose quality still requires evaluation.
 
 ## Chat and revisions
 
@@ -102,8 +104,8 @@ Keep the existing `BriefRevision`, `Reason`, `ReasonEntry`, `Evidence`, `Coverag
 and `SearchTrace` projections. Each reason has underlying atomic claim links;
 `CitedText.evidenceIds` is their deduplicated support. Evidence shows a literal
 excerpt/highlight, original URL, title, fetch/publication dates, source origin and
-review status. New-source badges are a later UI change. Sankey links reflect
+review status. Source badges and the HTTP adapter are implemented. Sankey links reflect
 actual recorded input → concept → evidence decisions, not a generated story.
 Case statuses describe the business lifecycle; run stages describe execution.
 Similar-case scores remain unavailable without an authorized dataset/method.
-The [HTTP handoff](FRONTEND_BACKEND_API.md) defines future endpoints, not a server.
+The [HTTP handoff](FRONTEND_BACKEND_API.md) defines the implemented endpoints.

@@ -42,6 +42,8 @@ export interface Evidence {
   highlight?: string;
   /** One line: why this matters for the company. */
   relevance: string;
+  origin?: 'corpus' | 'web';
+  reviewStatus?: 'curated' | 'unreviewed';
 }
 
 export interface CitedText {
@@ -130,6 +132,9 @@ export interface BriefRevision {
   coverage: Coverage;
   /** Shown instead of reasons for no_match / out_of_scope. */
   emptyMessage?: string;
+  resultHash?: string;
+  packId?: string;
+  packHash?: string;
 }
 
 export interface FollowUpQuestion {
@@ -154,6 +159,18 @@ export interface CaseDetail {
   currentRevisionId?: string;
   turns: DialogueTurn[];
   evidence: Record<string, Evidence>;
+  revision?: number;
+  inputId?: string;
+  selectionHash?: string;
+  currentRun?: CaseRun;
+}
+
+export interface CaseRun {
+  run_id: string;
+  input_id: string;
+  status: 'queued' | 'running' | 'waiting_for_input' | 'succeeded' | 'failed' | 'cancelled' | 'superseded';
+  stage?: RunStage;
+  error_code?: string;
 }
 
 /** A question the operator should ask an agency colleague, drafted per case. */

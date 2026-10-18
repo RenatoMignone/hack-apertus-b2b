@@ -1,6 +1,6 @@
 # Exact application schema reference
 
-Generated from `src/backend/data/schema.py`; migration head **`0005_finalize_schema`**.
+Generated from `src/backend/data/schema.py`; migration head **`0007_frontend_lifecycle`**.
 Do not edit by hand. Regenerate with `PYTHONPATH=src python -m backend.data.schema_docs`.
 
 **63 application tables.** Read [schema decisions](RELATIONAL_SCHEMA.md) and
@@ -592,6 +592,7 @@ Primary key: `snapshot_id, chunk_id`.
 | `question` | `TEXT` | yes | `—` | — |
 | `ask_role` | `TEXT` | yes | `—` | — |
 | `status` | `TEXT` | yes | `'open'` | — |
+| `answer` | `TEXT` | no | `—` | — |
 
 Primary key: `action_id`.
 
@@ -653,11 +654,14 @@ Primary key: `manifest_id`.
 | `namespace` | `TEXT` | yes | `—` | — |
 | `status` | `TEXT` | yes | `'draft'` | — |
 | `revision` | `INTEGER` | yes | `0` | — |
+| `on_hold` | `BOOLEAN` | yes | `false` | — |
+| `outcome` | `TEXT` | no | `—` | — |
 | `current_input_id` | `UUID` | no | `—` | cases.input_revisions.input_id |
 | `current_result_id` | `UUID` | no | `—` | cases.result_revisions.result_id |
 
 Primary key: `case_id`.
 
+- Check: `outcome IN ('visit','no_interest')`.
 - Index: `current_input_id`.
 - Index: `current_result_id`.
 - Index: `owner_id`.

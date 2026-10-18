@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Columns3, Info, LayoutGrid, ListChecks, Plus } from 'lucide-react';
-import { api } from '../api';
+import { api, apiMode } from '../api';
 import { useLive } from '../api/useLive';
 import logo from '../assets/logo.png';
 import { useToast } from './Toast';
@@ -93,7 +93,7 @@ export default function TopNav() {
         ))}
       </nav>
       <div className="ml-auto flex shrink-0 items-center gap-2">
-        <DemoMenu />
+        {apiMode === 'mock' ? <DemoMenu /> : <span className="text-xs text-muted">Connected</span>}
         <Link
           to="/cases/new"
           className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-dark"

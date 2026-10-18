@@ -1,6 +1,6 @@
 ```mermaid
 flowchart TB
-  %% Logical design; live adapters, HTTP graph and rendering remain feature work.
+  %% Implemented graph; see team/INTEGRATION.md for tested scope and live deployment gates.
   %% Frontend is separately owned; backend agents must not edit it.
   USER["Operator: permitted company context and Bern objectives"]
   UI["Frontend: cases, progress, cited reasons, chat, review and export"]
@@ -17,7 +17,7 @@ flowchart TB
     PACK["Code freezes ReportEvidencePack: claims, context, gaps and provenance"]
     DRAFT["Apertus drafts cited Why Bern reasons; validate wording and references"]
     REVIEW["Persist draft revision and per-reason keep / reject decisions"]
-    PDF["Future PDF renderer: exact reviewed revision, kept reasons and citations"]
+    PDF["PDF renderer: exact reviewed revision, kept reasons and citations"]
     STORE[("PostgreSQL + pgvector: corpus, taxonomy, cases, retrieval and ops")]
     ART[("Source and export artifacts")]
     OBS["Separate LangGraph checkpoints and self-hosted Langfuse tracing"]

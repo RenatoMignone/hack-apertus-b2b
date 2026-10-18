@@ -13,10 +13,13 @@ dependencies = [
   "langfuse>=3,<5", "PyYAML>=6,<7",
   "fastapi>=0.115,<1", "uvicorn>=0.34,<1", "langgraph>=1,<2",
   "langchain-core>=1,<2", "langchain>=1,<2",
+  "langsmith>=0.3,<1", "httpx>=0.28,<1", "jsonschema>=4,<5", "reportlab>=4,<6", "pypdf>=6,<7",
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=8,<10", "moto[s3]>=5,<6", "httpx>=0.28,<1", "pytest-asyncio>=0.25,<2"]
+test = ["pytest>=8,<10", "moto[s3]>=5,<6", "pytest-asyncio>=0.25,<2", "pypdfium2>=4,<6"]
+local-models = ["sentence-transformers>=5,<6", "transformers>=5,<6", "torch>=2.6,<3"]
+web = ["crawl4ai>=0.9.5,<0.10"]
 
 [project.scripts]
 navigator = "backend.data.cli:main"
@@ -30,4 +33,4 @@ testpaths = ["tests"]
 markers = ["integration: requires disposable PostgreSQL with pgvector"]
 
 [tool.setuptools.package-data]
-backend = ["deploy/*.yaml", "deploy/*.json", "deploy/*.sh", "deploy/*.ps1", "deploy/policies/*.json", "deploy/.env.example"]
+backend = ["deploy/*.yaml", "deploy/*.json", "deploy/*.sh", "deploy/*.ps1", "deploy/policies/*.json", "deploy/.env.example", "config/profiles/*.json"]

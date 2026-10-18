@@ -20,6 +20,7 @@ from pydantic import BaseModel, ConfigDict, Field, SecretStr, ValidationError
 
 from backend.contracts.services import (BudgetExceeded, InvalidModelOutput, RunContext,
                                        ServiceUnavailable)
+from backend.config.endpoints import local_inference_url
 
 ALIASES = {"apertus-v1-5-8b", "apertus-v1-5-70b",
            "apertus-v1-5-8b-thinking", "apertus-v1-5-70b-thinking"}
@@ -82,11 +83,10 @@ class KeeraChatModel(BaseChatModel):
 
     def _validate_endpoint(self, context: RunContext) -> None:
         endpoint = urlsplit(self.settings.base_url)
-        local = endpoint.hostname in {"localhost", "127.0.0.1", "::1"}
         if endpoint.username or endpoint.password or endpoint.query or endpoint.fragment:
             raise ServiceUnavailable()
         if self.settings.local:
-            if not local or endpoint.scheme not in {"http", "https"}:
+            if not local_inference_url(self.settings.base_url):
                 raise ServiceUnavailable()
         elif (context.mode == "offline" or endpoint.scheme != "https"
               or not self.settings.api_key.get_secret_value()

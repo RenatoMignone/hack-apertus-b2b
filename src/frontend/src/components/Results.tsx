@@ -300,7 +300,7 @@ export default function Results({
       {(openQuestions.length > 0 || coverage.limitations.length > 0) && (
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <HelpCircle size={15} className="text-muted" />
-          {[...openQuestions, ...coverage.limitations].map((q) => (
+          {[...new Set([...openQuestions, ...coverage.limitations])].map((q) => (
             <span key={q} className="rounded-full bg-white px-2.5 py-0.5 text-muted ring-1 ring-line">{q}</span>
           ))}
         </div>
@@ -341,7 +341,7 @@ export default function Results({
         </div>
       )}
 
-      <div id="sec-search" className="scroll-mt-16 rounded-xl border border-line bg-white">
+      {trace.inputs.length || trace.terms.length || trace.links.length ? <div id="sec-search" className="scroll-mt-16 rounded-xl border border-line bg-white">
         <button onClick={() => setTraceOpen(!traceOpen)} aria-expanded={traceOpen} className="flex w-full items-center gap-2 px-4 py-3 text-sm">
           <span className="font-medium">How I searched</span>
           <span className="text-muted">
@@ -354,7 +354,7 @@ export default function Results({
             <SearchSankey trace={trace} evidence={evidence} onOpen={onOpen} />
           </div>
         )}
-      </div>
+      </div> : <p id="sec-search" className="text-sm text-muted">Source passages are available on each reason. A detailed search trace is not available.</p>}
     </div>
   );
 }

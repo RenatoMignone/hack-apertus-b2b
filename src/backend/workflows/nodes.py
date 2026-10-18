@@ -88,12 +88,14 @@ class ResearchNodes:
                                        lambda: discover.ainvoke({"query": query}))
             # URL selection is constrained before delegating redirect/network safety to C's fetcher.
             from backend.contracts.pipeline import canonical_url
-            urls = list(dict.fromkeys(canonical_url(url) for url in urls))[:8]
+            urls = list(dict.fromkeys(canonical_url(url) for url in urls))[:min(5, context.max_tool_calls - used - 1)]
+            used += 1 + len(urls)  # C counts discovery and each fetched page independently.
             result = await execution.call(f"fetch.{state['round']}", {"urls": urls},
                                          lambda: fetch.ainvoke({"urls": urls}))
-        except ServiceUnavailable:
-            return {**unavailable("web_unavailable"), "tools_used": used + 2}
-        return {"web_research": WebResearchResult.model_validate(result).model_dump(mode="json"), "tools_used": used + 2}
+        except (ServiceUnavailable, BudgetExceeded) as error:
+            return {**unavailable("web_tool_budget_exhausted" if isinstance(error, BudgetExceeded) else "web_unavailable"),
+                    "tools_used": max(used, state.get("tools_used", 0) + 1)}
+        return {"web_research": WebResearchResult.model_validate(result).model_dump(mode="json"), "tools_used": used}
 
     async def merge(self, state):
         execution = self.execution(state)

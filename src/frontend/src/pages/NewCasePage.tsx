@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowUp, Lock } from 'lucide-react';
 import { api } from '../api';
 import { useTitle } from '../components/ui';
+import { reportApiError } from '../components/ApiErrors';
 
 const EXAMPLES: { label: string; text: string }[] = [
   {
@@ -26,8 +27,11 @@ export default function NewCasePage() {
   const submit = async () => {
     if (!text.trim() || busy) return;
     setBusy(true);
-    const c = await api.createCase(text.trim());
-    navigate(`/cases/${c.case.id}`, { state: { run: true } });
+    try {
+      const c = await api.createCase(text.trim());
+      navigate(`/cases/${c.case.id}`, { state: { run: true } });
+    } catch (error) { reportApiError(error); }
+    finally { setBusy(false); }
   };
 
   return (

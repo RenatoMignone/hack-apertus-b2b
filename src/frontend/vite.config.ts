@@ -2,9 +2,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
-// All assets are bundled locally; the build makes no runtime network requests
-// so it can run in the air-gapped target described in docs/plans/ARCHITECTURE.md.
+// Assets stay local. Offline deployments still call their local HTTP backend.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  server: { port: 5173 },
+  server: { port: 5173, proxy: { '/api': { target: 'http://127.0.0.1:8000', changeOrigin: true } } },
 });

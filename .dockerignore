@@ -1,0 +1,15 @@
+.git
+.venv
+**/.venv
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+**/.local
+**/.env
+**/.env.*
+!**/.env.example
+**/dist
+**/build
+**/*.egg-info
+**/*.safetensors
+**/*.gguf

@@ -1,6 +1,8 @@
 # Architecture and evidence preparation
 
-**18 October 2026 · Design, not implemented or deployment-tested.**
+**18 October 2026 · Core implemented/integrated; live deployment remains unverified.**
+See [integration evidence and gates](../team/INTEGRATION.md). Synthetic execution
+tests do not certify connected or air-gapped deployment or model quality.
 The user selected a domain-independent pipeline, manual text intake and the
 existing report structure. [Visual reference](../architecture.html) stacks the
 overview, ingestion, case research, evidence pack, domain changes and deployment.

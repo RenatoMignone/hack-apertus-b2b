@@ -1,5 +1,7 @@
 """Upgrade old records in a separate disposable database, without destroying history."""
 from uuid import UUID, uuid4
+from types import SimpleNamespace
+from unittest.mock import patch
 
 import psycopg
 from psycopg import sql
@@ -47,12 +49,17 @@ def test_upgrade_preserves_legacy_data_and_installs_guards(database, tmp_path, o
         with engine.begin() as c:
             c.execute(text("DROP TRIGGER historical_chunk_writer ON retrieval.chunks"))
             c.execute(text("DROP FUNCTION public.historical_chunk_writer()"))
-        repository, case_id, input_id, run_id, _ = make_run(engine, fixture)
-        evidence = None
-        with engine.connect() as c:
-            evidence = c.execute(select(t.spans.c.evidence_id)).scalars().first()
-        pack = repository.freeze_pack(context(fixture), run_id, {"legacy": True}, [evidence])
-        result = repository.record_result(context(fixture), case_id, pack, {"legacy": "result"}, expected_revision=0)
+        # Reproduce the historical writer's case projection, before new UI columns.
+        # Current repositories correctly require migration head at runtime.
+        from backend.data.migrations.baseline_schema import cases as old_cases
+        from backend.data.repositories import cases as cases_module
+        historical = SimpleNamespace(**{**vars(t), "cases": old_cases})
+        with patch.object(cases_module, "tables", historical):
+            repository, case_id, input_id, run_id, _ = make_run(engine, fixture)
+            with engine.connect() as c:
+                evidence = c.execute(select(t.spans.c.evidence_id)).scalars().first()
+            pack = repository.freeze_pack(context(fixture), run_id, {"legacy": True}, [evidence])
+            result = repository.record_result(context(fixture), case_id, pack, {"legacy": "result"}, expected_revision=0)
         query_plan = uuid4()
         with engine.begin() as c:
             c.execute(text("INSERT INTO cases.query_plans(query_plan_id,run_id,payload) VALUES(:id,:run,jsonb_build_object('old',true))"),

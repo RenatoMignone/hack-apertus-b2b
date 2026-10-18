@@ -1,153 +1,77 @@
-# Frontend ↔ backend HTTP handoff
+# Frontend and backend HTTP contract
 
-**18 October 2026 · Draft integration contract, not a running API.** U7 selects
-HTTP separation. Routes/projections below are a proposed v1 handoff; agree and
-export a machine-readable schema when implementation starts. The frontend is React/Vite on mocks. HTTP framework, authentication provider and
-backend port remain unselected. U8 implements contracts/persistence only.
+18 October 2026. Implemented FastAPI `/api/v1` and React `NavigatorApi` HTTP
+adapter. `/openapi.json` and `src/backend/api/schemas.py` are the machine-readable
+authority. [Integration status](../team/INTEGRATION.md) records tests and live
+deployment gates. Backend modules communicate through typed in-process ports.
 
-## Integration boundary
+## Authentication and transport
 
-Use a configurable backend base URL and `/api/v1` prefix. Same-origin hosting is
-the simplest initial deployment; separate frontend hosting requires an explicit
-backend origin/CORS allowlist. Never expose model/database/Langfuse credentials.
-Authentication/session/CSRF details depend on the later hosting/auth choice;
-authorization of every resource is mandatory and cannot trust client owner IDs.
+Every protected request uses an operator `Authorization: Bearer ...` header.
+The server maps its SHA-256 token digest to a DB principal, namespace and trusted
+DSN name. No browser-provided owner, DB/model keys, anonymous production user or
+ambient cookie authentication. The frontend keeps its token in memory only.
 
-The UI needs permitted text intake, progress, clarification, structured matches
-with citations, report revisions, selection/review and downloads. No confidential
-PDF upload endpoint is planned. Public research PDFs use controlled ingestion.
+Mutations include `Idempotency-Key`; a transport retry reuses the same key/body.
+A conflicting body returns 409. API requests are short commands/reads; a separate
+worker owns execution. Poll actual stages without invented percentages. Closing
+the browser does not cancel research; explicit cancellation is a separate command.
+Same-origin `/api` is the default; separate hosting needs exact CORS origins.
 
-Long retrieval/model/export work returns `202 Accepted` with stable IDs and a
-status URL. Polling is the baseline; SSE/WebSockets are deferred. Show actual
-stage/limitations, not invented completion percentages. Browser disconnection
-does not cancel a run; cancellation is explicit.
+## Implemented surface
 
-## Proposed resource surface
+Paths below follow `/api/v1`. Full request/response fields are in OpenAPI.
 
-Paths are relative to `/api/v1`. These project existing logical records rather
-than introduce a second evidence schema or database design.
+| Method / path | Behavior |
+| --- | --- |
+| `GET /capabilities` | Mode, configured adapters and export formats; configuration is not a provider health check |
+| `GET /cases?limit=100&offset=0` | Authorized summaries; client paginates |
+| `POST /cases` | `{prompt,profile_id?,run:true}` → 201 IDs/status URL; creation atomically queues research |
+| `GET /cases/{id}` | CaseDetail: revisions, literal evidence, durable clarification turns, `revision`, `inputId`, `selectionHash`, latest `currentRun` |
+| `PATCH /cases/{id}` | `{expected_revision,status?,current_revision_id?,on_hold?,outcome?}`; stale writes fail |
+| `POST /cases/{id}/runs` | `{input_id,profile_id?}` → 202 new run; client reuses/polls an existing active run |
+| `GET /cases/{id}/runs/{run}` | queued/running/waiting_for_input/succeeded/failed/cancelled/superseded; actual stage, questions and safe error |
+| `POST /cases/{id}/messages` (or `/inputs`) | `{text,expected_revision,kind,profile_id?}` → 202; kind formatting/focus/identity |
+| `POST /cases/{id}/runs/{run}/answers` | Exact `{input_id,question_id,answer}` → 202 resume/status URL |
+| `POST /cases/{id}/runs/{run}/cancel` | Explicitly cancel execution |
+| `GET /cases/{id}/runs/{run}/matches` | Supported frozen-pack output; no obsolete matches table |
+| `GET /cases/{id}/evidence-packs/{pack}` | Authorized pack/hash |
+| `GET /cases/{id}/evidence/{evidence}?run_id=...` | Exact authorized source passage; optional pack binding |
+| `POST /cases/{id}/reports` | New draft from an eligible pack, expected revision and writing instruction |
+| `GET /cases/{id}/reports/{result}` | Exact report projection; `resultHash`, `packId`, `packHash` |
+| `PUT /cases/{id}/reports/{result}/reasons/{key}/selection` | Selection plus expected result hash → current selection hash |
+| `POST /cases/{id}/reports/{result}/reviews` | Exact result/selection hashes and accepted/rejected decision → immutable review ID |
+| `POST /cases/{id}/exports` | Result/review IDs, both hashes and format pdf → 202 operation URL |
+| `GET /operations/{id}` | Durable pending/running/committed/failed export; authenticated download URL when ready |
+| `GET /cases/{id}/exports/{export}` | Export metadata |
+| `GET /cases/{id}/exports/{export}/download` | Authorized PDF bytes, safe filename and no-store |
+| `GET /action-items` | Authorized questions, roles, statuses and optional answer notes |
+| `POST /action-items` | `{case_id,question,ask_role}`; stores an operator task, sends no message |
+| `PATCH /action-items/{id}` | `{status,answer?}`; status open/asked/done |
 
-| Method / route | Input / purpose | Successful response |
-| --- | --- | --- |
-| `GET /capabilities` | Discover enabled features | `200`: deployment mode, schema versions, formats and optional features; no secrets |
-| `POST /cases` | Permitted message/context and domain profile ID | `201`: case and immutable input revision IDs |
-| `GET /cases/{case_id}` | Read authorized case overview | `200`: current revision pointers and run summaries |
-| `POST /cases/{case_id}/inputs` | New message/edit, base input/result revision IDs | `201`: new input/dialogue revision; earlier revisions retained |
-| `POST /cases/{case_id}/runs` | Input revision ID; server resolves/validates profile and snapshot | `202`: run ID, pinned input revision and status URL |
-| `GET /cases/{case_id}/runs/{run_id}` | Poll durable work | `200`: state, stage, outcome/limitations, questions and available pack/result IDs |
-| `POST /cases/{case_id}/runs/{run_id}/answers` | Question ID, target input revision, permitted answer | `202`: answer ID and resumed run status URL; stale answers fail |
-| `POST /cases/{case_id}/runs/{run_id}/cancel` | Stop new work | `202`: cancellation requested; poll for acknowledgment |
-| `GET /cases/{case_id}/runs/{run_id}/matches` | Inspect available validated matches | `200`: typed entities, supported fields, fit/relevance reasons, source links and limitations |
-| `GET /cases/{case_id}/evidence-packs/{pack_id}` | Inspect frozen eligible pack | `200`: authorized pack view/hash, versions, support and gaps |
-| `GET /cases/{case_id}/evidence/{evidence_id}` | Inspect passage; run ID required as query context | `200`: literal text, source URL/locator, document version and dates; server checks run membership |
-| `POST /cases/{case_id}/reports` | Pack ID, base result revision for edits, permitted instruction | `202`: report run/job ID and status URL; eligible ready pack required |
-| `GET /cases/{case_id}/reports/{result_revision_id}` | Read exact report revision | `200`: sections, claim/citation references, manifest, validation/review state |
-| `POST /cases/{case_id}/reports/{result_revision_id}/reviews` | Revision/hash, selections and approve/request-changes decision | `201`: immutable review; unsupported claims cannot be approved into facts |
-| `POST /cases/{case_id}/exports` | Approved result/review IDs and supported format | `202`: export ID and status URL |
-| `GET /cases/{case_id}/exports/{export_id}` | Poll rendering | `200`: state, bound result/review/template and available download URL |
-| `GET /cases/{case_id}/exports/{export_id}/download` | Download authorized artifact | `200`: file with content type/name; no raw path or unrestricted storage key |
+## UI and evidence rules
 
-Report status uses the same durable run-status projection. Report work must bind
-to its case, pack and result lineage; resuming the workflow versus creating a
-child run is still to be mapped in [processing design](REPORT_PROCESSING_BOUNDARIES.md).
-Automatic research → draft chaining, if later enabled, reuses the report use case
-and cannot bypass the frozen-pack gate. No direct SQL/model/prompt/checkpoint
-endpoints are exposed to the frontend.
+Board statuses are researching/in_review/pitch_sent/closed. On hold is an
+independent flag; visit/no_interest is a closed-case outcome. Migration 0007
+preserves existing combined statuses; legacy PATCH status aliases remain accepted.
+Run state and board status are separate. Historical input revisions remain readable;
+they cannot silently become the current company intent.
 
-## Response projections and state
+Every reason resolves through supported claim IDs to exact evidence IDs.
+Evidence exposes origin corpus/web and reviewStatus curated/unreviewed; semantic
+claim support does not certify the source. Missing facts stay unknown. Historical
+similar-case scores stay empty without an authorized dataset/method. Detailed
+Sankey lineage is unavailable until real recorded links are projected.
 
-JSON records include `schema_version`, stable IDs and appropriate UTC dates.
-Opaque IDs are not authorization tokens. Run responses expose:
+All reason cards reviewed plus at least one kept gates PDF. The client binds
+selection/export to the report hash actually displayed; the server rechecks exact
+current result, selection, approval and access before/after rendering/download.
+Company introduction is attributed operator context. PDF includes only kept
+reasons, their sources and material caveats. PPTX remains later work.
 
-```text
-case_id, run_id, input_revision_id, status, stage,
-outcome, limitations[], questions[], evidence_pack_id?, result_revision_id?,
-snapshot_id, updated_at, links
-```
-
-Proposed transport `status`: `queued`, `running`, `waiting_for_input`, `succeeded`,
-`failed`, `cancelled`. Cancellation request time is separate from acknowledgment.
-`stage` projects the existing [case workflow](OPERATIONS_PLAN.md#2-caserun-state-and-contracts);
-do not replace its durable state machine with a competing HTTP state machine.
-`outcome` is absent while undecided, then `complete`, `partial` or `no_match`.
-A successful partial/no-match assessment differs from a technical failure.
-Waiting runs supply question IDs and required/optional flags.
-
-Match views include person/unit IDs, roles/affiliations, units, expertise, projects,
-infrastructure/services, fit explanation and citations where supported. Missing
-values stay explicit. Separate direct/adjacent fit from evidence strength. Do not
-expose raw model context, internal trace payloads or storage credentials.
-
-Reports follow [output structure](OUTPUT_REPORT_STRUCTURE.md), with citations next
-to supported assertions and separate validation/review states. Pack views retain
-literal evidence versus claims, attributed input and generated hypotheses.
-List pagination is stable within a pinned run; cursor and field-level JSON
-schemas remain implementation follow-ups.
-
-## Errors, concurrency and UI behavior
-
-- Consistent errors: `schema_version`, `error.code`, safe `message`, `request_id`,
-  `retryable`, optional field/revision details. No secrets, stack traces or
-  unauthorized resource details.
-- `400` malformed request; `422` invalid fields; `401` authentication needed;
-  `403`/non-disclosing `404` per access policy; `404` unavailable resource;
-  `409` stale revision/invalid stage; `429` limits; `503` required service unavailable.
-  Trace-only outages cannot turn successful case work into a failure.
-- Mutations accept `Idempotency-Key` scoped to caller/case/operation. Same key/body
-  returns the same operation; different body under the same key returns `409`.
-  HTTP deduplication complements durable stage keys, never replaces them.
-- Edits, answers and reviews carry base revisions. On `409`, reload/present the
-  current revision; never silently overwrite a colleague's work. Busy/duplicate
-  run policy is enforced server-side before scheduling.
-- Preserve unsent input on network failure. Retry with the same mutation key,
-  then poll the returned resource. Do not start inference on every UI render.
-- Answers target displayed questions/revisions. Display partial/no-match coverage
-  and disabled offline features. Review/download binds to a specific revision.
-
-Before implementation, agree OpenAPI/JSON projections, caller/session integration,
-size limits, pagination and retry windows. Future contract fixtures must cover
-success, clarification, partial/no-match, stale revisions, access denial and
-export-not-ready. This scaffold includes no schema file, mock server or routes.
-
-## U8 integration mapping (future HTTP work)
-
-`createCase(prompt)` maps to case/input creation, then `runCase` starts research
-and automatic pack → draft chaining. Poll durable run state to drive existing
-`RunStage`: interpreting, searching, validating, drafting, done. Clarification
-is `waiting_for_input`, not an error or completed run.
-
-Add documented routes: `GET /cases` (authorized summaries), `PATCH /cases/{id}`
-(business status/current revision), `POST /cases/{id}/messages` (chat edit and base
-revision), `PUT /cases/{id}/reports/{revision}/reasons/{key}/selection` (kept,
-rejected, none plus expected result hash), and action-item list/update routes.
-Evidence projections add `origin` (corpus/web), `reviewStatus` (curated/unreviewed);
-new source trust stays separate from claim support and editorial selection.
-The backend uses UUIDs internally; the HTTP adapter serializes them as opaque
-strings matching the frontend contract. Existing `exportDeck` will become a
-format-aware report request; PDF first, PPTX later.
-
-Review submits exact result hash and selection hash; all reasons reviewed and at
-least one kept. Selections changing after review invalidate new exports. Cited
-lines map reason → claim IDs → evidence IDs, retaining literal quotes/highlights.
-The HTTP adapter must translate backend business statuses (`ready_for_review`)
-to the existing frontend status (`in_review`), independently from run status.
-No endpoints or client wiring are implemented by the data-layer work.
-
-## Separate frontend ownership (U9)
-
-The frontend belongs to another teammate. Backend/documentation agents must not
-edit `src/frontend/`, even to extend a TypeScript type. The current `Evidence`
-interface has no `origin`/`reviewStatus`; those are **proposed API additions** for
-source badges. Backend projection helpers can expose them, but the frontend
-owner must implement their display. Likewise, the current mock export checks
-only for at least one kept card; the stricter all-reviewed gate is backend design
-and a pending frontend integration change. Do not claim the mock is already wired.
-
-Before integration, agree these deltas with the frontend owner: source flags;
-company metadata projection; exact result/selection hashes on review/export;
-PDF-aware export naming; asynchronous polling/clarification/errors. Keep existing
-`NavigatorApi` behavior working via its future adapter, not ad hoc frontend edits.
-
-Schema contract v1 stores validated match output in the frozen evidence-pack payload;
-the `/matches` projection above does not imply a `cases.matches` table. Use
-[final schema decisions](../data/RELATIONAL_SCHEMA.md) and actual repository DTOs.
+Errors contain safe code/message/request ID, never raw provider/SQL details.
+401 requires reconnecting; 404 does not disclose another owner; 409 requires
+refresh/review; 422 is field validation; 413 is size; 502 is invalid model output;
+503 is service/storage unavailable. Failure never becomes an invented no-match.
+HTTP failure never switches to mock data. Chat defaults conservatively to focus;
+explicit formatting-only API edits reuse the pack and reassess the wording.

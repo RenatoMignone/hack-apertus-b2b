@@ -27,11 +27,15 @@ class BackboneRepository:
         self.research = ResearchRepository(engine)
         self.observations = observations if observations is not None else {}
 
-    def authorize(self, connection, context):
+    def authorize(self, connection, context, *, historical=False):
         if datetime.now(timezone.utc) >= context.deadline_at:
             raise BudgetExceeded()
         try:
-            run = self.cases._run(connection, context.access, context.run_id)
+            if historical:
+                self.cases._case(connection, context.access, context.case_id)
+                run = connection.execute(select(tables.runs).where(tables.runs.c.run_id == context.run_id)).mappings().one()
+            else:
+                run = self.cases._run(connection, context.access, context.run_id)
         except ValueError as error:
             raise StaleRevision() from error
         if (run["case_id"], run["input_id"], run["snapshot_id"]) != (context.case_id, context.input_id, context.snapshot_id):
@@ -121,7 +125,7 @@ class BackboneRepository:
         if len(evidence_ids) > 100:
             raise BudgetExceeded()
         with transaction(self.engine, context.access) as connection:
-            self.authorize(connection, context)
+            self.authorize(connection, context, historical=True)
             rows = self._evidence(connection, context, evidence_ids)
             return [self._project(connection, context, rows[key]) for key in dict.fromkeys(evidence_ids)]
 

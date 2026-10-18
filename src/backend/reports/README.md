@@ -17,7 +17,10 @@ truth approval.
 
 PDF imports ReportLab lazily, embeds its packaged Vera fonts and uses the supplied
 challenge-only English logo without modification. No network/inference/retrieval.
-Only kept reasons and their exact source passages are exported; sources retain
+Export includes an attributed company introduction, Bern objectives and needs
+from the frozen interpretation, followed by kept reasons and exact passages.
+The worker supplies `PdfInput.interpretation`; legacy direct renderer callers
+may omit it. Sources retain
 dates, public URLs, origin/review flags and caveats. Invalid/unmapped kept claims
 or missing support are rejected. Identical input produces identical bytes.
 Missing library/logo/font is unavailable. The packaged logo must remain accessible

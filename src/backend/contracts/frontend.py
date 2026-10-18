@@ -36,6 +36,7 @@ def evidence_view(record, number):
 def case_view(data, evidence):
     """Project actual stored records onto CaseDetail, retaining review hash extensions."""
     from backend.contracts.pipeline import DraftRevision, ReportEvidencePack
+    from backend.contracts.presentation import public_limitations
     case = data["case"]
     interpretation = data["interpretation"]
     choices = {str(row["result_id"]) + ":" + row["reason_key"]: row["selection"] or "none" for row in data["reasons"]}
@@ -58,16 +59,19 @@ def case_view(data, evidence):
             "parentId": str(row["parent_id"]) if row["parent_id"] else None, "createdAt": row["created_at"].isoformat(),
             "changeNote": draft.change_note, "changedReasonIds": [r["id"] for r in reasons],
             "company": {"summary": pack.interpretation.company_summary, "facts": []},
-            "reasons": reasons, "openQuestions": draft.open_questions, "similarCases": [], "trace": draft.trace,
+            "reasons": reasons, "openQuestions": public_limitations(draft.open_questions), "similarCases": [], "trace": draft.trace,
             "coverage": {"snapshotDate": (pack_row.get("snapshot_date") or pack_row["created_at"]).isoformat(), "institutions": sorted({entry["institution"] for reason in reasons for entry in reason["entries"] if entry["institution"] != "Other"}),
-                "limitations": pack.gaps, "resultKind": {"complete": "ok", "partial": "partial", "no_match": "no_match"}[pack.outcome]},
+                "limitations": public_limitations(pack.gaps), "resultKind": {"complete": "ok", "partial": "partial", "no_match": "no_match"}[pack.outcome]},
             "emptyMessage": "No supported match in the available sources" if pack.outcome == "no_match" else None,
             "resultHash": row["result_hash"], "packId": str(row["pack_id"]), "packHash": pack_row["pack_hash"]})
-    status = {"ready_for_review": "in_review"}.get(case["status"], case["status"])
-    if status not in {"draft", "researching", "in_review", "pitch_sent", "closed_visit", "closed_no_interest", "on_hold"}:
+    status = {"ready_for_review": "in_review", "draft": "researching", "on_hold": "researching",
+        "closed_visit": "closed", "closed_no_interest": "closed"}.get(case["status"], case["status"])
+    if status not in {"researching", "in_review", "pitch_sent", "closed"}:
         status = "researching"
     summary = {"id": str(case["case_id"]), "companyLabel": interpretation.get("company_name") or "New case",
         "oneLineNeed": interpretation.get("company_summary") or "Research pending", "status": status,
+        "onHold": case.get("on_hold", False) or case["status"] == "on_hold",
+        "outcome": case.get("outcome") or (case["status"][7:] if case["status"].startswith("closed_") else None),
         "createdAt": case["created_at"].isoformat(),
         "updatedAt": (data["results"][-1]["created_at"] if data["results"] else case["created_at"]).isoformat(),
         "keptCount": sum(value == "kept" for key, value in choices.items() if current and key.startswith(current + ":"))}

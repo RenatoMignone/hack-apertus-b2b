@@ -1,7 +1,10 @@
 import type { ActionItem, CaseOutcome, CaseDetail, CaseStatus, CaseSummary, RunStage, Selection } from '../types/contract';
 import { mockApi } from './mockApi';
+import { createHttpApi } from './httpApi';
+import { accessToken } from './session';
 
-/** Everything the UI needs from the backend. Swap mockApi for an HTTP client when the brain is ready. */
+export type ReportExpectation = { resultId: string; resultHash: string };
+/** Browser transport; HTTP is the default, mock mode is an explicit demo choice. */
 export interface NavigatorApi {
   listCases(): Promise<CaseSummary[]>;
   getCase(id: string): Promise<CaseDetail | null>;
@@ -10,10 +13,10 @@ export interface NavigatorApi {
   runCase(caseId: string, onStage: (s: RunStage) => void): Promise<CaseDetail>;
   sendMessage(caseId: string, text: string, onStage: (s: RunStage) => void): Promise<CaseDetail>;
   answerFollowUp(caseId: string, turnId: string, answer: string, onStage: (s: RunStage) => void): Promise<CaseDetail>;
-  setSelection(caseId: string, reasonId: string, selection: Selection): Promise<CaseDetail>;
+  setSelection(caseId: string, reasonId: string, selection: Selection, expected?: ReportExpectation): Promise<CaseDetail>;
   setStatus(caseId: string, status: CaseStatus): Promise<CaseDetail>;
   setCurrentRevision(caseId: string, revisionId: string): Promise<CaseDetail>;
-  exportDeck(caseId: string): Promise<{ filename: string; blob: Blob }>;
+  exportDeck(caseId: string, expected?: ReportExpectation): Promise<{ filename: string; blob: Blob }>;
   /** The case the user opened most recently, for "Continue where you left off". */
   getLastOpened(): Promise<CaseSummary | null>;
   /** Put a case on hold / take it off hold, or record the outcome of a closed case. */
@@ -27,4 +30,6 @@ export interface NavigatorApi {
   subscribe(listener: () => void): () => void;
 }
 
-export const api: NavigatorApi = mockApi;
+export const apiMode = import.meta.env.VITE_API_MODE === 'mock' ? 'mock' : 'http';
+export const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL ?? '';
+export const api: NavigatorApi = apiMode === 'mock' ? mockApi : createHttpApi({ baseUrl: apiBaseUrl, token: accessToken });

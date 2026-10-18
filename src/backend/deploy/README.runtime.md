@@ -4,12 +4,18 @@ API and durable worker also run with the Python commands in the
 [runtime handoff](../../../docs/team/runtime/HANDOFF.md). The existing data/
 LangGraph/Langfuse stack stays independently owned and is not started by runtime.
 
-`Dockerfile.runtime` copies only backend source/dependencies, installs the locked
+`Dockerfile.runtime` copies backend source/dependencies and the supplied unchanged
+English logo, injects its path, installs the locked
 requirements, and runs as UID 10001. Supply an operator-verified digest-pinned
 `PYTHON_RUNTIME_IMAGE`; there is no guessed default digest. `runtime.compose.yaml`
 starts API/worker on a pre-existing private navigator network, API published only
 on localhost. Operator configuration must use Docker-internal DB/storage/model
 addresses, not the host SSH tunnel addresses in the developer env example.
+Compose sets `RUNTIME_PDF_LOGO_PATH=/app/assets/Logo_SF_BE_EN.png` explicitly so a
+repo-relative path in the env file cannot override it. For direct Docker commands,
+use that container path too. Install/package optional local-model/web extras for the actual target
+platform and mount verified configurations/assets explicitly. The core Dockerfile
+does not include model weights or certify an operational offline deployment.
 
 ```bash
 docker compose -f src/backend/deploy/runtime.compose.yaml config

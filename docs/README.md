@@ -1,14 +1,15 @@
 # Project documentation
 
-**18 October 2026 · Final schema contract v1; live application integration pending.**
+**18 October 2026 · Backend lanes and HTTP frontend integrated; live deployment pending.**
 Bern Economic Development Agency — Research & Expertise Navigator.
 Current pilot: Bern diabetes technology; the engine must support other domains
 through versioned profiles and rebuildable retrieval indexes.
 
-For the current three-person backend build, use the
+Start with the [integration baseline and deployment gates](team/INTEGRATION.md).
+The original three-person backend build used the
 [exclusive lane plan and prompts](team/PARALLEL_BACKEND.md) and
 [v1 service interfaces](team/SERVICE_CONTRACTS.md). They give each agent an explicit
-path allowlist, shared contract bootstrap and independent handoff.
+path allowlists, shared contract bootstrap and independent handoffs.
 
 ## Start here
 

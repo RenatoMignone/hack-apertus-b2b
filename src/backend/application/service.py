@@ -33,6 +33,9 @@ class RuntimeApplication:
         current = data["case"]["current_result_id"]
         if current:
             projected["selectionHash"] = await self.execute("selection_state", access, case_id, current)
+        run_id = await self.execute("current_run", access, case_id)
+        if run_id:
+            projected["currentRun"] = await self.execute("run_view", access, case_id, run_id)
         return projected
 
     async def list_cases(self, access, *, limit=50, offset=0):

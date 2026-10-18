@@ -1,9 +1,30 @@
 # Backend workspace
 
-Python 3.12 data services are implemented: PostgreSQL repositories and migrations,
-hybrid retrieval, artifact storage, checkpoint persistence, local tracing and
-the `navigator` administration CLI. See [deployment](../../docs/data/DEPLOYMENT.md).
-The HTTP server/framework and full product workflows remain separate work.
+Python 3.12–3.14 backend: authenticated FastAPI, durable LangGraph worker,
+PostgreSQL/pgvector, reasoning/evidence/draft adapters, actual PDF, artifacts,
+checkpoints and masked tracing. [Integration status](../../docs/team/INTEGRATION.md)
+separates verified synthetic execution from live deployment prerequisites.
+
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r src/backend/requirements.lock
+python -m pip install --no-deps -e src/backend
+python -m pytest src/backend/tests -m "not integration" -q
+navigator-runtime --env-file .env serve --host 127.0.0.1 --port 8000
+# Separate terminal, same environment:
+navigator-runtime --env-file .env worker
+```
+
+Copy root `.env.example` privately and fill identity/token bindings, application
+DSN, checkpoint DB, artifact access, published profile and verified embedding
+configuration/assets. Startup never migrates, ingests a corpus or downloads weights.
+The maintainer must explicitly apply migrations through `0007_frontend_lifecycle`
+and set up the separate framework database. See [deployment](../../docs/data/DEPLOYMENT.md).
+
+Core/test dependencies are locked. Local embedding/reranker and connected web
+packages are optional `.[local-models,web]` extras; provision and lock them for the
+target platform before offline packaging. Their model assets remain external.
 
 | Component | Local guidance |
 | --- | --- |
@@ -20,17 +41,27 @@ The HTTP server/framework and full product workflows remain separate work.
 | Server configuration and profiles | [config](config/README.md) |
 
 The [source architecture](../../docs/plans/SOURCE_STRUCTURE.md) owns component
-boundaries; [HTTP handoff](../../docs/plans/FRONTEND_BACKEND_API.md) owns the draft
+boundaries; [HTTP handoff](../../docs/plans/FRONTEND_BACKEND_API.md) owns the current
 frontend integration. Components can share one backend initially. Keep files
 focused on single purposes, dependencies acyclic and SQL inside data adapters.
-The future bootstrap wires adapters; it must not become the business-logic file.
+`application.factories` wires the three lanes without embedding business logic.
 
-## U8 implementation boundary
+## Tests and local browser smoke
 
-The agreed [case pipeline](../../docs/plans/REPORT_PROCESSING_BOUNDARIES.md) defines interpretation, parallel DB/web research,
-supported frozen packs, reason-card review and PDF-first export. This change
-implements contracts and persistence only; frontend remains on mocks. Live models,
-search/scraping, HTTP, LangGraph execution and rendering are future integrations.
+For the full suite, set `NAVIGATOR_TEST_ADMIN_DSN` to an **isolated disposable
+PostgreSQL cluster with pgvector and the NOLOGIN navigator_app role**. Tests create
+and delete their own databases. Never use Eric's shared development database.
+
+```bash
+python -m pytest src/backend/tests -q
+# Optional: local synthetic API + worker, real A/B/C code, memory checkpoints.
+PYTHONPATH=src python -m backend.tests.runtime.smoke
+```
+
+The smoke server requires that same test-admin DSN, binds only localhost:8000,
+prints its test-only token and removes its temporary database on shutdown. Start
+the [frontend](../frontend/README.md) separately. Synthetic model/embedding adapters
+are explicit here and never selected by production factories.
 
 ## Feature agent entry point
 

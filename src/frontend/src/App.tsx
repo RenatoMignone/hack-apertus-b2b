@@ -6,10 +6,14 @@ import BoardPage from './pages/BoardPage';
 import ActionsPage from './pages/ActionsPage';
 import NewCasePage from './pages/NewCasePage';
 import CaseWorkspace from './pages/CaseWorkspace';
+import ConnectionGate from './components/ConnectionGate';
+import ApiErrors from './components/ApiErrors';
 
 export default function App() {
   return (
     <ToastProvider>
+    <ConnectionGate>
+    <ApiErrors />
     <div className="flex h-full flex-col">
       <TopNav />
       <main className="min-h-0 flex-1 overflow-hidden">
@@ -23,6 +27,7 @@ export default function App() {
         </Routes>
       </main>
     </div>
+    </ConnectionGate>
     </ToastProvider>
   );
 }

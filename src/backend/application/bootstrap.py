@@ -26,9 +26,9 @@ class Registry:
                 if not url:
                     raise ServiceUnavailable()
                 engine = engine_for(url)
-                check_schema(engine)  # never migrate at application startup
-                artifacts = Settings.from_env(database_url=url).artifact_store()
                 try:
+                    check_schema(engine)  # never migrate at application startup
+                    artifacts = Settings.from_env(database_url=url).artifact_store()
                     services = Services.configured(self.settings, engine, artifacts)
                 except Exception:
                     engine.dispose()

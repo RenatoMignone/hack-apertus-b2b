@@ -65,7 +65,7 @@ class CaseRepository:
             connection.execute(insert(tables.turns).values(turn_id=uuid4(), case_id=case_id, role="user",
                 message=instruction, input_id=input_id))
             connection.execute(update(tables.cases).where(tables.cases.c.case_id == case_id).values(
-                revision=expected_revision + 1, current_input_id=input_id, current_result_id=None, status="draft"))
+                revision=expected_revision + 1, current_input_id=input_id, current_result_id=None, status="draft", outcome=None))
             connection.execute(update(tables.exports).where(tables.exports.c.result_id.in_(
                 select(tables.results.c.result_id).where(tables.results.c.case_id == case_id))).values(status="stale"))
             return {"input_id": input_id, "reusable_pack_id": reusable_pack, "requires_retrieval": kind != "formatting",

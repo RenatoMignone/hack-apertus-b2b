@@ -295,3 +295,23 @@ default switch is claimed. In-process typed ports, not HTTP between backend modu
 New source-derived case claims must preserve same-scope evidence and origin lineage.
 Only task-owned Docker resources may be stopped; local inspection found no running
 containers and the prior schema test container had already been removed.
+
+## D19 — Integrate the backend lanes and HTTP frontend (18 October 2026)
+
+Provenance: the user requested review/fixes and merge of `backend/runtime`,
+`backend/intelligence`, `backend/backbone` and `ui-polish`, then explicitly chose
+to implement the HTTP connection now. [Integration handoff](../team/INTEGRATION.md)
+records reviewed branch tips, compatibility fixes, verified scope and prerequisites.
+
+FastAPI/LangGraph, typed A/B/C adapters and deterministic PDF are composed in one
+backend. The frontend defaults to authenticated HTTP; memory-only operator tokens
+and explicit demo mode replace automatic mock serving. Board hold/outcome fields
+and action notes persist. Exact visible report hashes and all-reviewed/one-kept
+gates bind PDF export. Shared schema/config changes are centralized here.
+
+Additive migration 0006 restricts case-scope provisioning and private runtime RLS;
+0007 persists the UI fields. Historical migrations/assets/transcripts are preserved.
+Disposable PostgreSQL tests and browser smoke use synthetic model/embedding adapters;
+they establish integration behavior, not research quality or a live shared-host
+deployment. No shared migration, ingestion/index publication or model download.
+Future work starts in fresh branches from updated main, retaining completed lanes.

@@ -7,6 +7,8 @@ x-runtime: &runtime
     args:
       PYTHON_RUNTIME_IMAGE: ${PYTHON_RUNTIME_IMAGE:?Supply a verified digest-pinned Python image}
   env_file: ${RUNTIME_ENV_FILE:-../.env}
+  environment:
+    RUNTIME_PDF_LOGO_PATH: /app/assets/Logo_SF_BE_EN.png
   restart: unless-stopped
   init: true
   networks: [navigator]

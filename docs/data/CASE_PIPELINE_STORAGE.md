@@ -1,6 +1,10 @@
 # Case pipeline persistence
 
 **18 October 2026 · Final schema contract v1 (D18); U8/D16 processing retained.**
+Additive [integration changes](../team/INTEGRATION.md) advance head to
+`0007_frontend_lifecycle`: 0006 adds restricted case-scope provisioning/private
+runtime RLS, and 0007 adds independent case hold/outcome fields and action notes.
+Historical migrations stay frozen; the shared host has not been migrated here.
 One `navigator` database retains `corpus`, `taxonomy`, `retrieval`, `cases`, `ops`.
 LangGraph and Langfuse retain their own databases/stores. No three application
 DBs or cross-database foreign keys are introduced.
@@ -14,7 +18,7 @@ DBs or cross-database foreign keys are introduced.
 | `cases.draft_reasons` | Reason row ID, stable reason key → result; content/support hash and typed payload |
 | `cases.reason_claims` | Reason row → validated corpus claim IDs |
 | `cases.reason_selections` | One current editorial selection per reason row; kept/rejected/none; reviewer/time |
-| `cases.action_items` | Action ID → case; question, ask role, open/asked/done |
+| `cases.action_items` | Action ID → case; question, ask role, open/asked/done and optional answer note |
 | `cases.reviews` | Exact result and immutable selection hash; approval is not truth validation |
 | `cases.exports` | Existing export lineage plus format; PDF first, PPTX later |
 
@@ -34,8 +38,9 @@ An empty supported-claim list is valid only with an explicit partial/no-match
 limitation. No semantic validator is implemented by storage.
 
 Draft persistence requires a supported `DraftAssessment` of the exact draft hash;
-the stored result includes that validator assertion. Live semantic validation is
-not supplied by this change. Reason revisions link claims to existing frontend cards. Carry editorial choices
+the stored result includes that validator assertion. Model-backed semantic adapters
+are now integrated; their quality is not established by persistence tests.
+Reason revisions link claims to existing frontend cards. Carry editorial choices
 only for identical content/support hashes; changed cards reset to none. Every
 card must be reviewed and at least one kept before an accepted review/export.
 Review hashes include the selection set; selection changes stale old exports.

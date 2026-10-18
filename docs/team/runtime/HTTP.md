@@ -1,8 +1,9 @@
 # Runtime HTTP integration for the frontend owner
 
-The existing React code is unchanged. Read-only reference:
-`src/frontend/src/api/index.ts`, `types/contract.ts`. A real client can implement
-NavigatorApi using the API below, without exposing DB/model keys. Polling is the
+The HTTP client is now implemented in `src/frontend/src/api/httpApi.ts` under the
+user-authorized integration. [Current API](../../plans/FRONTEND_BACKEND_API.md)
+and [integration notes](../INTEGRATION.md) supersede the original pending-client
+instructions below. The original lane A mapping follows. Polling is the
 baseline; the backend never runs inference in an HTTP background task.
 
 Every protected request has `Authorization: Bearer <user-token>`. Every mutation
@@ -44,7 +45,7 @@ cancel a run. Retry cancellation or mutations with their original idempotency ke
 
 CaseDetail adds `revision`, `inputId`, and `selectionHash`; each BriefRevision adds
 `resultHash`, `packId`, `packHash`. Evidence adds `origin` and `reviewStatus`; the
-frontend owner needs source badges. Editorial none/kept/rejected remains distinct
+frontend displays source badges. Editorial none/kept/rejected remains distinct
 from factual support. The backend requires every card reviewed and at least one
 kept before an accepted review. Send `expected_result_hash`,
 `expected_selection_hash`, decision `accepted`; the response gives review_id.

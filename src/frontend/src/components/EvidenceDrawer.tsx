@@ -52,6 +52,10 @@ export default function EvidenceDrawer({ ev, onClose }: { ev: Evidence; onClose:
           )}
         </blockquote>
         <p className="text-muted">{ev.relevance}</p>
+        {ev.origin && <p className="rounded-lg bg-canvas p-2 text-xs text-muted">
+          {ev.origin === 'web' ? 'New case research' : 'Pinned corpus'} · {ev.reviewStatus ?? 'unreviewed'} source.
+          {' '}Claim support does not certify the source.
+        </p>}
         <a
           href={ev.url}
           target="_blank"

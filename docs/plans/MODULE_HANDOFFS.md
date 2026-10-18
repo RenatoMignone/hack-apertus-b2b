@@ -6,25 +6,25 @@ read this table and only the focused owners for the assigned feature. The
 are the common system design. These are logical modules in one backend, not a
 requirement to deploy a service for every row.
 
-For the current three-backend-person pass, the
+The [integration handoff](../team/INTEGRATION.md) describes the merged baseline.
+For the original three-backend-person pass, the
 [exclusive ownership plan](../team/PARALLEL_BACKEND.md) and its three prompts
 supersede the broad example write boundaries below. Use its shared
 [service contracts](../team/SERVICE_CONTRACTS.md); do not independently define ports.
 
 ## Current baseline and boundaries
 
-Implemented: Python data contracts, PostgreSQL/pgvector repositories and migrations
-through `0005_finalize_schema`, artifact storage, hybrid retrieval, checkpoint port,
-masked tracing, and synthetic integration tests. React/Vite runs on a mock API.
-Not implemented: HTTP server/use cases, executable LangGraph case graph, live
-reasoning/embedding/reranking/search/fetch adapters, semantic validators or PDF
-renderer. No team-host migration or live model benchmark is claimed.
+Implemented: authenticated FastAPI/application, durable LangGraph worker, A/B/C
+reasoning/retrieval/evidence adapters, deterministic PDF, HTTP React frontend,
+PostgreSQL/pgvector through `0007_frontend_lifecycle`, artifacts, checkpoints and
+masked tracing. Cross-lane tests use synthetic inference/embeddings. Team-host
+migration, verified model assets, published corpus and live deployment remain gates.
 
 **The frontend belongs to another teammate. Do not modify anything under
 `src/frontend/` in backend/documentation tasks.** Read its existing `NavigatorApi`
 and types to understand the consumer. Describe needed changes in the HTTP handoff
-and coordinate them with that teammate. Source flags and stricter review/export
-rules are planned additions, not fields or behavior already present in the UI.
+and coordinate them with that teammate. Source flags, HTTP polling and strict
+review/export gates are now implemented; mock mode is an explicit demo choice.
 The historical sibling repository, supplied assets/transcripts and submission
 root template remain protected. Do not commit/push or migrate shared services
 unless the current task explicitly authorizes it.

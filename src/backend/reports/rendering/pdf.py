@@ -88,6 +88,15 @@ class ReportLabPdfRenderer:
         story = [Image(str(self.logo_path), width=190, height=190 * height / width, hAlign="LEFT"),
                  Spacer(1, 24), para("Bern opportunity brief", title),
                  para("Reviewed opportunities and supporting public evidence", small)]
+        if report.interpretation:
+            company = report.interpretation
+            story.append(para(company.company_name or "Company context", heading))
+            story.append(para("Operator-provided context; not independently verified", small))
+            story.append(para(company.company_summary))
+            for label, values in (("Bern objectives", company.bern_intents), ("Needs", company.needs)):
+                if values:
+                    story.append(para(label, heading))
+                    story.extend(para("- " + value) for value in values)
         nums = {e.evidence_id: i + 1 for i, e in enumerate(evidence)}
         for index, reason in enumerate(kept, 1):
             story.append(para(f"{index}. {reason.headline}", heading))
@@ -99,7 +108,8 @@ class ReportLabPdfRenderer:
                 entry_refs = list(dict.fromkeys(nums[e] for c in entry.claim_ids for e in mapping[c]))
                 story.append(para(f"{entry.name} | {entry.institution} " +
                                   " ".join(f"[{n}]" for n in entry_refs), small))
-        caveats = list(dict.fromkeys([*report.limitations, *report.draft.open_questions]))
+        from backend.contracts.presentation import public_limitations
+        caveats = public_limitations([*report.limitations, *report.draft.open_questions])
         if caveats:
             story.append(para("Limitations and next steps", heading))
             story.extend(para("- " + item) for item in caveats)

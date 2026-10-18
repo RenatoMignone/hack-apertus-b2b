@@ -10,6 +10,7 @@ import Results from '../components/Results';
 import RunStepper from '../components/RunStepper';
 import { useToast } from '../components/Toast';
 import { Button, CaseFlags, Skeleton, StatusSelect, useTitle } from '../components/ui';
+import { reportApiError } from '../components/ApiErrors';
 
 function useWide(query = '(min-width: 1100px)') {
   const [wide, setWide] = useState(() => window.matchMedia(query).matches);
@@ -116,6 +117,7 @@ export default function CaseWorkspace() {
   const wide = useWide();
   const [detail, setDetail] = useState<CaseDetail | null | undefined>(undefined);
   const [running, setRunning] = useState(false);
+  const [error, setError] = useState('');
   const [stage, setStage] = useState<RunStage>('interpreting');
   const [drawer, setDrawer] = useState<string | null>(null);
   const [flash, setFlash] = useState<Set<string>>(new Set());
@@ -141,11 +143,22 @@ export default function CaseWorkspace() {
   };
 
   useEffect(() => {
+    let alive = true;
     setStarted(false);
+    setRunning(false); setError('');
     setDrawer(null);
     setDetail(undefined);
-    api.getCase(id).then(setDetail);
+    api.getCase(id).then((data) => { if (alive) setDetail(data); }).catch((reason) => {
+      if (alive) setError(reason instanceof Error ? reason.message : 'Cannot load this case.');
+    });
+    return () => { alive = false; };
   }, [id]);
+
+  const failed = (reason: unknown) => {
+    setRunning(false);
+    setError(reason instanceof Error ? reason.message : 'The request could not be completed.');
+    void api.getCase(id).then(setDetail).catch(reportApiError);
+  };
 
   // Show an unread dot when the agent replies while the chat is closed.
   useEffect(() => {
@@ -157,17 +170,19 @@ export default function CaseWorkspace() {
   // A freshly created case runs its first search here.
   useEffect(() => {
     const wantsRun = (location.state as { run?: boolean } | null)?.run;
-    if (!detail || started || !wantsRun || detail.revisions.length) return;
+    if (!detail || started) return;
+    const active = detail.currentRun && ['queued', 'running'].includes(detail.currentRun.status);
+    if (!active && !(wantsRun && !detail.currentRun && !detail.revisions.length)) return;
     setStarted(true);
     setRunning(true);
     api.runCase(detail.case.id, setStage).then((d) => {
       setDetail(d);
       setRunning(false);
-    });
+    }).catch(failed);
   }, [detail, location.state, started]);
 
   const revision = useMemo(
-    () => detail?.revisions.find((r) => r.id === detail.currentRevisionId) ?? detail?.revisions[detail.revisions.length - 1],
+    () => detail?.revisions.find((r) => r.id === detail.currentRevisionId),
     [detail],
   );
 
@@ -188,6 +203,7 @@ export default function CaseWorkspace() {
   if (detail === undefined)
     return (
       <div className="mx-auto max-w-3xl space-y-3 px-6 py-8">
+        {error && <p role="alert" className="text-brand">{error}</p>}
         <Skeleton className="h-28" />
         <Skeleton className="h-20" />
         <Skeleton className="h-20" />
@@ -204,22 +220,29 @@ export default function CaseWorkspace() {
     setDetail({ ...detail, turns: [...detail.turns, { id: 'pending', role: 'operator', text, createdAt: new Date().toISOString() }] });
     setRunning(true);
     setStage('interpreting');
-    api.sendMessage(detail.case.id, text, setStage).then(afterAgent);
+    setError('');
+    api.sendMessage(detail.case.id, text, setStage).then(afterAgent).catch(failed);
   };
   const answer = (turnId: string, a: string) => {
     setRunning(true);
     setStage('interpreting');
-    api.answerFollowUp(detail.case.id, turnId, a, setStage).then(afterAgent);
+    setError('');
+    api.answerFollowUp(detail.case.id, turnId, a, setStage).then(afterAgent).catch(failed);
   };
   const select = async (reasonId: string, s: Selection) => {
     const r = revision?.reasons.find((x) => x.id === reasonId);
     const prev = r?.selection ?? 'none';
-    setDetail(await api.setSelection(detail.case.id, reasonId, s));
+    const expected = revision?.resultHash ? { resultId: revision.id, resultHash: revision.resultHash } : undefined;
+    setDetail(await api.setSelection(detail.case.id, reasonId, s, expected));
     if (s === 'kept') toast('Kept for the pitch');
-    if (s === 'rejected') toast(`Hidden: ${r?.headline ?? 'item'}`, () => api.setSelection(detail.case.id, reasonId, prev).then(setDetail));
+    if (s === 'rejected') toast(`Hidden: ${r?.headline ?? 'item'}`, () => api.setSelection(detail.case.id, reasonId, prev, expected).then(setDetail));
   };
   const setStatus = (s: CaseStatus) => api.setStatus(detail.case.id, s).then(setDetail);
   const kept = revision?.reasons.filter((r) => r.selection === 'kept').length ?? 0;
+  const retry = () => {
+    setError(''); setRunning(true);
+    void api.runCase(detail.case.id, setStage).then(afterAgent).catch(failed);
+  };
 
   const chat = (
     <ChatPanel
@@ -259,6 +282,11 @@ export default function CaseWorkspace() {
           </div>
         )}
       </div>
+
+      {(error || detail.currentRun?.status === 'failed') && <div role="alert" className="border-b border-line bg-white px-6 py-3 text-sm text-brand">
+        {error || 'Research stopped before a report could be published.'}
+        {!running && <button className="ml-3 underline" onClick={retry}>Retry / resume research</button>}
+      </div>}
 
       <div className="relative flex min-h-0 flex-1">
         <div className="min-w-0 flex-1 overflow-y-auto" id="case-scroll">

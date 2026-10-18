@@ -70,7 +70,7 @@ class DraftRepository:
                 connection.execute(insert(t.reason_selections).values(reason_row_id=reason_row_id,
                     selection=choice or "none", reviewer_id=access.principal_id))
             connection.execute(update(t.cases).where(t.cases.c.case_id == case_id).values(
-                current_result_id=result_id, revision=expected_revision + 1, status="ready_for_review"))
+                current_result_id=result_id, revision=expected_revision + 1, status="ready_for_review", outcome=None))
             connection.execute(update(t.exports).where(t.exports.c.result_id.in_(select(t.results.c.result_id).where(
                 t.results.c.case_id == case_id)), t.exports.c.status == "ready").values(status="stale"))
             return result_id

@@ -95,9 +95,10 @@ class FixtureBackbone:
         self.calls["persist"] += 1
         if not batch.claims:
             return PersistedClaims()
-        scope, source = uuid4(), uuid4()
+        source = uuid4()
         with self.store.engine.begin() as c:
-            c.execute(insert(t.scopes).values(scope_id=scope, kind="case", case_id=context.case_id, access_policy_id="test-only"))
+            scope = c.execute(select(t.scopes.c.scope_id).where(t.scopes.c.kind == "case",
+                t.scopes.c.case_id == context.case_id)).scalar_one()
             c.execute(insert(t.sources).values(source_id=source, scope_id=scope,
                 canonical_origin="https://fixture.invalid", registry_ref="synthetic-copy-only"))
         grant_scope(self.store.engine, context.access.principal_id, scope, write=True)

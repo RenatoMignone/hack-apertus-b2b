@@ -21,6 +21,10 @@ fixtures. `worker.py` executes jobs with heartbeat, run locks and checkpoints;
 
 Read the [runtime handoff](../../../docs/team/runtime/HANDOFF.md) for factory
 signatures, restart guarantees, startup commands and remaining cross-lane work.
+The [integration handoff](../../../docs/team/INTEGRATION.md) supersedes its original
+missing-factory list: `factories.py` composes the actual A/B/C adapters. Migration
+0006 provisions a case scope through an owner-checked DB function and restricts
+private stage/command reads; 0007 persists independent UI flags/action notes.
 Add integration tests only in `tests/runtime/`; preserve data/ and B's modules.
 
 ## Parallel feature routing

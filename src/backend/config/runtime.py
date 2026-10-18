@@ -2,10 +2,10 @@
 import json
 import os
 from dataclasses import dataclass, field
-from urllib.parse import urlsplit
 from uuid import UUID
 
 from backend.contracts.data import AccessContext
+from backend.config.endpoints import local_inference_url
 
 
 @dataclass(frozen=True)
@@ -45,6 +45,15 @@ class RuntimeSettings:
     langfuse_url: str = ""
     langfuse_public_key: str = field(default="", repr=False)
     langfuse_secret_key: str = field(default="", repr=False)
+    pdf_logo_path: str = ""
+    embedding_configuration: str = ""
+    embedding_model_path: str = ""
+    reranker_configuration: str = ""
+    reranker_model_path: str = ""
+    model_device: str = "cpu"
+    web_user_agent: str = ""
+    web_allowed_hosts: tuple[str, ...] = ()
+    brave_api_key: str = field(default="", repr=False)
 
     def __post_init__(self):
         if self.mode not in {"connected", "offline"} or not 1 <= self.max_research_rounds <= 3:
@@ -55,9 +64,7 @@ class RuntimeSettings:
             raise ValueError("invalid token or input budget")
         if not 15 <= self.worker_lease_seconds <= 3600:
             raise ValueError("worker lease must be 15–3600 seconds")
-        if self.mode == "offline" and urlsplit(self.llm_base_url).hostname not in {
-            "localhost", "127.0.0.1", "::1", "apertus", "llm"
-        }:
+        if self.mode == "offline" and not local_inference_url(self.llm_base_url):
             raise ValueError("offline inference requires an explicit local model endpoint")
         if "*" in self.cors_origins:
             raise ValueError("CORS requires explicit origins")
@@ -91,4 +98,12 @@ class RuntimeSettings:
             template_version=os.getenv("RUNTIME_TEMPLATE_VERSION", "unconfigured"),
             renderer_version=os.getenv("RUNTIME_RENDERER_VERSION", "unconfigured"),
             langfuse_url=os.getenv("LANGFUSE_BASE_URL", ""), langfuse_public_key=os.getenv("LANGFUSE_PUBLIC_KEY", ""),
-            langfuse_secret_key=os.getenv("LANGFUSE_SECRET_KEY", ""))
+            langfuse_secret_key=os.getenv("LANGFUSE_SECRET_KEY", ""),
+            pdf_logo_path=os.getenv("RUNTIME_PDF_LOGO_PATH", ""),
+            embedding_configuration=os.getenv("EMBEDDING_CONFIGURATION", ""),
+            embedding_model_path=os.getenv("EMBEDDING_MODEL_PATH", ""),
+            reranker_configuration=os.getenv("RERANKER_CONFIGURATION", ""),
+            reranker_model_path=os.getenv("RERANKER_MODEL_PATH", ""),
+            model_device=os.getenv("MODEL_DEVICE", "cpu"), web_user_agent=os.getenv("WEB_USER_AGENT", ""),
+            web_allowed_hosts=tuple(x.strip() for x in os.getenv("WEB_ALLOWED_HOSTS", "").split(",") if x.strip()),
+            brave_api_key=os.getenv("BRAVE_API_KEY", ""))

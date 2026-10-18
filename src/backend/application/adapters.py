@@ -29,6 +29,9 @@ class Services:
     def configured(cls, settings, engine, artifacts):
         def adapter(spec):
             return load_factory(spec, settings=settings, engine=engine, artifacts=artifacts)
-        return cls(reasoning=adapter(settings.reasoning_factory), backbone=adapter(settings.backbone_factory),
+        services = cls(reasoning=adapter(settings.reasoning_factory), backbone=adapter(settings.backbone_factory),
             web=adapter(settings.web_factory) if settings.mode == "connected" and settings.web_factory else None,
             pdf=adapter(settings.pdf_factory))
+        from backend.application.factories import connect_observations
+        connect_observations(services.backbone, services.web)
+        return services

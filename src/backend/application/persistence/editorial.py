@@ -7,7 +7,7 @@ from backend.contracts.services import StaleRevision
 from backend.data import schema as t
 from backend.data.repositories.drafts import selection_hash
 
-CASE_STATUSES = {"draft", "researching", "in_review", "pitch_sent", "closed_visit", "closed_no_interest", "on_hold"}
+CASE_STATUSES = {"draft", "researching", "in_review", "pitch_sent", "closed", "closed_visit", "closed_no_interest", "on_hold"}
 
 
 class Editorial:
@@ -44,7 +44,20 @@ class Editorial:
             if body.get("status"):
                 if body["status"] not in CASE_STATUSES:
                     raise ValueError("invalid case status")
-                values["status"] = "ready_for_review" if body["status"] == "in_review" else body["status"]
+                status = body["status"]
+                if status == "on_hold":
+                    values["on_hold"] = True
+                else:
+                    values["status"] = "ready_for_review" if status == "in_review" else (
+                        "closed" if status.startswith("closed") else status)
+                    values["outcome"] = (status[7:] if status.startswith("closed_") else
+                        case["outcome"] if status == "closed" else None)
+            if body.get("on_hold") is not None:
+                values["on_hold"] = body["on_hold"]
+            if "outcome" in body:
+                if body["outcome"] is not None and values.get("status", case["status"]) != "closed":
+                    raise ValueError("outcome requires a closed case")
+                values["outcome"] = body["outcome"]
             if body.get("current_revision_id"):
                 result_id = UUID(body["current_revision_id"])
                 result = self._result(c, access, case_id, result_id)
@@ -61,7 +74,7 @@ class Editorial:
     def actions(self, access):
         with self.session(access) as c:
             return [{"id": str(row["action_id"]), "caseId": str(row["case_id"]), "question": row["question"],
-                "askRole": row["ask_role"], "status": row["status"]} for row in c.execute(select(t.action_items)
+                "askRole": row["ask_role"], "status": row["status"], "answer": row["answer"]} for row in c.execute(select(t.action_items)
                 .join(t.cases).where(t.cases.c.owner_id == access.principal_id, t.cases.c.namespace == access.namespace)
                 .order_by(t.action_items.c.created_at, t.action_items.c.action_id)).mappings()]
 
@@ -70,8 +83,16 @@ class Editorial:
             action = c.execute(select(t.action_items).where(t.action_items.c.action_id == action_id)).mappings().one()
             self.case(c, access, action["case_id"])
             self.repositories(c)[1].set_action_status(access, action_id, body["status"])
+            if "answer" in body:
+                c.execute(update(t.action_items).where(t.action_items.c.action_id == action_id).values(answer=body["answer"]))
             return {"id": str(action_id), "status": body["status"]}
         return self.command(access, key, f"action:{action_id}", body, callback)
+
+    def create_action(self, access, key, body):
+        def callback(c):
+            action_id = self.repositories(c)[1].action(access, UUID(body["case_id"]), body["question"], body["ask_role"])
+            return {"id": str(action_id)}
+        return self.command(access, key, "action:create", body, callback)
 
     def selection_state(self, access, case_id, result_id):
         with self.session(access) as c:

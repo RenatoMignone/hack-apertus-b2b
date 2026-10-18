@@ -25,11 +25,15 @@ class Commands:
                 return old["response"]
             response = callback(c)
             c.execute(insert(t.outbox).values(event_id=uuid4(), namespace=access.namespace, idempotency_key=digest,
-                event_type="runtime.command", status="delivered", payload={"body_hash": body_hash, "response": response}))
+                event_type="runtime.command", status="delivered", payload={"body_hash": body_hash,
+                    "principal_id": str(access.principal_id), "response": response}))
             return response
 
     def start(self, c, access, case_id, input_id, profile_id, request_id, *, instruction="", parent_id=None, pack_id=None):
         case = self.case(c, access, case_id)
+        # The restricted DB function verifies session identity and locks this owned case.
+        # It grants only this case's owner, never a browser-supplied principal/scope.
+        c.execute(text("SELECT ops.ensure_case_scope(:case)"), {"case": case_id})
         if c.execute(select(t.runs.c.run_id).where(t.runs.c.case_id == case_id, t.runs.c.status.in_(ACTIVE))).first():
             raise StaleRevision()
         if pack_id:

@@ -4,7 +4,14 @@ Active repository: **hack-apertus-submission**, Bern Economic Development Agency
 Research & Expertise Navigator. Preserve the hackathon submission template.
 Work here; the sibling `hack-apertus-liebefeld` is historical and must not change.
 
-## Current three-person backend build
+## Integrated baseline
+
+The three backend lanes and `ui-polish` are integrated. Read the
+[integration handoff](docs/team/INTEGRATION.md) before starting new work. Create
+fresh feature branches from current `main`; completed lane prompts/handoffs below
+are historical ownership records, not a ban on separately authorized integration.
+
+## Original three-person backend build
 
 Use [exclusive lane ownership and Git workflow](docs/team/PARALLEL_BACKEND.md)
 and [v1 service contracts](docs/team/SERVICE_CONTRACTS.md) for this parallel pass.
@@ -36,20 +43,21 @@ never overwrite another agent's work or independently rename shared fields.
 
 ## Current implementation and model configuration
 
-- React/Vite frontend runs on mocks. Python contracts, PostgreSQL/pgvector,
-  artifacts, retrieval, checkpoints, tracing and case persistence through migration
-  `0005_finalize_schema` are implemented. Final schema contract v1 is authoritative;
+- React/Vite defaults to authenticated HTTP, with explicit mock demo mode. Python
+  contracts, FastAPI, durable LangGraph, A/B/C adapters, semantic task stages,
+  PDF rendering and PostgreSQL persistence through `0007_frontend_lifecycle` are
+  implemented. Final schema fields are authoritative;
   read [data handoff](docs/data/INGESTION_RETRIEVAL_HANDOFF.md) before ingestion or
   retrieval work and use the generated [field reference](docs/data/SCHEMA_REFERENCE.md).
   Synthetic integration checks are not a quality/model benchmark.
-- HTTP/application integration, executable LangGraph case graph, live model and
-  web adapters, semantic validators and PDF rendering are future feature tasks.
-  A specific user feature request authorizes that scoped work; old documentation-
-  only/scaffold authorizations are historical, not a blanket ban on implementation.
+- Cross-lane execution is tested with synthetic model responses/embeddings and
+  real disposable PostgreSQL. Shared-host migration, real corpus/index population,
+  verified local model assets and a combined live provider run remain prerequisites.
 - Connected inference: CSCS via Keera, `https://gateway.keera.ch/api/v1`, default
   `apertus-v1-5-8b`. Four supplied aliases and tool/thinking rules are in
   [inference configuration](docs/data/INFERENCE_CONFIGURATION.md). Key and quotas
-  are unverified. Use root [.env.example](.env.example); no real secrets in git.
+  remain unverified for deployment; limited synthetic inference probes are in B's
+  handoff. Use root [.env.example](.env.example); no real secrets in git.
 - Embedding proposal: `google/embeddinggemma-2`, local text-only/shared host first;
   [deployment comparison](docs/data/EMBEDDING_DEPLOYMENT.md). Artifact reference is
   verified; exact revision/runtime/host and performance remain open. BGE reranker

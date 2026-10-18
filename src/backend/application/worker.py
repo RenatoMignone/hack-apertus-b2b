@@ -147,7 +147,8 @@ class Worker:
             await self.db("validate_evidence", access, prepared["run_id"], evidence)
             report = PdfInput(result_id=result_id, review_id=UUID(command["review_id"]),
                 result_hash=prepared["result_hash"], selection_hash=prepared["selection_hash"], draft=draft,
-                claims=claims, kept_reason_keys=prepared["kept"], evidence=evidence, limitations=pack.gaps,
+                interpretation=pack.interpretation, claims=claims,
+                kept_reason_keys=prepared["kept"], evidence=evidence, limitations=pack.gaps,
                 template_version=self.store.settings.template_version)
             data = await self.services.pdf.render(report)
         if not isinstance(data, bytes) or not data.startswith(b"%PDF-") or len(data) > 20_000_000:

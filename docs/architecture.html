@@ -21,12 +21,13 @@
   <div class="eyebrow">Bern Research &amp; Expertise Navigator / Architecture reference</div>
   <h1>From a few keywords<br>to a supported opportunity brief.</h1>
   <p class="lede">The full preparation path: what the operator supplies, what we collect and derive, what enters the evidence pack, and where the components run.</p>
-  <div class="meta"><span class="badge proposal">Data layer implemented · product integration pending</span><span class="badge">18 October 2026</span><span class="badge">Domain-independent core</span><span class="badge">Current pilot: diabetes technology / Bern</span></div>
+  <div class="meta"><span class="badge proposal">HTTP application integrated · live deployment pending</span><span class="badge">18 October 2026</span><span class="badge">Domain-independent core</span><span class="badge">Current pilot: diabetes technology / Bern</span></div>
 </header>
 <nav aria-label="Diagrams"><div class="links">
 <a href="#overview">01 Input &amp; overview</a><a href="#ingestion">02 Shared ingestion</a><a href="#case">03 Case preparation</a><a href="#pack">04 Evidence pack</a><a href="#report">05 Report &amp; revisions</a><a href="#domains">06 New domains</a><a href="#deployment">07 Deployment</a><a href="#data-layer">08 Data layer</a>
 </div></nav>
 <main>
+<div class="callout"><strong>Integration baseline.</strong> Backend A/B/C and the HTTP frontend are implemented; synthetic cross-module tests and a local browser-to-PDF smoke run are verified. See <a href="team/INTEGRATION.md">fixes, additive migrations through 0007 and live deployment prerequisites</a>. No shared-host migration, corpus publication or full live-model deployment is claimed.</div>
 <div class="callout"><strong>Current team handoff.</strong> <a href="plans/MODULE_HANDOFFS.md">Module ownership/read paths</a>, <a href="data/INFERENCE_CONFIGURATION.md">Keera settings</a>, <a href="data/EMBEDDING_DEPLOYMENT.md">embedding recommendation</a> and <a href="project/OPEN_QUESTIONS.md">active questions</a>. Frontend is separately owned. Connected mode enables bounded public discovery/fetch parallel to independent lexical/vector retrieval. Offline disables web tools. New sources stay case-local and flagged; supported claims feed a frozen pack. Reason keep/reject is editorial. See the compact <a href="plans/EXECUTION_GRAPH.md">execution graph</a> and <a href="data/CASE_PIPELINE_STORAGE.md">storage contract</a>.</div>
 <div class="toolbar">
 <label for="mode">Explore runtime design <select id="mode"><option value="offline">Air-gapped · primary design target</option><option value="connected">Connected · alternative</option></select></label>

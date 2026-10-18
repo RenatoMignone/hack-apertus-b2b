@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-CaseStatus = Literal["draft", "researching", "in_review", "pitch_sent", "closed_visit", "closed_no_interest", "on_hold"]
+CaseStatus = Literal["draft", "researching", "in_review", "pitch_sent", "closed", "closed_visit", "closed_no_interest", "on_hold"]
 Selection = Literal["kept", "rejected", "none"]
 
 
@@ -66,10 +66,19 @@ class PatchCase(Input):
     expected_revision: int = Field(ge=0)
     status: CaseStatus | None = None
     current_revision_id: UUID | None = None
+    on_hold: bool | None = None
+    outcome: Literal["visit", "no_interest"] | None = None
 
 
 class ActionStatus(Input):
     status: Literal["open", "asked", "done"]
+    answer: str | None = Field(default=None, max_length=10000)
+
+
+class CreateAction(Input):
+    case_id: UUID
+    question: str = Field(min_length=1, max_length=10000)
+    ask_role: str = Field(min_length=1, max_length=200)
 
 
 class CaseSummary(BaseModel):
@@ -80,6 +89,8 @@ class CaseSummary(BaseModel):
     createdAt: datetime
     updatedAt: datetime
     keptCount: int
+    onHold: bool = False
+    outcome: Literal["visit", "no_interest"] | None = None
 
 
 class CitedText(BaseModel):
@@ -172,6 +183,7 @@ class CaseDetail(BaseModel):
     revision: int
     inputId: str
     selectionHash: str | None = None
+    currentRun: dict | None = None
 
 
 class Accepted(BaseModel):

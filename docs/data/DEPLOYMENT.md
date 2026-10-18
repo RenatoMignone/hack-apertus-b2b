@@ -1,9 +1,14 @@
 # Running the data layer
 
-The database layer is implemented under `src/backend/`. The web application,
-live collection, supplied model endpoints and report-generation algorithms remain
-separate work. Commands below run from the repository root in PowerShell. Use
-Python 3.12 and Docker Desktop with its WSL2 Linux engine enabled. Linux hosts
+Application/API, worker, adapters, PDF and HTTP frontend are now integrated;
+see [current integration gates](../team/INTEGRATION.md) and
+[backend startup](../../src/backend/README.md). Migration head is
+`0007_frontend_lifecycle`. Only the maintainer may back up and explicitly migrate
+the shared target; this integration did not do so. Live corpus/model deployment
+remains unverified. Historical data-layer results below retain their original scope.
+
+Commands below run from the repository root in PowerShell. Use
+Python 3.12–3.14 and Docker Desktop with its WSL2 Linux engine enabled. Linux hosts
 can use the same Compose file and Python commands with their virtualenv paths.
 
 ## First start

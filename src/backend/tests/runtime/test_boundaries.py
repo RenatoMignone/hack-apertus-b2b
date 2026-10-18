@@ -87,6 +87,36 @@ async def test_semantically_rejected_draft_has_bounded_research(harness):
     assert h.store.case_rows(h.access, UUID(case["case_id"]))[0]["results"] == []
 
 
+async def test_changed_pack_after_draft_gap_has_separate_durable_stage(harness):
+    h = harness
+    h.reasoning.bad_draft = True
+    original = h.reasoning.propose_pack
+    async def changed(*args):
+        pack = await original(*args)
+        return pack.model_copy(update={"gaps": [f"Synthetic research-round limitation {h.reasoning.calls['pack']}"]})
+    h.reasoning.propose_pack = changed
+    case = new(h)
+    await h.worker.run_once(h.access)
+    state = h.store.run_view(h.access, UUID(case["case_id"]), UUID(case["run_id"]))
+    assert state["error_code"] == "evidence_rejected", state
+    assert h.reasoning.calls["draft"] == 3
+
+
+async def test_optional_real_web_tool_budget_does_not_abort_supported_database_result(harness):
+    from backend.contracts.services import BudgetExceeded
+    from backend.ingestion.web import PublicWebTools
+    h = harness
+    class Discovery:
+        async def discover(self, query, limit):
+            raise BudgetExceeded()
+    h.services.web = PublicWebTools(discovery=Discovery())
+    case = new(h)
+    await h.worker.run_once(h.access)
+    state = h.store.run_view(h.access, UUID(case["case_id"]), UUID(case["run_id"]))
+    assert state["status"] == "succeeded", state
+    assert "web_tool_budget_exhausted" in state["limitations"]
+
+
 async def test_graph_runs_database_and_web_branches_concurrently(harness):
     h = harness
     h.services.web = FixtureWeb()
@@ -118,7 +148,7 @@ async def test_offline_never_invokes_web(harness):
     await h.worker.run_once(h.access)
     assert not h.services.web.calls
     detail = await h.application.detail(h.access, UUID(case["case_id"]))
-    assert "web_disabled_offline" in detail["revisions"][0]["coverage"]["limitations"]
+    assert any("Offline mode" in item for item in detail["revisions"][0]["coverage"]["limitations"])
 
 
 async def test_cancelled_case_cannot_receive_late_results(harness):

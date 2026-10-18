@@ -112,8 +112,8 @@ class ClaimCandidate(Contract):
 
 
 class ExtractionBatch(Contract):
-    entities: list[EntityCandidate] = Field(default_factory=list)
-    claims: list[ClaimCandidate] = Field(default_factory=list)
+    entities: list[EntityCandidate] = Field(default_factory=list, max_length=30)
+    claims: list[ClaimCandidate] = Field(default_factory=list, max_length=60)
     gaps: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
@@ -154,6 +154,7 @@ class PdfInput(Contract):
     result_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     selection_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     draft: DraftRevision
+    interpretation: CaseInterpretation | None = None
     claims: list[SupportedClaim] = Field(default_factory=list)
     kept_reason_keys: list[str] = Field(min_length=1)
     evidence: list[EvidenceRecord]

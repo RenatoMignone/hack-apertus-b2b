@@ -1,10 +1,9 @@
 # Frontend — screens, data contract and mock-to-backend handoff
 
-**18 October 2026 · Status: implemented on seeded mock data in `src/frontend/`.
-Not connected to the backend. No retrieval, model or evaluation results are claimed.**
+**18 October 2026 · Status: HTTP-connected UI; explicit seeded demo mode remains available.**
 Decisions: D12–D14 in [DECISIONS_AND_OPEN_QUESTIONS.md](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
-Backend integration: map `NavigatorApi` onto the draft routes in
-[FRONTEND_BACKEND_API.md](FRONTEND_BACKEND_API.md) (not done yet).
+`NavigatorApi` now uses the [implemented HTTP contract](FRONTEND_BACKEND_API.md).
+See [integration](../team/INTEGRATION.md) for verification and live deployment gates.
 
 ## Design rule
 
@@ -16,20 +15,21 @@ Bern fits the company. Details and sources appear only on click.
 
 ```text
 cd src/frontend
-npm install
+npm ci            # Node 22.18+
 npm run dev        # http://localhost:5173
 npm run build      # typecheck + static bundle in dist/
+npm test           # HTTP transport/gate tests
 ```
 
 Stack: Vite, React 18, TypeScript, Tailwind CSS 4, React Router, d3-sankey, lucide
-icons, self-hosted Inter. No external requests at runtime, so it fits the
-air-gapped target in [ARCHITECTURE.md](ARCHITECTURE.md). Source links open live
-pages only when clicked.
+icons, self-hosted Inter. Assets stay local; the UI calls its configured backend.
+An air-gapped deployment needs the entire backend/model stack packaged locally.
+Source links open live pages only when clicked and when networking is available.
 
 ## Screens
 
 Top navigation bar: logo, *My desk*, *My cases*, *Action items* (with an open-items badge),
-a *Demo* menu (explanation + *Reset demo data*), *New case*. Labels collapse to icons
+a Connected label (or explicit demo menu), *New case*. Labels collapse to icons
 below 768 px.
 
 | Route | Screen |
@@ -141,14 +141,15 @@ input→term mappings are hand-written for the demo, not model output.
 ## Known gaps
 
 - The Sankey can crowd labels when there are many terms; long entry names are truncated with a tooltip.
-- Demo persistence is per browser (`localStorage`); there is no shared or server state.
+- Demo persistence alone uses localStorage. HTTP cases/actions persist server-side;
+  access tokens remain memory-only. Real detailed Sankey lineage remains unavailable.
 - Narrow layouts are supported down to about 768 px; there is no phone layout.
 - The pitch-only field map / "add field" showcase is not built.
 
 ## Team ownership (U9)
 
 This is a consumer handoff document. A separate teammate owns `src/frontend/`;
-backend agents must not edit it. Source badges, strict review gates, HTTP wiring
-and PDF export remain proposed UI changes in the
-[API handoff](FRONTEND_BACKEND_API.md#separate-frontend-ownership-u9). The current
-TypeScript `Evidence` lacks source origin/review fields; no UI badge is implemented.
+backend agents must not edit it without a frontend integration request. The user
+explicitly authorized this merge and HTTP connection. Source badges, strict review
+gates, persisted flags/notes and PDF downloads are now implemented; later UI work
+continues under its teammate's ownership. See the [API handoff](FRONTEND_BACKEND_API.md).

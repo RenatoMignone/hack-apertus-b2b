@@ -21,6 +21,7 @@ def provision_principal(engine, role, namespace, *, password=None):
             raw.execute(sql.SQL("GRANT SELECT,INSERT,UPDATE ON ALL TABLES IN SCHEMA {} TO navigator_app").format(sql.Identifier(schema)))
         connection.execute(text("REVOKE INSERT,UPDATE ON ops.principals,ops.scope_grants FROM navigator_app"))
         connection.execute(text("REVOKE ALL ON FUNCTION ops.prevent_change() FROM PUBLIC"))
+        connection.execute(text("GRANT EXECUTE ON FUNCTION ops.ensure_case_scope(uuid) TO navigator_app"))
         connection.execute(insert(tables.principals).values(principal_id=principal_id, database_role=role, namespace=namespace))
     return principal_id, password
 

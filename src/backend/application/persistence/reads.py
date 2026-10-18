@@ -11,6 +11,13 @@ from backend.data.database import require_scope
 
 
 class Reads:
+    def current_run(self, access, case_id):
+        with self.session(access) as c:
+            case = self.case(c, access, case_id)
+            return c.execute(select(t.runs.c.run_id).where(t.runs.c.case_id == case_id,
+                t.runs.c.input_id == case["current_input_id"]).order_by(
+                t.runs.c.created_at.desc(), t.runs.c.run_id.desc()).limit(1)).scalar_one_or_none()
+
     def context(self, access, run_id):
         with self.session(access) as c:
             run = self.run(c, access, run_id)

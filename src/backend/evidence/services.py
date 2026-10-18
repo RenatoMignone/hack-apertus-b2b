@@ -102,7 +102,7 @@ class ApertusReasoningServices:
                                          *research.limitations])
         existing = {str(e.get("entity_id", e.get("id"))) for e in research.existing_entities}
         def check(batch):
-            if len(batch.entities) > 60 or len(batch.claims) > 100:
+            if len(batch.entities) > 30 or len(batch.claims) > 60:
                 raise ValueError()
             for item in [*batch.entities, *batch.claims]:
                 if not set(item.evidence_ids) <= evidence.keys():

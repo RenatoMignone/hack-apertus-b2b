@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 from pgvector.sqlalchemy import Vector
 
 
-SCHEMA_REVISION = "0005_finalize_schema"
+SCHEMA_REVISION = "0007_frontend_lifecycle"
 
 metadata = MetaData(naming_convention={"ix": "ix_%(table_name)s_%(column_0_name)s",
                                       "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -47,6 +47,8 @@ principals = table("ops", "principals", "principal_id", value("database_role"), 
                    value("active", Boolean, default=text("true")), UniqueConstraint("database_role", "namespace"))
 cases = table("cases", "cases", "case_id", uid("owner_id", "ops.principals.principal_id"),
               value("namespace"), state(), value("revision", Integer, default=text("0")),
+              value("on_hold", Boolean, default=text("false")), value("outcome", nullable=True),
+              CheckConstraint("outcome IN ('visit','no_interest')", name="case_outcome_allowed"),
               uid("current_input_id", nullable=True), uid("current_result_id", nullable=True),
               ForeignKeyConstraint(["current_input_id"], ["cases.input_revisions.input_id"], name="current_input_fk",
                                    deferrable=True, initially="DEFERRED", use_alter=True),
@@ -233,7 +235,8 @@ reason_selections = Table("reason_selections", metadata,
     value("updated_at", DateTime(timezone=True), default=text("now()")),
     CheckConstraint("selection IN ('none','kept','rejected')"), schema="cases")
 action_items = table("cases", "action_items", "action_id", uid("case_id", "cases.cases.case_id"),
-    value("question"), value("ask_role"), state("open"), CheckConstraint("status IN ('open','asked','done')"))
+    value("question"), value("ask_role"), state("open"), value("answer", nullable=True),
+    CheckConstraint("status IN ('open','asked','done')"))
 reviews.append_column(value("selection_hash", nullable=True))
 exports.append_column(value("format", default=text("'pdf'")))
 

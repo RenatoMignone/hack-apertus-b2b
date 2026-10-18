@@ -76,16 +76,18 @@ export function Button({
   onClick,
   variant = 'secondary',
   disabled,
+  type = 'button',
 }: {
   children: ReactNode;
   onClick?: () => void;
   variant?: 'primary' | 'secondary';
   disabled?: boolean;
+  type?: 'button' | 'submit';
 }) {
   const v = variant === 'primary' ? 'bg-brand text-white hover:bg-brand-dark border-transparent' : 'bg-white text-ink border-line hover:bg-canvas';
   return (
     <button
-      type="button"
+      type={type}
       disabled={disabled}
       onClick={onClick}
       className={`inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${v}`}

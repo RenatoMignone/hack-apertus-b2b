@@ -37,7 +37,7 @@ async def case_detail(case_id: UUID, who: Actor = Depends(actor)):
 
 @router.patch("/cases/{case_id}")
 async def patch_case(case_id: UUID, body: s.PatchCase, who: Actor = Depends(actor), key=Depends(idempotency_key)):
-    return await who.application.execute("patch_case", who.access, key, case_id, body.model_dump(mode="json"))
+    return await who.application.execute("patch_case", who.access, key, case_id, body.model_dump(mode="json", exclude_unset=True))
 
 
 @router.post("/cases/{case_id}/runs", status_code=202, response_model=s.Accepted, response_model_exclude_none=True)
@@ -138,4 +138,9 @@ async def actions(who: Actor = Depends(actor)):
 
 @router.patch("/action-items/{action_id}")
 async def action(action_id: UUID, body: s.ActionStatus, who: Actor = Depends(actor), key=Depends(idempotency_key)):
-    return await who.application.execute("action_status", who.access, key, action_id, body.model_dump(mode="json"))
+    return await who.application.execute("action_status", who.access, key, action_id, body.model_dump(mode="json", exclude_unset=True))
+
+
+@router.post("/action-items", status_code=201)
+async def create_action(body: s.CreateAction, who: Actor = Depends(actor), key=Depends(idempotency_key)):
+    return await who.application.execute("create_action", who.access, key, body.model_dump(mode="json"))
