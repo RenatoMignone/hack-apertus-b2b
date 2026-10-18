@@ -28,7 +28,10 @@ ELIGIBLE = """
     JOIN corpus.document_versions v ON v.document_version_id=c.document_version_id
     JOIN corpus.documents d ON d.document_id=v.document_id
     JOIN retrieval.embeddings e ON e.embedding_id=sc.embedding_id AND e.chunk_id=c.chunk_id AND e.config_id=b.config_id
-    WHERE s.snapshot_id=:snapshot AND s.status='published' AND s.namespace=:namespace
+    WHERE s.snapshot_id=:snapshot AND s.namespace=:namespace
+      AND (s.status='published' OR (s.status='live' AND EXISTS (
+        SELECT 1 FROM cases.runs r WHERE r.run_id=:run AND r.snapshot_id=s.snapshot_id
+          AND r.case_id::text=s.manifest->>'runtime_case_id')))
       AND ops.can_access(c.scope_id) AND v.status='accepted'
       AND (:all_languages OR c.language IN :languages)
       AND (:all_documents OR d.document_id NOT IN :excluded)
@@ -65,7 +68,7 @@ class HybridSearch:
         return result
 
     def _search(self, access, plan: QueryPlan) -> SearchResult:
-        parameters = {"snapshot": plan.snapshot_id, "namespace": access.namespace,
+        parameters = {"snapshot": plan.snapshot_id, "namespace": access.namespace, "run": plan.run_id,
                       "all_languages": not plan.languages, "languages": plan.languages or ["und"],
                       "all_documents": not plan.excluded_document_ids, "excluded": plan.excluded_document_ids or [UUID(int=0)],
                       "all_families": not plan.source_family_ids, "families": plan.source_family_ids or [UUID(int=0)]}
@@ -74,7 +77,12 @@ class HybridSearch:
                 tables.embedding_configs.c.dimension).select_from(tables.snapshots.join(tables.builds).join(
                     tables.embedding_configs)).where(tables.snapshots.c.snapshot_id == plan.snapshot_id,
                     tables.snapshots.c.namespace == access.namespace,
-                    tables.snapshots.c.status == "published")).mappings().one()
+                    tables.snapshots.c.status.in_(["published", "live"]))).mappings().one()
+            if pin["status"] == "live":
+                run = connection.execute(select(tables.runs.c.case_id).where(
+                    tables.runs.c.run_id == plan.run_id, tables.runs.c.snapshot_id == plan.snapshot_id)).scalar_one_or_none()
+                if run is None or str(run) != pin["manifest"].get("runtime_case_id"):
+                    raise PermissionError("live retrieval requires its owning case run")
             if (pin["profile_id"] != plan.profile_id or pin["taxonomy_version_id"] != plan.taxonomy_version_id
                     or pin["build_id"] != plan.build_id or pin["config_hash"] != plan.embedding_config_hash
                     or self.embedder.config_hash != pin["config_hash"]):
@@ -137,4 +145,6 @@ class HybridSearch:
             for row in rows_by_id.values():
                 from backend.data.database import require_scope
                 require_scope(connection, row["scope_id"])
-        return SearchResult(hits=hits, limitations=["scores_are_not_confidence"] + ([] if reranked is not None else ["reranker_unavailable"]))
+        return SearchResult(hits=hits, limitations=["scores_are_not_confidence"]
+            + (["live_corpus_incomplete_coverage"] if pin["status"] == "live" else [])
+            + ([] if reranked is not None else ["reranker_unavailable"]))

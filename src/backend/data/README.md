@@ -1,5 +1,10 @@
 # Data adapters
 
+Migration `0008_live_corpus` supports case-owned captures of ready chunks while
+ingestion continues. Runtime users receive `navigator_runtime` for corpus reads
+and owned case writes. Publication remains separate; see
+[live runtime](../../../docs/data/LIVE_CORPUS_RUNTIME.md).
+
 Implemented adapters for canonical records, scoped evidence, snapshots and search.
 Use [data-layer router](../../../docs/data/DATA_LAYER.md) and its focused specs.
 

@@ -34,4 +34,4 @@ testpaths = ["tests"]
 markers = ["integration: requires disposable PostgreSQL with pgvector"]
 
 [tool.setuptools.package-data]
-backend = ["deploy/*.yaml", "deploy/*.json", "deploy/*.sh", "deploy/*.ps1", "deploy/policies/*.json", "deploy/.env.example", "config/profiles/*.json"]
+backend = ["deploy/*.yaml", "deploy/*.json", "deploy/*.sh", "deploy/*.ps1", "deploy/policies/*.json", "deploy/.env.example", "config/profiles/*.json", "data/migrations/versions/*.sql"]

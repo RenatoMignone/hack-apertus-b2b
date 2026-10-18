@@ -8,7 +8,8 @@ This document owns the processing stages; [architecture](ARCHITECTURE.md) owns
 pack content, [physical schema](../data/RELATIONAL_SCHEMA.md) owns storage.
 
 Schema contract v1 was finalized at 0005; additive runtime/UI changes advance head
-to `0007_frontend_lifecycle`. Corpus/retrieval agents start
+through `0007_frontend_lifecycle`; live captures advance head to `0008_live_corpus`.
+Corpus/retrieval agents start
 with the [data handoff](../data/INGESTION_RETRIEVAL_HANDOFF.md); use the
 [exact field reference](../data/SCHEMA_REFERENCE.md) for queries. The pack owns
 match output; reason selections own editorial review; durable stage outputs own
@@ -45,7 +46,10 @@ query plans and retrieval observations.
 6. **Pack:** code assembles and freezes `ReportEvidencePack` from validated claims,
    matches, attributed input, arguments/gaps and literal support. Its evidence is
    the union of a pinned published snapshot and an immutable case-local manifest.
-   No-match/partial packs may have no public claims, with an explicit limitation.
+   Development live mode may instead use an immutable case-owned capture of ready
+   authorized corpus chunks while ingestion continues; it requires no publication.
+   See [live runtime](../data/LIVE_CORPUS_RUNTIME.md). No-match/partial packs may
+   have no public claims, with an explicit limitation.
    A model cannot assign authoritative source metadata or quotation offsets.
 7. **Draft:** Apertus receives only the frozen pack and writing instructions.
    Produce concise `Why Bern?` reasons, direct/adjacent labels, entries and claim

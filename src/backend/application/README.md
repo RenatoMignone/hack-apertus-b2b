@@ -1,5 +1,11 @@
 # Application use cases
 
+Live ingestion development uses `RUNTIME_CORPUS_MODE=live` after migration
+`0008_live_corpus`. New runs capture complete authorized chunks in immutable
+case-owned live snapshots, without shared publication. See
+[live runtime](../../../docs/data/LIVE_CORPUS_RUNTIME.md) for configuration,
+narrow user provisioning and acceptance checks.
+
 Own case/input/run operations, authorization, revision checks, reviews, selections
 and export requests. Inputs: validated commands plus trusted caller identity.
 Outputs: durable resource IDs/views. Use narrow repository/workflow ports;

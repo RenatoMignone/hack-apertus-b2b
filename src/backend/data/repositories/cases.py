@@ -33,7 +33,10 @@ class CaseRepository:
             if case["current_input_id"] != input_id:
                 raise ValueError("stale input revision")
             snapshot = connection.execute(select(tables.snapshots).where(tables.snapshots.c.snapshot_id == snapshot_id,
-                tables.snapshots.c.status == "published", tables.snapshots.c.namespace == access.namespace)).mappings().one()
+                tables.snapshots.c.namespace == access.namespace)).mappings().one()
+            if not (snapshot["status"] == "published" or (snapshot["status"] == "live"
+                    and snapshot["manifest"].get("runtime_case_id") == str(case_id))):
+                raise PermissionError("run requires a published corpus or its own live capture")
             run_id, thread_id = uuid4(), uuid4()
             pinned = {**configuration, "profile_id": str(snapshot["profile_id"]),
                       "taxonomy_version_id": str(snapshot["taxonomy_version_id"]), "build_id": str(snapshot["build_id"])}

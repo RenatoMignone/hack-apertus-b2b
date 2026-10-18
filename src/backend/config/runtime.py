@@ -25,6 +25,8 @@ class RuntimeSettings:
     mode: str = "connected"
     bindings: tuple[IdentityBinding, ...] = field(default=(), repr=False)
     default_profile_id: UUID | None = None
+    corpus_mode: str = "published"
+    live_taxonomy_version_id: UUID | None = None
     reasoning_factory: str = ""
     backbone_factory: str = ""
     web_factory: str = ""
@@ -61,6 +63,8 @@ class RuntimeSettings:
     brave_api_key: str = field(default="", repr=False)
 
     def __post_init__(self):
+        if self.corpus_mode not in {"live", "published"}:
+            raise ValueError("RUNTIME_CORPUS_MODE must be live or published")
         if self.mode not in {"connected", "offline"} or not 1 <= self.max_research_rounds <= 3:
             raise ValueError("invalid deployment mode or research budget")
         if not 1 <= self.deadline_seconds <= 3600 or not 0 <= self.max_tool_calls <= 30:
@@ -93,6 +97,8 @@ class RuntimeSettings:
             for item in json.loads(os.getenv("RUNTIME_AUTH_BINDINGS", "[]")))
         return cls(mode=os.getenv("DEPLOYMENT_MODE", "connected"), bindings=bindings,
             default_profile_id=UUID(os.environ["RUNTIME_PROFILE_ID"]) if os.getenv("RUNTIME_PROFILE_ID") else None,
+            corpus_mode=os.getenv("RUNTIME_CORPUS_MODE", "published"),
+            live_taxonomy_version_id=UUID(os.environ["RUNTIME_LIVE_TAXONOMY_ID"]) if os.getenv("RUNTIME_LIVE_TAXONOMY_ID") else None,
             reasoning_factory=os.getenv("RUNTIME_REASONING_FACTORY", ""),
             backbone_factory=os.getenv("RUNTIME_BACKBONE_FACTORY", ""), web_factory=os.getenv("RUNTIME_WEB_FACTORY", ""),
             pdf_factory=os.getenv("RUNTIME_PDF_FACTORY", ""), llm_name=os.getenv("LLM_NAME", "apertus-v1-5-8b"),

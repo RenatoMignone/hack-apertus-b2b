@@ -42,7 +42,10 @@ class BackboneRepository:
             raise EvidenceRejected()
         pin = connection.execute(select(tables.snapshots, tables.embedding_configs.c.config_hash).select_from(
             tables.snapshots.join(tables.builds).join(tables.embedding_configs)).where(
-                tables.snapshots.c.snapshot_id == context.snapshot_id, tables.snapshots.c.status == "published")).mappings().one()
+                tables.snapshots.c.snapshot_id == context.snapshot_id,
+                tables.snapshots.c.status.in_(["published", "live"]))).mappings().one()
+        if pin["status"] == "live" and pin["manifest"].get("runtime_case_id") != str(context.case_id):
+            raise EvidenceRejected()
         if (pin["namespace"] != context.access.namespace or pin["profile_id"] != context.profile_id
                 or pin["taxonomy_version_id"] != context.taxonomy_version_id or pin["build_id"] != context.build_id
                 or pin["config_hash"] != context.embedding_config_hash):

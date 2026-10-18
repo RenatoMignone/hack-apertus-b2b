@@ -1,6 +1,6 @@
 # Final application schema
 
-**18 October 2026 · Contract v1 finalized at 0005; current head `0007_frontend_lifecycle`.**
+**18 October 2026 · Contract v1 finalized at 0005; source head `0008_live_corpus`.**
 This is the schema for the agreed case → research → evidence pack → draft →
 reason review → PDF pipeline. The executable table definitions are
 [`schema.py`](../../src/backend/data/schema.py); the generated
@@ -12,6 +12,12 @@ updated reference and focused integration checks.
 One PostgreSQL `navigator` database has five application schemas. LangGraph and
 Langfuse own separate databases and migrations. Do not create a database per
 institution, entity type, case or taxonomy topic.
+
+Migration 0008 adds case-owned immutable `live` snapshots/builds. New runs may
+capture ready public chunks while ingestion continues, without publication or an
+active pointer. `navigator_runtime` reads public scopes and writes owned case
+evidence/reports. See [live runtime](LIVE_CORPUS_RUNTIME.md); source head does not
+itself confirm deployment on a particular host.
 
 ## Tables retained and why
 

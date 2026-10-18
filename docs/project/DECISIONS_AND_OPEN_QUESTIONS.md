@@ -1,5 +1,17 @@
 # Decisions, unknowns and next work
 
+## Live ingestion development — 18 October 2026
+
+Eric authorized Renato and other users to work against ongoing ingestion without
+a completed version or production release. `RUNTIME_CORPUS_MODE=live` captures
+ready authorized public chunks per owned case. Captures remain stable through
+retries/review/export; new research runs can include later ingestion. Publication
+stays available for reviewed releases. Embedding compatibility, evidence support
+and case isolation remain required. Migration `0008_live_corpus` and the narrow
+`navigator_runtime` role implement this boundary. See
+[live runtime](../data/LIVE_CORPUS_RUNTIME.md) and its
+[verification/rollout status](../team/RUNTIME_ACCESS_STATUS.md).
+
 **Updated: 18 October 2026.** This records actual user choices and known gaps.
 This is a chronological record: older implementation/authorization statements
 describe their original task, not the current development boundary.

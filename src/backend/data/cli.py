@@ -40,6 +40,13 @@ def main():
     principal.add_argument("role")
     principal.add_argument("namespace")
     principal.add_argument("--credentials-file", required=True)
+    principal.add_argument("--ingestion", action="store_true", help="Explicit maintainer-only shared-corpus writer")
+    runtime_access = commands.add_parser("runtime-access")
+    runtime_access.add_argument("role")
+    runtime_access.add_argument("namespace")
+    runtime_access.add_argument("--scope", type=UUID, action="append", required=True)
+    runtime_access.add_argument("--runtime-env-file", type=Path, help="Patch an existing private bundle without rotating credentials")
+    runtime_access.add_argument("--profile", type=UUID)
     grant = commands.add_parser("scope-grant")
     grant.add_argument("principal", type=UUID)
     grant.add_argument("scope", type=UUID)
@@ -63,7 +70,7 @@ def main():
         print("Recovery operation completed; verify a pinned case before declaring recovery.")
         return
     settings = Settings.from_env()
-    if arguments.command == "principal-create":
+    if arguments.command in {"principal-create", "runtime-access"}:
         admin_url = os.getenv("ADMIN_DATABASE_URL")
         if not admin_url and os.getenv("POSTGRES_PASSWORD"):
             admin_url = f"postgresql://postgres:{os.environ['POSTGRES_PASSWORD']}@127.0.0.1:5432/navigator"
@@ -107,13 +114,31 @@ def main():
             path = Path(arguments.credentials_file)
             if path.exists():
                 raise ValueError("credentials file already exists")
-            principal_id, password = provision_principal(engine, arguments.role, arguments.namespace)
+            principal_id, password = provision_principal(engine, arguments.role, arguments.namespace, ingestion=arguments.ingestion)
             path.parent.mkdir(parents=True, exist_ok=True)
             with path.open("x", encoding="utf-8") as output:
                 json.dump({"principal_id": str(principal_id), "role": arguments.role,
                            "namespace": arguments.namespace, "password": password}, output)
             path.chmod(0o600)
             print("Principal created; credentials saved privately to the specified file.")
+        elif arguments.command == "runtime-access":
+            from backend.data.admin import configure_runtime_access
+            patch = None
+            if arguments.runtime_env_file:
+                if not arguments.profile:
+                    raise ValueError("--profile is required when updating a private runtime environment")
+                from backend.config.runtime_bundle import prepare_live_environment
+                from backend.data import schema as t
+                from sqlalchemy import select
+                with engine.connect() as c:
+                    c.execute(select(t.profiles.c.profile_id).where(t.profiles.c.profile_id == arguments.profile,
+                        t.profiles.c.namespace == arguments.namespace)).scalar_one()
+                patch = prepare_live_environment(arguments.runtime_env_file, arguments.role, arguments.namespace, arguments.profile)
+            principal_id = configure_runtime_access(engine, arguments.role, arguments.namespace, arguments.scope)
+            if patch:
+                patch(principal_id)
+            print(json.dumps({"principal_id": str(principal_id), "namespace": arguments.namespace,
+                              "role": arguments.role, "corpus_access": "read", "case_access": "owner-write"}))
         elif arguments.command == "scope-grant":
             from backend.data.admin import grant_scope
             grant_scope(engine, arguments.principal, arguments.scope, write=arguments.write)

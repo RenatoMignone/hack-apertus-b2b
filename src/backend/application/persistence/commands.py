@@ -43,10 +43,14 @@ class Commands:
                 raise StaleRevision()
             snapshot = c.execute(select(t.snapshots).where(t.snapshots.c.snapshot_id == original["snapshot_id"])).mappings().one()
         else:
-            snapshot = c.execute(select(t.snapshots).join(t.active_snapshots,
-                t.active_snapshots.c.snapshot_id == t.snapshots.c.snapshot_id).where(
-                t.active_snapshots.c.profile_id == profile_id, t.snapshots.c.namespace == access.namespace,
-                t.snapshots.c.status == "published")).mappings().one_or_none()
+            if self.settings.corpus_mode == "live":
+                from backend.data.repositories.live import capture_live_corpus
+                snapshot = capture_live_corpus(c, self.settings, case_id, profile_id)
+            else:
+                snapshot = c.execute(select(t.snapshots).join(t.active_snapshots,
+                    t.active_snapshots.c.snapshot_id == t.snapshots.c.snapshot_id).where(
+                    t.active_snapshots.c.profile_id == profile_id, t.snapshots.c.namespace == access.namespace,
+                    t.snapshots.c.status == "published")).mappings().one_or_none()
             if snapshot is None:
                 raise ServiceUnavailable()
         config = {"runtime_version": "1", "mode": self.settings.mode, "model": self.settings.llm_name,
@@ -55,6 +59,7 @@ class Commands:
             "max_research_rounds": self.settings.max_research_rounds, "max_output_tokens": self.settings.max_output_tokens,
             "max_tool_calls": self.settings.max_tool_calls, "request_id": request_id,
             "expected_revision": case["revision"], "instruction": instruction,
+            "corpus_mode": "live" if snapshot["status"] == "live" else "published",
             "parent_result_id": str(parent_id) if parent_id else None, "reuse_pack_id": str(pack_id) if pack_id else None}
         repo, _, _, jobs = self.repositories(c)
         run_id, _ = repo.start_run(access, case_id, input_id, snapshot["snapshot_id"], config)

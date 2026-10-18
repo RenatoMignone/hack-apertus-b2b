@@ -1,5 +1,13 @@
 # Current development status
 
+Live ingestion runtime (18 October, explicitly authorized by Eric): backend source
+head is `0008_live_corpus`. `RUNTIME_CORPUS_MODE=live` creates case-owned captures
+of ready authorized chunks, so cases no longer require completed publication.
+New users receive a narrow corpus-read/case-write role. See
+[deployment](../data/LIVE_CORPUS_RUNTIME.md) and the
+[runtime access receipt](../team/RUNTIME_ACCESS_STATUS.md) for host rollout.
+Earlier publication prerequisites below describe the reviewed-release path.
+
 18 October 2026 · Integrated baseline plus Eric's published migration outcome
 (`9367b9b`), runtime preparation, Renato’s acceptance fixes and refreshed UI.
 This is the current status entry point; the [open register](OPEN_QUESTIONS.md)
@@ -10,7 +18,7 @@ owns merge/test evidence. Historical lane docs describe earlier checkpoints.
 | --- | --- | --- |
 | Backend | Authenticated FastAPI, durable LangGraph worker, real reasoning/retrieval adapters, exact evidence assessment, frozen packs, drafts and reviewed PDF | Run against the actual corpus and providers on the selected host |
 | Frontend | HTTP by default; explicit mock mode, polling/clarification, history, flags/actions, source badges and authenticated PDF download | Shared-environment acceptance; detailed real Sankey lineage, live structured result metadata and explicit formatting-only chat UX |
-| Database | Migration head `0007_frontend_lifecycle`; fresh/upgrade and restricted-role tests | Shared host upgraded 0004 → 0007; backup/restore and preserved artifact checks recorded in [migration status](../team/MIGRATION_STATUS.md) |
+| Database | Migration head `0008_live_corpus`; case-owned live captures and restricted runtime users; 51 isolated runtime/access checks pass | Shared host 0008 and both user bindings verified after backup; see [runtime access status](../team/RUNTIME_ACCESS_STATUS.md) |
 | Corpus / RAG | Collection, registry/MeSH, build/publication CLI, hybrid/relationship retrieval and local model adapters | Real HF encoding/parity verified; Eric is ingesting. Reviewed pilot corpus and published snapshot/profile pins remain |
 | Inference | Configurable Keera Apertus; authenticated synthetic 8B/70B probes | Current key/quotas, tokenizer/revision provenance, full-case quality and resource budgets |
 | Infrastructure | Compose definitions, individual SSH access design, storage/checkpoint/tracing adapters | Eric reports private bundles, checkpoint roles and synthetic saver/S3 writes verified host-locally; peer access and pilot pins remain. Apply [LF checkout fix](../data/WINDOWS_SHELL_FIX.md) on the Windows host |

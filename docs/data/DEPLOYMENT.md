@@ -1,10 +1,11 @@
 # Data services, shared access and recovery
 
 Application/API, worker, adapters, PDF and HTTP frontend are integrated.
-Application head is **`0007_frontend_lifecycle`**. Start at the
+Application head is **`0008_live_corpus`**. Start at the
 [first live run checklist](LIVE_SETUP.md) for existing deployments and Mac-to-host
 setup. A new data stack follows the commands below; do not reinitialize Eric's
-existing secrets/volumes. Eric's [completed migration](../team/MIGRATION_STATUS.md) is at 0007. Future shared
+existing secrets/volumes. The earlier [migration](../team/MIGRATION_STATUS.md) reached 0007;
+the [live runtime rollout](../team/RUNTIME_ACCESS_STATUS.md) now records host 0008. Future shared
 migrations still require a backup/window and migration-role access. Windows
 checkouts should apply the [LF fix](WINDOWS_SHELL_FIX.md); hosted encoder setup
 is in [HF configuration](HOSTED_EMBEDDINGS.md).
@@ -41,7 +42,10 @@ Docker Engine installation inside WSL when using Docker Desktop's engine.
 
 PostgreSQL 17 and pgvector 0.8.2 use a Docker volume. Its three databases have
 separate owners: `navigator_migrator`, `langgraph` and `langfuse`. The application
-role `navigator_app` has no login; individual developers inherit its DML access.
+roles have no login. New application users inherit `navigator_runtime` for corpus
+reads and owned case writes; `navigator_app` remains the explicit ingestion role.
+See [live runtime](LIVE_CORPUS_RUNTIME.md) for migration 0008 and changing an
+existing developer login without replacing credentials.
 The host maintainer or an explicitly delegated migration operator applies migrations. Startup calls `check_schema`, which
 checks the Alembic head without migrating. Migrations use a PostgreSQL advisory
 lock. Use additive migrations when branches must share the same database.
@@ -224,11 +228,12 @@ References: [Docker WSL2](https://docs.docker.com/desktop/features/wsl/),
 
 ## Schema upgrades and measured history
 
-Always target the current Alembic head, now `0007_frontend_lifecycle`; the
+Always target the current Alembic head, now `0008_live_corpus`; the
 [runbook](LIVE_SETUP.md#2-upgrade-only-if-behind-eric-or-his-delegated-operator)
 explains migration credentials and sequencing. Migration 0005 archives populated
 retired structures; 0006 adds restricted case-scope/runtime access; 0007 adds UI
-lifecycle fields. Existing case history remains; legacy results need a validated
+lifecycle fields; 0008 adds immutable case-owned live captures and the narrow
+runtime role. Existing case history remains; legacy results need a validated
 v2 draft before new approval/export. Read [upgrade behavior](RELATIONAL_SCHEMA.md#removed-structures-and-upgrade-behavior).
 
 Dated checks, all on 18 October 2026:
