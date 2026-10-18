@@ -15,8 +15,8 @@ class Settings:
     s3_secret_key: str | None
 
     @classmethod
-    def from_env(cls):
-        database_url = os.environ.get("DATABASE_URL")
+    def from_env(cls, database_url=None):
+        database_url = database_url or os.environ.get("DATABASE_URL")
         if not database_url:
             raise ValueError("DATABASE_URL is required; credentials stay in your environment")
         return cls(database_url, os.getenv("LANGGRAPH_DATABASE_URL"),

@@ -1,0 +1,30 @@
+name: bern-navigator-runtime
+
+x-runtime: &runtime
+  build:
+    context: ../../..
+    dockerfile: src/backend/deploy/Dockerfile.runtime
+    args:
+      PYTHON_RUNTIME_IMAGE: ${PYTHON_RUNTIME_IMAGE:?Supply a verified digest-pinned Python image}
+  env_file: ${RUNTIME_ENV_FILE:-../.env}
+  restart: unless-stopped
+  init: true
+  networks: [navigator]
+  volumes: [runtime-artifacts:/app/.local/artifacts]
+
+services:
+  api:
+    <<: *runtime
+    ports: ["127.0.0.1:${RUNTIME_PORT:-8000}:8000"]
+    command: [serve, --host, 0.0.0.0, --port, "8000"]
+  worker:
+    <<: *runtime
+    command: [worker]
+
+networks:
+  navigator:
+    external: true
+    name: ${NAVIGATOR_NETWORK:-bern-navigator_default}
+
+volumes:
+  runtime-artifacts:
