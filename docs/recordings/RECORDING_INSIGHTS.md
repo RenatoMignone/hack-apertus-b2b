@@ -284,9 +284,10 @@ does not clearly establish which materials would appear there.
 **Later source update (N1, 18 October):** the user-supplied Notion page text
 lists `powerpoint_template.pptx` and `Logo_SF_BE_EN.png`, explicitly for this
 challenge only. See the [source snapshot](../sources/NOTION_CHALLENGE_2026-10-18.md).
-This establishes the asset names and page reference, but the files themselves
-have not arrived or been inspected. Colors and export layout remain unverified;
-do not infer permission to use client company assets or general reuse rights.
+This initially established asset names/page reference. The later U3 delivery
+provides the [original files and structural inspection](../provided_material/README.md).
+Rendered export checks remain pending; do not infer permission to use client
+company assets or general reuse rights.
 
 ## General event remarks and transcript limitations
 

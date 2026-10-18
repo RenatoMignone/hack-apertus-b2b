@@ -19,6 +19,17 @@ to your task rather than reading the entire knowledge base every time.
   preparation context: **do not modify it**. Relevant context has been summarized
   here; routine work should not require reopening it.
 
+## Visual reference and current intake
+
+Start architecture/workflow work at [docs/architecture.html](docs/architecture.html),
+backed by [ARCHITECTURE.md](docs/plans/ARCHITECTURE.md). The core is domain-independent;
+sources, taxonomy, ranking/validation and evaluation belong to versioned profiles.
+RAG indexes can be rebuilt without rewriting orchestration. Current intake is
+manually typed permitted keywords/context. Confidential business plan and one-pager
+PDFs stay outside the application; a future attachment adapter is disabled pending
+explicit permission and revised handling rules. Public research PDFs are separate.
+Proposed primary target is an air-gapped independent runtime; not yet tested.
+
 ## Task router
 
 | Your task | Read |

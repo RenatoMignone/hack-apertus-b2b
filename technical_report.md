@@ -17,6 +17,10 @@ The problem, your approach, and the headline result in one paragraph.
 Components, data flow, and where each one runs. Put diagrams in `docs/` and
 reference them here.
 
+**Current design (not implemented):** [visual architecture and pipeline](docs/architecture.html).
+The [architecture contract](docs/plans/ARCHITECTURE.md) records components and
+locations, domain profiles, evidence preparation and build/runtime dependencies.
+
 ### Target architecture (mandatory)
 
 State which of the three architectures your project is deployable in, and how
@@ -27,6 +31,13 @@ it meets that constraint:
 - **c) Sovereign Swiss cloud** — on a cloud platform operated in Switzerland, under Swiss jurisdiction, with Swiss data residency.
 
 List any external dependencies, and separate build time from runtime.
+
+**Proposed primary target: b) air-gapped case runtime**, outside cantonal ICT.
+Connected collection/build prepare permitted evidence, indexes, models and assets
+for transfer; all case inference, retrieval and export then run locally without
+external access. Hardware and deployment are not verified. On-premise and
+sovereign Swiss-cloud alternatives and required proof are in the architecture
+contract; no deployment capability is claimed yet.
 
 ## 3. Use of Apertus
 

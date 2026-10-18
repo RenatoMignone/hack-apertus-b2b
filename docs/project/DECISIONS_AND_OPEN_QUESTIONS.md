@@ -19,6 +19,17 @@ focus in Bern; UniBE/ARTORG/Diabetes Center Berne coverage; Apertus v1.5;
 source-backed structured results; no confidential-plan ingestion; external,
 self-contained deployment. See [PRODUCT_REQUIREMENTS.md](../challenge/PRODUCT_REQUIREMENTS.md).
 
+**Current input/architecture update (U5), 18 October:** the user confirms manually
+typed keywords, context and operator knowledge after reading confidential
+business plans/one-pagers outside the app. Those PDF uploads are a future disabled
+extension requiring explicit permission and revised handling rules. The user
+requires a domain-independent pipeline/RAG and selects the existing report
+structure plus [stacked visual architecture reference](../architecture.html).
+Sources/taxonomy/settings/evaluation are versioned profiles; indexes can be rebuilt.
+The [architecture contract](../plans/ARCHITECTURE.md) proposes an air-gapped primary
+runtime with connected build/collection and records alternatives/dependencies.
+That target is a design proposal, not a hardware choice or tested deployment.
+
 **Not selected:** product/team name or roster, frontend framework,
 taxonomy contents/ontology mappings, actual model endpoints/revisions,
 deployment target, extra data sources, export library and UI design.
@@ -26,14 +37,14 @@ The Git remote organization is not evidence of a finalized team name.
 
 ## Two-phase planning update — 18 October 2026
 
-**D06 / user decision:** define Phase 1 as source collection, taxonomy processing
+**Two-phase user decision:** define Phase 1 as source collection, taxonomy processing
 and memory publication; define Phase 2 as the case workflow consuming that
 memory. The user requested two implementation plans, now recorded in
 [INGESTION_PLAN.md](../plans/INGESTION_PLAN.md) and [OPERATIONS_PLAN.md](../plans/OPERATIONS_PLAN.md).
 This authorizes documentation planning, not implementation in this pass.
 
-**User-requested operational scope:** permitted email/context intake, later
-attachments, contextual topic interpretation, company background research,
+**User-requested operational scope:** manual permitted text/context intake, future
+disabled attachment adapter, contextual topic interpretation, company background research,
 generic Bern and company-specific matching, previous-case retrieval, explained
 scores/confidence, potential economic benefits and PowerPoint output. This
 selects presentation export for the operational plan (Q08); the later partner

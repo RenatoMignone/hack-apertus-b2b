@@ -4,6 +4,10 @@
 selection and evaluation design to the agent. **Status:** selected documentation
 scope based on public-page investigation; no corpus, benchmark or matches built.
 
+The [visual architecture](../architecture.html) treats this pilot as a versioned
+domain profile; the reusable core and retrieval-index rebuild rules are defined
+in [ARCHITECTURE.md](../plans/ARCHITECTURE.md).
+
 ## Selected focus and rationale
 
 Focus on **diabetes technology**, with glucose monitoring, automated insulin

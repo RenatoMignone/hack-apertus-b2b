@@ -1,7 +1,11 @@
 # Bern opportunity brief — Proposed output structure
 
 **Status:** supporting content design, aligned with the paired implementation
-plans. The agent accepts user refocusing/edit instructions and asks targeted
+plans. The [visual pipeline](../architecture.html) and
+[architecture contract](ARCHITECTURE.md) define preparation of the evidence pack.
+Current intake is manually typed permitted keywords/context; confidential PDFs
+remain outside the app pending separately authorized future handling.
+The agent accepts user refocusing/edit instructions and asks targeted
 follow-up questions; revisions retain citations and regenerate affected exports.
 The supplied template and logo are challenge-only assets.
 

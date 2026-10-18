@@ -48,15 +48,16 @@ The Notion page names these supporting materials [N1]:
 
 | Listed file | Purpose | Local status |
 | --- | --- | --- |
-| `unibe_sous_domaines_publics_etendus.xlsx` | Initial public UniBE subdomain discovery map | Filename supplied; workbook contents/download URL not supplied or inspected |
-| `powerpoint_template.pptx` | Challenge presentation template | Filename supplied; file not available locally or inspected |
-| `Logo_SF_BE_EN.png` | Challenge logo | Filename supplied; file not available locally or inspected |
+| `unibe_sous_domaines_publics_etendus.xlsx` | Initial public UniBE subdomain discovery map | Later supplied and structurally inspected; 42 actual entries, Notes count 71 inconsistent |
+| `powerpoint_template.pptx` | Challenge presentation template | Later supplied and structurally inspected; see provided-material inventory |
+| `Logo_SF_BE_EN.png` | Challenge logo | Later supplied and structurally inspected; see provided-material inventory |
 
 **Use the PowerPoint template and logo only for this challenge.** This explicit
 restriction is not a general reuse/license grant. The presentation template is
 separate from the required repository/technical-report template and does not
-establish a mandatory automatic teaser-export feature. Obtain the actual
-workbook before claiming a configured or validated UniBE discovery map.
+establish a mandatory automatic teaser-export feature. The [provided-material inventory](../provided_material/README.md) records the
+later file delivery and inspection; workbook discovery rows still require live
+access/relevance checks before collection.
 
 ## 3. Technology and infrastructure
 

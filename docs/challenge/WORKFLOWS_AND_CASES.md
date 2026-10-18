@@ -10,6 +10,7 @@ entities can be supplied, but none has arrived. The selected pilot is
 executed cases. Automatic PowerPoint export and case operations are now planned
 in [OPERATIONS_PLAN.md](../plans/OPERATIONS_PLAN.md), superseding the earlier optional
 feature descriptions below. English is the baseline presentation language.
+[The main visual reference](../architecture.html) details all intermediate steps.
 
 ## Current workflow
 
@@ -43,20 +44,21 @@ No measured task durations were supplied.
 
 ```mermaid
 flowchart TD
-    A[Human prepares non-confidential keywords or description] --> B[Search the Bern source ecosystem]
+    A[Human reads private documents outside app and types permitted context] --> B[Search the Bern source ecosystem]
     B --> C[Retrieve and check supporting evidence]
     C --> D{Sufficient evidence?}
     D -->|Yes| E[Structured matches with plain-language reasons and sources]
     D -->|No| F[Explain missing evidence or coverage limits]
     E --> G[Business developer verifies and selects relevant items]
-    G --> H[Optional company teaser assembled from selected evidence]
+    G --> H[Reviewed company brief and PowerPoint with evidence]
     H --> I[Agency handles invitations and contacts]
 ```
 
 The core prototype covers search through source-backed matches and limitations.
-A saved shortlist, iterative clarification, case workspaces and automatic export
-are useful options, not yet selected features. Each selected item should retain
-its evidence when copied/exported. [R01–R08, S01–S04 in
+The user-selected plan includes case workspaces, iterative clarification/revisions
+and reviewed PowerPoint export. Current input is text only; confidential PDF
+intake is a future disabled extension. Each selected item retains evidence
+when copied/exported. [R01–R08, S01–S04 in
 PRODUCT_REQUIREMENTS.md](PRODUCT_REQUIREMENTS.md)
 
 For vague terms such as “diabetes,” proposed behavior is to offer visible facets
@@ -85,8 +87,8 @@ evidence in a specified corpus, not proven absence of expertise in Bern.
 | C11 | A person/project appears on both UniBE and ARTORG pages | Deduplicate cautiously; retain both supporting sources and correct affiliations; count source coverage honestly | B1 ecosystem requirement; proposed data check |
 | C12 | Stale role, conflicting profiles, blocked page or failed collection | Surface dated/conflicting/insufficient evidence; distinguish collection failure from a genuine no-match | Proposed reliability check supporting B1 traceability |
 | C13 | Ask whether the top researcher will meet the company | Identify expertise only; do not imply willingness, availability or a confirmed partnership | E16 |
-| C14 | Produce a company teaser from selected matches | If export is selected, keep short descriptions, source links and uncertainty; exclude confidential input and rejected items | E03, E12–E14; optional feature |
-| C15 | Two concurrent company needs | If case state is introduced, keep their queries/shortlists separate; otherwise disclose stateless scope | E06; optional feature |
+| C14 | Produce a company teaser from selected matches | Keep short descriptions, source links and uncertainty; exclude confidential input and rejected items | E03, E12–E14; user-selected export |
+| C15 | Two concurrent company needs | Keep case queries/shortlists and revisions separate | E06; user-selected case workflow |
 
 Do not turn the recorded hypothetical EEG/epilepsy example into C08's real-world
 negative label. Do not populate C03 with the transcript's named company until

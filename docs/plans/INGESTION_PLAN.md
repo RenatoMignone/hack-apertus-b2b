@@ -1,249 +1,111 @@
-# Phase 1 — Source ingestion, taxonomy and memory
+# Phase 1 — Ingestion, taxonomy and memory
 
-**Date:** 18 October 2026. **Status:** implementation proposal; no implementation
-or measured results. The two-phase boundary is a user decision. The user has
-specified an initial architecture to validate: Apertus 1.5 8B/70B, BGE-M3,
-Weaviate, BGE-reranker-v2-m3 and LangGraph. Exact deployments, revisions and
-corpus-specific performance remain unverified; taxonomy contents are not yet defined.
+**18 October 2026 · Implementation plan; nothing built or measured.**
+Start with the [stacked visual diagrams](../architecture.html) and
+[architecture/deployment contract](ARCHITECTURE.md). This plan owns the shared
+records and memory interfaces. [Phase 2](OPERATIONS_PLAN.md) consumes them.
 
-**Companion:** [Phase 2 — Case operations](OPERATIONS_PLAN.md).
-This file owns the shared data and memory contracts consumed by Phase 2.
+Initial stack to validate: Apertus v1.5 8B / optional 70B, BGE-M3, Weaviate,
+BGE-reranker-v2-m3 and LangGraph. Endpoints, revisions, hardware, taxonomy
+contents and corpus performance remain unverified. Code belongs in `src/`.
 
-**Current scope decisions:** [selected pilot](../challenge/PILOT_SCOPE.md), based on the user's
-18 October answers and public-source investigation. Diabetes technology is the
-pilot, English the output baseline, and DE/FR/IT support an extension. Endpoint
-and deployment details will be supplied before development.
-
-## 1. Outcome and scope
-
-Build a repeatable pipeline that collects permitted source material, preserves
-evidence, maps its meaning into a team-defined taxonomy, extracts supported
-entities and claims, and publishes a searchable, versioned memory snapshot.
+## 1. Pipeline and boundaries
 
 ```text
-Reviewed sources → raw artifacts → normalized documents and evidence spans
-                 → Apertus 8B classification → validation → 70B fallback if needed
-                 → exact source chunks → BGE-M3 dense vectors
-                 → Weaviate BM25F + vector index → published memory snapshot
-
-Phase 2: request + context → LangGraph → hybrid retrieval → BGE reranking
-         → evidence validation → answer/report → user edits or follow-up dialogue
+Domain profile + source registry
+  → discover → scope/access checks → fetch raw bytes
+  → extract/normalize → quality checks + exact evidence spans
+       ├→ Apertus concept/entity/claim candidates → validation/entity resolution
+       └→ original source chunks → BGE-M3 vectors
+  → staged Weaviate hybrid index + canonical evidence/claim store
+  → evaluate → immutable published snapshot
 ```
 
-Collection and normalization are deterministic. Apertus enrichment is a separate,
-recorded derivation; it must never overwrite the source representation. Memory
-is the durable evidence store plus rebuildable retrieval indexes, not merely
-conversation history or a vector database.
+The collector preserves source content. Model enrichment is a separate recorded
+derivation. Memory includes artifacts and claims as well as rebuildable indexes.
+Case-specific company research reuses this pipeline in an isolated case scope.
+Branding/template files and workshop transcripts are not research-corpus evidence.
 
-Phase 2 reads published snapshots to understand a company case, research context,
-retrieve matches and generate a reviewed PowerPoint. Case-specific public web
-research may reuse this pipeline but starts in a case-scoped collection.
+## 2. Domain-independent configuration and precedence
 
-## 2. Authority and relationship to existing documentation
+The engine is reusable across medicine, robotics and other domains. A versioned
+profile supplies sources/families, geography, languages, taxonomy/aliases,
+optional entity/predicate extensions, validation/ranking settings and evaluation
+fixtures. Never hardcode pilot concepts or institutions in core processing.
+Changing domains may require re-enrichment and rebuilding RAG indexes; use the
+[rebuild matrix](ARCHITECTURE.md#rag-rebuild-rules), not a second pipeline.
 
-- **Requirement:** [challenge brief](../challenge/CHALLENGE_BRIEF.md) and
-  [product requirements](../challenge/PRODUCT_REQUIREMENTS.md): Bern life sciences/medicine,
-  UniBE + ARTORG + Diabetes Center Berne coverage, source-supported results,
-  purposeful Apertus v1.5 use and independent deployment.
-- **User decision, 18 October 2026:** Phase 1 includes taxonomy processing and
-  memory publication; Phase 2 implements the previously described case workflow.
-- **Detailed collection reference:** [existing ingestion spec](../data/ingestion/INGESTION_SPEC.md).
-  Its old “Phase 1” is now the collection/normalization substage of this plan.
-  Its exclusion of classification and indexes does not apply to this expanded
-  phase. Keep its faithful extraction, provenance and crawl-policy requirements.
-- **Precedence for implementation:** use this plan for phase boundaries, shared
-  contracts and the corrections in section 11. Treat the existing
-  [source registry](../data/ingestion/sources.yaml) as a draft requiring revision, not
-  verified coverage or an approved live crawl configuration.
+Current requirements still apply: Bern healthcare pilot, UniBE + ARTORG + DCB,
+source-backed claims, purposeful Apertus use and deployment outside cantonal ICT.
+The [pilot scope](../challenge/PILOT_SCOPE.md) owns medical focus and source seeds;
+this plan owns shared contracts; [collection detail](../data/ingestion/INGESTION_SPEC.md)
+owns deterministic acquisition. The YAML is a draft profile input, not proof of
+live access or a working collector. Preserve the root template and `LLM_*` names.
 
-Implementation code belongs under `src/`; working plans remain under `docs/`.
-Preserve the root submission files and `LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY`.
+## 3. Acquisition
 
-## 3. Source scope and acquisition
+- Import the [partner workbook](../provided_material/README.md): **42 actual rows**,
+  including DCB, despite its Notes count of 71. Retain sheet/row/hash provenance;
+  use the URL column, then verify hosts/redirects. Extend from links and sitemaps.
+- Prioritize diabetes technology across all three required families, including
+  UniBE beyond ARTORG. Additional organizations require evidenced Bern activity.
+- Public HTML first, linked public PDFs next. Preserve original languages;
+  English descriptions/translations are separate derivations.
+- Enforce host/path/redirect/IP scope, robots and published restrictions, quotas,
+  time/byte/retry budgets and shared-host rate limits. Public robots-allowed
+  collection is authorized; no blanket manual approval for every origin.
+  Actual ambiguity/blocks require review; redistribution remains separate.
+- Save raw bytes, URLs, headers/MIME, timestamps, hashes, failures and discovery
+  lineage. Source-family membership can overlap; downloads need not duplicate.
 
-### 3.1 Required collection order
+## 4. Extraction and faithful evidence
 
-1. Start with the verified discovery seeds in [PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md),
-   including ARTORG research, DBMR Bally Lab and DCB `/en/projects/`. Import the
-   [partner workbook](../provided_material/README.md) as the initial discovery map:
-   42 actual entries, including ARTORG and DCB. Its Notes count of 71 is
-   inconsistent; do not invent missing entries. Retain workbook/sheet/row
-   provenance, use column C URLs, prioritize healthcare and extend discovery
-   under per-origin robots/access rules. Treat DCB as a separate origin/family.
-2. Collect research units, professional profiles, projects, capabilities,
-   infrastructure and services across all three source families.
-3. Start expansion from partner-provided references already captured locally;
-   add healthcare institutions/companies with evidenced Canton of Bern activity.
-   Do not treat international partners/competition participants as Bern-local.
+HTML/text-PDF parsers preserve headings, lists, tables, links, page/section maps
+and language. Keep tables/media in sidecars where necessary. Scans require a
+verified OCR adapter with quality/provenance flags; unsupported media stays
+explicit. A model receiving an image does not establish native PDF-upload support.
+Endpoint modalities remain unverified and are not prerequisites for this design.
 
-Prioritize glucose monitoring, automated insulin delivery and supporting
-digital tools. Public web pages are primary, linked public PDFs secondary.
-Collect German/French/Italian material where useful without translating the
-canonical evidence; English descriptions are separate derived records. Apply
-bounded quotas for safe execution, not an invented fixed user coverage limit.
+Normalized body excludes generated metadata/summaries. Each literal span obeys
+`body[char_start:char_end] == text` with Unicode offsets and exclusive end.
+Keep extraction and raw versions distinct, including parser configuration.
+OCR/visual transcription is a labeled derivation, not a guaranteed literal quote.
 
-Do not substitute general UniBE directory pages or extra institutions for
-ARTORG/DCB coverage. Report source-family membership separately from the single
-administrative owner of a document; one page may support multiple families.
-National expertise is not automatically Bern-local expertise.
+## 5. Versioned taxonomy
 
-### 3.2 Registry and policy
+Review a small pilot vocabulary before accepting classifications. Each concept
+has a stable ID/version, definitions/inclusions/exclusions, multilingual labels,
+reviewed synonyms/ambiguous aliases, broader/narrower and separately related
+concepts, optional external mappings with provenance/terms, and deprecation maps.
 
-Validate source IDs, seeds, allowed hosts, exact paths, path prefixes, exclusions,
-content types, language hints, adapters, quotas and shared host rate limits.
-Record terms review status, reviewer, date, reviewed URLs and restrictions.
-The user authorizes collection of public content allowed by robots; a separate
-manual approval for every origin is not required. Automatically inspect robots
-and known published restrictions, recording actual blocks/ambiguities for review.
-The draft registry's `block_unreviewed_terms: true` and blanket pending-state
-gate must be revised to this policy before implementation; do not relabel pending
-terms as reviewed. Redistribution rights remain distinct from collection access.
+Use general facets: domain, capability, method/technology, application, service
+and collaboration need. Location/affiliation remain sourced claims. Entity types
+are person, unit, project, infrastructure, service and company; they are not
+concept labels. Allow multi-label, ambiguous and unmapped content. Proposed new
+concepts require review. Missing labels must not hide otherwise valid evidence.
 
-Check scope, robots and destination IP safety before requests and redirects.
-Apply the same policy to browser requests and downloaded assets. Preserve
-semantic query parameters; reject forbidden navigation rather than silently
-rewriting its meaning. Bound response bytes, decoded bytes, processing time,
-PDF pages, retries and total run time. Persist retryable work for resumption.
+## 6. Enrichment and validation
 
-## 4. Preserve raw material and normalize evidence
+| Step | Input → output | Rules |
+| --- | --- | --- |
+| Classification request | Exact bounded passages + IDs/locators, metadata/hash, language and relevant fixed taxonomy definitions → `ClassificationRequest` | Source text is untrusted data; application owns instructions. Include neighboring context; record which sections were processed. |
+| Apertus 8B | Request → document types, concept assignments, entity/claim candidates, missing fields and evidence-linked plain descriptions | Keep factual claims separate from lay explanations and suggested adjacent uses. Do not silently truncate or classify only a generated summary. |
+| Mechanical checks | Candidate → schema/ID/label/span validation | Exact quotes and valid JSON do not establish semantic support. |
+| Semantic/identity checks | Candidate + original context → accepted, unknown, conflict or needs_review | Explicit identifiers/compatible affiliations support merges; name similarity is insufficient. No invented contact, geography, clinical suitability or availability. |
+| Bounded fallback | One repair attempt, unresolved ambiguity/conflict/context failure → optional 70B with the same evidence plus diagnostics | Apply identical checks; retain both derivations/routing reason. Unavailable 70B leaves explicit limitations/pending work. |
+| Persistence | Validated output → separate derivation and claim records | Store model/prompt/taxonomy/settings, hashes, coverage, time and errors; preserve original evidence. |
 
-Store original bytes, requested/final URLs, response metadata, fetch time, raw
-hash and collection-policy decisions. Extract HTML and text PDFs first; add
-OCR for scans with engine/version, language, page provenance and quality flags.
-Preserve headings, lists, tables, links and original language. Store complex
-tables or media as referenced sidecars and include them in exports.
-
-Keep body-only normalized text separate from generated metadata and summaries.
-An evidence span must satisfy `body[char_start:char_end] == text`, using Unicode
-character offsets and an exclusive end. Keep page/section locators and the
-mapping back to the exact raw artifact. OCR or visual transcription is derived
-text with its method recorded, not a guaranteed verbatim original quote.
-
-Image/audio support and native PDF upload are distinct capabilities. The
-[official Apertus 1.5 70B model card](https://huggingface.co/swiss-ai/Apertus-v1.5-70B)
-documents text/image/audio input; actual endpoint support remains unverified.
-If visual interpretation is used, retain it as a separate derived artifact with
-page/image locators and validation status. Do not insert it into faithful text.
-
-## 5. Define and version the taxonomy
-
-The team must supply/review the initial taxonomy before enrichment is accepted.
-Start with a small controlled vocabulary covering the pilot; do not require a
-graph database or a comprehensive medical ontology to begin.
-
-Each concept contains:
-
-- Stable `concept_id`, `taxonomy_version`, preferred labels by language.
-- Definition, inclusion/exclusion notes and relevant examples.
-- Multilingual synonyms and abbreviations, with ambiguous aliases identified.
-- Explicit broader/narrower relations and separately labeled related concepts.
-- Optional external ontology IDs with provenance and reuse terms.
-- Deprecation/replacement mapping when concepts change.
-
-Proposed facets: medical domain, research capability, technology/method,
-application, infrastructure/service and collaboration need. Geography and
-organization identity remain evidence-backed entity attributes, not guessed
-topic labels. Entity types are person, unit, project, infrastructure, service
-and company. These types are distinct from taxonomy concepts.
-
-Classification uses surrounding passages, document context and concept
-definitions. Keywords alone cannot assign a concept. Allow multiple concepts,
-`unmapped` and `ambiguous`; retain candidate alternatives and supporting spans.
-An alias shared by two concepts must not force them to merge. Proposed new
-concepts go to review rather than modifying the taxonomy automatically.
-
-## 6. Apertus enrichment and validation
-
-### 6.1 Information sent to the classifier
-
-Pass an explicit `ClassificationRequest`, not the whole crawler state or a
-conversation transcript. Include `schema_version`, request/document/version
-IDs, normalized body hash, title, source URL, language, organization hints marked
-as hints, taxonomy ID/version, allowed document types, relevant concept
-definitions, and source passages with evidence IDs/page/section locators.
-The task instruction is application-owned; source text is delimited untrusted
-data. Input includes contextual neighboring sections when a passage is ambiguous.
-
-Use Apertus **v1.5 8B** as the default classifier. Long documents are processed
-as bounded contextual section batches, then consolidated with the same evidence
-IDs. Do not classify only a generated summary or silently truncate a document.
-Store which spans were processed and disclose incomplete coverage. Budget with
-the actual Apertus tokenizer/processor/template; endpoint capabilities are pending.
-
-### 6.2 Information returned and validation routing
-
-Require a `ClassificationResult` containing:
-
-- Document type: institute profile, project, facility, funding opportunity,
-  service, news or `unknown`. Allow additional reviewed types such as person
-  profile instead of forcing an unsupported label. Types are versioned separately
-  from research-topic concepts and can be multi-valued for mixed documents.
-- Multiple research-topic assignments with concept IDs, mapping kind and evidence.
-- Explicitly supported organization/location claims. Separate organization
-  address, activity location and project geography; national/international
-  content does not inherit a Bern location from its publisher.
-- Extracted entity/claim candidates, supporting quotations, evidence IDs,
-  original section/page references and missing-field reasons.
-- Ambiguities, conflicting assignments and `unknown`/`unmapped` fields.
-- Model/prompt/taxonomy versions and processing coverage. Plain-language
-  descriptions, if generated, are separate derived fields with supporting claims.
-
-Validate JSON/schema, label membership, IDs and literal quotation/span equality
-deterministically. These checks do not establish semantic entailment; inspect
-claim support and evaluate against independently labeled examples as well.
-
-Route schema/quote failures after one bounded repair attempt, unresolved
-ambiguities, conflicting topic assignments or insufficient context to **Apertus
-v1.5 70B**. Send the same source passages/taxonomy plus validation diagnostics
-and the 8B candidate explicitly labeled as unverified. The larger model cannot
-resolve conflicting source facts by guesswork. Preserve both derivations and
-the routing reason. Apply the same validators to its output; unresolved records
-remain `needs_review` or `unknown` and do not become accepted claims.
-
-If 70B is unavailable, preserve pending work and explicit limitations; do not
-silently relabel the 8B output as verified. Use deterministic routing signals
-and a manually labeled routing sample rather than model self-confidence alone.
-
-### 6.3 Terminology bridge and claim protection
-
-The stakeholder describes a gap between scientific page language and investor
-language [T05 00:00–00:47](../recordings/bern-navigator-followup-2026-10-18.txt).
-Retain scientific terms and their surrounding evidence. Store reviewed lay
-aliases in the taxonomy; keep generated `plain_language_description`,
-`business_relevance_hint` and suggested adjacent uses as derived, evidence-linked
-fields. They are retrieval/explanation aids, never substitutes for source text.
-Do not equate a suggested application with an evidenced project. Future fields
-such as robotics should reuse these contracts with a new taxonomy/configuration,
-without widening the current Bern healthcare pilot automatically.
-
-### 6.4 Processing invariants
-
-For each eligible document/section:
-
-1. Construct a bounded input containing exact evidence, metadata and relevant
-   taxonomy definitions. Delimit source content as untrusted data.
-2. Ask Apertus 8B, with the bounded 70B route above, to produce concept assignments, entities and
-   factual claims, each pointing to supporting evidence IDs.
-3. Validate schema, allowed concept IDs, evidence existence and locator integrity.
-   Missing facts remain null with a reason. Retry malformed output within a
-   fixed budget; otherwise quarantine the derivation.
-4. Check semantic support separately: valid offsets alone do not prove that a
-   passage supports a role or capability. Use reviewed pilot examples and a
-   documented review policy; retain unverified/conflicting claims explicitly.
-5. Resolve duplicate entities using explicit profile links/identifiers and
-   compatible affiliations. Similar names are insufficient. Record merge
-   evidence and preserve ambiguous identities separately.
-6. Store the derived result with model ID/revision, prompt version, taxonomy
-   version, settings, input hashes, validation state and processing time.
-
-Do not store a proposed adjacent application as an established capability, or
-infer expert availability, willingness to collaborate, contact details or
-economic impact. These boundaries also apply to Phase 2.
+Budget with the actual tokenizer/template. Do not equate a related concept with
+a synonym or store a possible transfer as an existing project. Evaluate 8B-only
+versus fallback on independently reviewed samples; model self-confidence is not
+an acceptance signal.
 
 ## 7. Shared contract v1 — owned here, consumed by Phase 2
 
 Implement typed schemas and JSON Schema exports in `src/`. Every record carries
-`schema_version`. IDs are opaque to consumers; references must resolve within
+`schema_version`; runs/manifests also pin `domain_profile_id` and
+`domain_profile_version`. Core contracts are domain-independent; new domain
+fields use versioned extensions. IDs are opaque to consumers; references must resolve within
 the selected snapshot or its explicitly attached case evidence collection.
 
 ### 7.1 Records
@@ -280,7 +142,7 @@ the selected snapshot or its explicitly attached case evidence collection.
   outcomes stay unknown. Synthetic cases are explicitly labeled.
 - **Derivation:** input IDs/hashes, model and prompt/configuration identifiers,
   taxonomy version, output hash, timestamps, validation status and errors.
-- **SnapshotManifest:** `snapshot_id`, schema/taxonomy versions, included
+- **SnapshotManifest:** `snapshot_id`, domain-profile/schema/taxonomy versions, included
   document/entity/claim IDs, index versions, embedding/tokenizer identifiers if
   used, source coverage/failures, snapshot date and artifact checksums.
 
@@ -474,9 +336,11 @@ generated expansion terms are hypotheses rather than company facts.
    token and model-call budgets. Ask the user a follow-up when a material
    ambiguity cannot be resolved from permitted context, then resume from a
    checkpoint. Do not keep cycling until a confident-looking answer appears.
-5. Pass an `EvidencePack` to synthesis: interpreted need, user priorities,
-   accepted claim IDs, literal passages, locators, sources, conflicts, coverage
-   and missing evidence. Use 8B initially; 70B is optional for difficult synthesis
+5. Pass the frozen `ReportEvidencePack` defined in
+   [ARCHITECTURE.md](ARCHITECTURE.md#evidence-pack-the-report-generation-gate) to
+   synthesis: current intent/company facts, needs, accepted matches, argument
+   derivations, optional numerical/case records, literal passages, locators,
+   sources, conflicts, coverage and missing evidence. Use 8B initially; 70B is optional for difficult synthesis
    if access/resources permit. Validate answer claims against the pack.
 
 Thirty candidates/eight context passages are initial passage budgets, not an
@@ -515,93 +379,55 @@ Capabilities in documentation do not establish performance on this taxonomy or
 corpus. Pin actual packages/model revisions and verify deployment/license details
 during implementation; no hosted inference URL is inferred from a model card.
 
-## 9. Incremental processing and previous cases
+## 9. Refresh and rebuild
 
-Use conditional HTTP requests and raw hashes to avoid unnecessary extraction.
-Document versions include extraction/normalization configuration; enrichment
-versions additionally depend on taxonomy/model/prompt settings. Index builds
-depend on chunker and embedding configuration. A changed taxonomy can trigger
-reenrichment/reindexing without a new crawl.
+Use conditional requests and hashes to skip unchanged work. Separate raw fetch,
+normalized body, enrichment and index versions. Parser changes reuse raw bytes;
+taxonomy changes trigger affected enrichment; embedding/chunker changes rebuild
+compatible indexes. Preserve history and apply a configured permanent-unavailability
+policy rather than retiring a source on one temporary failure. Revoke access in
+historical builds/caches when required. See the architecture rebuild matrix.
 
-Track raw fetch snapshots separately from normalized content versions so a
-boilerplate-only change does not destroy auditability. Define a configurable
-permanent-unavailability policy: an isolated 404 or temporary failure must not
-silently remove evidence. Retire confirmed unavailable sources from current
-search while retaining permitted history and warnings.
+Historical cases enter only through reviewed eligible records; no corpus is
+supplied. Keep synthetic fixtures labeled. Generated reports cannot become their
+own sole factual evidence or silently update shared taxonomy/embeddings.
 
-Import historical cases only from an approved public/non-confidential dataset.
-Confidential plans cannot be made acceptable merely by moving inference locally
-or removing names. No historical-case corpus is currently supplied. Support an
-empty case collection with an explicit unavailable-data result. Demonstration
-fixtures may be synthetic and must not be presented as real agency cases.
+## 10. Acceptance gates
 
-## 10. Milestones and acceptance gates
+1. Schemas/profile/registry validate; required families and missing prerequisites
+   are explicit. No endpoint or taxonomy assumptions are invented.
+2. HTML/public-PDF samples retain raw bytes, sidecars, exact spans and source
+   provenance. Track fetched/extracted/enriched/indexed/rejected counts separately.
+3. Independent checks cover synonyms, negation, ambiguous identity, missing
+   fields, labels and supported claims. Review the 8B/70B routing policy.
+4. Staged publication verifies IDs/checksums/vector inputs, dimensions, batch
+   failures, access filters and cross-store references before switching snapshots.
+5. Phase 2 can retrieve exact evidence with compatible query vectors. Freeze
+   snapshot/taxonomy/query versions for [evaluation](../challenge/EVALUATION.md).
+6. Exercise a second profile with fixtures and an index rebuild/rollback without
+   changing core orchestration. Measure domain quality separately.
 
-1. **Contracts and scope:** implement schemas, taxonomy loader and registry
-   validator; verify seeds for all three required families; identify endpoint
-   and permitted pilot inputs. Exit: fixtures validate and missing prerequisites
-   are reported rather than invented.
-2. **Collection and evidence:** bounded HTML/PDF acquisition, raw storage,
-   normalization and exact spans. Exit: reviewed samples from all three families
-   with recoverable provenance; scans/unsupported media have explicit outcomes.
-3. **Taxonomy and entities:** Apertus derivations, validation and cautious entity
-   resolution. Exit: reviewed ambiguous/synonym/missing-field examples, with no
-   unsupported accepted claims in the reviewed sample.
-   Compare 8B-only classification and the 8B-to-70B routing policy on a manually
-   labeled sample; report routing rate, correction rate, cost and remaining errors.
-4. **Published memory:** implement section 7 functions, indexes and atomic
-   snapshots. Exit: Phase 2 contract tests can retrieve entities and resolve
-   every cited span from a fixed snapshot; access filters and empty cases work.
-5. **Refresh and evaluation:** verify unchanged reruns, changed sources,
-   taxonomy migrations, revoked access and failed publication. Measure retrieval
-   using [EVALUATION.md](../challenge/EVALUATION.md); document actual coverage and omissions.
+Use offline fixture tests for scope/redirects/robots, query parameters, encoding,
+PDF/OCR flags, tables, prompt injection, offsets, duplicate content, conditional
+requests, revocation and failed publication. Ensure unlabeled relevant text
+remains retrievable, summaries never replace evidence, and edits reach retrieval.
 
-Use offline fixtures for automated tests, including query parameters, scope,
-redirects, robots denial, shared-host limits, malformed PDFs, Unicode, tables,
-OCR flags, injected instructions, exact offsets, deduplication and index rebuilds.
-Live source smoke tests are additional evidence, not prerequisites for offline
-tests. Track fetched/extracted/enriched/indexed/rejected counts separately.
+## 11. Collection integration
 
-Handoff tests must reject unresolved evidence references, changed embedding
-inputs with reused vectors, dimension mismatches, cross-snapshot queries and
-partial index publications. Verify that an unlabeled but relevant source remains
-retrievable, classifier summaries cannot replace original text, and a user focus
-change reaches both retrieval and the evidence pack. Evaluate DE/FR/EN retrieval
-and terminology bridging explicitly; Italian remains an extension.
+The [collection spec](../data/ingestion/INGESTION_SPEC.md) now covers acquisition
+only, not an alternative phase definition. Use code under `src/`, current pilot
+families, config-driven source adapters and shared-host limits. Map any legacy
+`version_id` to `document_version_id` at one typed boundary; preserve chunk IDs,
+locators and sidecars. Never confuse source, enrichment and index versions.
 
-When consuming the legacy collector, map its `version_id` to the shared
-`document_version_id` at one typed adapter boundary. Preserve `chunk_id` and
-offsets; do not accidentally treat an enrichment revision or index-build ID as
-a source-document version. Publish this mapping with the JSON Schemas.
+## 12. Deployment and remaining inputs
 
-## 11. Corrections required in the collection implementation
+The [architecture contract](ARCHITECTURE.md#target-architecture-mandatory) owns
+component placement, the proposed air-gapped primary target, cloud alternatives,
+dependency inventory and disconnected-run proof. No deployment has been tested.
+Collection is connected; isolated case runtime must bundle models, evidence,
+indexes, taxonomy/profile, UI and rendering assets without remote fallbacks.
 
-- Move the old proposed root `bern_ingest/` package under `src/`.
-- Add explicit ARTORG/DCB coverage and revise optional-source priorities.
-- Support `allowed_exact_paths`, `adapter` and structured review metadata.
-- Include parser/normalizer configuration and chunker/tokenizer versions in
-  derived artifact identities; keep raw and content lineage distinct.
-- Unify 404/410 retirement handling with section 9.
-- Define `needs_review` records as ineligible for accepted factual results until
-  validated; retain them for diagnostics and targeted review.
-- Include sidecars and extraction locators in portable exports.
-- Replace the old missing-inventory/manual-per-source gate with the supplied
-  workbook, supplementary discovery and robots/access policy above. Update the draft registry
-  and legacy spec accordingly when implementing collection.
-
-## 12. Deployment and unresolved choices
-
-Connected collection is distinct from runtime. A disconnected deployment must
-bundle permitted snapshots, taxonomy, indexes, model/tokenizer assets and all
-runtime dependencies. Test with networking disabled before claiming offline
-operation. Independent cloud operation is also allowed; cantonal internal
-networks remain excluded.
-
-The selected pilot, discovery seeds and English-first language policy are in
-[PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md). Partner examples/expected entities can be
-provided but are not received. Inference and deployment details are deferred
-to the user's pre-development handoff. Remaining technical choices include
-taxonomy contents/reviewer, model/package revisions, actual access policies and corpus
-size; a historical-case dataset remains separately unavailable. Follow the
-pilot's proposed pre-demo refresh policy and report snapshot age. Record decisions in
-[DECISIONS_AND_OPEN_QUESTIONS.md](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
+Await the user's endpoint/hardware handoff, reviewed taxonomy and partner gold
+examples. Historical-case data remains independently absent. Record actual
+choices in [decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md).

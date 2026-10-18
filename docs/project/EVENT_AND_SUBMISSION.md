@@ -55,7 +55,9 @@ For this track, also apply B1's stricter infrastructure boundary: development
 and deployment remain **outside cantonal ICT and internal networks**. A generic
 on-premise template option does not authorize use of cantonal infrastructure.
 List build-time and runtime dependencies separately and distinguish proposed
-deployment from actually tested deployment.
+deployment from actually tested deployment. The [visual reference](../architecture.html)
+and [architecture contract](../plans/ARCHITECTURE.md) now document the proposed
+air-gapped primary runtime and independent alternatives; no target is tested.
 
 M1 lists six main-jury dimensions, each scored **0–5**: purposeful use of AI;
 technical rigour; value/cost/scalability; sovereign deployability; implementation
@@ -66,9 +68,9 @@ lists the first five; both sources should be represented in final materials.
 
 The [Notion page text N1](../sources/NOTION_CHALLENGE_2026-10-18.md) lists
 `powerpoint_template.pptx` and `Logo_SF_BE_EN.png` for use **only for this
-challenge**. Actual asset files have not been supplied or inspected. Use these
-within that purpose if acquired; they do not replace M1/M2, alter report limits
-or establish an automatic teaser-export requirement. The page supplies no
+challenge**. The [original assets](../provided_material/README.md) are now supplied and
+structurally inspected. They do not replace M1/M2 or alter report limits.
+Automatic PowerPoint export is a later user-selected product feature. The page supplies no
 additional ZIP rule, live-pitch duration or confirmed submission cutoff.
 
 ## Historical delivery instructions requiring current confirmation

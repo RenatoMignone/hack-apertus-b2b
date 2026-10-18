@@ -118,7 +118,7 @@ this local scoring-scale statement. Stage-specific details remain unverified.
 | Purposeful use of AI | Observed Apertus contribution and comparison/justification for its chosen role | Not assessed; implementation absent |
 | Technical rigour | Reproducible working pipeline, pilot metrics, evidence audit and known failures | Not assessed |
 | Value, cost & scalability | Operator benefit, measured/estimated costs with assumptions, coverage/extension behavior | Stakeholder need documented; product evidence absent |
-| Sovereign deployability | Selected target, full dependency map and verified operation for claimed mode | Not selected or tested |
+| Sovereign deployability | Selected target, full dependency map and verified operation for claimed mode | Air-gapped primary design proposed; no deployment tested |
 | Implementation feasibility | Run instructions, data/rights boundary, maintenance and partner handoff requirements | Not demonstrated |
 | Pitch & presentation | Clear, truthful working demo and coherent report/video within actual limits | Not produced |
 
@@ -126,3 +126,23 @@ Do not fabricate internal judge scores or imply that documentation proves a
 working prototype. The report should state corpus size/coverage, query counts,
 recall protocol, support/completeness results, baseline comparison, cost basis,
 deployment evidence and limitations **once available**.
+
+## Architecture extension and deployment checks
+
+Additional user design gates, not new organizer metrics:
+
+- Run a second domain profile with fixtures without changing core orchestration;
+  verify different concepts/sources and unknown terms. This proves configuration
+  behavior, not second-domain research quality.
+- Exercise parser/taxonomy/chunker/embedding changes with staged rebuilds,
+  compatible query vectors, publication failure and rollback.
+- Verify manual text intake, disabled confidential attachments, intent revisions
+  and full evidence-pack → report → export lineage.
+- For the proposed air-gapped primary target, cold-start and complete a case and
+  export with external networking disabled; inspect attempted egress and absence
+  of downloads, telemetry, CDN, remote vectorizers and model/search fallbacks.
+- For any other claimed target, record the actual ownership/administration or
+  Swiss operator/jurisdiction/residency and every runtime dependency.
+
+[Architecture/dependency inventory](../plans/ARCHITECTURE.md#target-architecture-mandatory).
+No checks in this section have been executed.

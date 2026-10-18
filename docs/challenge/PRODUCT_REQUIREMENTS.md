@@ -2,7 +2,7 @@
 
 **Status:** requirements extracted; no product has been implemented. B1 refers
 to the [supplied challenge brief](CHALLENGE_BRIEF.md), confirmed by the complete
-[Notion text N1](../sources/NOTION_CHALLENGE_2026-10-18.md). E01–E26 refer to
+[Notion text N1](../sources/NOTION_CHALLENGE_2026-10-18.md). E01–E30 refer to
 [recording evidence](../recordings/RECORDING_INSIGHTS.md). Proposed checks below are internal
 acceptance guidance, not additional organizer rules.
 
@@ -79,6 +79,15 @@ are described in [DATA_AND_PROVENANCE.md](../data/DATA_AND_PROVENANCE.md).
 | S06 | Multiple cases sometimes run concurrently, about 300/year overall (E06) | Context for future workflow; no required case-management feature or load target |
 
 ## Scope boundaries
+
+**Current user architecture/input requirements, 18 October:** manual text intake
+(keywords, context, public company facts and operator leads), domain-independent
+core with configurable/rebuildable RAG, and a grounded main
+[visual architecture reference](../architecture.html). Future confidential PDF
+intake remains disabled pending explicit permission and revised handling rules.
+The [architecture contract](../plans/ARCHITECTURE.md) owns components, deployment
+targets and lifecycle dependencies. These extend the product design, not the
+organizer's official criteria.
 
 **Additional user requirements, 18 October:** the operator can issue natural-
 language instructions to modify/refocus existing results/reports, and the agent

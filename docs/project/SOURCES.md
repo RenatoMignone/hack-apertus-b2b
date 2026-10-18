@@ -30,6 +30,7 @@ Do not merge conflicting instructions silently. For example, conversational
 | U2 | User's open-question answers in this session, 18 Oct 2026 | No official UniBE inventory; robots-allowed public collection; agent-delegated medical focus and evaluation design; English-first with DE/FR/IT desirable; Bern healthcare expansion; confirmed export; partner examples available | Examples, endpoint/deployment details and branding assets not delivered; no historical-case corpus confirmed; no redistribution grant |
 | U3 | User's later material delivery, 18 Oct 2026; [inspection inventory](../provided_material/README.md) | Best-effort UniBE workbook with 42 actual entries, supplied PowerPoint template and English agency logo | Supersedes missing inventory/branding delivery status in U2; Notes count 71 conflicts with data rows; no sample cases/gold labels or endpoint details supplied |
 | U4 | User's architecture and information-handoff request, plus revision/follow-up instructions, 18 Oct 2026 | Initial Apertus 8B/70B + BGE-M3 + Weaviate + BGE reranker + LangGraph design; editable conversational results and agent questions | Starting architecture to validate, not measured superiority, access credentials or implementation authorization |
+| U5 | User's visual architecture, manual input and domain-independence request, 18 Oct 2026 | Typed permitted keywords/context/operator knowledge; private PDFs outside app; future attachment extension; unchanged report sections; stacked HTML reference; concise docs and explicit deployment/dependency accounting | Documentation authorization; future confidential ingestion requires revised permission/handling; deployment target remains untested |
 | B1 | [Challenge text captured locally](../challenge/CHALLENGE_BRIEF.md), supplied by user | Objective, sources, models, expected fields, metrics, ethics and infrastructure boundaries | Linked Notion page not independently retrieved; capture is based on pasted text |
 | N1 | [Complete Notion page text supplied by user](../sources/NOTION_CHALLENGE_2026-10-18.md), 18 Oct 2026 | Confirms B1; domain Research & Innovation; exact supporting filenames; template/logo use only for this challenge | User-supplied page capture, not independent live verification; no attachment bytes/download URLs or workbook/branding inspection |
 | M1 | Root [README.md](../../README.md), local template at baseline commit `e1a8246` | Required layout, environment names, deliverables, report/video limits, six 0–5 jury dimensions | Contains unfilled project/team/challenge placeholders; remote template ancestry/visibility not checked |
@@ -44,7 +45,7 @@ Do not merge conflicting instructions silently. For example, conversational
 
 All five transcripts were read completely. Their immutable IDs, last timestamps
 and original hashes are in [recordings/README.md](../recordings/README.md). Derived
-findings E01–E26 in [RECORDING_INSIGHTS.md](../recordings/RECORDING_INSIGHTS.md) link to original
+findings E01–E30 in [RECORDING_INSIGHTS.md](../recordings/RECORDING_INSIGHTS.md) link to original
 files and give recording-relative time ranges. No original audio was accessed.
 
 The later T05 text was also read completely and preserved byte-for-byte with a

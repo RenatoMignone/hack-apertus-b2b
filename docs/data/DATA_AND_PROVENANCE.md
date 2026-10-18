@@ -1,141 +1,93 @@
-# Data sources, evidence and collection boundaries
+# Data, evidence and provenance
 
-**Status:** contract proposal derived from B1, N1 and recording evidence E03,
-E07–E11, E15, E18–E22. No source collection, entity extraction or rights clearance
-has been performed. See [SOURCES.md](../project/SOURCES.md) for context-source provenance.
+**18 October 2026 · Design; no corpus, extraction or clearance results claimed.**
+Start with the [visual pipeline](../architecture.html). The
+[Phase 1 shared contract](../plans/INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2)
+owns schemas/interfaces; this file owns evidence and rights rules.
 
 ## Source inventory
 
-| Source family required by B1 | Discovery input | Current status |
+| Family | Discovery input | Current evidence / limitation |
 | --- | --- | --- |
-| University of Bern | Partner workbook, supplemented by relevant public links/sitemaps and DBMR/medical seeds | 42 actual workbook entries including external DCB; best-effort list, Notes count of 71 inconsistent. Import URL column with row provenance; apply per-origin policy. |
-| ARTORG Center for Biomedical Engineering Research | Official website and associated research, team and project pages | Research directory and diabetes/nutrition pages inspected; links in PILOT_SCOPE; bulk crawl policies not tested |
-| Diabetes Center Berne | Official website and research, expertise, team, project and service pages | Official English research entry is `https://www.dcberne.com/en/projects/`; inspected, not a completed crawl |
-| Additional Bern institutions/companies | Partner references first, then relevant public healthcare sources | User allows expansion with evidenced Canton of Bern operations; affiliation alone does not prove locality |
+| UniBE | Partner workbook, public links/sitemaps and medical/DBMR seeds | Workbook has 42 actual rows including DCB, despite Notes count of 71; not exhaustive DNS coverage |
+| ARTORG | Research directory and associated team/project pages | Dated public-page observations in pilot scope; not a completed crawl |
+| DCB | `https://www.dcberne.com/en/projects/` and associated public pages | Dated discovery observation; do not substitute a guessed research URL |
+| Additional organizations | Partner references, then eligible public sources | Current pilot requires healthcare relevance and evidenced Canton of Bern activity; network membership alone is insufficient |
+| Case company | Permitted typed clues plus attributable public pages or packaged evidence | Company identity must be resolved; user statements remain attributed until independently supported |
+| Historical cases | Approved public/non-confidential records only | No dataset supplied; distinguish unavailable data from no similar case |
 
-Resolve redirects and actual institutional site ownership before configuring
-collection. ARTORG may overlap the UniBE web ecosystem: source families describe
-institutional coverage, not necessarily disjoint hosts or datasets. Deduplicate
-physical pages without losing institutional attribution. Do not count duplicate
-copies as extra experts or fabricate three separate databases.
+Use the [pilot scope](../challenge/PILOT_SCOPE.md) for exact dated seeds and the
+[provided-material inventory](../provided_material/README.md) for original hashes,
+workbook row details and template/logo handling. The workbook is a discovery map,
+not a verified expertise or gold-label dataset. Branding and workshop transcripts
+stay outside the research index.
 
-See [PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md) for dated discovery evidence and selected
-diabetes-technology scope. The user authorizes public robots-allowed collection;
-do not require separate blanket per-origin approval. Check actual access rules
-and escalate real ambiguity/blocks; redistribution rights remain separate.
-English is the output baseline; preserve DE/FR/IT original source text where
-collected and keep translations as evidence-linked derivations.
+One page can belong to multiple source families. Deduplicate physical pages
+without losing institutional attribution or treating copies as corroboration.
+English output is baseline; preserve DE/FR/IT source text where actually collected.
+Translations are labeled derivations linked to original passages.
 
-The [provided-material inventory](../provided_material/README.md) records original
-file hashes and handling rules. The workbook provides discovery candidates,
-not accepted expertise claims or evaluation labels. Logo and slide template are
-presentation assets; keep them outside the research-evidence index.
+## Collection and lineage
 
-## Proposed source configuration and collection record
+The [collection specification](ingestion/INGESTION_SPEC.md) defines config-driven
+hosts/paths, robots/access checks, safe requests, extraction and quality reporting.
+The user authorizes relevant public robots-allowed collection without a blanket
+manual-per-origin gate. Record actual restrictions/ambiguities; collection access
+and redistribution rights are different questions.
 
-The named workbook has now been received and inspected; its origin/date/hash,
-sheets, columns and count discrepancy are documented in the provided-material
-inventory. Validate actual domains/URLs before collection; supplied rows do not
-establish live reachability, completeness or crawl permission. The N1
-[page-text snapshot](../sources/NOTION_CHALLENGE_2026-10-18.md) is context evidence,
-not the inventory itself or evidence of any researcher's expertise.
+Keep requested/final URLs, discovery provenance, fetch/source dates separately,
+raw/body hashes, parser/configuration versions, language, title and status.
+Distinguish attempted, fetched, extracted, enriched, indexed and rejected pages.
+Evidence preserves literal text, version and section/page/Unicode offsets.
+Claims, taxonomy mappings, translations and summaries have separate derivations.
+Every case pins profile/taxonomy/snapshot/index versions and its case evidence
+manifest. Indexes are rebuildable; source truth is not just a vector store.
 
-A new source should need a small configuration entry and, only where necessary,
-a documented site-specific extractor. Suggested fields:
+## Evidence rules
 
-- stable source ID, institution label and source-family membership;
-- verified seed URLs, allowed hosts/path prefixes, inclusion/exclusion patterns;
-- language discovery/handling, supported page/file types, URL normalization;
-- bounded depth/page count, per-host request rate, timeout and retry limits;
-- extractor choice and any site-specific handling;
-- collection date, rights/usage notes and known access limitations.
+1. **Support every factual claim.** A real URL is insufficient unless its
+   passages support the specific role, capability or relationship. Facts may
+   require multiple sources; exact quotes still require semantic review.
+2. **Separate evidence and inference.** An evidenced lung model does not become
+   an existing liver project. Suggested transfer and potential benefits remain
+   labeled arguments with premises and prerequisites.
+3. **Keep unknowns.** Missing roles, contacts, dates or outcomes stay null with
+   reasons. Never derive email addresses or expert willingness from patterns.
+4. **Resolve identity cautiously.** Prefer explicit links/IDs and compatible
+   affiliations; similar names or topical overlap do not establish identity.
+5. **Preserve dates/conflicts.** Do not resolve contradictory roles or stale
+   source information by guessing. Retrieval failure is distinct from no-match.
+6. **Generated text is not its own factual source.** Keep raw passages behind
+   summaries; operator suggestions are research leads; reviewed selection does
+   not bypass support checks or automatically update shared memory.
+7. **Treat source content as untrusted data.** It cannot override application
+   instructions, execute tools or change source/access policies.
 
-These are design suggestions, not existing configuration keys. Verify public
-access, relevant site conditions and crawl guidance; use bounded, polite access.
-Do not cross login walls, obtain internal network access or treat a public URL
-as a blanket redistribution license. No collection permission is established
-merely by a workshop participant suggesting scraping.
+## Intake, rights and publication
 
-Keep a collection manifest: attempted URL, canonical/final URL, source family,
-fetch timestamp/status, content hash, title, language, extractor version and
-inclusion/exclusion reason. Distinguish fetched pages from successfully extracted,
-indexed and rejected pages. Keep failures visible in coverage reporting.
+Current intake is manually typed permitted keywords/context after the human reads
+confidential plans and one-pagers outside the application. Those PDFs cannot be
+uploaded now, including to a local model. Future attachment support is disabled
+pending explicit permission and revised handling/access/retention/deployment
+requirements. A model cannot redact the forbidden document before receiving it.
+Public linked research PDFs use a separate eligible collection path. [T05
+00:48–01:22](../recordings/bern-navigator-followup-2026-10-18.txt).
 
-## Proposed knowledge and evidence contract
+Retain only relevant public professional information and record restrictions.
+Do not infer sensitive attributes. The root code's Apache-2.0, report's CC-BY-4.0
+and challenge's Open Commons wording do not relicense source pages, contacts,
+photos, PDFs, branding or transcripts. Actual reuse/redistribution rights and
+current event terms remain unresolved where not supplied.
 
-The required result fields are in [PRODUCT_REQUIREMENTS.md](../challenge/PRODUCT_REQUIREMENTS.md).
-The internal representation should support these additional provenance concepts:
+The template/logo are **challenge-only**. Preserve originals; do not infer rights
+to client-company assets. Transcripts are working context with unknown publication
+consent. Keep secrets, confidential plans and unapproved personal/non-redistributable
+material out of public artifacts; `.gitignore` does not remove tracked files.
 
-| Record | Suggested contents and rules |
-| --- | --- |
-| Source page | Stable ID, original/canonical URL, title, institution/source family, fetched time, visible publication/update date if present, content hash and extraction status |
-| Evidence passage | Page ID, exact excerpt or reproducible text offsets/section locator, extraction version; retain only as rights/storage policy allows |
-| Entity | Stable ID, entity type (person, unit, project, infrastructure, service; company if scope extended), supported labels/aliases, links to evidence |
-| Claim/relationship | Subject, predicate, object/value, evidence passage IDs, source dates, verification/conflict status; e.g. person → affiliation → unit only when supported |
-| Search match | Query/run ID, entity/result ID, supported required fields, matched concepts, short description, explanation and evidence references |
-| Coverage/run metadata | Corpus snapshot, participating source families, missing/failed sources, model/configuration identifiers and retrieval/evaluation version |
+## Disconnected runtime
 
-This is a conceptual contract; it does not select a graph database, JSON schema
-or storage technology. A small implementation can satisfy it with simpler records.
-
-### Evidence rules
-
-1. **Every factual result claim needs support.** A source URL must support the
-   claim, not merely belong to the right institution. Multiple fields may need
-   multiple pages. Proposed passage-level references make review reproducible.
-2. **Separate observations from interpretations.** Source says “lung model” is
-   an observed capability; “possibly relevant to liver R&D” is a labeled match
-   hypothesis. Never extract the hypothesis as a completed liver project.
-3. **Missing fields remain missing.** Use an empty list or null with a reason
-   such as “not stated in retrieved sources,” adapted to the eventual format.
-   Do not derive email addresses from name patterns or invent named contacts.
-4. **Merge identities cautiously.** Similar names and topical overlap are not
-   enough. Prefer explicit profile IDs/links and compatible affiliations; keep
-   ambiguous candidates separate and retain evidence for aliases.
-5. **Roles can change.** Preserve source/fetch dates, avoid silently resolving
-   contradictions by model guesswork, and disclose staleness or disagreement.
-6. **Enrichment does not become source truth.** Synonyms, model-generated tags
-   and suggested relations need origin labels. Never use generated summaries
-   as sole evidence for a person, project or service.
-7. **Untrusted page content stays data.** Proposed implementation guardrail:
-   extracted pages must not override agent instructions or trigger arbitrary
-   tools. A citation-quality check must be separate from trusting page text.
-
-## Privacy, rights and publication
-
-**Recorded boundary:** business plans stay outside models; the human prepares
-non-confidential keywords. Public researcher/contact pages can still contain
-personal information. Limit collection to relevant professional facts and do
-not infer sensitive attributes. [B1 §5; E03]
-
-**Template requirement:** describe data origin/license and flag personal or
-non-redistributable material in the technical report; keep that material out of
-the repository. Public access does not imply blanket consent or ownership.
-Record the actual basis and restrictions; do not invent consent. [M2 §4]
-
-Apache-2.0 in the root applies to the code artifact; M2 labels the report CC-BY-4.0;
-B1 refers to Open Commons/T&C §6 while retaining institutional source copyrights.
-Do not relicense crawled pages, photos, PDFs, logos or transcripts under the code
-license. Redistribution permissions and the current T&C wording remain unresolved.
-
-N1 explicitly limits `powerpoint_template.pptx` and `Logo_SF_BE_EN.png` to use
-for this challenge. The supplied files have now been inspected structurally and their hashes
-recorded; visual export checks remain to be performed during implementation. Do not assume general reuse rights or
-include these branding assets in the search evidence corpus.
-
-The supplied transcripts are working context, not source facts for expertise
-results. Publication/redistribution consent is unknown. Keep credentials, company
-plans and unapproved personal/non-redistributable content out of public artifacts.
-No `.gitignore` change has been made in this documentation-only pass; choose
-appropriate local-only data paths before future collection and remember that
-ignore patterns do not remove already tracked files.
-
-## Fresh collection versus disconnected operation
-
-Public-web collection requires a connected environment. For an air-gapped search
-runtime, prepackage the permitted corpus/index, model weights, dependencies and
-assets; run with local inference and no remote services. A source link can remain
-attached for later verification even when offline, but the interface must not
-claim it just checked that page live. Document snapshot age and a separate
-connected refresh process. This is a proposed deployment pattern, not a tested
-capability. Independent connected cloud operation is another allowed target.
+Connected build/collection produces a permitted dated snapshot. The proposed
+air-gapped runtime packages evidence/indexes, models, profile/taxonomy and all
+assets locally. Do not claim live verification when offline; source URLs are
+references for later checking. Dependency inventory and proof requirements live
+in [ARCHITECTURE.md](../plans/ARCHITECTURE.md#target-architecture-mandatory).
