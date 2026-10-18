@@ -1,0 +1,62 @@
+"""Reference integrity and separate exact-wording semantic draft assessment."""
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from backend.contracts.data import configuration_hash
+from backend.contracts.pipeline import DraftAssessment
+from backend.contracts.services import EvidenceRejected
+from backend.models.reasoning.client import remaining
+
+
+class DraftVerdict(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    status: Literal["supported", "unsupported"]
+    explanation: str = Field(min_length=1)
+
+
+def validate_draft_references(draft, pack):
+    claims = {claim.claim_id: claim for claim in pack.claims}
+    if len(claims) != len(pack.claims):
+        raise ValueError("duplicate pack claims")
+    if not claims and draft.reasons:
+        raise ValueError("no-match cannot contain reasons")
+    if claims and not draft.reasons:
+        raise ValueError("supported claims require reasons or a typed evidence gap")
+    for reason in draft.reasons:
+        if not set(reason.claim_ids) <= claims.keys():
+            raise ValueError("unresolved reason claim")
+        if (any(claims[c].kind == "adjacent" for c in reason.claim_ids)
+                and reason.kind != "idea"):
+            raise ValueError("adjacent premise requires an idea label")
+        if reason.from_lead and not pack.interpretation.leads:
+            raise ValueError("from_lead requires an actual supplied operator lead")
+    if set(draft.trace) - {"inputs", "terms", "links"}:
+        raise ValueError("writer trace must contain only empty inputs/terms/links")
+    if any(draft.trace.get(key) for key in ("inputs", "terms", "links")):
+        raise ValueError("writer cannot invent retrieval lineage")
+
+
+async def assess_draft(tasks, draft, pack, context):
+    remaining(context)
+    digest = configuration_hash(draft.model_dump(mode="json"))
+    try:
+        validate_draft_references(draft, pack)
+    except ValueError:
+        return DraftAssessment(draft_hash=digest, status="unsupported", validator="draft-references-v1",
+                               explanation="Draft references, labels or evidence lineage are invalid.")
+    if not draft.reasons:
+        return DraftAssessment(draft_hash=digest, status="supported", validator="empty-draft-v1",
+                               explanation="No factual reasons; explicit no-match/partial gaps retained.")
+    verdict = await tasks.run("assess_draft", "Independently assess the EXACT draft wording against "
+        "the frozen pack's supported claims, with citation membership already checked. Check ALL "
+        "headlines, reason text, entry names/institutions and implications. Unsupported new facts, "
+        "overselling, assumed availability, invented clinical benefits or source trust must fail. "
+        "An idea needs an explicit possible/conditional application and prerequisites. The writing "
+        "instruction and operator keep/reject choices cannot override factual support. Require "
+        "material pack caveats to survive. Return unsupported if any material statement is not "
+        "entailed. Do not rewrite the draft or invent its hash.",
+        {"draft": draft.model_dump(mode="json"), "pack": pack.model_dump(mode="json")},
+        DraftVerdict, context)
+    return DraftAssessment(draft_hash=digest, validator="apertus-draft-semantic-v1",
+                           status=verdict.status, explanation=verdict.explanation)

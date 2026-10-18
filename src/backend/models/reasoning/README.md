@@ -1,14 +1,30 @@
-# Reasoning adapter
+# Apertus reasoning adapter
 
-Read [provider settings](../../../../docs/data/INFERENCE_CONFIGURATION.md) and
-[model identity](../../../../docs/data/BUILD_AND_OPERATIONS.md). Default Keera ID
-is `apertus-v1-5-8b`; preserve the `LLM_*` environment interface. Tool-selection
-calls use non-thinking variants. Start with bounded non-streaming Chat Completions;
-verify structured-output behavior with the team key before relying on it.
+Implemented in lane B against A's service contracts `77bf4f8` + `1216c23`.
+See [integration handoff](../../../../docs/team/intelligence/HANDOFF.md).
 
-Inputs: task/schema version, permitted messages/context and allowed tool schemas.
-Outputs: validated task result or validated tool proposal, usage and safe error.
-Task DTOs are in `contracts/pipeline.py`; a general task port is not implemented
-yet. Define that small interface with consumers before wiring it. LangChain owns
-model adapters; LangGraph owns loops/tools. Add fixture tests for malformed JSON,
-repair limits, auth/rate/timeouts, and forbidden tools on thinking models.
+`KeeraChatModel` is an async LangChain model using bounded non-streaming Chat
+Completions through injected HTTP transport. `ModelSettings` defaults to the
+supplied Keera URL and 8B alias; A injects `LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY`.
+No env-file loading, hard-coded secrets, automatic model fallback or database work.
+Remote inference is unavailable offline; explicit loopback/local serving is allowed.
+
+`StructuredTasks.run` sends a fixed task/schema, validates output and references,
+and permits one repair with sanitized validation diagnostics. No native JSON Schema
+support is assumed. `propose_tools` validates only allowed function names/arguments
+and returns proposals; A's LangGraph owns execution. Thinking aliases reject tools.
+Requests, retries, input characters, reply bytes, output tokens and deadline are
+bounded. An optional verified input-token limit requires A's matching chat-template
+token counter; characters are not claimed as tokenizer counts.
+
+Credentials and provider bodies stay out of errors; tracing is disabled inside
+the adapter. Optional receipts contain only task/model, timing and usage. The
+explicit `FixtureChatModel` is for tests/demo injection and is never a real-mode
+fallback. Cancellation propagates; a direct LangChain adapter invocation avoids
+the installed core's cancellation aggregation bug and hidden tracing/cache paths.
+
+Dependency proposals: `requirements.in`; A owns the shared lock. Run lane tests
+with `PYTHONPATH=src python -m pytest src/backend/tests/intelligence -q`.
+The opt-in `backend.tests.intelligence.benchmark` uses synthetic non-confidential
+fixtures only; [comparison findings](../../../../docs/team/intelligence/MODEL_COMPARISON.md)
+record limitations rather than claiming model quality.
