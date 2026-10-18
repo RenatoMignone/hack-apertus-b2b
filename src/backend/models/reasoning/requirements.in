@@ -1,0 +1,9 @@
+# Lane B dependency proposals; A owns the shared pyproject and lock.
+langchain-core>=1,<2
+langsmith>=0.3,<1
+httpx>=0.28,<1
+jsonschema>=4,<5
+reportlab>=4,<6
+# Verification only:
+pypdf>=5,<7
+pypdfium2>=4,<6
