@@ -152,6 +152,50 @@ invented evidence. Connected Keera requires `DEPLOYMENT_MODE=connected`.
 
 ## 5. Connect and verify
 
+Before starting processes, run the repeatable readiness check from repo root:
+
+```bash
+.venv/bin/python -m backend.deploy.check_runtime --env-file .env
+# With the SSH tunnel open and credentials supplied:
+.venv/bin/python -m backend.deploy.check_runtime --env-file .env --network
+```
+
+The default checks local configuration/tokenizer assets only; it makes no model,
+DB or S3 calls. `--network` adds read-only application schema/identity, checkpoint
+table reads and S3 bucket HEAD. It never migrates, runs jobs or writes artifacts.
+Missing/failed checks return exit code 1 and omit exception messages/secrets.
+These checks do not prove profile publication/scope access, checkpoint write
+permissions, object read/write permissions or model quality. Verify those at
+their acceptance steps. Existing shell variables override env-file values.
+
+### Local preparation checkpoint — 18 October 2026
+
+The Mac repository `.venv` was refreshed from `requirements.hosted.lock` and the
+editable backend. Dependency consistency and CLI imports passed; **117 tests
+passed, 58 integration tests deselected**. Local HF tokenizer/config validation
+passed without contacting providers. Private operator token/hash binding and
+developer DSN were prepared in ignored local files; no secret is recorded here.
+
+The supplied developer identity uses a **fixture namespace**. Confirm with Eric
+which namespace/principal and public-source grants should access the real pilot;
+do not relabel that identity or copy fixture profile IDs into pilot settings.
+API/worker on this Mac is the proposed first placement; no worker was started.
+
+SSH to the user-confirmed account `elia@192.168.10.230` returned **No route to host**.
+No shared database/storage check could complete. Remaining operator inputs:
+
+- Reachable SSH host/network and verified host key; use the existing Bern key.
+- Checkpoint DSN and confirmation that framework tables are provisioned; runtime
+  read/write permissions must be agreed separately from setup ownership.
+- MinIO application credentials for the `navigator` bucket.
+- Published pilot profile/snapshot/build/taxonomy pins and compatible embedding
+  configuration, plus confirmation that the developer identity can access them.
+
+Eric's application migration is already complete. This preparation did not
+change his host, ingest data, publish a snapshot or initialize checkpoint tables.
+
+### Live acceptance
+
 Start the [frontend](../../src/frontend/README.md) with Node 22.18+ and its default
 HTTP mode, then enter your operator token. The Vite dev proxy targets localhost:8000.
 Run one permitted public test case: verify actual progress or clarification,

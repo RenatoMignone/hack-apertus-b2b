@@ -23,6 +23,11 @@ Eric completed the shared migration through `0007_frontend_lifecycle`;
 see [host status](../../docs/team/MIGRATION_STATUS.md). Set up the separate framework database explicitly.
 See [live setup](../../docs/data/LIVE_SETUP.md) and [deployment](../../docs/data/DEPLOYMENT.md).
 
+Before startup: `python -m backend.deploy.check_runtime --env-file .env` checks
+local settings/assets. Add `--network` for read-only infrastructure probes with
+your SSH tunnel open. Neither mode migrates or runs cases; publication, provider
+calls and artifact/checkpoint writes still require separate acceptance checks.
+
 Core/test dependencies are locked. Hosted embeddings use
 `requirements.hosted.lock` (tokenizer runtime, no local model weights);
 [HF setup](../../docs/data/HOSTED_EMBEDDINGS.md) documents endpoint/config/tokenizer

@@ -1,5 +1,13 @@
 # Optional runtime container wiring
 
+For Mac preparation, run `python -m backend.deploy.check_runtime --env-file .env`
+from repo root in the backend virtualenv. It checks configuration and local assets
+without network access; `--network` adds read-only DB/checkpoint/S3 probes after
+the SSH tunnel is open. It does not migrate, start a worker, write objects or call
+models. Missing checks return exit code 1; exception details/secrets are omitted.
+See the [live setup checkpoint](../../../docs/data/LIVE_SETUP.md#5-connect-and-verify)
+for remaining access inputs and the limits of these probes.
+
 API and durable worker also run with the Python commands in the
 [runtime handoff](../../../docs/team/runtime/HANDOFF.md). The existing data/
 LangGraph/Langfuse stack stays independently owned and is not started by runtime.

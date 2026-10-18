@@ -9,7 +9,9 @@ and [open questions](../project/OPEN_QUESTIONS.md).
 | --- | --- |
 | [INTEGRATION.md](INTEGRATION.md) | Current merged baseline, reviewed tips, fixes and dated verification |
 | [SERVICE_CONTRACTS.md](SERVICE_CONTRACTS.md) | In-process service boundaries; executable DTOs/ports are authoritative |
-| [Eric migration prompt](prompts/04_SHARED_HOST_MIGRATION.md) | Current bounded backup/upgrade/verification task |
+| [Eric runtime access prompt](prompts/05_RUNTIME_ACCESS_HANDOFF.md) | Active access/credential and publication handoff; preserve ongoing ingestion |
+| [Renato runtime acceptance prompt](prompts/06_BACKEND_RUNTIME_ACCEPTANCE.md) | Active local setup, isolated tests and real-provider/corpus acceptance |
+| [Eric migration prompt](prompts/04_SHARED_HOST_MIGRATION.md) | Completed rollout instructions; do not rerun for runtime setup |
 | [Migration outcome](MIGRATION_STATUS.md) | Completed 0004 → 0007, backup/preservation and services |
 | [Hosted embeddings](../data/HOSTED_EMBEDDINGS.md) / [LF fix](../data/WINDOWS_SHELL_FIX.md) | Current adapter and Windows follow-up |
 | [Live setup](../data/LIVE_SETUP.md) | Current rollout steps, migration authority and local/shared prerequisites |
