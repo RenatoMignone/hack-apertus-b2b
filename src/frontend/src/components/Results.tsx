@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, ChevronDown, ClipboardList, ExternalLink, FlaskConical, HelpCircle, Lightbulb, SearchX, Users } from 'lucide-react';
+import { Building2, Check, ChevronDown, ChevronRight, ClipboardList, ExternalLink, FlaskConical, HelpCircle, Lightbulb, SearchX, Users } from 'lucide-react';
 import type { BriefRevision, Evidence, Reason, ReasonCategory, Selection } from '../types/contract';
 import { CaseFlags, INSTITUTION, StatusBadge } from './ui';
 import SearchSankey from './SearchSankey';
@@ -13,8 +13,43 @@ const CATEGORIES: { key: ReasonCategory; label: string; Icon: typeof Users }[] =
   { key: 'people', label: 'People', Icon: Users },
   { key: 'groups', label: 'Research groups', Icon: FlaskConical },
   { key: 'projects', label: 'Projects & studies', Icon: ClipboardList },
+  { key: 'infrastructure', label: 'Infrastructure & services', Icon: Building2 },
   { key: 'ideas', label: 'Ideas to explore', Icon: Lightbulb },
 ];
+
+/** Structured result fields: unit hierarchy, expertise tags and fields the sources don't state. */
+function Fields({ r }: { r: Reason }) {
+  const path = r.entries.find((e) => e.unitPath?.length)?.unitPath;
+  const expertise = [...new Set(r.entries.flatMap((e) => e.expertise ?? []))];
+  const missing = r.missingFields ?? [];
+  if (!path && !expertise.length && !missing.length) return null;
+  return (
+    <div className="mt-2 space-y-1.5">
+      {path && (
+        <div className="flex flex-wrap items-center gap-0.5 text-xs text-muted" aria-label="Unit">
+          {path.map((u, i) => (
+            <span key={u + i} className="flex items-center gap-0.5">
+              {i > 0 && <ChevronRight size={11} aria-hidden />}
+              {u}
+            </span>
+          ))}
+        </div>
+      )}
+      {expertise.length > 0 && (
+        <div className="flex flex-wrap gap-1" aria-label="Expertise">
+          {expertise.map((t) => (
+            <span key={t} className="rounded-md bg-canvas px-1.5 py-0.5 text-xs text-ink ring-1 ring-line">{t}</span>
+          ))}
+        </div>
+      )}
+      {missing.length > 0 && (
+        <div className="text-xs text-muted">
+          <span className="font-medium">Not stated in sources:</span> {missing.join(' · ')}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Chips({ ids, evidence, onOpen, active }: { ids: string[]; evidence: Record<string, Evidence>; onOpen: Open; active?: string }) {
   return (
@@ -136,6 +171,7 @@ function ReasonCard({
             {r.line.text}
             <Chips ids={r.line.evidenceIds} evidence={evidence} onOpen={onOpen} active={active} />
           </p>
+          <Fields r={r} />
           {person ? (
             profileUrl && (
               <a
@@ -231,7 +267,7 @@ export default function Results({
     .filter(Boolean)
     .slice(0, 4);
   // Groups and projects are numbered as one running list; people and ideas use icons.
-  const numbered = reasons.filter((r) => r.category === 'groups' || r.category === 'projects').map((r) => r.id);
+  const numbered = (['groups', 'projects', 'infrastructure'] as const).flatMap((c) => reasons.filter((r) => r.category === c).map((r) => r.id));
   const sourceCount = new Set(trace.links.map((l) => l.target).filter((id) => evidence[id])).size;
 
   if (!reasons.length) {

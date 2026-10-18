@@ -85,6 +85,7 @@ function JumpBar({ revision }: { revision: BriefRevision }) {
     has('people') && ['people', 'People'],
     has('groups') && ['groups', 'Groups'],
     has('projects') && ['projects', 'Projects'],
+    has('infrastructure') && ['infrastructure', 'Infrastructure'],
     has('ideas') && ['ideas', 'Ideas'],
     (revision.openQuestions.length > 0 || has('people')) && ['next', 'Next steps'],
     (revision.similarCases?.length ?? 0) > 0 && ['similar', 'Similar cases'],

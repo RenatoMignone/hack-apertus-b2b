@@ -56,11 +56,15 @@ export interface ReasonEntry {
   /** Role or function exactly as the source states it (people only). */
   role?: string;
   institution: Institution;
+  /** Organisational hierarchy, top-down, e.g. ["University of Bern", "DBMR", "Bally Lab"]. */
+  unitPath?: string[];
+  /** Fields of expertise stated by the sources (short tags). */
+  expertise?: string[];
   evidenceIds: string[];
 }
 
 /** How "Why Bern" elements are grouped in the UI. */
-export type ReasonCategory = 'people' | 'groups' | 'projects' | 'ideas';
+export type ReasonCategory = 'people' | 'groups' | 'projects' | 'infrastructure' | 'ideas';
 
 /** One clear way in which Bern is good for this company. */
 export interface Reason {
@@ -68,7 +72,7 @@ export interface Reason {
   /**
    * people: an expert (headline = name, entries[0] = the person);
    * groups: labs, units, centres; projects: projects and studies;
-   * ideas: possible adjacent applications.
+   * infrastructure: facilities and services; ideas: possible adjacent applications.
    */
   category: ReasonCategory;
   headline: string;
@@ -78,6 +82,11 @@ export interface Reason {
   kind: 'direct' | 'idea';
   /** Set when the reason confirms a lead the operator suggested. */
   fromLead?: boolean;
+  /**
+   * Required result fields (challenge success criterion 4) that the sources do
+   * not state, e.g. "Named contact", "Projects". Shown as "Not stated in sources".
+   */
+  missingFields?: string[];
   selection: Selection;
 }
 

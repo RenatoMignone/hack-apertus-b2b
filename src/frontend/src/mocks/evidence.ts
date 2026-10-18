@@ -31,6 +31,8 @@ const LABELS: Record<string, string> = {
   'ev-aihn-contact': 'ARTORG AIHN · contact',
   'ev-dcb-profs-a': 'DCB professors · sensors & ML',
   'ev-dcb-profs-b': 'DCB professors · insulin therapy',
+  'ev-dbmr-cores': 'DBMR core facilities',
+  'ev-dcb-clinical': 'DCB clinical research access',
 };
 
 const BALLY_TEAM = 'https://www.dbmr.unibe.ch/research/research_programs/bally_lab/team/index_eng.html';
@@ -216,6 +218,31 @@ list.push(
     excerpt: 'Prof. Dr. Maria Louisa Balmer (Mikrobiom und Stoffwechsel) und Prof. Dr. José Garcia (automatisierte Insulintherapie)',
     highlight: 'José Garcia (automatisierte Insulintherapie)',
     relevance: 'Names the DCB professor for automated insulin therapy (German source).',
+  },
+);
+
+// Infrastructure and services (captured 18 Oct 2026).
+list.push(
+  {
+    id: 'ev-dbmr-cores',
+    url: 'https://dbmr.unibe.ch/services/core_facilities/index_eng.html',
+    title: 'Services: Core Facilities — Department for BioMedical Research (DBMR)',
+    institution: 'UniBE',
+    fetchedAt: FETCHED,
+    excerpt:
+      'Staff of the Core Facilities of the Department for BioMedical Research provide essential services for their users. … Our core facility Biomedical Genomics provides expertise and infrastructure in multiple aspects of genomics analysis …',
+    highlight: 'provide essential services for their users',
+    relevance: 'Shared lab infrastructure (genomics, live-cell imaging, proteomics) in the same department as the Bally Lab.',
+  },
+  {
+    id: 'ev-dcb-clinical',
+    url: 'https://www.dcberne.com/en/',
+    title: 'Home — Diabetes Center Berne',
+    institution: 'DCB',
+    fetchedAt: FETCHED,
+    excerpt: 'Driving diabetes technology innovation … by providing expertise, access to clinical research facilities and financial resources.',
+    highlight: 'access to clinical research facilities',
+    relevance: 'DCB states it offers access to clinical research facilities, which matters for validating a device.',
   },
 );
 

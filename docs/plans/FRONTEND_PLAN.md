@@ -49,11 +49,17 @@ a *Demo* menu (explanation + *Reset demo data*), *New case*.
 
 1. **Company card:** one-sentence description from her message, plus 3–4 fact chips.
    Then the **"Why Bern"** heading with institution dots.
-2. **Categorized "Why Bern" elements**, in four sections: **People** (experts and
+2. **Categorized "Why Bern" elements**, in five sections: **People** (experts and
    key contacts: initials avatar, name, role exactly as the source states it, why
    they fit, source-page link; no emails or phone numbers), **Research groups**,
-   **Projects & studies**, and **Ideas to explore**. Empty sections are hidden.
-   Groups and projects share one running number. Each non-people card has a one-line headline, one plain sentence
+   **Projects & studies**, **Infrastructure & services**, and **Ideas to explore**.
+   Empty sections are hidden. Groups, projects and infrastructure share one running
+   number. Every card also shows the challenge's required result fields where the
+   sources state them: the **unit hierarchy** as a breadcrumb (e.g. University of
+   Bern › DBMR › Bally Lab), **expertise** tags, and a **"Not stated in sources: …"**
+   line naming required fields the pages don't give (e.g. contact details, project
+   lead), so missing information is explicit rather than guessed (success criterion 4).
+   Each non-people card has a one-line headline, one plain sentence
    with citation chips `[n]`, and the Bern entries behind it (institution dot +
    name). Badges appear only when relevant: *Your lead ✓* (her suggestion was
    confirmed, E29) and *Idea · to validate* (adjacent application, E10). Each card
@@ -127,7 +133,7 @@ Defined in `src/frontend/src/types/contract.ts`:
 | `CaseDetail` | summary, `revisions[]`, `currentRevisionId`, `turns[]`, `evidence` map |
 | `SimilarCase` | caseId, companyLabel, score 0–100, shared[], status, optional outcome |
 | `BriefRevision` | `company` (summary, facts[]), `reasons[]`, `similarCases[]`, `openQuestions[]`, `trace`, `coverage`, `changeNote`, `changedReasonIds`, optional `emptyMessage` |
-| `Reason` | `category` people / groups / projects / ideas, headline (a person's name for people), `line` (`CitedText`), `entries[]` (name, optional `role`, institution, evidenceIds), `kind` direct/idea, `fromLead`, selection |
+| `Reason` | `category` people / groups / projects / infrastructure / ideas, headline (a person's name for people), `line` (`CitedText`), `entries[]` (name, optional `role`, institution, optional `unitPath[]` and `expertise[]`, evidenceIds), optional `missingFields[]`, `kind` direct/idea, `fromLead`, selection |
 | `Evidence` | one entry extracted from one URL: short `label`, literal `excerpt` + `highlight`, url, title, institution, dates, one-line `relevance`, citation number `n` |
 | `SearchTrace` | `inputs` (her phrases), `terms` (ontology terms), `links` input→term and term→evidence id, with weights |
 | `DialogueTurn` | chat turn, optional `followUp` with choices |
