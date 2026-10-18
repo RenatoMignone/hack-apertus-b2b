@@ -24,12 +24,19 @@ or model redaction does not override the confidential-document boundary.
 Public linked research PDFs remain eligible for Phase 1 collection.
 [T05 00:48–01:22, 01:43–04:41](../recordings/bern-navigator-followup-2026-10-18.txt).
 
-Initial stack to validate: LangGraph state/control, Phase 1 Weaviate/BGE-M3
-hybrid retrieval, BGE reranking, Apertus v1.5 8B and optional bounded 70B fallback.
+Selected stack: LangGraph with PostgreSQL checkpoints, Phase 1 PostgreSQL
+full-text + pgvector retrieval with RRF fusion, EmbeddingGemma 2 candidate,
+BGE reranking, Apertus v1.5 8B and optional bounded 70B fallback; local Langfuse
+observes execution. Exact model/tokenizer sources and revisions are deferred.
 The engine is domain-independent; pilot concepts, sources, geography, validation
 and ranking settings come from a versioned profile. Current pilot remains Bern
 diabetes technology across UniBE, ARTORG and DCB, English-first with DE/FR/IT
 extensions. No model endpoint/hardware capability is yet verified.
+
+Physical case tables, graph recovery and export lineage are owned by
+[case state](../data/CASE_STATE_AND_LINEAGE.md); [retrieval](../data/RETRIEVAL_SPEC.md)
+owns branch/fusion/ranking rules, and [observability](../data/OBSERVABILITY.md)
+owns sanitized traces. See the [data-layer router](../data/DATA_LAYER.md).
 
 ## 2. Case/run state and contracts
 
@@ -79,6 +86,12 @@ do not automatically alter taxonomy, embeddings or shared facts.
 The email/website does not silently replace the operator's current request.
 Scientific capability and specific research fit take priority over personal
 marketing connections. [T05 05:15–07:21](../recordings/bern-navigator-followup-2026-10-18.txt).
+
+Contextualization uses the original request and versioned concepts without
+forcing one category. Execute lexical and vector retrieval independently after
+reliable access/snapshot constraints, then fuse and rerank. Inferred topics are
+ranking hints; reranked passages still undergo claim/constraint validation.
+The model cannot establish that a perfect expert is absent from unindexed pages.
 
 Generate reproducible Boolean queries/encoded links for further research;
 label suggestions separately from executed searches and factual sources.
@@ -165,6 +178,12 @@ report/revision and export. These need not be separate services. LangGraph owns
 bounded state/checkpoints, not the corpus. Keep credentials server-side,
 authorization/access-aware caches and cancellation/retries. Disable external
 tracing and runtime downloads for the isolated target.
+
+Use PostgreSQL for business case history and the supported saver in a separate
+LangGraph database for checkpoints. No distributed transaction is assumed;
+persist stage outputs idempotently and reconcile on resume. Instrument stages
+through local Langfuse with masked/allowlisted metadata. Its outage must not
+block search or export, and traces cannot replace canonical evidence.
 
 Build text intake and one fixed-snapshot case first; then research/matching,
 questions/revisions, optional cases/figures and presentation. Future attachments

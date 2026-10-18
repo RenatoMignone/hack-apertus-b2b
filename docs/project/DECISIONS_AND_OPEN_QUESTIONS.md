@@ -52,14 +52,13 @@ material supplies the logo/template. Historical-case data and taxonomy contents 
 supplied. Confidential-plan boundaries still apply.
 
 **Shared design:** the plans share versioned documents, evidence, claims, concepts,
-entities, cases and memory snapshots. The newer D07 architecture below supersedes
-the earlier SQLite-search/optional-vector proposal; SQLite may retain job and
-provenance state. Endpoint support
+entities, cases and memory snapshots. D09 below supersedes both the earlier
+SQLite-search proposal and D07's Weaviate/BGE-M3 storage choices. Endpoint support
 for tokenization, modalities, quotas and the actual served model remains Q05.
 
 ## Open-question backlog
 
-**D07 / user-requested starting architecture, 18 October:** validate Apertus
+**D07 / historical starting architecture, superseded by D09 for storage/embeddings:** validate Apertus
 v1.5 8B for classification, 70B for difficult classification and optional
 synthesis, BGE-M3 dense embeddings, Weaviate hybrid search, BGE-reranker-v2-m3
 and LangGraph orchestration. This selects a plan to validate, not a measured
@@ -72,6 +71,25 @@ versioned case intent, answers, result revisions, citations and export lineage;
 pause dependent work for required answers and resume the correct checkpoint.
 The attached follow-up transcript is preserved as T05, with E27–E30 documenting
 the public-input boundary, terminology gap and iterative refinement.
+
+**D09 / current data architecture, U6, 18 October:** select PostgreSQL + pgvector
+for canonical records, case state and independent lexical/vector retrieval;
+LangGraph with PostgreSQL checkpoints; self-hosted Langfuse for execution tracking.
+Artifact storage holds original/normalized files and exports. Framework databases
+are separate from application tables; Langfuse adds ClickHouse, Redis/Valkey and
+S3-compatible storage. No Weaviate or SQLite is an active default. Model roles are
+Apertus v1.5 8B/optional 70B, EmbeddingGemma 2 embedding candidate and BGE reranking.
+Exact model/tokenizer sources/revisions/endpoints remain deferred at user request.
+
+**D10 / retrieval and persistence contract, U6, 18 October:** preserve full intent;
+use taxonomy for optional multi-label context/aliases; run lexical and vector
+branches independently under reliable constraints, fuse ranks, rerank, then
+validate claim support. Store versioned case evidence/reviews/exports separately
+from shared snapshots. Reranking is not factual verification. No automatic corpus
+updates from reports, user corrections or web discoveries. The focused
+[data-layer specs](../data/DATA_LAYER.md) own physical schemas, search, cases,
+tracing and build/restore gates; ingestion section 7 retains logical interfaces.
+Current authorization is documentation and AGENTS routing, not implementation.
 
 **18 October user answers (U2):** recorded below. The agent selected the delegated
 medical slice and evaluation protocol in [PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md).
@@ -103,6 +121,8 @@ ask again for facts already supplied.
 | Q12 | What are the live pitch/Q&A duration and latest delivery cutoff? | Current on-site organizer announcements | Historical cutoff is 19 Oct 14:30 CEST; two-minute limit is the video cap, not live pitch time |
 | Q13 | Are remote template ancestry and public visibility correct, and what is the final team name? | Team's GitHub/submission account | Initial context was committed/pushed to `origin/main` as `ab3d534` at user request; ancestry, visibility and team name are not established by that push |
 | Q14 | Collection extent, formats and freshness | Website/public-source priority resolved; refresh policy proposed | Collect relevant accessible public information, websites first, linked PDFs next; use safe engineering budgets and report omissions. Dated snapshot and conditional pre-demo refresh proposed, no freshness SLA selected. |
+| Q15 | Exact model/tokenizer sources, revisions, compatible adapters and limits | Explicitly deferred by U6 | Named roles/candidates are documented; resolve immutable configs before real embeddings/inference, without guessing artifact URLs. |
+| Q16 | PostgreSQL/framework versions, Langfuse resources, trace/backup retention and deployment | Implementation/deployment handoff | Logical services and failure/isolation contracts selected; no provisioned database, working instrumentation or recovery test claimed. |
 
 ## Suggested next work after a new implementation task
 

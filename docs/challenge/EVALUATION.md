@@ -140,9 +140,29 @@ Additional user design gates, not new organizer metrics:
   and full evidence-pack → report → export lineage.
 - For the proposed air-gapped primary target, cold-start and complete a case and
   export with external networking disabled; inspect attempted egress and absence
-  of downloads, telemetry, CDN, remote vectorizers and model/search fallbacks.
+  of downloads, external telemetry, CDN, remote vectorizers and model/search fallbacks.
 - For any other claimed target, record the actual ownership/administration or
   Swiss operator/jurisdiction/residency and every runtime dependency.
 
 [Architecture/dependency inventory](../plans/ARCHITECTURE.md#target-architecture-mandatory).
 No checks in this section have been executed.
+
+## Data-layer implementation checks
+
+The [data-layer specs](../data/DATA_LAYER.md) add concrete acceptance cases:
+
+- Compare PostgreSQL lexical-only, dense-only, RRF fusion and reranked retrieval
+  on the same frozen snapshot/gold suite; report relevance and factual support
+  separately. Relevant missing-label passages must remain retrievable.
+- Start from exact filtered vector search. If adding HNSW, compare entity recall
+  under scope/snapshot/language filters and handle candidate shortfalls honestly.
+- Preserve run → snapshot/model/query → literal evidence → pack/review → export
+  lineage; failed publication cannot replace the active snapshot.
+- Resume after a business-state commit but before checkpoint persistence without
+  duplicate writes. Reject stale clarification answers and cross-case access.
+- Verify local Langfuse correlation/masking, absent usage/cost behavior and bounded
+  outage handling. Trace scores are not independent gold judgments or probabilities.
+- Restore the database and artifact package, resolve exact citations, and test
+  revocation across old snapshots, checkpoints, traces and dependent exports.
+
+These extend engineering validation; they do not add organizer scoring rules.

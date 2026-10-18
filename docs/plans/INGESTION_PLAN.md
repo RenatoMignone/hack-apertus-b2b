@@ -5,9 +5,11 @@ Start with the [stacked visual diagrams](../architecture.html) and
 [architecture/deployment contract](ARCHITECTURE.md). This plan owns the shared
 records and memory interfaces. [Phase 2](OPERATIONS_PLAN.md) consumes them.
 
-Initial stack to validate: Apertus v1.5 8B / optional 70B, BGE-M3, Weaviate,
-BGE-reranker-v2-m3 and LangGraph. Endpoints, revisions, hardware, taxonomy
-contents and corpus performance remain unverified. Code belongs in `src/`.
+Selected stack: PostgreSQL + pgvector, LangGraph PostgreSQL checkpoints and
+self-hosted Langfuse; Apertus v1.5 8B / optional 70B, EmbeddingGemma 2 candidate
+and BGE reranking. Exact model/tokenizer sources, revisions, endpoints, hardware
+and taxonomy remain deferred. [Data-layer specs](../data/DATA_LAYER.md) own physical
+implementation; this plan owns logical contracts. Code belongs in `src/`.
 
 ## 1. Pipeline and boundaries
 
@@ -16,8 +18,8 @@ Domain profile + source registry
   → discover → scope/access checks → fetch raw bytes
   → extract/normalize → quality checks + exact evidence spans
        ├→ Apertus concept/entity/claim candidates → validation/entity resolution
-       └→ original source chunks → BGE-M3 vectors
-  → staged Weaviate hybrid index + canonical evidence/claim store
+       └→ original source chunks → configured embedding vectors
+  → staged PostgreSQL full-text/pgvector build + canonical evidence/claim records
   → evaluate → immutable published snapshot
 ```
 
@@ -205,23 +207,20 @@ snapshot access and invalidates affected caches/index entries.
 
 ### 8.1 Component ownership and persistent artifacts
 
-Implement Python modules under `src/`. Raw files, full `clean.md`, page/table
-sidecars, classification JSON, claims, taxonomy and embedding manifests remain
-in the versioned artifact store. SQLite may retain crawl/job state, provenance
-and manifests; it is no longer the proposed primary search database.
+The [data-layer router](../data/DATA_LAYER.md) owns storage/build specifications.
+Raw files, normalized bodies and sidecars remain in artifact storage; PostgreSQL
+holds canonical evidence, claims, taxonomy, jobs, cases and version manifests.
+PostgreSQL full-text search and pgvector store the rebuildable retrieval view.
+Independent lexical/vector results are fused with RRF, then BGE reranking scores
+query/passage pairs. Full-text ranking is not BM25 and does not gate vector search.
 
-**Weaviate** stores searchable source chunks, metadata and externally generated
-**BGE-M3** dense vectors. Its BM25F lexical index plus vector search provides
-hybrid retrieval. Use bring-your-own vectors and explicit query vectors; do not
-enable an unrelated default hosted vectorizer. BGE-M3's learned sparse and
-multi-vector modes are not required for this initial design: Weaviate BM25F is
-the lexical branch, BGE-M3 dense vectors the semantic branch.
-
-**BGE-reranker-v2-m3** consumes query/passage pairs at retrieval time and emits
-relevance scores. It does not generate corpus embeddings. **LangGraph** owns
-bounded workflow state, transitions, follow-up questions and checkpoints; the
-corpus remains in artifact storage/Weaviate. A checkpoint stores evidence IDs
-and revisions, not an unversioned replacement copy of the knowledge base.
+LangGraph's PostgreSQL saver owns graph checkpoints in a separate database;
+Langfuse observes through a local integration and its own services. Neither
+framework's internal records replace canonical evidence or business case state.
+The [schema](../data/RELATIONAL_SCHEMA.md), [case state](../data/CASE_STATE_AND_LINEAGE.md)
+and [tracing](../data/OBSERVABILITY.md) specs define physical boundaries. Exact
+model/tokenizer artifact sources remain deferred, with roles/configuration
+contracts in [build and operations](../data/BUILD_AND_OPERATIONS.md).
 
 ### 8.2 Data envelope passed between ingestion stages
 
@@ -260,60 +259,50 @@ The handoffs are:
    not proof that every chunk expresses it. Missing/uncertain labels must not
    remove otherwise valid source text from search.
 4. **Chunk → embed:** deterministic title/heading context plus original chunk
-   text, its input hash and BGE-M3 configuration. Never embed only a classifier
-   summary. Original DE/FR/EN (and IT where available) wording remains searchable.
-5. **Chunk + embedding → Weaviate:** stable object identity, source text,
-   provenance/filter metadata and one supplied dense vector. Validate every
-   object acknowledgement and failed batch item before publishing a snapshot.
+   text, its input hash and the resolved embedding configuration. Never embed
+   only a classifier summary. Original DE/FR/EN (and IT where available) wording
+   remains searchable.
+5. **Chunk + embedding → PostgreSQL:** stable chunk/version identity, literal text,
+   lexical projection, scope/provenance and one supplied dense vector/config.
+   Validate transactional writes, references and build completeness before
+   publishing a snapshot; no successful publication from partial batch errors.
 6. **Published snapshot → operations:** manifest/index-build IDs and section 7
    interfaces; no application consumer depends on storage-specific object shape.
 
 ### 8.3 Chunk and embedding preparation
 
 Use heading/paragraph/page boundaries and contiguous offsets. Start around
-400–650 BGE-M3 tokens with 60–100 overlap for long sections, as tunable initial
-settings. Include title/heading context in the embedding budget. The model card
-documents 1,024 dimensions and up to 8,192 tokens; validate the loaded revision
-and configured serving limit instead of silently truncating to defaults.
+400–650 embedding-model tokens with 60–100 overlap for long sections, as tunable
+settings. Count title/heading and role-template context in the actual loaded
+embedding tokenizer budget; exact tokenizer source/limit remains deferred.
 
-Pin BGE-M3 revision, tokenizer, normalization and encoding settings for both
-documents and queries. Reject dimension/non-finite-value mismatches. Record
-reranker pair-token limits separately and reduce passage windows explicitly
-with evidence offsets when necessary. Apertus has its own tokenizer/processor/
-chat template for classification/synthesis; those counts are not interchangeable.
+EmbeddingGemma 2 is the initial candidate, with a provisional 768-dimensional
+build. Required input/output/configuration fields are in the
+[model contract](../data/BUILD_AND_OPERATIONS.md#model-roles-and-required-interfaces).
+Reject unresolved configurations, invalid vectors, silent truncation and mixed
+spaces. Query/document role templates can differ while sharing one pinned model
+configuration. Apertus and the BGE reranker have separate compatible tokenizers
+and budgets; Apertus token IDs are not passed to the embedding model.
 
-### 8.4 Weaviate representation and snapshot publication
+### 8.4 PostgreSQL representation and snapshot publication
 
-Use a source-chunk collection per index build, or an equivalently isolated build
-namespace. Each object has a deterministic UUID derived from the application
-chunk ID and build identity, while retaining those IDs as properties. Store:
+The [relational schema](../data/RELATIONAL_SCHEMA.md) owns physical tables/keys:
+canonical records in `corpus`, vocabulary in `taxonomy`, chunks/embeddings/lexical
+projections in `retrieval`, case records in `cases`, jobs in `ops`. LangGraph and
+Langfuse have separate framework databases. Preserve the logical IDs of section 7.
 
-- `document_id`, `document_version_id`, `chunk_id`, `snapshot_id`/build ID.
-- Original `text`, `title`, `heading_path`, language and body offsets.
-- Source/final URLs, PDF page range, evidence IDs and artifact-manifest reference.
-- Supported organization/location claim references and source-family IDs.
-- Topic/document-type labels, their scope and classification validation state.
-- Scope/access IDs, retrieval/source dates and extraction-quality status.
-- Embedding model/revision/input hash and the supplied dense vector.
+Use explicit snapshot/build membership, foreign keys, scoped references and
+validated JSONB extensions. Build lexical projections over original title,
+headings and body with appropriate language configuration; vectors reference
+the exact embedding input/config hash. Uncertain labels must not hide valid text.
+Full search/fusion behavior belongs to the [retrieval spec](../data/RETRIEVAL_SPEC.md).
 
-Configure BM25F over original text/title/heading properties, not opaque IDs,
-hashes or generated summaries. Validate multilingual tokenization/analyzers on
-German/French/English examples; test Italian as an extension. Configure vector
-search for the matching dense space and explicit query-vector delivery.
-
-Do not duplicate unbounded nested evidence graphs in each object. Resolve claim
-references from the canonical store. Document DTO-to-Weaviate property mapping
-and serialize compound fields explicitly rather than assuming arbitrary JSON
-can be indexed. Distinguish source-extraction quality from enrichment quality:
-valid source text with uncertain labels may be searchable, while unsupported
-claims remain excluded from accepted results.
-
-Build in staging; verify counts/checksums, references, vectors and hybrid smoke
-queries before switching the application manifest pointer. No cross-store
-transaction is assumed. Failed publication keeps the old snapshot and records
-partial batch errors. All reads enforce the pinned build plus access policy;
-revocation overrides historical access. Retiring a source removes its objects
-from new builds while preserving permitted historical artifacts.
+Stage artifacts/rows and validate evidence, vectors, coverage and eligibility
+before publication. Atomically update the active profile pointer in PostgreSQL;
+existing runs remain pinned. No transaction spans artifact storage, checkpoints
+and tracing. Use idempotent jobs and reconciliation under the
+[publication/recovery contract](../data/BUILD_AND_OPERATIONS.md#transactional-publication-and-artifacts).
+Failed publication retains the old snapshot; revocation overrides old access.
 
 ### 8.5 Information handed to agentic retrieval
 
@@ -323,9 +312,10 @@ version, candidate concepts, explicit reliable filters, snapshot ID and budgets.
 Keep original lay wording alongside scientific expansions and their origin;
 generated expansion terms are hypotheses rather than company facts.
 
-1. Embed the retrieval query with the pinned BGE-M3 configuration. Send both its
-   original/contextual query text and dense vector to Weaviate hybrid search.
-2. Retrieve 30 candidate source passages initially, with score metadata and
+1. Embed contextual queries with the pinned embedding configuration. Execute
+   PostgreSQL lexical and pgvector cosine searches independently over eligible
+   evidence, then fuse their ranks; keyword matches never gate semantic matches.
+2. Keep 30 fused unique candidate passages initially, with score metadata and
    provenance. Use reliable access/snapshot/explicit constraints as filters;
    classification labels are hints/boost signals, not mandatory topic filters.
 3. Pass the contextual query plus each original passage to BGE-reranker-v2-m3;
@@ -362,22 +352,20 @@ from a conversational correction.
 
 ### 8.7 Technical references checked 18 October 2026
 
-- [Apertus v1.5 8B model card](https://huggingface.co/swiss-ai/Apertus-v1.5-8B):
-  model-family reference; no taxonomy-specific classification accuracy established.
-- [Weaviate hybrid search](https://docs.weaviate.io/weaviate/search/hybrid):
-  configurable BM25F/vector fusion.
-- [Bring your own vectors](https://docs.weaviate.io/weaviate/starter-guides/custom-vectors):
-  externally generated corpus/query vectors.
-- [BGE-M3 model card](https://huggingface.co/BAAI/bge-m3): multilingual embedding
-  modes, dimensions and context limits.
-- [BGE-reranker-v2-m3 model card](https://huggingface.co/BAAI/bge-reranker-v2-m3):
-  multilingual query/passage relevance scoring.
-- [LangGraph overview](https://docs.langchain.com/oss/python/langgraph/overview):
-  stateful orchestration, persistence and human interaction.
+- [pgvector](https://github.com/pgvector/pgvector): cosine search, optional HNSW
+  and combination with PostgreSQL full-text search/RRF.
+- [PostgreSQL text search](https://www.postgresql.org/docs/current/textsearch-controls.html):
+  `tsvector`, text-search configurations and lexical ranking; not native BM25.
+- [LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence):
+  framework-owned PostgreSQL checkpoints, distinct from application knowledge.
+- [Langfuse integration](https://langfuse.com/integrations/frameworks/langchain)
+  and [self-hosting](https://langfuse.com/self-hosting): callbacks, custom traces
+  and required auxiliary services.
 
-Capabilities in documentation do not establish performance on this taxonomy or
-corpus. Pin actual packages/model revisions and verify deployment/license details
-during implementation; no hosted inference URL is inferred from a model card.
+The [focused build spec](../data/BUILD_AND_OPERATIONS.md) records model roles and
+required resolved configurations. Exact model/tokenizer sources/revisions remain
+intentionally deferred. Documented interfaces do not establish endpoint access,
+corpus quality, package compatibility or successful deployment.
 
 ## 9. Refresh and rebuild
 

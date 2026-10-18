@@ -31,6 +31,7 @@ Do not merge conflicting instructions silently. For example, conversational
 | U3 | User's later material delivery, 18 Oct 2026; [inspection inventory](../provided_material/README.md) | Best-effort UniBE workbook with 42 actual entries, supplied PowerPoint template and English agency logo | Supersedes missing inventory/branding delivery status in U2; Notes count 71 conflicts with data rows; no sample cases/gold labels or endpoint details supplied |
 | U4 | User's architecture and information-handoff request, plus revision/follow-up instructions, 18 Oct 2026 | Initial Apertus 8B/70B + BGE-M3 + Weaviate + BGE reranker + LangGraph design; editable conversational results and agent questions | Starting architecture to validate, not measured superiority, access credentials or implementation authorization |
 | U5 | User's visual architecture, manual input and domain-independence request, 18 Oct 2026 | Typed permitted keywords/context/operator knowledge; private PDFs outside app; future attachment extension; unchanged report sections; stacked HTML reference; concise docs and explicit deployment/dependency accounting | Documentation authorization; future confidential ingestion requires revised permission/handling; deployment target remains untested |
+| U6 | User's data-layer discussion/refinement and request for build specs plus AGENTS update, 18 Oct 2026 | PostgreSQL + pgvector instead of Weaviate/SQLite; LangGraph persistence; self-hosted Langfuse; named model roles/candidates, taxonomy-assisted hybrid retrieval, versioned cases/evidence; exact model/tokenizer sources deliberately deferred | Authorizes focused technical documentation, not application implementation, provisioning or measured performance claims; D09/D10 supersede older storage choices |
 | B1 | [Challenge text captured locally](../challenge/CHALLENGE_BRIEF.md), supplied by user | Objective, sources, models, expected fields, metrics, ethics and infrastructure boundaries | Linked Notion page not independently retrieved; capture is based on pasted text |
 | N1 | [Complete Notion page text supplied by user](../sources/NOTION_CHALLENGE_2026-10-18.md), 18 Oct 2026 | Confirms B1; domain Research & Innovation; exact supporting filenames; template/logo use only for this challenge | User-supplied page capture, not independent live verification; no attachment bytes/download URLs or workbook/branding inspection |
 | M1 | Root [README.md](../../README.md), local template at baseline commit `e1a8246` | Required layout, environment names, deliverables, report/video limits, six 0–5 jury dimensions | Contains unfilled project/team/challenge placeholders; remote template ancestry/visibility not checked |
@@ -52,10 +53,17 @@ The later T05 text was also read completely and preserved byte-for-byte with a
 hash in the recording inventory. E27–E30 record its timestamped implications.
 Its public-only company-input statements do not authorize private one-pagers.
 
-The current ingestion plan's technical references were inspected on 18 October
-2026: official Weaviate hybrid/BYOV documentation, BAAI BGE-M3/reranker model cards,
-LangGraph documentation and the Apertus 8B model card. See
+The data discussion transcript at local `docs/recordings/data-discussion.ogg.txt`
+was read in full (00:00–16:19). It is team design debate, not an organizer mandate
+or expertise evidence. It was untracked at intake and is left unchanged; this
+documentation update does not automatically add/publish that raw transcript.
+The subsequent chat corrections and user-selected stack are recorded as U6.
+
+Earlier technical planning examined Weaviate/BGE-M3; those active choices are
+superseded by U6. Current interfaces checked on 18 October 2026 include pgvector,
+PostgreSQL text search, LangGraph persistence and Langfuse integration/self-hosting. See
 [INGESTION_PLAN.md](../plans/INGESTION_PLAN.md#87-technical-references-checked-18-october-2026)
+and [data-layer build references](../data/BUILD_AND_OPERATIONS.md#technical-references-and-deferred-work)
 for direct links and capability limits. These checks establish documented
 interfaces, not actual endpoint access, corpus quality or deployment success.
 
@@ -74,6 +82,13 @@ interfaces, not actual endpoint access, corpus quality or deployment success.
 
 ## Conflicts and ambiguity resolved for this context pack
 
+- **Current storage and tracing:** U6/D09 supersedes D07's Weaviate/BGE-M3 and
+  earlier SQLite defaults. PostgreSQL full-text ranking is not BM25; pgvector
+  requires actual embeddings, not tokenizer IDs. LangGraph checkpoints and
+  Langfuse traces do not replace canonical evidence or durable case history.
+- **Retrieval trust:** contextualization and reranking improve candidate selection
+  but do not establish factual support or completeness outside the indexed corpus.
+  U6/D10 retains post-retrieval claim checks and bounded gap handling.
 - **Additional Notion source:** N1 agrees with B1 on all product, model,
   deployment, output, metric and ethics requirements. It adds the domain and
   names `unibe_sous_domaines_publics_etendus.xlsx`, `powerpoint_template.pptx`

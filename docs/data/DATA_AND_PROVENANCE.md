@@ -4,6 +4,9 @@
 Start with the [visual pipeline](../architecture.html). The
 [Phase 1 shared contract](../plans/INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2)
 owns schemas/interfaces; this file owns evidence and rights rules.
+Physical storage/search/case/tracing contracts are routed through
+[DATA_LAYER.md](DATA_LAYER.md): PostgreSQL + pgvector, artifact storage,
+LangGraph PostgreSQL checkpoints and self-hosted Langfuse.
 
 ## Source inventory
 

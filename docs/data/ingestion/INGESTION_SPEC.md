@@ -5,6 +5,7 @@ This is the acquisition substage of [Phase 1](../../plans/INGESTION_PLAN.md), no
 a competing phase definition. Start with the [visual reference](../../architecture.html).
 The Phase 1 shared contract owns document/evidence/chunk schemas; this file owns
 faithful extraction and crawl behavior. Code belongs under `src/`.
+The [data-layer spec](../DATA_LAYER.md) owns PostgreSQL persistence and build gates.
 
 ## 1. Inputs and source configuration
 
@@ -93,7 +94,6 @@ Original language remains searchable; translations and summaries are derivations
 
 ```text
 controlled-data/                       # outside public artifacts unless licensed
-  state.sqlite                        # frontier/jobs/fetches/version pointers
   raw/<document>/<raw-version>/...
   normalized/<document>/<body-version>/clean.md
   normalized/<document>/<body-version>/metadata.json
@@ -105,8 +105,9 @@ controlled-data/                       # outside public artifacts unless license
 ```
 
 Storage path is configurable; these are planned artifacts, not existing output.
-State tracks sources, frontier, fetches, raw/body versions, links, runs and
-failures. JSONL points to immutable artifacts, with optional literal text export.
+PostgreSQL `corpus`/`ops` tables track sources, frontier, fetches, raw/body
+versions, links, runs and failures; no separate SQLite state store is selected.
+JSONL points to immutable artifacts, with optional literal text export.
 Include sidecars/locators in portable packages. Validate typed schemas and hashes.
 Legacy `version_id` maps to shared `document_version_id` at one adapter boundary.
 Public web records require actual source URLs; never fabricate one for user text.

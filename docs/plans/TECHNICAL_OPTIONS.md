@@ -1,6 +1,6 @@
 # Technical choices and implementation handoff
 
-**18 October 2026 · Initial architecture to validate; not implemented.**
+**18 October 2026 · Selected architecture with candidate models; not implemented.**
 The main reference is [the visual pipeline](../architecture.html), backed by
 [ARCHITECTURE.md](ARCHITECTURE.md). These choices are user-selected starting
 points, not measured superiority or verified hosting capabilities.
@@ -10,17 +10,21 @@ points, not measured superiority or verified hosting capabilities.
 | Responsibility | Initial choice | Validation still needed |
 | --- | --- | --- |
 | Interpretation, extraction, reasoning, writing | Apertus v1.5 8B; bounded optional 70B fallback | Actual served model/protocol, structured output handling, resources, quality/cost and licensing |
-| Original-text embeddings | BGE-M3 dense vectors | Pin revision/tokenizer/settings, query/corpus compatibility and domain/language retrieval |
-| Lexical + vector retrieval | Weaviate BM25F + supplied vectors | Schema/mapping, access/snapshot filters, batch failures and offline packaging; no hosted default vectorizer |
+| Original-text embeddings | EmbeddingGemma 2 candidate, provisional 768-dimensional output | Source/revision/tokenizer/encoding settings deferred; resolve before ingestion and evaluate pilot retrieval |
+| Lexical + vector retrieval | PostgreSQL full-text search + pgvector cosine, fused with RRF | Full-text ranking is not BM25; validate language configs, access/snapshot filters and exact baseline before optional HNSW |
 | Passage reranking | BGE-reranker-v2-m3 | Pair-token budget, ranking quality and latency; scores are not calibrated probabilities |
-| Workflow and resumable dialogue | LangGraph | Revision/checkpoint isolation, cancellation, bounded retries and no required external tracing |
-| Raw/evidence/claim storage | Versioned artifact store; SQLite may hold job/provenance/case state | Reference integrity, atomic publication pointer and access-aware retention |
+| Workflow and resumable dialogue | LangGraph with PostgreSQL checkpointer in separate database | Revision/thread isolation, idempotent recovery across application/checkpoint commits and bounded retries |
+| Raw/evidence/claim storage | Artifact volume + PostgreSQL canonical records/jobs/cases | Reference integrity, atomic publication pointer, access-aware retention and restore |
+| Tracking/evaluation observations | Self-hosted Langfuse | Local web/worker, PostgreSQL, ClickHouse, Redis/Valkey and S3-compatible storage; masked payloads and non-blocking failure |
 | Interface/export | Framework/library not selected; supplied editable PowerPoint template | Rendered report/slide QA, editability, citations, local assets and licensing |
 
 Detailed records, payloads, indexing and initial budgets live in
 [INGESTION_PLAN.md](INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2).
 Case intake/research/revisions/export live in [OPERATIONS_PLAN.md](OPERATIONS_PLAN.md).
-Avoid a second schema, taxonomy or search API.
+Physical ownership is in the [data-layer router](../data/DATA_LAYER.md), with
+focused schema/retrieval/case/tracing/build specs. Avoid a second schema, taxonomy
+or search API. U6/D09 supersedes Weaviate, SQLite and BGE-M3 as active defaults;
+the exact model sources/tokenizer packages/revisions remain deferred.
 
 ## Retrieval approach and alternatives
 
@@ -28,6 +32,10 @@ Use a prefetched, dated evidence snapshot as the reproducible baseline. Connecte
 mode can add bounded company research/refresh. Live-only navigation cannot
 substantiate an air-gapped runtime. Compare selected hybrid retrieval with a
 simple lexical baseline on independently checked terminology variants.
+
+Run lexical and vector branches independently over eligible evidence, fuse ranks,
+then rerank. Keep inferred topic labels optional and validate factual support
+after retrieval. A larger model or a high relevance score cannot establish truth.
 
 A graph database, fine-tuning and autonomous browsing are not requirements.
 Evidence-linked claims can use simple records. Keep core contracts independent

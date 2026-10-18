@@ -7,6 +7,12 @@ overview, ingestion, case research, evidence pack, domain changes and deployment
 This file owns the architecture/deployment boundary; the paired plans own
 processing contracts and operational details.
 
+**U6/D09 update:** PostgreSQL + pgvector replace Weaviate/SQLite; LangGraph
+uses PostgreSQL checkpoints and Langfuse provides local tracing. EmbeddingGemma 2
+replaces BGE-M3 as the initial embedding candidate. Exact model/tokenizer sources,
+revisions and deployment resources are deferred. [Data-layer router](../data/DATA_LAYER.md)
+owns physical specs; logical payloads remain in ingestion section 7.
+
 ## Input and output boundary
 
 The business developer reads the confidential business plan and one-pager
@@ -35,10 +41,11 @@ gaps/next steps; sources/coverage; optional economic contribution and prior case
 | Collection worker | Discovery, robots/access checks, safe fetch, public company research | Connected collection host; optional runtime tool only in connected mode |
 | Parsers/normalizers | HTML/text-PDF extraction, tables, locators, quality checks; OCR later | Collection host or local case-research worker |
 | Apertus v1.5 8B / optional 70B | Interpretation, evidence-linked enrichment, match reasoning, report writing | Local serving inside the deployment boundary for disconnected mode; otherwise only a verified compliant endpoint |
-| BGE-M3 + BGE reranker | Document/query embeddings and passage reranking | Local runtime model workers; embedding also runs during index build |
-| Artifact/claim store | Raw bytes, normalized text, exact evidence, derivations, manifests | Controlled persistent storage inside the boundary |
-| Weaviate | BM25F + supplied dense vectors; snapshot and access filtering | Runtime boundary; no implicit hosted vectorizer |
-| Case/checkpoint store | Intent, questions, selections, run/export revisions | Runtime boundary, isolated from public corpus; SQLite is an initial option |
+| EmbeddingGemma 2 candidate + BGE reranker | Document/query embeddings and passage reranking through separate adapters/tokenizers | Local runtime workers; embedding also runs during index build; exact artifacts deferred |
+| Artifact store + PostgreSQL canonical records | Raw/normalized bytes, exact evidence, entities, claims, derivations, manifests | Controlled persistent storage inside the boundary |
+| PostgreSQL + pgvector | Full-text lexical + vector cosine retrieval, RRF fusion, snapshot/access filtering | Runtime boundary; supplied vectors and versioned search configs |
+| PostgreSQL case/checkpoint stores | Intent, questions, selections, run/export revisions; framework-owned checkpoints in separate DB | Runtime boundary; case access isolated from public corpus |
+| Self-hosted Langfuse | Sanitized execution/model/retrieval observations and evaluation events | Runtime boundary; web/worker, PostgreSQL, ClickHouse, Redis/Valkey and S3-compatible storage |
 | Calculator + export worker | Validated formulas, chart datasets, report rendering, editable slides | Runtime boundary with packaged template, logo, fonts and renderer |
 
 Logical components may share a host/process. Hardware, serving endpoints and
@@ -99,6 +106,11 @@ historical similarity and evidence strength are different fields, not success
 probabilities. Missing optional data disables its section; missing core support
 produces a partial/no-match result, not fabricated content.
 
+Contextualization and reranking select candidates, not verified facts. Retrieval
+uses independent PostgreSQL lexical and pgvector branches with rank fusion;
+inferred concept labels cannot hide otherwise relevant evidence. The owning
+[retrieval spec](../data/RETRIEVAL_SPEC.md) defines budgets and validation handoffs.
+
 The report writer receives this frozen pack, then its draft undergoes another
 claim/citation check and operator review. Render charts from prepared datasets;
 render editable PowerPoint from the reviewed revision and supplied template.
@@ -108,9 +120,9 @@ render editable PowerPoint from the reviewed revision and supplied template.
 **Proposed primary target: b) air-gapped case runtime on independent infrastructure
 outside cantonal ICT.** No external network connection at runtime. Build and
 collection happen separately while connected; transfer only permitted, checked
-artifacts. All inference, embeddings, reranking, storage, UI assets, charts and
-export run inside the isolated boundary. Live company research is unavailable;
-use packaged company evidence or mark missing context. Citation URLs remain
+artifacts. All inference, embeddings, reranking, storage, tracing, UI assets,
+charts and export run inside the isolated boundary. Live company research is
+unavailable; use packaged company evidence or mark missing context. Citation URLs remain
 references and are not fetched automatically. No air-gap capability is yet tested.
 
 | Template target | Proposed support / constraint | Proof required before a claim |
@@ -129,12 +141,19 @@ inference endpoint does not prove either sovereign or air-gapped deployment.
 | --- | --- | --- |
 | Build/package | Package/container registries, model/tokenizer weights, optional browser/OCR/render binaries, fonts | Pin versions/checksums/licenses; package assets, remove install-on-first-use behavior |
 | Connected collection/refresh | Public institutional/company websites, robots/sitemaps, optional search provider | Access policy, requests, timestamps, failures, permitted storage/export; search provider remains unselected |
-| Air-gapped runtime | **None external**; models, database, application, checkpoint store, renderer and all assets local | No hosted APIs, remote vectorizers, CDN, telemetry, remote tracing, external fonts or runtime downloads; verify by blocked-network run |
+| Air-gapped runtime | **None external**; models, PostgreSQL/pgvector, app/checkpoints, local Langfuse and its auxiliary stores, renderer/assets | No hosted APIs, remote vectorizers, CDN, external telemetry/tracing, external fonts or runtime downloads; verify by blocked-network run |
 | Connected runtime alternative | Only explicitly enabled web/search and verified model services | Disclose query/data egress and failures; enforce deployment policy; disable unsupported dependencies rather than silently switching |
 
 Quantitative economics needs supplied public/eligible figures and a stated method;
 there is no automatic economic data feed or forecasting model. Historical-case
 data is absent. Future confidential PDFs require a separately authorized design.
+
+Langfuse adds web/worker, its PostgreSQL database, ClickHouse, Redis/Valkey and
+S3-compatible storage; include these in resource/backup/offline packaging. Trace
+only masked eligible data through the local endpoint, without requiring tracing
+availability to finish a case. [Observability](../data/OBSERVABILITY.md) owns these
+contracts; [build/operations](../data/BUILD_AND_OPERATIONS.md) owns data-service
+publication, migrations, recovery and implementation gates.
 
 ## Validation before implementation claims
 
@@ -147,4 +166,5 @@ data is absent. Future confidential PDFs require a separately authorized design.
   report/slide rendering on the actual selected target.
 
 Owners: [ingestion/contracts](INGESTION_PLAN.md), [case operations](OPERATIONS_PLAN.md),
-[evaluation](../challenge/EVALUATION.md), [decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
+[data-layer implementation](../data/DATA_LAYER.md), [evaluation](../challenge/EVALUATION.md),
+[decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md).

@@ -9,9 +9,12 @@ to your task rather than reading the entire knowledge base every time.
 
 - Challenge selected by the user on 18 October 2026. The delegated pilot focus
   is diabetes technology: glucose monitoring, automated insulin delivery and
-  supporting digital tools; see [pilot scope](docs/challenge/PILOT_SCOPE.md). The initial
-  architecture to validate is Apertus 8B/70B, BGE-M3, Weaviate, BGE reranking and
-  LangGraph; see the paired plans. Deployment, roster and project name remain open.
+  supporting digital tools; see [pilot scope](docs/challenge/PILOT_SCOPE.md). The
+  selected data layer is PostgreSQL + pgvector, artifact storage, LangGraph with
+  PostgreSQL checkpoints, and self-hosted Langfuse. Model roles are Apertus
+  8B/optional 70B, EmbeddingGemma 2 candidate, and BGE reranking. Exact model
+  sources/tokenizer packages/revisions are deferred; see the data-layer router.
+  Deployment, roster and project name remain open.
 - Current authorized work is **documentation and agent context only**. Implement
   features when a subsequent user task authorizes them. Do not treat proposed
   designs or acceptance checks in these docs as implemented behavior.
@@ -39,6 +42,11 @@ Proposed primary target is an air-gapped independent runtime; not yet tested.
 | Understand stakeholder intent or check a recording claim | [Recording insights](docs/recordings/RECORDING_INSIGHTS.md), then the linked [original transcript](docs/recordings/README.md) |
 | Design a user flow, result presentation or demo scenario | [Workflows and cases](docs/challenge/WORKFLOWS_AND_CASES.md), [requirements](docs/challenge/PRODUCT_REQUIREMENTS.md) |
 | Plan crawling, extraction, entities or citations | [Data and provenance](docs/data/DATA_AND_PROVENANCE.md) |
+| Build the data layer or change persistence | [Data-layer router](docs/data/DATA_LAYER.md), then its owning focused spec |
+| Implement database migrations or evidence/taxonomy tables | [Relational schema](docs/data/RELATIONAL_SCHEMA.md) |
+| Implement embeddings, hybrid search or reranking | [Retrieval spec](docs/data/RETRIEVAL_SPEC.md), [model/build contracts](docs/data/BUILD_AND_OPERATIONS.md) |
+| Implement case history, graph resumption or output lineage | [Case state](docs/data/CASE_STATE_AND_LINEAGE.md), [operations plan](docs/plans/OPERATIONS_PLAN.md) |
+| Add Langfuse tracing or deploy the data services | [Observability](docs/data/OBSERVABILITY.md), [build/operations](docs/data/BUILD_AND_OPERATIONS.md) |
 | Choose architecture, retrieval or Apertus integration | [Technical options](docs/plans/TECHNICAL_OPTIONS.md), [decisions and questions](docs/project/DECISIONS_AND_OPEN_QUESTIONS.md) |
 | Evaluate quality, grounding or sovereign operation | [Evaluation](docs/challenge/EVALUATION.md), [data and provenance](docs/data/DATA_AND_PROVENANCE.md) |
 | Prepare report, pitch, video or delivery | Root [README.md](README.md), [technical_report.md](technical_report.md), [event and submission](docs/project/EVENT_AND_SUBMISSION.md) |
@@ -70,6 +78,14 @@ Proposed primary target is an air-gapped independent runtime; not yet tested.
    Document a self-contained independent deployment and distinguish connected
    collection from offline runtime. A hosted development endpoint alone proves
    no air-gapped capability.
+7. Follow the current PostgreSQL design (U6/D09), which supersedes Weaviate,
+   SQLite and BGE-M3 as active defaults. Keep original evidence authoritative,
+   case data isolated, and runs pinned to validated snapshots/model configs.
+   Fuse lexical and vector candidates; inferred topic labels must not exclude
+   semantic matches. Reranking never replaces claim-support validation.
+8. LangGraph checkpoints and Langfuse traces are not the evidence store.
+   Self-host Langfuse and its required services inside the deployment boundary;
+   trace eligible, masked data only. Tracing failure must not stop a case.
 
 ## Keeping context reliable
 
@@ -89,6 +105,9 @@ Proposed primary target is an air-gapped independent runtime; not yet tested.
   Do not publish transcripts, source datasets or external messages automatically.
 - Update the relevant focused document and its source references when new facts
   arrive. Keep this file a compact router, not a second requirements document.
+- Logical payload contracts remain in ingestion plan section 7; physical storage,
+  retrieval, case persistence and tracing belong to the focused data specs.
+  Update these owners and the visual together; avoid competing schemas.
 - For documentation changes, check relative links, evidence references and
   template/transcript preservation. Do not claim application tests or results
   before an implementation exists.
