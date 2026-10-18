@@ -179,3 +179,13 @@ that connector was rejected with `MCP tool call requires approval, but approval
 policy is never`; shell GitHub DNS is also unavailable. The focused changes are
 committed locally for a normal push from an authorized network-capable terminal.
 No remote branch, main merge or shared history rewrite was performed here.
+
+### Subsequent integration note — 18 October 2026
+
+The user subsequently pushed this commit to `origin/codex/backend-runtime-acceptance`;
+it was fetched and integrated. The original publication block above describes the
+sandbox session at the time. Eric’s later [host-local access report](RUNTIME_ACCESS_STATUS.md)
+provides private bundle availability but does not prove peer-side connectivity.
+A later unrestricted local run passed 177 backend tests including database tests;
+see [integration](INTEGRATION.md). This does not retroactively change this report’s
+partial acceptance or establish a published pilot corpus.

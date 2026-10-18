@@ -75,3 +75,15 @@ refresh/review; 422 is field validation; 413 is size; 502 is invalid model outpu
 503 is service/storage unavailable. Failure never becomes an invented no-match.
 HTTP failure never switches to mock data. Chat defaults conservatively to focus;
 explicit formatting-only API edits reuse the pack and reassess the wording.
+
+## Latest UI compatibility — 18 October 2026
+
+Board-as-home replaces the desk/action pages; backend action resources remain.
+Optional `ReasonEntry.unitPath`, `expertise`, `Reason.missingFields` and the
+`infrastructure` category are frontend additions, with demo fixtures. Current
+backend projections omit those optional fields and do not yet classify
+infrastructure separately. Supply them only from assessed evidence in a future
+coordinated contract change; omission must not be replaced by invented metadata.
+HTTP PDF remains the reviewed server artifact; browser PDF/PPTX are explicit demo
+features. Connected PPTX requires a new supported format plus the same immutable
+review/export gates, not client generation from an unapproved projection.

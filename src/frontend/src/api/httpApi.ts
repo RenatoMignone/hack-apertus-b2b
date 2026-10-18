@@ -1,6 +1,14 @@
 import type { NavigatorApi } from './index';
 import type { ActionItem, BriefRevision, CaseDetail, CaseRun, CaseSummary, RunStage } from '../types/contract';
 
+/** Backend resources retained even though their old standalone screens were removed. */
+interface HttpNavigatorApi extends NavigatorApi {
+  getLastOpened(): Promise<CaseSummary | null>;
+  listActionItems(): Promise<ActionItem[]>;
+  setActionStatus(id: string, status: ActionItem['status'], answer?: string): Promise<ActionItem[]>;
+  addActionItem(caseId: string, question: string, askRole: string): Promise<ActionItem[]>;
+}
+
 type Fetch = typeof fetch;
 type Accepted = { case_id: string; input_id: string; run_id?: string; status_url?: string };
 type Operation = { status: string; download_url?: string; error_code?: string };
@@ -29,7 +37,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
   pause = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)),
   pollInterval = 1200, maxPolls = 750,
 }: { baseUrl?: string; token: () => string; fetcher?: Fetch; pause?: (ms: number) => Promise<void>;
-  pollInterval?: number; maxPolls?: number }): NavigatorApi {
+  pollInterval?: number; maxPolls?: number }): HttpNavigatorApi {
   const listeners = new Set<() => void>();
   let lastOpened: string | undefined;
   const base = baseUrl.replace(/\/$/, '');
@@ -107,7 +115,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     await request(path(caseId), 'PATCH', { expected_revision: detail.revision, ...values });
     emit(); return requireCase(caseId);
   }
-  const api: NavigatorApi = {
+  const api: HttpNavigatorApi = {
     async listCases() {
       const cases: CaseSummary[] = [];
       for (let offset = 0; offset < 10000; offset += 100) {

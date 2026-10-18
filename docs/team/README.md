@@ -8,6 +8,8 @@ and [open questions](../project/OPEN_QUESTIONS.md).
 | Document | Use now |
 | --- | --- |
 | [INTEGRATION.md](INTEGRATION.md) | Current merged baseline, reviewed tips, fixes and dated verification |
+| [Runtime access status](RUNTIME_ACCESS_STATUS.md) | Owner-reported host checks; private bundle transfer, peer SSH and publication pending |
+| [Backend acceptance](BACKEND_RUNTIME_ACCEPTANCE.md) | Renato’s partial sandbox run and explicit disposable-test guard |
 | [SERVICE_CONTRACTS.md](SERVICE_CONTRACTS.md) | In-process service boundaries; executable DTOs/ports are authoritative |
 | [Eric runtime access prompt](prompts/05_RUNTIME_ACCESS_HANDOFF.md) | Active access/credential and publication handoff; preserve ongoing ingestion |
 | [Renato runtime acceptance prompt](prompts/06_BACKEND_RUNTIME_ACCEPTANCE.md) | Active local setup, isolated tests and real-provider/corpus acceptance |

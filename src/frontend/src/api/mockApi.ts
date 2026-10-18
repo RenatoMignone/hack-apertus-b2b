@@ -1,6 +1,6 @@
 import type { NavigatorApi } from './index';
-import type { ActionItem, BriefRevision, CaseDetail, DialogueTurn, Reason, RunStage, Selection } from '../types/contract';
-import { emptyRevision, NETWORK_REASON, pruneTrace, reasonEvidence, SEED_ACTIONS, SEED_CASES, TRACE_B } from '../mocks/cases';
+import type { BriefRevision, CaseDetail, DialogueTurn, Reason, RunStage, Selection } from '../types/contract';
+import { emptyRevision, NETWORK_REASON, pruneTrace, reasonEvidence, SEED_CASES, TRACE_B } from '../mocks/cases';
 import { EVIDENCE } from '../mocks/evidence';
 
 // In-memory mock backend with scripted agent behaviour. Unknown instructions are
@@ -10,8 +10,8 @@ const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 
 // Demo state survives reloads via localStorage (per browser only). Evidence is
 // static and re-attached on load rather than stored.
-const KEY = 'bern-navigator-demo-v3';
-type Saved = { cases: Omit<CaseDetail, 'evidence'>[]; actions: ActionItem[]; lastOpened?: string };
+const KEY = 'bern-navigator-demo-v5';
+type Saved = { cases: Omit<CaseDetail, 'evidence'>[] };
 
 function loadSaved(): Saved | null {
   try {
@@ -26,12 +26,11 @@ const saved = loadSaved();
 const store = new Map<string, CaseDetail>(
   (saved ? saved.cases.map((c) => ({ ...c, evidence: EVIDENCE })) : SEED_CASES.map((c) => clone(c))).map((c) => [c.case.id, c]),
 );
-let lastOpened: string | undefined = saved?.lastOpened;
 
 function persist() {
   try {
     const cases = [...store.values()].map(({ evidence: _e, ...rest }) => rest);
-    localStorage.setItem(KEY, JSON.stringify({ cases, actions, lastOpened } satisfies Saved));
+    localStorage.setItem(KEY, JSON.stringify({ cases } satisfies Saved));
   } catch {
     // Storage blocked or full: the demo keeps working in memory.
   }
@@ -58,16 +57,11 @@ async function stages(onStage: (s: RunStage) => void, which: RunStage[] = ['inte
   onStage('done');
 }
 
-const actions: ActionItem[] = saved ? saved.actions : clone(SEED_ACTIONS);
 const listeners = new Set<() => void>();
 const emit = () => {
   persist();
   listeners.forEach((l) => l());
 };
-
-function addActions(caseId: string, items: [string, string][]) {
-  for (const [question, askRole] of items) actions.push({ id: uid('a'), caseId, question, askRole, status: 'open' });
-}
 
 function touch(c: CaseDetail) {
   c.case.updatedAt = now();
@@ -128,15 +122,7 @@ export const mockApi: NavigatorApi = {
   async getCase(id) {
     await wait(100);
     const c = store.get(id);
-    if (c) {
-      lastOpened = id;
-      persist();
-    }
     return c ? clone(c) : null;
-  },
-
-  async getLastOpened() {
-    return lastOpened && store.has(lastOpened) ? clone(store.get(lastOpened)!.case) : null;
   },
 
   async createCase(prompt) {
@@ -169,12 +155,6 @@ export const mockApi: NavigatorApi = {
     c.revisions = [rev];
     c.currentRevisionId = rev.id;
     c.case.status = rev.reasons.length ? 'in_review' : 'researching';
-    if (rev.reasons.length) {
-      addActions(c.case.id, [
-        ['Do we already have a contact at this company?', 'Account owner'],
-        ['Who on our side knows these Bern groups best?', 'Life-sciences lead'],
-      ]);
-    }
     if (topic === 'insulin') {
       say(c, 'First draft ready. One question:', {
         revisionId: rev.id,
@@ -283,7 +263,6 @@ export const mockApi: NavigatorApi = {
       answer,
     );
     say(c, clinical ? 'Added DCB’s research network for clinical studies.' : 'Kept the R&D-focused groups.', { revisionId: rev.id });
-    addActions(c.case.id, [[clinical ? 'Can we introduce them to DCB’s clinical research team?' : 'Can we set up a call with the closed-loop researchers?', 'Life-sciences lead']]);
     c.case.status = 'in_review';
     touch(c);
     return clone(c);
@@ -312,40 +291,13 @@ export const mockApi: NavigatorApi = {
     return clone(c);
   },
 
+
   async exportDeck(caseId) {
-    await wait(700);
-    const c = get(caseId);
-    const kept = current(c)?.reasons.filter((r) => r.selection === 'kept') ?? [];
-    const used = [...new Set(kept.flatMap((r) => r.line.evidenceIds))];
-    const lines = [
-      `# Why Bern — ${c.case.companyLabel}`,
-      '',
-      ...kept.map((r) => `- **${r.headline}.** ${r.line.text} ${r.line.evidenceIds.map((id) => `[${c.evidence[id].n}]`).join('')}`),
-      '',
-      ...used.map((id) => `[${c.evidence[id].n}] ${c.evidence[id].url}`),
-    ];
-    const slug = c.case.companyLabel.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
-    return { filename: `why-bern-${slug}.md`, blob: new Blob([lines.join('\n')], { type: 'text/markdown' }) };
-  },
-
-  async listActionItems() {
-    return clone(actions);
-  },
-
-  async setActionStatus(id, status, answer) {
-    const a = actions.find((x) => x.id === id);
-    if (a) {
-      a.status = status;
-      if (answer !== undefined) a.answer = answer;
-    }
-    emit();
-    return clone(actions);
-  },
-
-  async addActionItem(caseId, question, askRole) {
-    actions.push({ id: uid('a'), caseId, question, askRole, status: 'open' });
-    emit();
-    return clone(actions);
+    const detail = get(caseId);
+    const revision = current(detail);
+    const { buildExportModel } = await import('../export/model');
+    const { buildPdf } = await import('../export/pdf');
+    return { filename: 'demo-brief.pdf', blob: await buildPdf(buildExportModel(detail, revision)) };
   },
 
   async setCaseFlags(caseId, flags) {
@@ -364,8 +316,6 @@ export const mockApi: NavigatorApi = {
     }
     store.clear();
     SEED_CASES.forEach((c) => store.set(c.case.id, clone(c)));
-    actions.splice(0, actions.length, ...clone(SEED_ACTIONS));
-    lastOpened = undefined;
     emit();
   },
 

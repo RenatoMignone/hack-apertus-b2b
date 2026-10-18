@@ -1,4 +1,4 @@
-import type { ActionItem, BriefRevision, CaseDetail, CaseOutcome, CaseStatus, Coverage, Institution, Reason, SearchTrace } from '../types/contract';
+import type { BriefRevision, CaseDetail, CaseOutcome, CaseStatus, Coverage, Institution, Reason, SearchTrace } from '../types/contract';
 import { EVIDENCE } from './evidence';
 
 // Seeded demo cases. Company names are synthetic. Institutions, projects and
@@ -36,13 +36,20 @@ const PROMPT_A =
   'algorithms behind it, and are considering a Swiss R&D site. Most early users are women. I think DCB did something ' +
   'on diabetes and the menstrual cycle.';
 
+// Unit paths, expertise and missing fields only restate what the captured pages
+// say; anything a page does not state is listed in missingFields.
+const DCB_PATH = ['Diabetes Center Berne'];
+const BALLY_PATH = ['University of Bern', 'Department for BioMedical Research (DBMR)', 'Bally Lab'];
+const AIHN_PATH = ['University of Bern', 'ARTORG Center', 'AI in Health and Nutrition (AIHN)'];
+
 const reasonsA: Reason[] = [
   {
     id: 'pA-witthauer',
     category: 'people',
     headline: 'Prof. Dr. Lilian Witthauer',
     line: { text: 'Holds DCB’s sensor-technology professorship, the core of a glucose-sensor company.', evidenceIds: ['ev-dcb-profs-a'] },
-    entries: [{ id: 'eA-witt', name: 'Prof. Dr. Lilian Witthauer', role: 'DCB professorship · Sensortechnologie', institution: 'DCB', evidenceIds: ['ev-dcb-profs-a'] }],
+    entries: [{ id: 'eA-witt', name: 'Prof. Dr. Lilian Witthauer', role: 'DCB professorship · Sensortechnologie', institution: 'DCB', unitPath: [...DCB_PATH, 'DCB professorships'], expertise: ['Sensor technology'], evidenceIds: ['ev-dcb-profs-a'] }],
+    missingFields: ['Contact details', 'Projects'],
     kind: 'direct',
     selection: 'none',
   },
@@ -51,7 +58,8 @@ const reasonsA: Reason[] = [
     category: 'people',
     headline: 'Prof. Dr. Lisa Koch',
     line: { text: 'Holds DCB’s data-science and machine-learning professorship, relevant to the sensor algorithms.', evidenceIds: ['ev-dcb-profs-a'] },
-    entries: [{ id: 'eA-koch', name: 'Prof. Dr. Lisa Koch', role: 'DCB professorship · Data Science und Machine Learning', institution: 'DCB', evidenceIds: ['ev-dcb-profs-a'] }],
+    entries: [{ id: 'eA-koch', name: 'Prof. Dr. Lisa Koch', role: 'DCB professorship · Data Science und Machine Learning', institution: 'DCB', unitPath: [...DCB_PATH, 'DCB professorships'], expertise: ['Data science', 'Machine learning'], evidenceIds: ['ev-dcb-profs-a'] }],
+    missingFields: ['Contact details', 'Projects'],
     kind: 'direct',
     selection: 'none',
   },
@@ -60,7 +68,8 @@ const reasonsA: Reason[] = [
     category: 'people',
     headline: 'Dr. med. Dr. phil. Lia Bally',
     line: { text: 'Leads the lab that evaluates digital biomarkers.', evidenceIds: ['ev-bally-team', 'ev-bally-biomarkers'] },
-    entries: [{ id: 'eA-lbally', name: 'Dr. med. Dr. phil. Lia Bally', role: 'Group Leader, Bally Lab (DBMR)', institution: 'UniBE', evidenceIds: ['ev-bally-team'] }],
+    entries: [{ id: 'eA-lbally', name: 'Dr. med. Dr. phil. Lia Bally', role: 'Group Leader, Bally Lab (DBMR)', institution: 'UniBE', unitPath: BALLY_PATH, expertise: ['Digital biomarkers', 'Automated insulin delivery'], evidenceIds: ['ev-bally-team'] }],
+    missingFields: ['Contact details'],
     kind: 'direct',
     selection: 'none',
   },
@@ -69,7 +78,8 @@ const reasonsA: Reason[] = [
     category: 'people',
     headline: 'Prof. Dr. Stavroula Mougiakakou',
     line: { text: 'Contact for ARTORG’s AI-in-health group working on personalised diabetes management.', evidenceIds: ['ev-aihn-contact'] },
-    entries: [{ id: 'eA-moug', name: 'Prof. Dr. Stavroula Mougiakakou', role: 'Contact, AI in Health and Nutrition (ARTORG)', institution: 'ARTORG', evidenceIds: ['ev-aihn-contact'] }],
+    entries: [{ id: 'eA-moug', name: 'Prof. Dr. Stavroula Mougiakakou', role: 'Contact, AI in Health and Nutrition (ARTORG)', institution: 'ARTORG', unitPath: AIHN_PATH, expertise: ['AI for personalised diagnosis and management'], evidenceIds: ['ev-aihn-contact'] }],
+    missingFields: ['Formal role (the page lists her as contact only)'],
     kind: 'direct',
     selection: 'none',
   },
@@ -78,7 +88,8 @@ const reasonsA: Reason[] = [
     category: 'projects',
     headline: 'Needle-free glucose monitoring is already researched here',
     line: { text: 'DCB runs a pilot study on painless, needle-free monitoring.', evidenceIds: ['ev-dcb-spn005'] },
-    entries: [{ id: 'eA-spn', name: 'SPN-005 pilot study', institution: 'DCB', evidenceIds: ['ev-dcb-spn005'] }],
+    entries: [{ id: 'eA-spn', name: 'SPN-005 pilot study', institution: 'DCB', unitPath: [...DCB_PATH, 'Projects'], expertise: ['Needle-free glucose monitoring'], evidenceIds: ['ev-dcb-spn005'] }],
+    missingFields: ['Project lead', 'Status and results'],
     kind: 'direct',
     selection: 'none',
   },
@@ -87,7 +98,8 @@ const reasonsA: Reason[] = [
     category: 'groups',
     headline: 'Experts who validate digital biomarkers',
     line: { text: 'Bally Lab develops and evaluates new digital biomarkers.', evidenceIds: ['ev-bally-biomarkers'] },
-    entries: [{ id: 'eA-bally', name: 'Bally Lab', institution: 'UniBE', evidenceIds: ['ev-bally-biomarkers', 'ev-bally-aid'] }],
+    entries: [{ id: 'eA-bally', name: 'Bally Lab', institution: 'UniBE', unitPath: BALLY_PATH, expertise: ['Digital biomarkers', 'Closed-loop insulin delivery', 'Individualized therapy'], evidenceIds: ['ev-bally-biomarkers', 'ev-bally-aid'] }],
+    missingFields: [],
     kind: 'direct',
     selection: 'none',
   },
@@ -96,7 +108,8 @@ const reasonsA: Reason[] = [
     category: 'groups',
     headline: 'AI that turns readings into personalised care',
     line: { text: 'ARTORG builds AI for adaptive, personalised diabetes care.', evidenceIds: ['ev-adaptive-ai'] },
-    entries: [{ id: 'eA-adm', name: 'Adaptive Diabetes Management', institution: 'ARTORG', evidenceIds: ['ev-adaptive-ai', 'ev-adaptive-proactive'] }],
+    entries: [{ id: 'eA-adm', name: 'Adaptive Diabetes Management', institution: 'ARTORG', unitPath: [...AIHN_PATH, 'Adaptive Diabetes Management'], expertise: ['AI for diabetes care', 'Personalised care'], evidenceIds: ['ev-adaptive-ai', 'ev-adaptive-proactive'] }],
+    missingFields: ['Named contact', 'Projects'],
     kind: 'direct',
     selection: 'none',
   },
@@ -105,7 +118,8 @@ const reasonsA: Reason[] = [
     category: 'projects',
     headline: 'Research on diabetes in women',
     line: { text: 'DCB studied how the menstrual cycle relates to insulin needs.', evidenceIds: ['ev-dcb-menstrual'] },
-    entries: [{ id: 'eA-cycle', name: 'Menstrual Cycle Study', institution: 'DCB', evidenceIds: ['ev-dcb-menstrual'] }],
+    entries: [{ id: 'eA-cycle', name: 'Menstrual Cycle Study', institution: 'DCB', unitPath: [...DCB_PATH, 'Projects'], expertise: ['Diabetes in women', 'Insulin needs'], evidenceIds: ['ev-dcb-menstrual'] }],
+    missingFields: ['Project lead'],
     kind: 'direct',
     fromLead: true,
     selection: 'none',
@@ -115,7 +129,28 @@ const reasonsA: Reason[] = [
     category: 'projects',
     headline: 'Clinical-trial experience with diabetes tools',
     line: { text: 'ARTORG’s GoCARB nutrition tool was validated in a clinical trial.', evidenceIds: ['ev-gocarb-trial'] },
-    entries: [{ id: 'eA-gocarb', name: 'GoCARB', institution: 'ARTORG', evidenceIds: ['ev-gocarb-trial', 'ev-gocarb-project'] }],
+    entries: [{ id: 'eA-gocarb', name: 'GoCARB', institution: 'ARTORG', unitPath: [...AIHN_PATH, 'Intelligent Nutrition'], expertise: ['Carbohydrate estimation', 'Clinical validation'], evidenceIds: ['ev-gocarb-trial', 'ev-gocarb-project'] }],
+    missingFields: ['Named contact'],
+    kind: 'direct',
+    selection: 'none',
+  },
+  {
+    id: 'iA-clinical',
+    category: 'infrastructure',
+    headline: 'Access to clinical research facilities',
+    line: { text: 'DCB states it provides access to clinical research facilities for diabetes technology.', evidenceIds: ['ev-dcb-clinical'] },
+    entries: [{ id: 'eA-clin', name: 'DCB clinical research access', institution: 'DCB', unitPath: DCB_PATH, expertise: ['Clinical research'], evidenceIds: ['ev-dcb-clinical'] }],
+    missingFields: ['Access conditions for companies', 'Costs'],
+    kind: 'direct',
+    selection: 'none',
+  },
+  {
+    id: 'iA-cores',
+    category: 'infrastructure',
+    headline: 'Shared lab core facilities',
+    line: { text: 'DBMR core facilities provide genomics, live-cell imaging and proteomics services.', evidenceIds: ['ev-dbmr-cores'] },
+    entries: [{ id: 'eA-cores', name: 'DBMR Core Facilities', institution: 'UniBE', unitPath: ['University of Bern', 'Department for BioMedical Research (DBMR)', 'Core Facilities'], expertise: ['Genomics', 'Live cell imaging', 'Proteomics'], evidenceIds: ['ev-dbmr-cores'] }],
+    missingFields: ['Access for external companies', 'Costs'],
     kind: 'direct',
     selection: 'none',
   },
@@ -124,7 +159,8 @@ const reasonsA: Reason[] = [
     category: 'ideas',
     headline: 'Future idea: sensing several metabolites at once',
     line: { text: 'Early-stage DCB chemistry for continuous multi-metabolite measurement.', evidenceIds: ['ev-dcb-porphyrin'] },
-    entries: [{ id: 'eA-porph', name: 'Illuminating Personalized Medicine', institution: 'DCB', evidenceIds: ['ev-dcb-porphyrin'] }],
+    entries: [{ id: 'eA-porph', name: 'Illuminating Personalized Medicine', institution: 'DCB', unitPath: [...DCB_PATH, 'Projects'], expertise: ['Multi-metabolite sensing'], evidenceIds: ['ev-dcb-porphyrin'] }],
+    missingFields: ['Project lead', 'Status'],
     kind: 'idea',
     selection: 'none',
   },
@@ -166,6 +202,8 @@ const traceA: SearchTrace = {
     { source: 't-cycle', target: 'ev-dcb-menstrual', value: 1 },
     { source: 't-cgm', target: 'ev-dcb-profs-a', value: 1 },
     { source: 't-personal', target: 'ev-aihn-contact', value: 1 },
+    { source: 't-validation', target: 'ev-dcb-clinical', value: 1 },
+    { source: 't-biomarker', target: 'ev-dbmr-cores', value: 1 },
     { source: 't-biomarker', target: 'ev-bally-team', value: 1 },
   ],
 };
@@ -236,7 +274,8 @@ const reasonsB: Reason[] = [
     category: 'people',
     headline: 'Prof. Dr. José Garcia',
     line: { text: 'Holds DCB’s professorship for automated insulin therapy, exactly Pumpline’s next step.', evidenceIds: ['ev-dcb-profs-b'] },
-    entries: [{ id: 'eB-garcia', name: 'Prof. Dr. José Garcia', role: 'DCB professorship · automatisierte Insulintherapie', institution: 'DCB', evidenceIds: ['ev-dcb-profs-b'] }],
+    entries: [{ id: 'eB-garcia', name: 'Prof. Dr. José Garcia', role: 'DCB professorship · automatisierte Insulintherapie', institution: 'DCB', unitPath: [...DCB_PATH, 'DCB professorships'], expertise: ['Automated insulin therapy'], evidenceIds: ['ev-dcb-profs-b'] }],
+    missingFields: ['Contact details', 'Projects'],
     kind: 'direct',
     selection: 'none',
   },
@@ -245,7 +284,8 @@ const reasonsB: Reason[] = [
     category: 'people',
     headline: 'Dr. med. Dr. phil. Lia Bally',
     line: { text: 'Leads the lab working on closed-loop insulin delivery in hospitals.', evidenceIds: ['ev-bally-team', 'ev-bally-aid'] },
-    entries: [{ id: 'eB-lbally', name: 'Dr. med. Dr. phil. Lia Bally', role: 'Group Leader, Bally Lab (DBMR)', institution: 'UniBE', evidenceIds: ['ev-bally-team'] }],
+    entries: [{ id: 'eB-lbally', name: 'Dr. med. Dr. phil. Lia Bally', role: 'Group Leader, Bally Lab (DBMR)', institution: 'UniBE', unitPath: BALLY_PATH, expertise: ['Automated insulin delivery', 'Digital biomarkers'], evidenceIds: ['ev-bally-team'] }],
+    missingFields: ['Contact details'],
     kind: 'direct',
     selection: 'none',
   },
@@ -254,7 +294,8 @@ const reasonsB: Reason[] = [
     category: 'groups',
     headline: 'Closed-loop insulin delivery research',
     line: { text: 'Bally Lab works on closed-loop automated insulin delivery.', evidenceIds: ['ev-bally-aid'] },
-    entries: [{ id: 'eB-bally', name: 'Bally Lab', institution: 'UniBE', evidenceIds: ['ev-bally-aid'] }],
+    entries: [{ id: 'eB-bally', name: 'Bally Lab', institution: 'UniBE', unitPath: BALLY_PATH, expertise: ['Closed-loop insulin delivery', 'Hospital setting'], evidenceIds: ['ev-bally-aid'] }],
+    missingFields: [],
     kind: 'direct',
     selection: 'none',
   },
@@ -263,7 +304,18 @@ const reasonsB: Reason[] = [
     category: 'projects',
     headline: 'An active automated-insulin-delivery study',
     line: { text: 'DCB studies therapies used alongside automated insulin delivery.', evidenceIds: ['ev-dcb-aidjunct'] },
-    entries: [{ id: 'eB-junct', name: 'AID-JUNCT study', institution: 'DCB', evidenceIds: ['ev-dcb-aidjunct'] }],
+    entries: [{ id: 'eB-junct', name: 'AID-JUNCT study', institution: 'DCB', unitPath: [...DCB_PATH, 'Projects'], expertise: ['Automated insulin delivery', 'Adjunctive therapy'], evidenceIds: ['ev-dcb-aidjunct'] }],
+    missingFields: ['Project lead', 'Status and results'],
+    kind: 'direct',
+    selection: 'none',
+  },
+  {
+    id: 'iB-clinical',
+    category: 'infrastructure',
+    headline: 'Access to clinical research facilities',
+    line: { text: 'DCB states it provides access to clinical research facilities for diabetes technology.', evidenceIds: ['ev-dcb-clinical'] },
+    entries: [{ id: 'eB-clin', name: 'DCB clinical research access', institution: 'DCB', unitPath: DCB_PATH, expertise: ['Clinical research'], evidenceIds: ['ev-dcb-clinical'] }],
+    missingFields: ['Access conditions for companies', 'Costs'],
     kind: 'direct',
     selection: 'none',
   },
@@ -272,7 +324,8 @@ const reasonsB: Reason[] = [
     category: 'ideas',
     headline: 'AI for personalised insulin decisions',
     line: { text: 'ARTORG builds AI for adaptive, personalised diabetes care.', evidenceIds: ['ev-adaptive-ai'] },
-    entries: [{ id: 'eB-adm', name: 'Adaptive Diabetes Management', institution: 'ARTORG', evidenceIds: ['ev-adaptive-ai'] }],
+    entries: [{ id: 'eB-adm', name: 'Adaptive Diabetes Management', institution: 'ARTORG', unitPath: [...AIHN_PATH, 'Adaptive Diabetes Management'], expertise: ['AI for diabetes care'], evidenceIds: ['ev-adaptive-ai'] }],
+    missingFields: ['Named contact'],
     kind: 'idea',
     selection: 'none',
   },
@@ -313,6 +366,7 @@ export const TRACE_B: SearchTrace = {
     { source: 't-network', target: 'ev-dcb-network', value: 1 },
     { source: 't-aid', target: 'ev-dcb-profs-b', value: 1 },
     { source: 't-aid', target: 'ev-bally-team', value: 1 },
+    { source: 't-network', target: 'ev-dcb-clinical', value: 1 },
   ],
 };
 
@@ -458,19 +512,6 @@ function miniCase(
 const W: Mini = ['people', 'Prof. Dr. Lilian Witthauer', 'Holds DCB’s sensor-technology professorship.', 'Prof. Dr. Lilian Witthauer', 'DCB', ['ev-dcb-profs-a'], 'DCB professorship · Sensortechnologie'];
 const K: Mini = ['people', 'Prof. Dr. Lisa Koch', 'Holds DCB’s data-science and machine-learning professorship.', 'Prof. Dr. Lisa Koch', 'DCB', ['ev-dcb-profs-a'], 'DCB professorship · Data Science und Machine Learning'];
 const G: Mini = ['people', 'Prof. Dr. José Garcia', 'Holds DCB’s professorship for automated insulin therapy.', 'Prof. Dr. José Garcia', 'DCB', ['ev-dcb-profs-b'], 'DCB professorship · automatisierte Insulintherapie'];
-
-// ---------- Action items: questions for agency colleagues ----------
-
-export const SEED_ACTIONS: ActionItem[] = [
-  { id: 'a1', caseId: 'case-glucowave', question: 'Do we already know anyone at Diabetes Center Berne?', askRole: 'Life-sciences lead', status: 'open' },
-  { id: 'a2', caseId: 'case-glucowave', question: 'Has SGE shared their timeline for a Swiss R&D site?', askRole: 'Account owner', status: 'asked' },
-  { id: 'a3', caseId: 'case-glucowave', question: 'Which sensing method do they use?', askRole: 'Account owner', status: 'open' },
-  { id: 'a4', caseId: 'case-pumpline', question: 'Do they already have a Swiss entity?', askRole: 'Account owner', status: 'open' },
-  { id: 'a5', caseId: 'case-pumpline', question: 'Have we pitched closed-loop research to a pump maker before?', askRole: 'Life-sciences lead', status: 'open' },
-  { id: 'a6', caseId: 'case-d1', question: 'Did the company reply to the pitch?', askRole: 'Account owner', status: 'done' },
-  { id: 'a7', caseId: 'case-d4', question: 'Any update on the planned visit date?', askRole: 'Account owner', status: 'open' },
-  { id: 'a8', caseId: 'case-d3', question: 'Is the project still funded?', askRole: 'Investment team', status: 'done' },
-];
 
 export const SEED_CASES: CaseDetail[] = [
   caseA,

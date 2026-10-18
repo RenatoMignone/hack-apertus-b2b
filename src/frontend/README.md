@@ -27,6 +27,10 @@ formatting-only editing is also available through the backend API. Source badges
 distinguish new web research; absent lineage is explicitly unavailable.
 
 For the original seeded demo only, set `VITE_API_MODE=mock` in an ignored
-`.env.local` and restart Vite. Its Markdown export and localStorage are demo-only.
+`.env.local` and restart Vite. Its browser PDF/PowerPoint exports and localStorage are demo-only. The board is
+home; the standalone desk/action screens were removed. All cards must be reviewed
+and at least one kept for export. HTTP mode retains server-authorized PDF;
+connected PowerPoint is pending backend support. New hierarchy/expertise/missing
+field displays are optional and are not yet fully populated by the backend.
 An HTTP failure never switches to mocks. The connection token and live case
 content are never saved by the frontend to localStorage.

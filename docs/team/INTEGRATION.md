@@ -71,16 +71,29 @@ or paid provisioning was performed. No Docker runtime image was built on this PC
 ## Run and deployment gates
 
 Use the [first live run runbook](../data/LIVE_SETUP.md) and [current status](../project/STATUS.md).
-Repository migration head is `0007_frontend_lifecycle`; Eric's **current** host
-revision is unverified. Lane C last reported 0004 before integration. If behind,
-Eric or his delegated migration operator coordinates a backup/window and upgrades
-with the migration-role DSN. Developer SSH/app credentials alone are insufficient.
+Repository and shared-host migration head are `0007_frontend_lifecycle`; Eric’s
+[completed rollout](MIGRATION_STATUS.md) supersedes the earlier 0004 observation.
+Do not rerun that migration for runtime setup.
 
-Next configure real identity/token/DB bindings, checkpoints/artifacts and a
-published reviewed corpus/profile. Supply compatible verified embedding assets
-where the API/worker runs. Start the backend/frontend and complete one authorized
-public live case before claiming deployment or research quality. Neither the
-integration nor the subsequent documentation audit changed Eric's host.
+[Runtime access status](RUNTIME_ACCESS_STATUS.md) summarizes the owner-reported
+private bundles and host-local checks. Peer-side SSH and pilot publication remain
+pending. [Renato’s acceptance](BACKEND_RUNTIME_ACCEPTANCE.md) establishes partial
+sandbox results, not live end-to-end acceptance. Start with the current live
+runbook; use isolated infrastructure for destructive integration tests.
+
+## Follow-up integration — 18 October 2026
+
+Renato’s `66dbfd1` removes deployment-credential fallback from the test runner and
+adds explicit disposable-DSN guards. Mohamed’s `ui-polish` through `c0c4812`
+removes the desk/action screens, makes the board home, and adds structured result
+fields, infrastructure cards and demo browser PDF/PPTX exports.
+
+Merge resolution retains authenticated HTTP, memory-only tokens, source limitations
+and exact hash/review gates for server PDF. Browser exports run only in explicit
+demo mode and require all-reviewed/one-kept selections. Connected PPTX remains
+unavailable. Existing action-item HTTP resources are retained without their old
+standalone screens. Optional hierarchy/expertise/missing-field UI metadata is
+backward-compatible; backend population is a separate enhancement.
 
 ## After merging
 
@@ -89,3 +102,21 @@ feature branch from it. The completed lane branches can stay as historical
 references; do not reset/rewrite them or merge `main` back merely to reuse their
 names. If unfinished work must continue on an existing branch, merge current
 `main` into that branch explicitly and resolve any overlap with its owner.
+
+## Latest merged verification — 18 October 2026
+
+On this Mac, the merged code passed **177 backend tests**, including all 58
+PostgreSQL integration tests, on isolated local PostgreSQL 18.0 / pgvector 0.8.1.
+No asyncio polling workaround was used. The first attempts were blocked by socket
+sandboxing and an incorrect local admin role; the final run used the isolated
+cluster’s configured administrator with approved local network access.
+Frontend clean locked install, **11 tests** (8 transport + 3 export-policy),
+TypeScript/build passed; npm reported zero vulnerabilities. Browser export bundles
+produce size warnings; demo PPTX visual/PowerPoint compatibility is not certified.
+These are synthetic engineering checks, not real corpus/provider acceptance.
+
+Merged browser smoke also passed against the isolated synthetic API/worker:
+board home, authenticated case creation, cited result, unavailable-trace wording,
+blocked export before review, kept selection, exact-hash review, queued export and
+HTTP 200 PDF download. Connected export offered PDF only. Source providers and
+company input in this smoke were synthetic; no shared host was contacted.

@@ -182,7 +182,11 @@ do not relabel that identity or copy fixture profile IDs into pilot settings.
 API/worker on this Mac is the proposed first placement; no worker was started.
 
 SSH to the user-confirmed account `elia@192.168.10.230` returned **No route to host**.
-No shared database/storage check could complete. Remaining operator inputs:
+No peer-side database/storage check could complete from this Mac. Eric subsequently
+reported protected per-developer bundles and successful host-local saver/S3 writes;
+see [runtime access](../team/RUNTIME_ACCESS_STATUS.md). Transfer those bundles
+privately, preserving each identity/token, before filling the remaining settings.
+The original Mac preparation still needs these inputs:
 
 - Reachable SSH host/network and verified host key; use the existing Bern key.
 - Checkpoint DSN and confirmation that framework tables are provisioned; runtime

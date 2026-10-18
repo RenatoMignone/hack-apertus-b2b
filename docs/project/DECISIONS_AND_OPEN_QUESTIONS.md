@@ -159,6 +159,24 @@ compact version menu, toasts with Undo, keyboard focus, WCAG AA contrast and
 per-browser demo persistence were added. Audit and rationale: the approved UX plan,
 summarised in [FRONTEND_PLAN.md](../plans/FRONTEND_PLAN.md).
 
+**D16 / user decision, 18 October (supersedes D14's page set):** remove *My desk* and
+*Action items*. No recording asks for a dashboard or for tracking questions to
+colleagues. Meetings, outreach and relationship follow-up are the agency's job and
+outside the challenge (T03 11:04–12:09, 21:45–22:26; PRODUCT_REQUIREMENTS scope). The
+app is now the cases board (home, `/`), the composer and the case page. The supported
+part, "Gaps and next steps" (questions for the company, possible introductions with
+availability not confirmed), moves into a *Next steps* block on the case page.
+
+**D17 / user decision, 18 October:** the export produces two files from the items she
+kept: a structured **PDF brief** with the supplied English agency logo, and an
+editable **PowerPoint** built from the supplied partner template (its layouts,
+master and theme; example slides removed). Both are generated client-side on the
+`ui-polish` branch (`src/frontend/src/export/`) so they work with the mock and offline.
+Open point for merging: `main` already has a backend ReportLab PDF renderer, with PPTX
+listed there as later work. The team must choose one PDF path (backend renderer, or
+this client-side brief) and whether PPTX stays client-side or moves to the backend.
+Template and logo remain challenge-only (N1).
+
 **18 October user answers (U2):** recorded below. The agent selected the delegated
 medical slice and evaluation protocol in [PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md).
 Selected scope is diabetes technology; English outputs are required and DE/FR/IT
@@ -350,3 +368,21 @@ Root `.gitattributes` enforces LF for shell scripts; simulated Windows-style Git
 checkout and shell syntax passed. Eric must rewrite his existing checked-out script
 and verify normal bootstrap before removing his temporary override. Secrets remain
 only in ignored `.env`; public examples contain no private keys.
+
+## D23 — Reconcile runtime handoffs and refreshed UI (18 October 2026)
+
+Provenance: user supplies Eric’s host-access report and Renato’s acceptance output,
+asks to keep docs consistent and merge the latest `ui-polish`, adapting as needed.
+Renato’s `66dbfd1` is available remotely; Eric’s `300c677` is not published after
+an automatic approval rejection. A reduced [runtime summary](../team/RUNTIME_ACCESS_STATUS.md)
+records owner-reported results without publishing private bundles or reproducing
+operational network/identity details. No rejected push is retried here.
+
+Keep Mohamed’s board navigation and result presentation, with authenticated HTTP
+and server-reviewed PDF from main. Browser PDF/PPTX remain explicit demo exports;
+D17’s browser-export design is not a replacement for D20’s connected review gate.
+New optional UI result metadata is not automatically supplied by the backend.
+Host-local checks and sandbox tests do not establish either developer’s peer SSH
+or a real provider-backed case. Renato can lead live acceptance if his terminal
+has access; no live test success is inferred. Pilot publication remains the
+corpus owner’s gate, independent of Elia’s unresolved route.
