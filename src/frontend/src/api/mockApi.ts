@@ -10,7 +10,7 @@ const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 
 // Demo state survives reloads via localStorage (per browser only). Evidence is
 // static and re-attached on load rather than stored.
-const KEY = 'bern-navigator-demo-v4';
+const KEY = 'bern-navigator-demo-v5';
 type Saved = { cases: Omit<CaseDetail, 'evidence'>[] };
 
 function loadSaved(): Saved | null {
