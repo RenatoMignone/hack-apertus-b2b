@@ -4,6 +4,16 @@ Active repository: **hack-apertus-submission**, Bern Economic Development Agency
 Research & Expertise Navigator. Preserve the hackathon submission template.
 Work here; the sibling `hack-apertus-liebefeld` is historical and must not change.
 
+## Current three-person backend build
+
+Use [exclusive lane ownership and Git workflow](docs/team/PARALLEL_BACKEND.md)
+and [v1 service contracts](docs/team/SERVICE_CONTRACTS.md) for this parallel pass.
+[Three copyable prompts](docs/team/prompts/01_RUNTIME.md) assign runtime (A),
+intelligence/reports (B), and data backbone (C). Their narrower path allowlists
+override the generic feature examples below; each lane edits only its own
+READMEs/handoff docs. A alone publishes shared service DTOs/config/dependency locks.
+Existing data/pipeline DTOs and the separately owned frontend stay read-only.
+
 ## Start a feature task
 
 1. Read [module handoffs](docs/plans/MODULE_HANDOFFS.md) and select the row matching
@@ -28,8 +38,10 @@ never overwrite another agent's work or independently rename shared fields.
 
 - React/Vite frontend runs on mocks. Python contracts, PostgreSQL/pgvector,
   artifacts, retrieval, checkpoints, tracing and case persistence through migration
-  `0004_case_pipeline` are implemented. The preceding data task passed 37 tests
-  on disposable PostgreSQL; this is not a quality/model benchmark.
+  `0005_finalize_schema` are implemented. Final schema contract v1 is authoritative;
+  read [data handoff](docs/data/INGESTION_RETRIEVAL_HANDOFF.md) before ingestion or
+  retrieval work and use the generated [field reference](docs/data/SCHEMA_REFERENCE.md).
+  Synthetic integration checks are not a quality/model benchmark.
 - HTTP/application integration, executable LangGraph case graph, live model and
   web adapters, semantic validators and PDF rendering are future feature tasks.
   A specific user feature request authorizes that scoped work; old documentation-
@@ -54,6 +66,7 @@ never overwrite another agent's work or independently rename shared fields.
 | HTTP/application/frontend handoff | [API handoff](docs/plans/FRONTEND_BACKEND_API.md), [frontend behavior](docs/plans/FRONTEND_PLAN.md) |
 | Graph, interpretation, evidence or drafting | [Processing](docs/plans/REPORT_PROCESSING_BOUNDARIES.md), [operations](docs/plans/OPERATIONS_PLAN.md), [pack authority](docs/plans/ARCHITECTURE.md#evidence-pack-the-report-generation-gate) |
 | Apertus calls, tool routing, keys | [Inference configuration](docs/data/INFERENCE_CONFIGURATION.md), [model/build contracts](docs/data/BUILD_AND_OPERATIONS.md) |
+| Populate corpus or implement hybrid retrieval | [Data handoff](docs/data/INGESTION_RETRIEVAL_HANDOFF.md), [final schema](docs/data/RELATIONAL_SCHEMA.md), [exact fields](docs/data/SCHEMA_REFERENCE.md) |
 | Embeddings, hybrid search, reranking | [Embedding deployment](docs/data/EMBEDDING_DEPLOYMENT.md), [retrieval](docs/data/RETRIEVAL_SPEC.md), [model/build contracts](docs/data/BUILD_AND_OPERATIONS.md) |
 | Web research, scraping, citations | [Web research](docs/data/WEB_RESEARCH.md), [provenance](docs/data/DATA_AND_PROVENANCE.md), [ingestion §7](docs/plans/INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2) |
 | Persistence, migrations or case history | [Data router](docs/data/DATA_LAYER.md), [schema](docs/data/RELATIONAL_SCHEMA.md), [case additions](docs/data/CASE_PIPELINE_STORAGE.md), [lineage](docs/data/CASE_STATE_AND_LINEAGE.md) |
@@ -80,6 +93,8 @@ never overwrite another agent's work or independently rename shared fields.
 - New web evidence stays flagged and case-scoped; prefer pinned corpus versions
   for duplicate URLs. A supported claim does not certify its source. No automatic
   shared-corpus updates from user edits, reports or case-time research.
+- Query only final application tables; never build features on `legacy` or the
+  frozen migration baseline. Update schema docs/migrations together for changes.
 - Freeze supported `ReportEvidencePack` before drafting. Reason keep/reject is
   editorial, not truth approval. All cards reviewed plus one kept gates export;
   result/support/selection hashes bind approval. PDF first; editable PPTX later.
@@ -102,4 +117,5 @@ recommendation, measured result and unknown. Do not claim tests or services not
 actually run. Check links, contract consistency and protected materials.
 
 Commit/push only when the current user request authorizes it; do not migrate the
-shared host implicitly. Preserve the untracked raw discussion transcript.
+shared host implicitly. The discussion transcript is tracked following explicit
+user publication authorization; preserve its contents.

@@ -1,6 +1,6 @@
-# Case pipeline persistence additions
+# Case pipeline persistence
 
-**18 October 2026 · U8/D16; supplements the physical schema and lineage specs.**
+**18 October 2026 · Final schema contract v1 (D18); U8/D16 processing retained.**
 One `navigator` database retains `corpus`, `taxonomy`, `retrieval`, `cases`, `ops`.
 LangGraph and Langfuse retain their own databases/stores. No three application
 DBs or cross-database foreign keys are introduced.
@@ -21,9 +21,10 @@ DBs or cross-database foreign keys are introduced.
 Reuse existing entities/claims for organizations, institutes, companies, people,
 units, projects, facilities and services. Relations are supported predicates, not
 a separate graph database. Public companies are distinct from private case history.
-Existing input revisions, dialogue, runs, questions/answers, plans/rounds/hits,
-matches/support, manifests/items, packs/items/claims and result revisions remain.
-Old match selections are retained as legacy data; never guess reason mappings.
+Input revisions, dialogue, runs, questions/answers, manifests/items, packs/items/claims
+and result revisions remain. Plans/round observations live in durable stage outputs;
+entity matches live in the frozen pack. Removed match selections have no mapping
+to reason cards; populated old tables are preserved only in the maintainer archive.
 
 Pack membership is exactly pinned snapshot support plus a sealed, case-owned
 manifest. Live evidence is stored in case scopes and never mutates the snapshot.
@@ -40,9 +41,9 @@ card must be reviewed and at least one kept before an accepted review/export.
 Review hashes include the selection set; selection changes stale old exports.
 Readers recheck access/revocation even for historical packs and artifacts.
 
-Forward migration `0004_case_pipeline` preserves existing data and installs new
-RLS/immutable guards and app-role grants. Migration 0001 must create only its
-original tables (exclude U8 tables), because it currently imports live metadata;
-0004 adds new tables/columns for both fresh and existing databases. Old untyped
-packs/results remain readable for audit but cannot gain a new accepted approval
-or export through the v2 reason workflow without validated content.
+Migration `0004_case_pipeline` added this workflow; `0005_finalize_schema` retires
+the duplicate older workflow and finalizes active tables. Fresh and upgraded
+databases expose the same [exact application schema](SCHEMA_REFERENCE.md).
+Historical migrations use frozen metadata. Old untyped packs/results remain
+readable for audit but cannot gain a new accepted approval/export without
+validated v2 content. See [upgrade rules](RELATIONAL_SCHEMA.md#removed-structures-and-upgrade-behavior).

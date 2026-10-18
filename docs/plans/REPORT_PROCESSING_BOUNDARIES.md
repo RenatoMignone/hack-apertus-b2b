@@ -6,6 +6,12 @@ execution and PDF rendering are subsequent integrations, not working features.
 This document owns the processing stages; [architecture](ARCHITECTURE.md) owns
 pack content, [physical schema](../data/RELATIONAL_SCHEMA.md) owns storage.
 
+Schema contract v1 is finalized at migration 0005. Corpus/retrieval agents start
+with the [data handoff](../data/INGESTION_RETRIEVAL_HANDOFF.md); use the
+[exact field reference](../data/SCHEMA_REFERENCE.md) for queries. The pack owns
+match output; reason selections own editorial review; durable stage outputs own
+query plans and retrieval observations.
+
 ## Execution and ownership
 
 1. **Intake:** persist the permitted message as an immutable input revision.

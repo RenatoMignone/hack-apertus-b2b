@@ -244,3 +244,45 @@ eligibility, hardware and immutable config remain open. No endpoint/weights were
 provisioned/downloaded. See [embedding recommendation](../data/EMBEDDING_DEPLOYMENT.md).
 `AGENTS.md` and [module handoffs](../plans/MODULE_HANDOFFS.md) route scoped work;
 [OPEN_QUESTIONS.md](OPEN_QUESTIONS.md) is the current backlog. No commit/push.
+
+## U10 / D18 — finalized schema and corpus/retrieval handoff
+
+18 October 2026: user asks to remove useless structures and stabilize schemas
+before a teammate populates the corpus and implements hybrid RAG. Contract v1
+retains five PostgreSQL application schemas and evidence-backed typed entities/claims;
+no separate institute/company databases. Migration 0005 removes unused/duplicate
+plan/round/hit, match/support/selection and crawl-frontier tables from the active
+schema, plus duplicate chunk encoding fields. Populated history is owner-only
+archive; empty retired structures are removed. Frozen baseline metadata makes
+older migrations independent of future runtime schema edits.
+
+[Schema decisions](../data/RELATIONAL_SCHEMA.md), generated
+[field inventory](../data/SCHEMA_REFERENCE.md), and the focused
+[data teammate handoff](../data/INGESTION_RETRIEVAL_HANDOFF.md) are the query/build
+contract. Actual DTOs own structured JSON; stages store bounded plans/results,
+packs own matches, reason selections own editorial review. Source dates can be
+passed at ingestion; relationship snapshots require full support and pinned
+subject/object entities. Entity relations also use SQL NULL for the absent literal
+(the previous JSON-null encoding blocked valid affiliations). Shared-host migration, real import/model quality and
+live application integration remain future work.
+
+Validation: 42 backend tests passed on disposable PostgreSQL 17 + pgvector, including
+fresh schema parity and upgrades preserving 0003/0004 history. Generated field
+reference and local documentation links checked. Frontend/template/recordings
+unchanged. No shared-host migration or commit/push performed in this task.
+
+## U11 / D19 — three exclusive backend lanes
+
+User authorizes pushing pending schema work, stopping task services and preparing
+three implementation prompts: A runtime/LangGraph/API/integration; B Apertus/
+evidence/reports; C ingestion/database/hybrid and graph-supported retrieval/
+EmbeddingGemma/reranking. Frontend remains separately owned.
+[Exclusive paths](../team/PARALLEL_BACKEND.md) and the
+[service contract bootstrap](../team/SERVICE_CONTRACTS.md) define the parallel pass.
+A is the sole shared DTO/config/lock owner; each lane has its own tests/docs and
+feature branch/worktree. Model recommendation is to measure hosted 70B first for
+reasoning quality against the provisional 8B default; no quality result or silent
+default switch is claimed. In-process typed ports, not HTTP between backend modules.
+New source-derived case claims must preserve same-scope evidence and origin lineage.
+Only task-owned Docker resources may be stopped; local inspection found no running
+containers and the prior schema test container had already been removed.

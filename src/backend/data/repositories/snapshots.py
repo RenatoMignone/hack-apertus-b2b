@@ -52,12 +52,13 @@ class SnapshotRepository:
             for claim_id in set(claim_ids):
                 claim = connection.execute(select(tables.claims).where(tables.claims.c.claim_id == claim_id)).mappings().one()
                 require_scope(connection, claim["scope_id"], write=True)
-                support = connection.execute(select(tables.claim_evidence.c.evidence_id).join(tables.spans).where(
+                support = connection.execute(select(tables.spans.c.document_version_id).join(tables.claim_evidence).where(
                     tables.claim_evidence.c.claim_id == claim_id, tables.claim_evidence.c.relation == "supports",
-                    tables.claim_evidence.c.review_decision == "accepted",
-                    tables.spans.c.document_version_id.in_({member["document_version_id"] for member in members}))).first()
-                if claim["status"] != "accepted" or claim["subject_id"] not in entity_ids or not support:
-                    raise ValueError("pinned claims require accepted support and a pinned subject")
+                    tables.claim_evidence.c.review_decision == "accepted")).scalars().all()
+                if (claim["status"] != "accepted" or claim["subject_id"] not in entity_ids or not support
+                        or not set(support) <= {member["document_version_id"] for member in members}
+                        or (claim["object_entity_id"] is not None and claim["object_entity_id"] not in entity_ids)):
+                    raise ValueError("pinned claims require complete accepted support and pinned subject/object entities")
                 connection.execute(insert(tables.snapshot_claims).values(snapshot_id=snapshot_id, claim_id=claim_id))
             return snapshot_id
 

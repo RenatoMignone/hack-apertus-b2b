@@ -1,7 +1,8 @@
+"""Historical 0001 security installer. New schema changes belong in forward migrations."""
 from sqlalchemy import text
 
 
-def install_security(connection, exclude=()):
+def install_security(connection, *, metadata, exclude=()):
     connection.execute(text("""
         CREATE FUNCTION ops.can_access(target uuid, writing boolean DEFAULT false)
         RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER
@@ -141,8 +142,6 @@ def install_security(connection, exclude=()):
         connection.execute(text(f"CREATE TRIGGER freeze_membership BEFORE INSERT OR UPDATE OR DELETE ON {target} FOR EACH ROW EXECUTE FUNCTION ops.freeze_membership()"))
     for target in ("corpus.snapshots", "retrieval.index_builds"):
         connection.execute(text(f"CREATE TRIGGER freeze_published BEFORE UPDATE OR DELETE ON {target} FOR EACH ROW WHEN (OLD.status='published') EXECUTE FUNCTION ops.prevent_change()"))
-
-    from backend.data.schema import metadata
 
     rules = {
         "ops.principals": "database_role=session_user",

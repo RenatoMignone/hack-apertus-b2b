@@ -1,8 +1,8 @@
 from alembic import op
 from sqlalchemy import text
 
-from backend.data.schema import metadata, PIPELINE_TABLES
-from backend.data.security import install_security
+from backend.data.migrations.baseline_schema import metadata, PIPELINE_TABLES
+from backend.data.migrations.baseline_security import install_security
 
 
 revision = "0001_data_layer"
@@ -17,7 +17,7 @@ def upgrade():
     for schema in ("corpus", "taxonomy", "retrieval", "cases", "ops"):
         connection.execute(text(f"CREATE SCHEMA {schema}"))
     metadata.create_all(connection, tables=[t for t in metadata.sorted_tables if t.fullname not in PIPELINE_TABLES])
-    install_security(connection, exclude=PIPELINE_TABLES)
+    install_security(connection, exclude=PIPELINE_TABLES, metadata=metadata)
 
 
 def downgrade():

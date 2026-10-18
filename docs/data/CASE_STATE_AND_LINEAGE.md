@@ -10,23 +10,30 @@ Langfuse observations are linked diagnostics, not recoverable business state.
 
 | Table | Key fields / relationships |
 | --- | --- |
-| `cases` | Case ID, owner/access policy, status, current input/result revision pointers |
+| `cases` | Case ID, owner ID, namespace, status/revision, current input/result pointers |
 | `input_revisions` | Immutable input ID, case ID, parent ID, permitted full message/context, creation time |
-| `dialogue_turns` | Turn/case ID, role, text, target input/result/question ID, timestamp; role text is not public evidence |
-| `runs` | Run ID, case/input ID, profile/schema/taxonomy/snapshot/build/model/prompt versions, case-manifest ID, state, budgets/usage, thread/trace correlations |
+| `dialogue_turns` | Turn/case ID, role, message, optional input ID, timestamp; role text is not public evidence |
+| `runs` | Run ID, case/input/snapshot IDs, pinned configuration JSON, status, thread/trace IDs, last stage/failure |
 | `questions`, `answers` | Question ID, target revision/field, required flag, reason/status, answer turn ID; stale answers cannot overwrite newer intent |
-| `query_plans`, `retrieval_rounds` | Run/round, original/expanded query artifacts, reliable filters, budget/candidate counts, methods/timings/errors |
-| `retrieval_hits` | Round/chunk/evidence/entity IDs, component ranks/scores, rejection/support state; persist enough to reconstruct selection |
-| `matches` | Run/entity/need IDs, supporting claims, direct/adjacent status, relevance and evidence-strength reasons |
-| `case_evidence_manifests`, `case_evidence_items` | Immutable manifest ID/hash, scoped document/claim/evidence IDs; new discoveries create a new manifest revision |
+| `interpretations` | Run → structured `CaseInterpretation`; input/taxonomy pins resolve through the run |
+| `claim_assessments` | Run/claim → exact assessed statement/support, outcome and validator |
+| `case_evidence_manifests`, `case_evidence_items` | Immutable manifest ID/hash and parent/case IDs; items reference scoped evidence IDs; new discoveries create a new manifest |
 | `evidence_packs`, `pack_items` | Pack ID, run/manifest/input IDs, accepted facts/matches/derivations/gaps, literal support and hash; frozen before writing |
-| `result_revisions`, `selections`, `reviews` | Parent result, pack, edit instruction, accepted/rejected findings, reviewer decision and exact reviewed revision/hash |
-| `exports` | Export ID, reviewed result/selection set, template/logo/renderer versions, artifact/hash, source manifest and status |
+| `result_revisions`, `draft_reasons`, `reason_claims` | Immutable draft/result, exact reason content/support and claim links |
+| `reason_selections`, `reviews` | Per-card editorial selection and immutable approval of exact result/selection hashes |
+| `exports` | Export ID, result/review/artifact IDs, template/renderer versions, selection hash, format and status |
 
-Use explicit association tables for pack-to-claims/evidence and match-to-support
+Use explicit association tables for pack-to-claims/evidence and reason-to-claim
 joins; validated JSON payloads may carry structured need/argument details. The
 same evidence contracts apply to public and case-private documents. A pack may
 use only the pinned shared snapshot plus the run's eligible case manifest.
+
+The [final schema](RELATIONAL_SCHEMA.md) and [field reference](SCHEMA_REFERENCE.md)
+supersede older conceptual field lists. Run pins include `snapshot_id` and
+`configuration`; profile/taxonomy/build resolve through that snapshot. There are
+no separate run columns for every model/prompt setting. Query plans and round
+hits are serialized in `ops.stage_attempts.outputs`; pack payloads own matches.
+No application query reads the retired legacy tables.
 
 ## Durable execution
 
@@ -101,5 +108,5 @@ These are acceptance cases for future implementation, not completed tests.
 
 [Case pipeline storage](CASE_PIPELINE_STORAGE.md) owns the new tables, manifest
 eligibility, supported-claim assessments and reason-level selection/review hashes.
-Legacy match selections remain historical. New accepted reviews/exports require
+Populated retired match selections remain in the maintainer-only archive. New accepted reviews/exports require
 the v2 reason workflow; rejection is editorial and does not retract a claim.

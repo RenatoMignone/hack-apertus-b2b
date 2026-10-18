@@ -16,6 +16,11 @@ draft; reason-card editorial keep/reject; clarification only when blocking;
 connected and offline modes; PDF first and PPTX later. React/Vite frontend is
 owned by a separate teammate and remains untouched by backend work.
 
+D18 finalizes schema contract v1 at `0005_finalize_schema`: [exact fields](../data/SCHEMA_REFERENCE.md)
+and [corpus/retrieval handoff](../data/INGESTION_RETRIEVAL_HANDOFF.md). Database shape
+is settled for implementation; O04/O13/O14 concern model configuration, corpus
+population and taxonomy contents, not alternative database designs.
+
 Keera URL and four model aliases are supplied (Q05 partially resolved). API key,
 authenticated access and gateway constraints remain untested. EmbeddingGemma 2
 artifact reference is verified; **local text-only hosting is a recommendation**,

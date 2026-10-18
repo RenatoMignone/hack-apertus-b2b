@@ -178,3 +178,18 @@ See [provider settings](../data/INFERENCE_CONFIGURATION.md),
 [embedding comparison](../data/EMBEDDING_DEPLOYMENT.md),
 [module routing](../plans/MODULE_HANDOFFS.md) and
 [active unresolved items](OPEN_QUESTIONS.md).
+
+## U10 — schema finalization request, 18 October 2026
+
+User asks to finalize tables/fields for the agreed scope, remove useless structures
+and give the corpus/hybrid-RAG teammate an unambiguous schema. D18 records the
+implementation decision; runtime metadata and generated reference own exact fields.
+No shared-host migration or push is inferred from this request.
+
+## U11 — three backend contributors and exclusive agent prompts
+
+18 October 2026: user requests push/cleanup and three mutually exclusive backend
+implementation prompts with standardized interfaces. One contributor owns
+ingestion/database/graph-supported retrieval/embedding; two own the rest, with
+frontend excluded. User asks why 8B rather than 70B (referring to it as 7B).
+D19 records boundaries and an unmeasured 70B-first comparison recommendation.

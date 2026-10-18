@@ -16,7 +16,7 @@ Langfuse retain their own migration tools and framework-owned tables.
 
 ## U8 persistence implementation
 
-U8 adds interpretations, case web research, supported claim assessments, case manifests, typed packs, draft reasons, editorial selections and PDF export lineage. Use migration 0004 and focused case repositories; legacy match selections remain historical.
+U8 adds interpretations, case web research, supported claim assessments, case manifests, typed packs, draft reasons, editorial selections and PDF export lineage. Use migration 0005 and focused case repositories; populated retired workflow tables are owner-only history outside the application schema.
 
 ## Parallel feature routing
 
@@ -24,3 +24,12 @@ U8 adds interpretations, case web research, supported claim assessments, case ma
 focused read path, outputs and acceptance checks. [Active questions](../../../docs/project/OPEN_QUESTIONS.md)
 own unresolved inputs. Implement scoped behavior against agreed contracts and
 fixtures; coordinate shared schema/config changes. Leave `src/frontend/` untouched.
+
+## Final schema and corpus/retrieval task
+
+Start with the [ingestion/retrieval handoff](../../../docs/data/INGESTION_RETRIEVAL_HANDOFF.md).
+`schema.py` defines final tables; [exact fields](../../../docs/data/SCHEMA_REFERENCE.md)
+are generated from it with `PYTHONPATH=src python -m backend.data.schema_docs`
+(from repository root). Add `--check` for drift checking. Never import
+`migrations/baseline_schema.py` in runtime code: it freezes old migration behavior.
+No new code reads `legacy` or recreates removed match/selection/plan/hit/frontier tables.

@@ -6,6 +6,11 @@ Storage: [relational schema](RELATIONAL_SCHEMA.md). Logical search functions:
 No model repository, download source, endpoint or tokenizer implementation is
 selected here. The named model roles are in [build and operations](BUILD_AND_OPERATIONS.md).
 
+Read the [ingestion/retrieval handoff](INGESTION_RETRIEVAL_HANDOFF.md) for actual
+repository calls, joins and write order. Use the [exact field reference](SCHEMA_REFERENCE.md);
+removed plan/hit/match tables are not query targets. Plans/results can be persisted
+in durable stage outputs using the existing DTOs.
+
 ## Query contract
 
 `QueryPlan` carries the full permitted request, case/input revision, verified or

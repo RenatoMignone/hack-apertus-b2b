@@ -147,3 +147,7 @@ Before integration, agree these deltas with the frontend owner: source flags;
 company metadata projection; exact result/selection hashes on review/export;
 PDF-aware export naming; asynchronous polling/clarification/errors. Keep existing
 `NavigatorApi` behavior working via its future adapter, not ad hoc frontend edits.
+
+Schema contract v1 stores validated match output in the frozen evidence-pack payload;
+the `/matches` projection above does not imply a `cases.matches` table. Use
+[final schema decisions](../data/RELATIONAL_SCHEMA.md) and actual repository DTOs.

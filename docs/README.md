@@ -1,9 +1,14 @@
 # Project documentation
 
-**18 October 2026 · U9 team module routing and provider handoff; live application integration pending.**
+**18 October 2026 · Final schema contract v1; live application integration pending.**
 Bern Economic Development Agency — Research & Expertise Navigator.
 Current pilot: Bern diabetes technology; the engine must support other domains
 through versioned profiles and rebuildable retrieval indexes.
+
+For the current three-person backend build, use the
+[exclusive lane plan and prompts](team/PARALLEL_BACKEND.md) and
+[v1 service interfaces](team/SERVICE_CONTRACTS.md). They give each agent an explicit
+path allowlist, shared contract bootstrap and independent handoff.
 
 ## Start here
 
@@ -18,6 +23,8 @@ through versioned profiles and rebuildable retrieval indexes.
    for module dependencies and [API handoff](plans/FRONTEND_BACKEND_API.md) for HTTP.
 4. [Data router](data/DATA_LAYER.md) and [deployment](data/DEPLOYMENT.md) — existing
    PostgreSQL/pgvector persistence, retrieval, cases, checkpoints and tracing.
+   Corpus/retrieval teammate starts at [data handoff](data/INGESTION_RETRIEVAL_HANDOFF.md);
+   [exact schema fields](data/SCHEMA_REFERENCE.md) are generated from runtime metadata.
 5. **[Inference settings](data/INFERENCE_CONFIGURATION.md)** — supplied Keera
    endpoint/model IDs; [embedding recommendation](data/EMBEDDING_DEPLOYMENT.md).
    Root [.env.example](../.env.example) contains placeholders, not a working key.
@@ -61,7 +68,7 @@ through versioned profiles and rebuildable retrieval indexes.
 
 **B1/N1:** supplied challenge/Notion baseline. **M1/M2:** local submission
 README/report template. **T01–T05:** supplied transcripts, not audio-verified;
-speakers' names/authority unverified. **U1–U9:** user instructions recorded in
+speakers' names/authority unverified. **U1–U10:** user instructions recorded in
 sources. **P1:** dated historical preparation. Label requirements, stakeholder
 clarifications, user decisions, proposals, measured results and unknowns.
 

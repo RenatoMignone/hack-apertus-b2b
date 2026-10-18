@@ -2,7 +2,7 @@
 from alembic import op
 from sqlalchemy import text
 
-from backend.data.schema import metadata, PIPELINE_TABLES
+from backend.data.migrations.baseline_schema import metadata, PIPELINE_TABLES
 from backend.data.pipeline_security import install_pipeline_security
 
 revision = "0004_case_pipeline"

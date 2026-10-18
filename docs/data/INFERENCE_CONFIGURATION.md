@@ -97,3 +97,13 @@ output strategy; use bounded validation/repair rather than assuming it exists.
 - Gateway alias is a served identity, not an immutable weight revision. Record
   returned model/version information when available and label revision unknown
   until CSCS/organizers confirm it. No made-up commit hash or verified flag.
+
+## Current parallel-build model comparison
+
+The existing 8B default is a provisional baseline, not a benchmark-backed choice
+over 70B. It is not a 7B model. For hosted connected reasoning, evaluate the supplied
+70B alias first on extraction, semantic assessment and drafting; compare grounded
+quality, schema reliability, latency and actual team quotas with 8B. Prefer 70B
+when that measured trade-off fits the case budget. Both remain configurable via
+LLM_NAME; only the runtime integrator changes shared defaults after the comparison.
+No key-based benchmark or 70B performance advantage has been established here.

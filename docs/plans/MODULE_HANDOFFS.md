@@ -6,10 +6,15 @@ read this table and only the focused owners for the assigned feature. The
 are the common system design. These are logical modules in one backend, not a
 requirement to deploy a service for every row.
 
+For the current three-backend-person pass, the
+[exclusive ownership plan](../team/PARALLEL_BACKEND.md) and its three prompts
+supersede the broad example write boundaries below. Use its shared
+[service contracts](../team/SERVICE_CONTRACTS.md); do not independently define ports.
+
 ## Current baseline and boundaries
 
 Implemented: Python data contracts, PostgreSQL/pgvector repositories and migrations
-through `0004_case_pipeline`, artifact storage, hybrid retrieval, checkpoint port,
+through `0005_finalize_schema`, artifact storage, hybrid retrieval, checkpoint port,
 masked tracing, and synthetic integration tests. React/Vite runs on a mock API.
 Not implemented: HTTP server/use cases, executable LangGraph case graph, live
 reasoning/embedding/reranking/search/fetch adapters, semantic validators or PDF
@@ -37,6 +42,7 @@ Use the actual contracts/repositories as implementation truth; docs describe int
 | Apertus adapter | [inference integration](../data/INFERENCE_CONFIGURATION.md), [model contracts](../data/BUILD_AND_OPERATIONS.md), `models/README.md` | `models/reasoning/` | Bounded typed calls, tool-capable versus thinking routing, schema repair, usage/timeout errors; no workflow or access policy |
 | Embeddings | [embedding deployment](../data/EMBEDDING_DEPLOYMENT.md), [retrieval](../data/RETRIEVAL_SPEC.md), `contracts/data.py` | `models/embeddings/` | Existing `Embedder` port; document encoding adapter for index builds; compatible config hashes/token budgets, finite nonzero vectors; benchmark CPU first |
 | Reranking | [retrieval](../data/RETRIEVAL_SPEC.md), [model roles](../data/BUILD_AND_OPERATIONS.md), `contracts/data.py` | `models/reranking/` | Existing `Reranker` port returns one finite relevance score per input passage; separate from factual assessment |
+| Corpus population and hybrid retrieval | [Data handoff](../data/INGESTION_RETRIEVAL_HANDOFF.md), [final schema](../data/RELATIONAL_SCHEMA.md), [exact field inventory](../data/SCHEMA_REFERENCE.md), [retrieval](../data/RETRIEVAL_SPEC.md) | `ingestion/`, `data/retrieval/`, scoped model adapters | Populate supported entities/claims and exact text; publish compatible snapshots; no alternate schema, retired tables or report/frontend edits |
 | Web discovery and fetch | [web research](../data/WEB_RESEARCH.md), `ingestion/README.md`, research/corpus repositories | `ingestion/` | Separate search provider and Crawl4AI tools; `FetchedSource`, actual page text/locators and failures; deduplicate against whole pinned corpus; case-local flags |
 | Evidence preparation | [processing](REPORT_PROCESSING_BOUNDARIES.md), [pack authority](ARCHITECTURE.md#evidence-pack-the-report-generation-gate), [case storage](../data/CASE_PIPELINE_STORAGE.md), evidence repository | `evidence/` | Bounded extraction/semantic assessment; exact statement/support in `ClaimAssessment`; code freezes `ReportEvidencePack`; no report drafting |
 | Draft generation and checking | [processing](REPORT_PROCESSING_BOUNDARIES.md), [output](OUTPUT_REPORT_STRUCTURE.md), draft repository and `contracts/pipeline.py` | `reports/generation/`, `reports/validation/` | `DraftRevision` + separate `DraftAssessment` of its exact hash; claim-backed reasons; unsupported text cannot pass just because JSON validates |

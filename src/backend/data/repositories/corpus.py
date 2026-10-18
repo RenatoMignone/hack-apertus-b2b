@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import insert, select, text
@@ -59,7 +60,10 @@ class CorpusRepository:
             return claim_id
 
     def stage_document(self, access, *, scope_id, source_id, url, title, language, raw: bytes,
-                       body: str, spans: list[Span], parser_hash: str, raw_mime="text/html", http_status=None):
+                       body: str, spans: list[Span], parser_hash: str, raw_mime="text/html", http_status=None,
+                       source_date: datetime | None = None):
+        if source_date is not None and source_date.tzinfo is None:
+            raise ValueError("source publication date must be timezone-aware")
         for span in spans:
             span.validate_body(body)
         with transaction(self.engine, access) as connection:
@@ -89,7 +93,7 @@ class CorpusRepository:
             version_id = uuid4()
             connection.execute(insert(tables.versions).values(document_version_id=version_id, document_id=document_id,
                 scope_id=scope_id, raw_artifact_id=raw_id, body_artifact_id=body_id, body_hash=body_reference.sha256,
-                body_text=body, parser_hash=parser_hash, language=language, title=title))
+                body_text=body, parser_hash=parser_hash, language=language, title=title, source_date=source_date))
             for span in spans:
                 connection.execute(insert(tables.spans).values(evidence_id=uuid4(), document_version_id=version_id,
                     scope_id=scope_id, char_start=span.char_start, char_end=span.char_end, literal_text=span.text,
@@ -142,7 +146,7 @@ class CorpusRepository:
                 connection.execute(insert(tables.chunks).values(chunk_id=chunk_id, document_version_id=version_id,
                     scope_id=version["scope_id"], char_start=span.char_start, char_end=span.char_end,
                     literal_text=span.text, title=version["title"], heading_path=span.heading_path,
-                    language=version["language"], chunker_hash=chunker_hash, embedding_text=span.text))
+                    language=version["language"], chunker_hash=chunker_hash))
                 connection.execute(pg_insert(tables.spans).values(evidence_id=evidence_id, document_version_id=version_id,
                     scope_id=version["scope_id"], char_start=span.char_start, char_end=span.char_end, literal_text=span.text,
                     heading_path=span.heading_path, page=span.page, extraction_method="normalized-text")

@@ -7,6 +7,14 @@ self-hosted Langfuse records execution. U9 supplies Keera endpoint/model aliases
 and the EmbeddingGemma 2 artifact reference. Authenticated behavior, immutable
 revisions, runtime packages and hardware benchmarks remain open.
 
+## Final schema entry point
+
+[Final schema contract v1](RELATIONAL_SCHEMA.md), [exact field inventory](SCHEMA_REFERENCE.md)
+and [ingestion/retrieval handoff](INGESTION_RETRIEVAL_HANDOFF.md) are authoritative
+for new queries at migration `0005_finalize_schema`. Seven unused/duplicate tables
+and two redundant chunk fields are retired; populated history stays owner-only,
+outside the application schema. Model choices remain configuration, not new tables.
+
 ## Read by implementation task
 
 Start runnable setup and team onboarding at [deployment](DEPLOYMENT.md).

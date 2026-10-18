@@ -1,8 +1,15 @@
-from sqlalchemy import (Boolean, CheckConstraint, Column, DateTime, Float, ForeignKey,
+"""Final application tables. Historical migrations use their frozen baseline metadata.
+
+See docs/data/SCHEMA_REFERENCE.md for the generated field inventory and
+INGESTION_RETRIEVAL_HANDOFF.md for the supported write/search path.
+"""
+from sqlalchemy import (Boolean, CheckConstraint, Column, DateTime, ForeignKey, ForeignKeyConstraint,
                         Index, Integer, MetaData, Table, Text, UniqueConstraint, text)
 from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 from pgvector.sqlalchemy import Vector
 
+
+SCHEMA_REVISION = "0005_finalize_schema"
 
 metadata = MetaData(naming_convention={"ix": "ix_%(table_name)s_%(column_0_name)s",
                                       "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -40,7 +47,11 @@ principals = table("ops", "principals", "principal_id", value("database_role"), 
                    value("active", Boolean, default=text("true")), UniqueConstraint("database_role", "namespace"))
 cases = table("cases", "cases", "case_id", uid("owner_id", "ops.principals.principal_id"),
               value("namespace"), state(), value("revision", Integer, default=text("0")),
-              uid("current_input_id", nullable=True), uid("current_result_id", nullable=True))
+              uid("current_input_id", nullable=True), uid("current_result_id", nullable=True),
+              ForeignKeyConstraint(["current_input_id"], ["cases.input_revisions.input_id"], name="current_input_fk",
+                                   deferrable=True, initially="DEFERRED", use_alter=True),
+              ForeignKeyConstraint(["current_result_id"], ["cases.result_revisions.result_id"], name="current_result_fk",
+                                   deferrable=True, initially="DEFERRED", use_alter=True))
 scopes = table("corpus", "scopes", "scope_id", value("kind"),
                uid("case_id", "cases.cases.case_id", nullable=True), value("access_policy_id"),
                value("revoked", Boolean, default=text("false")),
@@ -60,8 +71,8 @@ family_memberships = Table("source_family_memberships", metadata,
 documents = table("corpus", "documents", "document_id", uid("source_id", "corpus.sources.source_id"),
                   scoped(), value("canonical_url"), UniqueConstraint("scope_id", "canonical_url"))
 aliases = table("corpus", "document_aliases", "alias_id", uid("document_id", "corpus.documents.document_id"), value("url"))
-jobs = table("ops", "ingest_jobs", "job_id", value("namespace"), scoped(), uid("profile_id", nullable=True),
-             uid("base_snapshot_id", nullable=True), value("configuration_hash"), state(), payload("budgets"), payload("counters"))
+jobs = table("ops", "ingest_jobs", "job_id", value("namespace"), scoped(), uid("profile_id", "taxonomy.profiles.profile_id", nullable=True),
+             uid("base_snapshot_id", "corpus.snapshots.snapshot_id", nullable=True), value("configuration_hash"), state(), payload("budgets"), payload("counters"))
 fetches = table("corpus", "fetches", "fetch_id", uid("document_id", "corpus.documents.document_id"),
                 uid("job_id", "ops.ingest_jobs.job_id", nullable=True), value("requested_url"), value("final_url"),
                 value("http_status", Integer, nullable=True), uid("raw_artifact_id", "corpus.artifacts.artifact_id", nullable=True),
@@ -86,7 +97,7 @@ derivations = table("corpus", "derivations", "derivation_id", scoped(), payload(
                     uid("model_config_id", "ops.model_configurations.model_config_id", nullable=True),
                     value("configuration_hash"), value("output_hash"), state(), payload("diagnostics"))
 claims = table("corpus", "claims", "claim_id", scoped(), uid("subject_id", "corpus.entities.entity_id"), value("predicate"),
-               uid("object_entity_id", "corpus.entities.entity_id", nullable=True), value("typed_literal", JSONB, nullable=True),
+               uid("object_entity_id", "corpus.entities.entity_id", nullable=True), value("typed_literal", JSONB(none_as_null=True), nullable=True),
                uid("derivation_id", "corpus.derivations.derivation_id", nullable=True),
                uid("supersedes_id", "corpus.claims.claim_id", nullable=True), state("needs_review"),
                CheckConstraint("(object_entity_id IS NULL) <> (typed_literal IS NULL)"))
@@ -109,7 +120,6 @@ relations = Table("relations", metadata, uid("subject_id", "taxonomy.concepts.co
 chunks = table("retrieval", "chunks", "chunk_id", uid("document_version_id", "corpus.document_versions.document_version_id"),
                scoped(), value("char_start", Integer), value("char_end", Integer), value("literal_text"), value("title"),
                value("heading_path", JSONB, default=text("'[]'::jsonb")), value("language"), value("chunker_hash"),
-               value("context_prefix", default=text("''")), value("embedding_text"),
                CheckConstraint("char_start >= 0 AND char_end > char_start"),
                UniqueConstraint("document_version_id", "char_start", "char_end", "chunker_hash"))
 chunk_evidence = Table("chunk_evidence", metadata, uid("chunk_id", "retrieval.chunks.chunk_id", primary_key=True),
@@ -163,17 +173,6 @@ questions = table("cases", "questions", "question_id", uid("run_id", "cases.runs
                   value("required", Boolean), state("open"))
 answers = table("cases", "answers", "answer_id", uid("question_id", "cases.questions.question_id"),
                 uid("turn_id", "cases.dialogue_turns.turn_id"), UniqueConstraint("question_id"))
-query_plans = table("cases", "query_plans", "query_plan_id", uid("run_id", "cases.runs.run_id"), payload())
-rounds = table("cases", "retrieval_rounds", "round_id", uid("query_plan_id", "cases.query_plans.query_plan_id"),
-               value("round_number", Integer), payload("diagnostics"), CheckConstraint("round_number BETWEEN 1 AND 3"),
-               UniqueConstraint("query_plan_id", "round_number"))
-hits = table("cases", "retrieval_hits", "hit_id", uid("round_id", "cases.retrieval_rounds.round_id"),
-             uid("chunk_id", "retrieval.chunks.chunk_id"), payload("scores"), state("candidate"))
-matches = table("cases", "matches", "match_id", uid("run_id", "cases.runs.run_id"),
-                uid("entity_id", "corpus.entities.entity_id"), value("need_id"), value("mapping_kind"),
-                payload("relevance"), payload("evidence_strength"), state())
-match_support = Table("match_support", metadata, uid("match_id", "cases.matches.match_id", primary_key=True),
-                      uid("claim_id", "corpus.claims.claim_id", primary_key=True), schema="cases")
 manifests = table("cases", "case_evidence_manifests", "manifest_id", uid("case_id", "cases.cases.case_id"),
                   uid("parent_id", "cases.case_evidence_manifests.manifest_id", nullable=True), value("manifest_hash"))
 manifest_items = table("cases", "case_evidence_items", "item_id", uid("manifest_id", "cases.case_evidence_manifests.manifest_id"),
@@ -188,16 +187,11 @@ pack_claims = Table("pack_claims", metadata, uid("pack_id", "cases.evidence_pack
 results = table("cases", "result_revisions", "result_id", uid("case_id", "cases.cases.case_id"),
                 uid("pack_id", "cases.evidence_packs.pack_id"), uid("parent_id", "cases.result_revisions.result_id", nullable=True),
                 value("instruction"), value("result_hash"), payload(), state("draft"))
-selections = table("cases", "selections", "selection_id", uid("result_id", "cases.result_revisions.result_id"),
-                   uid("match_id", "cases.matches.match_id"), value("selected", Boolean))
 reviews = table("cases", "reviews", "review_id", uid("result_id", "cases.result_revisions.result_id"),
                 uid("reviewer_id", "ops.principals.principal_id"), value("result_hash"), value("decision"))
 exports = table("cases", "exports", "export_id", uid("result_id", "cases.result_revisions.result_id"),
                 uid("review_id", "cases.reviews.review_id"), uid("artifact_id", "corpus.artifacts.artifact_id"),
                 value("template_version"), value("renderer_version"), value("selection_hash"), state("ready"))
-frontier = table("ops", "frontier", "frontier_id", uid("job_id", "ops.ingest_jobs.job_id"),
-                 uid("source_id", "corpus.sources.source_id"), value("canonical_url"), state("pending"), payload("discovery"),
-                 UniqueConstraint("job_id", "source_id", "canonical_url"))
 attempts = table("ops", "stage_attempts", "attempt_id", uid("run_id", "cases.runs.run_id", nullable=True),
                  uid("job_id", "ops.ingest_jobs.job_id", nullable=True), value("namespace"), value("stage"),
                  value("input_hash"), value("config_hash"), value("idempotency_key"), state("pending"),
@@ -213,7 +207,7 @@ outbox = table("ops", "outbox", "event_id", value("namespace"), uid("run_id", "c
                value("attempts", Integer, default=text("0")), value("next_retry", DateTime(timezone=True), default=text("now()")),
                UniqueConstraint("idempotency_key"))
 
-# U8: case processing persistence. Kept separate from the legacy match selections.
+# Case processing and reason-level editorial review.
 interpretations = table("cases", "interpretations", "interpretation_id",
     uid("run_id", "cases.runs.run_id"), payload(), UniqueConstraint("run_id"))
 web_research = table("cases", "web_research", "research_id", uid("run_id", "cases.runs.run_id"),
@@ -241,11 +235,37 @@ reason_selections = Table("reason_selections", metadata,
 action_items = table("cases", "action_items", "action_id", uid("case_id", "cases.cases.case_id"),
     value("question"), value("ask_role"), state("open"), CheckConstraint("status IN ('open','asked','done')"))
 reviews.append_column(value("selection_hash", nullable=True))
-exports.append_column(value("format", default=text("'legacy'")))
-PIPELINE_TABLES = {"cases." + name for name in (
-    "interpretations", "web_research", "web_sources", "claim_assessments", "draft_reasons",
-    "reason_claims", "reason_selections", "action_items")}
+exports.append_column(value("format", default=text("'pdf'")))
 
+# Constraints installed by historical migrations, mirrored here for schema consumers.
+claims.append_constraint(CheckConstraint("typed_literal IS NULL OR (jsonb_typeof(typed_literal)='object' AND typed_literal ? 'type' AND typed_literal ? 'value')", name="typed_literal_shape"))
+for target, expression, name in (
+    (assignments, "status IN ('draft','accepted','needs_review','rejected')", "assignment_state"),
+    (claims, "status IN ('draft','accepted','needs_review','rejected')", "claim_state"),
+    (snapshots, "status IN ('draft','published','failed')", "snapshot_state"),
+    (attempts, "status IN ('pending','running','committed','failed')", "attempt_state"),
+    (outbox, "status IN ('pending','running','delivered','failed')", "outbox_state"),
+):
+    target.append_constraint(CheckConstraint(expression, name=name))
+Index("verified_entity_identifier", identifiers.c.authority, identifiers.c.kind,
+      identifiers.c.identifier_value, unique=True, postgresql_where=identifiers.c.verified)
+
+# Scope-specific finalization constraints are applied by migration 0005.
+for target, expression, name in (
+    (entities, "entity_type IN ('person','unit','organization','project','facility','service')", "entity_type_allowed"),
+    (entities, "length(btrim(display_label)) > 0", "entity_label_required"),
+    (claims, "length(btrim(predicate)) > 0", "claim_predicate_required"),
+    (builds, "status IN ('draft','published','failed')", "build_state"),
+    (reviews, "decision IN ('accepted','rejected')", "review_decision_allowed"),
+    (versions, "status IN ('accepted','needs_review','rejected')", "document_version_state"),
+):
+    target.append_constraint(CheckConstraint(expression, name=name))
+aliases.append_constraint(UniqueConstraint("document_id", "url", name="document_alias_unique"))
+manifest_items.append_constraint(UniqueConstraint("manifest_id", "evidence_id", name="manifest_evidence_unique"))
+Index("ix_claim_evidence_evidence", claim_evidence.c.evidence_id)
+Index("ix_chunk_evidence_evidence", chunk_evidence.c.evidence_id)
+Index("ix_pack_items_evidence", pack_items.c.evidence_id)
+Index("ix_document_alias_url", aliases.c.url)
 
 for current_table in list(metadata.tables.values()):
     for current_column in current_table.columns:
