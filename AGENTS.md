@@ -14,12 +14,16 @@ to your task rather than reading the entire knowledge base every time.
   PostgreSQL checkpoints, and self-hosted Langfuse. Model roles are Apertus
   8B/optional 70B, EmbeddingGemma 2 candidate, and BGE reranking. Exact model
   sources/tokenizer packages/revisions are deferred; see the data-layer router.
-  Deployment, roster and project name remain open.
-- Authorized work: documentation, directory scaffolding (`src/backend/` has
-  folder guidance and `.gitkeep` files only), and a **runnable frontend in
-  `src/frontend/` on mock data** (D12–D14), not yet connected to any backend.
-  Implement other features only after a subsequent task authorizes them. Do not
-  treat proposed designs or acceptance checks as implemented behavior.
+  Development deployment is Docker Desktop/WSL2 on the user's shared team host;
+  production hardware, roster and project name remain open.
+- Authorized work includes documentation, a **runnable frontend in
+  `src/frontend/` on mock data** (D12–D14), and the PostgreSQL hybrid RAG data
+  layer. The frontend is not yet connected to the backend. `src/backend/` now
+  contains Python contracts, repositories, migrations, tests, Docker Compose
+  deployment and administration commands. Start runtime work at
+  `docs/data/DEPLOYMENT.md`. Live model integration, collection and report
+  processing remain separate work. Do not claim test results beyond checks
+  actually run; pytest was unavailable during the latest validation.
 - Work in this repository. The sibling `hack-apertus-liebefeld` is historical
   preparation context: **do not modify it**. Relevant context has been summarized
   here; routine work should not require reopening it.
@@ -94,8 +98,8 @@ Proposed primary target is an air-gapped independent runtime; not yet tested.
    trace eligible, masked data only. Tracing failure must not stop a case.
 9. Keep frontend/backend independent through HTTP. Backend code is split by
    responsibility under `src/backend/`; use narrow contracts/ports and focused
-   files. No frontend internals/framework, scraper selection, executable code or
-   package setup is authorized by the current scaffold task (U7/D11).
+   files. The database implementation is authorized; frontend framework, scraper
+   selection and complete report-processing algorithms remain separate decisions.
 10. Retrieved hits must become a supported, frozen `ReportEvidencePack` before
     report generation. Detailed processing for retrieval → pack and pack → output
     still needs mapping; do not mistake high-level plans for settled algorithms.

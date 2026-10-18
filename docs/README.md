@@ -1,6 +1,6 @@
 # Project documentation
 
-**18 October 2026 · Design and directory scaffold; application not implemented.**
+**18 October 2026 · Database layer implemented; full application/model integration pending.**
 Bern Economic Development Agency — Research & Expertise Navigator.
 Current pilot: Bern diabetes technology; the engine must support other domains
 through versioned profiles and rebuildable retrieval indexes.
@@ -17,9 +17,10 @@ through versioned profiles and rebuildable retrieval indexes.
    [case operations](plans/OPERATIONS_PLAN.md). These are plans, not working code.
 5. **[Data-layer build router](data/DATA_LAYER.md)** — PostgreSQL + pgvector,
    physical schemas, retrieval, cases/checkpoints, Langfuse and build gates.
+   Run it with the [deployment and team guide](data/DEPLOYMENT.md).
 6. **[Source structure](plans/SOURCE_STRUCTURE.md)** — frontend/backend split,
    component ownership and folder guidance; [HTTP handoff](plans/FRONTEND_BACKEND_API.md)
-   for frontend integration. No server/UI or dependencies implemented.
+   for frontend integration. Python data-layer dependencies are pinned; the HTTP server/UI remain pending.
 7. **[Report-processing boundaries](plans/REPORT_PROCESSING_BOUNDARIES.md)** —
    retrieved data → `ReportEvidencePack` and pack → output; detailed mapping pending.
 

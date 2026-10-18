@@ -1,8 +1,9 @@
 # Source structure and component boundaries
 
-**18 October 2026 · U7/D11: directory scaffold only.** No application code,
-package manifests, dependencies or executable entry points have been created.
-Backend language, HTTP framework and frontend technology remain undecided.
+**18 October 2026 · Scaffold followed by authorized database implementation.**
+The backend data layer now uses Python 3.12, SQLAlchemy Core, psycopg, Alembic
+and Pydantic, with Docker Compose and an administrative CLI. See
+[deployment](../data/DEPLOYMENT.md). HTTP framework and frontend remain undecided.
 Keep the submission template: application work stays under root `src/`.
 
 ## Directory map

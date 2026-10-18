@@ -1,0 +1,1 @@
+"""Bern research navigator backend."""

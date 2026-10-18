@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bern-navigator-data"
+version = "0.1.0"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+  "alembic>=1.14,<2", "boto3>=1.35,<2", "pydantic>=2.10,<3",
+  "psycopg[binary,pool]>=3.2,<4", "pgvector>=0.3,<1",
+  "SQLAlchemy>=2.0.36,<3", "langgraph-checkpoint-postgres>=2,<4",
+  "langfuse>=3,<5", "PyYAML>=6,<7",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10", "moto[s3]>=5,<6"]
+
+[project.scripts]
+navigator = "backend.data.cli:main"
+
+[tool.setuptools]
+packages = { find = { where = [".."], include = ["backend*"] } }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: requires disposable PostgreSQL with pgvector"]
+
+[tool.setuptools.package-data]
+backend = ["deploy/*.yaml", "deploy/*.json", "deploy/*.sh", "deploy/*.ps1", "deploy/policies/*.json", "deploy/.env.example"]

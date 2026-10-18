@@ -1,7 +1,7 @@
 # Shared contracts and ports
 
-Reserved for future typed DTOs, validation schemas, narrow service/repository/
-model/storage ports and schema exports. No framework/client/SQL dependencies.
+`data.py` implements validated storage/search DTOs, exact span validation,
+model configuration, and artifact/embedding/reranking ports without SQL dependencies.
 Use opaque IDs, explicit versions and source/access context throughout.
 
 Specification owners:

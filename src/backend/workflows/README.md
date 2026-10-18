@@ -1,6 +1,7 @@
 # Workflow coordination
 
-Own future LangGraph composition, small stage adapters, budgets, clarification
+`checkpoints.py` implements an authorized per-run PostgreSQL saver port. Future
+LangGraph composition owns small stage adapters, budgets, clarification
 pause/resume, cancellation and recovery. Inputs: authorized command and pinned
 run references. Outputs: durable stage results, questions and resource IDs.
 Workflow ordering uses service ports, not HTTP handlers or embedded SQL.

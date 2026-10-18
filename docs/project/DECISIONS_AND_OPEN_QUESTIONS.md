@@ -5,6 +5,17 @@ Proposed designs in other docs are not team decisions or completed work.
 
 ## Confirmed decisions
 
+**D12 / implemented database layer and shared host, 18 October:** the user
+authorized the implementation plan after selecting one shared database on the
+user's Windows/WSL2 computer. Four developers run their code locally and connect
+through individual SSH accounts/tunnels. Docker Compose packages PostgreSQL 17
++ pgvector, shared MinIO and optional local Langfuse. Database ports bind
+loopback. Python 3.12/Pydantic/SQLAlchemy Core/psycopg/Alembic implement the data
+contracts. See [deployment and measured checks](../data/DEPLOYMENT.md).
+Real model artifacts/endpoints, actual team keys/network reachability, frontend
+and complete report workflows remain pending. This supersedes the earlier
+scaffold-only authorization for this database-layer scope.
+
 | ID | Decision | Source and implication |
 | --- | --- | --- |
 | D01 | Select Bern Economic Development Agency — Research & Expertise Navigator | User's current task; supersedes the historical preparation state of “challenge not selected” |

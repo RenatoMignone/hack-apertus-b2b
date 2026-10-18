@@ -1,12 +1,18 @@
 # Data layer architecture and build router
 
-**18 October 2026 · Selected design; not implemented.** Authority: U6/D09 in
+**18 October 2026 · Data-layer implementation added; model/product integration pending.** Authority: U6/D09 in
 [decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md). PostgreSQL + pgvector
 replace the earlier Weaviate/SQLite design. LangGraph orchestrates the workflow;
 self-hosted Langfuse records execution. Exact model sources, tokenizer packages,
 revisions, endpoints and deployment resources are deliberately deferred.
 
 ## Read by implementation task
+
+Start runnable setup and team onboarding at [deployment](DEPLOYMENT.md).
+Source implementation lives under `src/backend/data/`, with typed contracts,
+Alembic migrations, artifact adapters, hybrid retrieval and case repositories.
+The specs below remain the intended behavior; measured checks and unresolved
+integration gates are recorded in the deployment guide.
 
 | Task | Owning specification |
 | --- | --- |

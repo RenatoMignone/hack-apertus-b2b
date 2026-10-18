@@ -1,7 +1,7 @@
 # Data layer build, models and operational gates
 
-**18 October 2026 · Agent implementation handoff; documentation only today.**
-Read [data layer router](DATA_LAYER.md). The user deliberately defers exact model
+**18 October 2026 · Data-layer implementation available; model handoff pending.**
+Read [data layer router](DATA_LAYER.md) and [deployment](DEPLOYMENT.md). The user deliberately defers exact model
 sources/tokenizer packages/revisions/endpoints. Do not fetch weights, provision
 services or fill these gaps with guessed model URLs as part of this docs task.
 

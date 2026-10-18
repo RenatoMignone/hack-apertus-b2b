@@ -1,0 +1,9 @@
+{
+  "POSTGRES_IMAGE": "pgvector/pgvector:0.8.2-pg17-bookworm@sha256:feb68f4f15446397d8cac7f4fe48fe4586de83160d1fc48b46283312d1a33966",
+  "MINIO_IMAGE": "cgr.dev/chainguard/minio:latest@sha256:709099319add48dfb44aa596a7070d3ddd8dd04d7ae881765719aec29df9e510",
+  "MINIO_MC_IMAGE": "cgr.dev/chainguard/minio:latest@sha256:709099319add48dfb44aa596a7070d3ddd8dd04d7ae881765719aec29df9e510",
+  "REDIS_IMAGE": "redis:7.4.2-alpine@sha256:02419de7eddf55aa5bcf49efb74e88fa8d931b4d77c07eff8a6b2144472b6952",
+  "CLICKHOUSE_IMAGE": "clickhouse/clickhouse-server:25.12@sha256:8a790dd3468db22b1d4e7b18a176f378ff5ff6053b9c48dd4ea1fa71a24c5ba6",
+  "LANGFUSE_WEB_IMAGE": "docker.langfuse.com/langfuse/langfuse:4@sha256:67f48d12a190e4ad585249c75ae1ce172b449de3dbbe7486b8179cd28e21408e",
+  "LANGFUSE_WORKER_IMAGE": "docker.langfuse.com/langfuse/langfuse-worker:4@sha256:ca32a8fb2a214c7b5f42dd9c540c8072e41db659cb621f317911ce695ad6bca2"
+}

@@ -1,7 +1,9 @@
 # Backend workspace
 
-Reserved for an HTTP server and modular backend services. No language/framework,
-entry point, dependencies or runnable implementation have been selected.
+Python 3.12 data services are implemented: PostgreSQL repositories and migrations,
+hybrid retrieval, artifact storage, checkpoint persistence, local tracing and
+the `navigator` administration CLI. See [deployment](../../docs/data/DEPLOYMENT.md).
+The HTTP server/framework and full product workflows remain separate work.
 
 | Component | Local guidance |
 | --- | --- |

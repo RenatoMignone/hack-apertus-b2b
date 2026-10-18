@@ -3,7 +3,8 @@
 **18 October 2026 · Physical design proposal under selected PostgreSQL stack.**
 Read [data layer](DATA_LAYER.md) first. Logical record meanings remain owned by
 [Phase 1 section 7](../plans/INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2).
-The tables below are migration targets, not deployed tables or complete SQL DDL.
+The tables below are implemented by the versioned Alembic migrations under
+`src/backend/data/migrations/`; see [deployment](DEPLOYMENT.md) for validation.
 
 ## Common conventions
 
@@ -84,10 +85,11 @@ the imported profile hash; a runtime never reads changing YAML as its live truth
 | `retrieval.snapshot_chunks` | Snapshot/build → chunk and embedding IDs; unique membership, enforce matching config/version/scope |
 | `retrieval.search_documents` | One lexical projection per chunk/search-config version: weighted `tsvector`, text-search configuration and original-text references |
 
-Initial vector dimension is **768**, pending the resolved embedding artifact;
-use `vector(768)` for that build. A changed dimension requires an explicit
-migration/build; changed embedding space requires a separate build even at the
-same dimension. Do not mix configs in one nearest-neighbor search.
+The candidate full dimension **768** remains unverified. Storage uses `vector`
+with a trigger enforcing each immutable embedding configuration's dimension;
+no production dimension is hard-coded before model handoff. Different dimensions
+or embedding spaces require separate compatible builds. The exact-search baseline
+does not require dimension-specific ANN indexes. Do not mix configs in one search.
 
 GIN indexes support lexical projections; ordinary indexes support scope,
 version and snapshot joins. Start with exact cosine ranking on the bounded
