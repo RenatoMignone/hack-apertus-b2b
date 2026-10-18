@@ -22,6 +22,7 @@ to your task rather than reading the entire knowledge base every time.
 | Your task | Read |
 | --- | --- |
 | Understand the selected challenge | [Challenge brief](docs/CHALLENGE_BRIEF.md), [requirements](docs/PRODUCT_REQUIREMENTS.md) |
+| Find the Notion supporting files or check branding restrictions | [Notion text snapshot](docs/sources/NOTION_CHALLENGE_2026-10-18.md), [data and provenance](docs/DATA_AND_PROVENANCE.md) |
 | Understand stakeholder intent or check a recording claim | [Recording insights](docs/RECORDING_INSIGHTS.md), then the linked [original transcript](docs/recordings/README.md) |
 | Design a user flow, result presentation or demo scenario | [Workflows and cases](docs/WORKFLOWS_AND_CASES.md), [requirements](docs/PRODUCT_REQUIREMENTS.md) |
 | Plan crawling, extraction, entities or citations | [Data and provenance](docs/DATA_AND_PROVENANCE.md) |
@@ -59,7 +60,10 @@ to your task rather than reading the entire knowledge base every time.
 
 ## Keeping context reliable
 
-- Treat the user-supplied brief and local template as the current baseline.
+- Treat the user-supplied brief, complete Notion text (N1), and local template
+  as the current baseline. N1 lists an XLSX inventory, a PowerPoint template
+  and a PNG logo; actual files are not supplied. Use the template/logo only for
+  this challenge and preserve the root submission template.
   Record later verified organizer clarifications with dates and provenance.
 - Recording evidence is timestamped in `docs/RECORDING_INSIGHTS.md`. Speaker
   numbers are local to each file; names and formal authority are unverified.

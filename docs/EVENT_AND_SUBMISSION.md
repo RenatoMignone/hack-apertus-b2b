@@ -1,7 +1,7 @@
 # Event context and template compliance
 
 **Snapshot: 18 October 2026.** Sources: local template README (**M1**), local
-technical-report template (**M2**), user-supplied challenge (**B1**), transcripts
+technical-report template (**M2**), user-supplied challenge (**B1**, **N1**), transcripts
 and historical preparation notes (**P1**). See [SOURCES.md](SOURCES.md).
 
 ## Current local template is the working baseline
@@ -24,7 +24,9 @@ M1 requires the repository to originate from the template, become public for
 submission, and run end-to-end when judges try it. Local files do not prove the
 remote repository's template ancestry or visibility; those checks remain open.
 The current remote is `https://github.com/Spaghetti-Overflow/hack-apertus-submission`.
-No publishing, remote configuration or commits were performed in this pass.
+The initial documentation was committed and pushed to `origin/main` as
+`ab3d534` at the user's explicit request. This does not establish template
+ancestry, repository visibility or completion of the hackathon submission.
 
 Use the environment variables **`LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY`**.
 Provide running instructions in the technical report. The local template does
@@ -59,6 +61,15 @@ M1 lists six main-jury dimensions, each scored **0–5**: purposeful use of AI;
 technical rigour; value/cost/scalability; sovereign deployability; implementation
 feasibility; pitch/presentation. No weights are supplied. The selected challenge
 lists the first five; both sources should be represented in final materials.
+
+## Challenge presentation assets
+
+The [Notion page text N1](sources/NOTION_CHALLENGE_2026-10-18.md) lists
+`powerpoint_template.pptx` and `Logo_SF_BE_EN.png` for use **only for this
+challenge**. Actual asset files have not been supplied or inspected. Use these
+within that purpose if acquired; they do not replace M1/M2, alter report limits
+or establish an automatic teaser-export requirement. The page supplies no
+additional ZIP rule, live-pitch duration or confirmed submission cutoff.
 
 ## Historical delivery instructions requiring current confirmation
 

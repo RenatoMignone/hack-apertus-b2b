@@ -1,7 +1,8 @@
 # Product requirements and scope
 
 **Status:** requirements extracted; no product has been implemented. B1 refers
-to the [supplied challenge brief](CHALLENGE_BRIEF.md). E01–E26 refer to
+to the [supplied challenge brief](CHALLENGE_BRIEF.md), confirmed by the complete
+[Notion text N1](sources/NOTION_CHALLENGE_2026-10-18.md). E01–E26 refer to
 [recording evidence](RECORDING_INSIGHTS.md). Proposed checks below are internal
 acceptance guidance, not additional organizer rules.
 
@@ -45,6 +46,7 @@ staff remain responsible for relevance selection and external communications.
 | R12 | Public data, privacy and source copyright boundaries (B1 §5, E03) | No confidential company-plan ingestion; source rights and any personal/non-redistributable content recorded separately from code licensing |
 | R13 | Fair discoverability (B1 §5) | Audit source/group coverage and prominence effects; document omissions and retrieval bias rather than assuming a fair ranking |
 | R14 | Preserve organizer layout and model environment names (M1/M2) | Required root files and `src/` remain in place; future run instructions use the template interface |
+| R15 | Use the supplied PowerPoint template and logo only for this challenge (N1, Supporting Materials) | If acquired/used, `powerpoint_template.pptx` and `Logo_SF_BE_EN.png` remain within that purpose; broader reuse is not assumed |
 
 ## Required result information
 

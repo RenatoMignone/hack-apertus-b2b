@@ -16,6 +16,7 @@ been filled with unbuilt features or unmeasured results.
 | Document | Purpose |
 | --- | --- |
 | [CHALLENGE_BRIEF.md](CHALLENGE_BRIEF.md) | Faithful capture of the selected track supplied by the user |
+| [Notion source snapshot](sources/NOTION_CHALLENGE_2026-10-18.md) | Complete user-supplied page text, supporting filenames and challenge-only branding restriction |
 | [RECORDING_INSIGHTS.md](RECORDING_INSIGHTS.md) | Timestamped evidence from all four supplied transcripts; interpretation and authority caveats |
 | [PRODUCT_REQUIREMENTS.md](PRODUCT_REQUIREMENTS.md) | Needs, scope, required outputs, constraints and acceptance conditions |
 | [WORKFLOWS_AND_CASES.md](WORKFLOWS_AND_CASES.md) | Current workflow, intended assisted workflow, concrete cases and failure behavior |
@@ -34,6 +35,8 @@ the reasoning behind a requirement; use the original transcript to verify it.
 ## Evidence labels
 
 - **B1 / requirement:** the track brief pasted by the user, captured locally.
+- **N1 / requirement:** complete Notion page text subsequently pasted by the
+  user; confirms B1 and adds named supporting files and branding-use limits.
 - **M1 / M2 / requirement:** this repository's README / technical-report template.
 - **T01–T04 / stakeholder clarification:** supplied transcriptions; see the
   evidence entries E01–E26 in recording insights. No original audio was supplied.
@@ -45,7 +48,10 @@ the reasoning behind a requirement; use the original transcript to verify it.
 
 No crawler, application, benchmark, dataset of verified experts, generated PDF
 or deployment has been created in this documentation pass. The UniBE subdomain
-inventory mentioned in the brief is **not present** among the supplied files.
+inventory is named `unibe_sous_domaines_publics_etendus.xlsx` in N1, but its
+contents are **not present** among the supplied files. N1 also lists
+`powerpoint_template.pptx` and `Logo_SF_BE_EN.png`, both for this challenge only;
+their actual files have not been supplied or inspected.
 
 ## Important distinctions
 

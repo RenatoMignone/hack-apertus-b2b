@@ -1,13 +1,18 @@
 # Research & Expertise Navigator — supplied challenge brief
 
-**Source B1:** challenge text pasted by the user on 18 October 2026. This is a
-structured capture of that text, not a claim that the linked Notion page has
-been independently verified. Workshop clarifications are separate in
+**Sources B1 and N1:** initial challenge text and the complete Notion page text
+pasted by the user on 18 October 2026. N1 confirms the initial requirements and
+adds the supporting filenames and challenge-only branding restriction; see the
+[dated source snapshot](sources/NOTION_CHALLENGE_2026-10-18.md). This is a
+structured capture, not independent live-page verification. Workshop
+clarifications are separate in
 [RECORDING_INSIGHTS.md](RECORDING_INSIGHTS.md).
 
 **Partner:** Bern Economic Development Agency.
 
-**Guide:** [Bern Economic Development Agency challenge](https://app.notion.com/p/hackapertus/Bern-Economic-Development-Agency-fe5b4fec112a833daf9401a4771a7c12?source=copy_link).
+**Domain:** Research & Innovation.
+
+**Guide:** [Bern Economic Development Agency challenge](https://hackapertus.notion.site/bern-economic-development-agency).
 
 ## 1. Context, problem and objective
 
@@ -39,8 +44,19 @@ Treat these as **one distributed information ecosystem**:
    project and service pages.
 
 Design for easy addition of institutional websites and data sources later.
-The brief says a UniBE subdomain inventory is supplied; **the inventory itself
-has not yet been found in this repository or supplied context**.
+The Notion page names these supporting materials [N1]:
+
+| Listed file | Purpose | Local status |
+| --- | --- | --- |
+| `unibe_sous_domaines_publics_etendus.xlsx` | Initial public UniBE subdomain discovery map | Filename supplied; workbook contents/download URL not supplied or inspected |
+| `powerpoint_template.pptx` | Challenge presentation template | Filename supplied; file not available locally or inspected |
+| `Logo_SF_BE_EN.png` | Challenge logo | Filename supplied; file not available locally or inspected |
+
+**Use the PowerPoint template and logo only for this challenge.** This explicit
+restriction is not a general reuse/license grant. The presentation template is
+separate from the required repository/technical-report template and does not
+establish a mandatory automatic teaser-export feature. Obtain the actual
+workbook before claiming a configured or validated UniBE discovery map.
 
 ## 3. Technology and infrastructure
 

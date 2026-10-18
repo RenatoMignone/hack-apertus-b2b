@@ -1,6 +1,6 @@
 # Data sources, evidence and collection boundaries
 
-**Status:** contract proposal derived from B1 and recording evidence E03,
+**Status:** contract proposal derived from B1, N1 and recording evidence E03,
 E07–E11, E15, E18–E22. No source collection, entity extraction or rights clearance
 has been performed. See [SOURCES.md](SOURCES.md) for context-source provenance.
 
@@ -8,7 +8,7 @@ has been performed. See [SOURCES.md](SOURCES.md) for context-source provenance.
 
 | Source family required by B1 | Discovery input | Current status |
 | --- | --- | --- |
-| University of Bern | Supplied public `unibe.ch` subdomain inventory; faculties, institutes, centres, groups, laboratories, services/platforms | Inventory missing from the supplied repository/context; `unibe.ch` is a scope hint, not a complete crawl configuration |
+| University of Bern | Public `unibe.ch` discovery inventory `unibe_sous_domaines_publics_etendus.xlsx`, named in N1; faculties, institutes, centres, groups, laboratories, services/platforms | Filename known; workbook/download URL absent and contents not inspected. `unibe.ch` alone is not a complete crawl configuration |
 | ARTORG Center for Biomedical Engineering Research | Official website and associated research, team and project pages | Exact seed URLs, domain/path boundaries and language variants not supplied/verified |
 | Diabetes Center Berne | Official website and research, expertise, team, project and service pages | Exact seed URLs, domain/path boundaries and language variants not supplied/verified |
 | Additional Bern institutions/companies | Configurable future source entries | Stakeholder interest; no additional mandatory domain list or verified seeds |
@@ -20,6 +20,12 @@ physical pages without losing institutional attribution. Do not count duplicate
 copies as extra experts or fabricate three separate databases.
 
 ## Proposed source configuration and collection record
+
+Before collection, obtain the named workbook, record its origin/date/hash, inspect
+its sheets and columns, and validate the actual domains/URLs. Its filename does
+not establish a schema, entry count, completeness or crawl permission. The N1
+[page-text snapshot](sources/NOTION_CHALLENGE_2026-10-18.md) is context evidence,
+not the inventory itself or evidence of any researcher's expertise.
 
 A new source should need a small configuration entry and, only where necessary,
 a documented site-specific extractor. Suggested fields:
@@ -98,6 +104,11 @@ Apache-2.0 in the root applies to the code artifact; M2 labels the report CC-BY-
 B1 refers to Open Commons/T&C §6 while retaining institutional source copyrights.
 Do not relicense crawled pages, photos, PDFs, logos or transcripts under the code
 license. Redistribution permissions and the current T&C wording remain unresolved.
+
+N1 explicitly limits `powerpoint_template.pptx` and `Logo_SF_BE_EN.png` to use
+for this challenge. Their names and that restriction are known; the files and
+embedded notices have not been inspected. Do not assume general reuse rights or
+include these branding assets in the search evidence corpus.
 
 The supplied transcripts are working context, not source facts for expertise
 results. Publication/redistribution consent is unknown. Keep credentials, company

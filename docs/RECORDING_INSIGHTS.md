@@ -281,9 +281,12 @@ After clarifying a branding question, the stakeholder offers a PNG logo and
 discusses email/Discord sharing. The follow-up mentions Discord or Notion but
 does not clearly establish which materials would appear there.
 
-**Implication:** logo, colors, export layout and delivery location remain
-unverified. Do not infer permission to use client company assets or claim an
-asset pack has arrived.
+**Later source update (N1, 18 October):** the user-supplied Notion page text
+lists `powerpoint_template.pptx` and `Logo_SF_BE_EN.png`, explicitly for this
+challenge only. See the [source snapshot](sources/NOTION_CHALLENGE_2026-10-18.md).
+This establishes the asset names and page reference, but the files themselves
+have not arrived or been inspected. Colors and export layout remain unverified;
+do not infer permission to use client company assets or general reuse rights.
 
 ## General event remarks and transcript limitations
 

@@ -1,8 +1,9 @@
 # Sources, provenance and known conflicts
 
 **Documentation snapshot: 18 October 2026.** Local artifacts and the user's
-instructions are the basis of this knowledge pack. Linked external resources
-are references, not proof that their current contents were retrieved.
+instructions are the basis of this knowledge pack. The complete Notion page
+text was supplied by the user as N1 after retrieval difficulties. Linked external
+resources are references, not proof of independent live verification.
 
 ## Evidence hierarchy
 
@@ -25,8 +26,9 @@ Do not merge conflicting instructions silently. For example, conversational
 
 | ID | Source | Supports | Limitations |
 | --- | --- | --- | --- |
-| U1 | User's task in this session, 18 Oct 2026 | Chosen track; active submission repository; read-only old repository; docs-only scope and root AGENTS router | Not an implementation/hosting/publication request |
+| U1 | User's tasks in this session, 18 Oct 2026 | Chosen track; active submission repository; read-only old repository; docs-only scope, root AGENTS router, direct one-commit push, and later Notion-context update | Authorizes documentation commits/pushes; not application implementation or final hackathon submission |
 | B1 | [Challenge text captured locally](CHALLENGE_BRIEF.md), supplied by user | Objective, sources, models, expected fields, metrics, ethics and infrastructure boundaries | Linked Notion page not independently retrieved; capture is based on pasted text |
+| N1 | [Complete Notion page text supplied by user](sources/NOTION_CHALLENGE_2026-10-18.md), 18 Oct 2026 | Confirms B1; domain Research & Innovation; exact supporting filenames; template/logo use only for this challenge | User-supplied page capture, not independent live verification; no attachment bytes/download URLs or workbook/branding inspection |
 | M1 | Root [README.md](../README.md), local template at baseline commit `e1a8246` | Required layout, environment names, deliverables, report/video limits, six 0–5 jury dimensions | Contains unfilled project/team/challenge placeholders; remote template ancestry/visibility not checked |
 | M2 | Root [technical_report.md](../technical_report.md), same baseline | Mandatory target architecture, Apertus/data/limitations/reproducibility sections, report license label | Contains no actual architecture, results or evidence yet |
 | M3 | Root [LICENSE](../LICENSE) and [.gitignore](../.gitignore) | Apache-2.0 code template; existing secret/model-weight exclusion patterns | Not a license grant for institutional page content or recordings; ignore patterns do not guarantee clean publication |
@@ -45,6 +47,7 @@ files and give recording-relative time ranges. No original audio was accessed.
 
 | Resource | Purpose | Status in this pass, 18 Oct 2026 |
 | --- | --- | --- |
+| [Public challenge page](https://hackapertus.notion.site/bern-economic-development-agency) | Additional challenge reference and named supporting materials | Direct retrieval hit a Cloudflare challenge; reader proxy returned a partial page. User then supplied the complete text, preserved as N1 and used for the update. Attachments not downloaded |
 | [Selected challenge on Notion](https://app.notion.com/p/hackapertus/Bern-Economic-Development-Agency-fe5b4fec112a833daf9401a4771a7c12?source=copy_link) | Canonical challenge guide reference supplied by user | Retrieval inaccessible through web tool; use B1, not a claim of live verification |
 | [Official local event page](https://hackapertus.ch/regions/bern-liebefeld) | Event timeline and location | Two retrieval attempts timed out; recorded schedule is inherited from P1's 17 Oct snapshot |
 | [Sprintd submission guide](https://app.sprintd.org/events/hack-apertus-liebefeld/submit/guide) | Current submission form/packaging | Inaccessible through web tool; P1's participant-supplied instructions remain dated context |
@@ -55,6 +58,14 @@ files and give recording-relative time ranges. No original audio was accessed.
 
 ## Conflicts and ambiguity resolved for this context pack
 
+- **Additional Notion source:** N1 agrees with B1 on all product, model,
+  deployment, output, metric and ethics requirements. It adds the domain and
+  names `unibe_sous_domaines_publics_etendus.xlsx`, `powerpoint_template.pptx`
+  and `Logo_SF_BE_EN.png`. The latter two are explicitly challenge-only. This
+  resolves their names/location reference, not file availability or contents.
+- **Two templates:** N1's PowerPoint supports challenge presentations; M1/M2
+  still govern the repository and technical report. The asset listing does not
+  change report limits or make teaser-export implementation mandatory.
 - **Track/template pending:** P1's older state is superseded by U1 and this
   repository's actual template. Future agents must not restart track selection.
 - **Numeric scoring:** P1's photographed slide summary says no scale was shown;
