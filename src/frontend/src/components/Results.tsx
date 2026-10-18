@@ -7,6 +7,8 @@ import SearchSankey from './SearchSankey';
 
 type Open = (evidenceId: string) => void;
 
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
 const CATEGORIES: { key: ReasonCategory; label: string; Icon: typeof Users }[] = [
   { key: 'people', label: 'People', Icon: Users },
   { key: 'groups', label: 'Research groups', Icon: FlaskConical },
@@ -345,7 +347,7 @@ export default function Results({
         <button onClick={() => setTraceOpen(!traceOpen)} aria-expanded={traceOpen} className="flex w-full items-center gap-2 px-4 py-3 text-sm">
           <span className="font-medium">How I searched</span>
           <span className="text-muted">
-            {trace.inputs.length} words → {trace.terms.length} terms → {sourceCount} sources
+            {plural(trace.inputs.length, 'word')} → {plural(trace.terms.length, 'term')} → {plural(sourceCount, 'source')}
           </span>
           <ChevronDown size={16} className={`ml-auto text-muted transition ${traceOpen ? 'rotate-180' : ''}`} />
         </button>
