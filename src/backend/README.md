@@ -59,6 +59,9 @@ focused on single purposes, dependencies acyclic and SQL inside data adapters.
 For the full suite, set `NAVIGATOR_TEST_ADMIN_DSN` to an **isolated disposable
 PostgreSQL cluster with pgvector and the NOLOGIN navigator_app role**. Tests create
 and delete their own databases. Never use Eric's shared development database.
+The `backend.tests.run` and browser-smoke entry points require an explicitly set
+`NAVIGATOR_TEST_ADMIN_DSN`; neither derives it from deployment `.env` or
+`POSTGRES_PASSWORD`. Full pytest without that variable skips database tests.
 
 ```bash
 python -m pytest src/backend/tests -q

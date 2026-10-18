@@ -6,7 +6,6 @@ PYTHONPATH=src NAVIGATOR_TEST_ADMIN_DSN=postgresql://TEST_ADMIN@localhost:PORT/p
 import asyncio
 from contextlib import asynccontextmanager
 import hashlib
-import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import UUID, uuid4
@@ -33,6 +32,7 @@ from backend.evidence import create_reasoning_services
 from backend.models.reasoning import ModelSettings
 from backend.reports.rendering import create_pdf_renderer
 from backend.tests.runtime.test_integrated_lanes import synthetic_transport
+from backend.tests.run import require_test_admin_dsn
 
 
 async def serve(engine, artifacts, fixture, principal):
@@ -75,7 +75,7 @@ async def serve(engine, artifacts, fixture, principal):
 
 
 def main():
-    admin_dsn = os.environ["NAVIGATOR_TEST_ADMIN_DSN"]
+    admin_dsn = require_test_admin_dsn()
     name, role = "navigator_browser_" + uuid4().hex, "browser_" + uuid4().hex[:12]
     with psycopg.connect(admin_dsn, autocommit=True) as c:
         c.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
