@@ -49,7 +49,12 @@ Top navigation bar: logo, *My desk*, *My cases*, *Action items* (with an open-it
    has ✓ keep and ✕ not relevant controls. **Click** a card to expand the literal
    source quotes with the supporting span highlighted, plus page links.
 3. **Open questions / limitations** as small pills on one line.
-4. **"How I searched"** (collapsed by default): a Sankey of *her words → ontology
+4. **Similar cases** (only when some exist): earlier agency cases with a 0–100
+   similarity score and bar, shared aspects as chips, and their status. Clicking
+   one opens that case. The score measures how similar the needs and topics are,
+   not a chance of success. A real case-similarity method and data are still
+   missing (OPERATIONS_PLAN `case_similarity_score`); the mock values are illustrative.
+5. **"How I searched"** (collapsed by default): a Sankey of *her words → ontology
    terms searched → source entries*, where each entry is extracted from one URL and
    coloured by institution. Clicking an entry opens its quote.
 
@@ -79,7 +84,8 @@ Defined in `src/frontend/src/types/contract.ts`:
 | `CaseSummary` | Cases row: id, companyLabel, oneLineNeed, status, timestamps, keptCount |
 | `CaseDetail` | summary, `revisions[]`, `currentRevisionId`, `turns[]`, `evidence` map |
 | `ActionItem` | id, caseId, question, askRole (colleague role), status open / asked / done |
-| `BriefRevision` | `company` (summary, facts[]), `reasons[]`, `openQuestions[]`, `trace`, `coverage`, `changeNote`, `changedReasonIds`, optional `emptyMessage` |
+| `SimilarCase` | caseId, companyLabel, score 0–100, shared[], status |
+| `BriefRevision` | `company` (summary, facts[]), `reasons[]`, `similarCases[]`, `openQuestions[]`, `trace`, `coverage`, `changeNote`, `changedReasonIds`, optional `emptyMessage` |
 | `Reason` | headline, `line` (`CitedText`), `entries[]` (name, institution, evidenceIds), `kind` direct/idea, `fromLead`, selection |
 | `Evidence` | one entry extracted from one URL: short `label`, literal `excerpt` + `highlight`, url, title, institution, dates, one-line `relevance`, citation number `n` |
 | `SearchTrace` | `inputs` (her phrases), `terms` (ontology terms), `links` input→term and term→evidence id, with weights |

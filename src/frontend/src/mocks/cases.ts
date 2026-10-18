@@ -137,6 +137,11 @@ const revA1: BriefRevision = {
   },
   reasons: reasonsA,
   openQuestions: ['Which sensing method do they use?', 'Study partner, R&D site, or both?'],
+  similarCases: [
+    { caseId: 'case-d1', companyLabel: 'NordSense', score: 78, shared: ['Non-invasive sensing', 'Metabolite monitoring'], status: 'pitch_sent' },
+    { caseId: 'case-d4', companyLabel: 'MedPatch', score: 61, shared: ['Wearable device', 'Clinical validation'], status: 'pitch_sent' },
+    { caseId: 'case-d3', companyLabel: 'Diabeto App', score: 44, shared: ['Diabetes', 'Algorithms'], status: 'on_hold' },
+  ],
   trace: traceA,
   coverage: coverage('ok', ['No named contacts on the retrieved pages.']),
 };
@@ -254,6 +259,10 @@ const revB1: BriefRevision = {
   },
   reasons: reasonsB,
   openQuestions: ['R&D partner or clinical validation?'],
+  similarCases: [
+    { caseId: 'case-d2', companyLabel: 'InsuTech Labs', score: 72, shared: ['Insulin delivery', 'R&D site'], status: 'closed_visit' },
+    { caseId: 'case-d5', companyLabel: 'Kardia Systems', score: 38, shared: ['Diabetes device'], status: 'draft' },
+  ],
   trace: pruneTrace(TRACE_B, reasonEvidence(reasonsB)),
   coverage: coverage('partial', ['Waiting for your answer in the chat.']),
 };

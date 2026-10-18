@@ -80,6 +80,20 @@ export interface SearchTrace {
   links: { source: string; target: string; value: number }[];
 }
 
+/**
+ * A past case that resembles the current one. `score` (0–100) measures how
+ * similar the company needs and matched topics are. It is not a probability
+ * of success (see case_similarity_score in OPERATIONS_PLAN.md).
+ */
+export interface SimilarCase {
+  caseId: string;
+  companyLabel: string;
+  score: number;
+  /** What the two cases have in common, e.g. "Wearable sensing". */
+  shared: string[];
+  status: CaseStatus;
+}
+
 export interface Coverage {
   snapshotDate: string;
   institutions: Institution[];
@@ -100,6 +114,8 @@ export interface BriefRevision {
   company?: { summary: string; facts: string[] };
   reasons: Reason[];
   openQuestions: string[];
+  /** Earlier agency cases that resemble this one, best first. Empty when none qualify. */
+  similarCases?: SimilarCase[];
   trace: SearchTrace;
   coverage: Coverage;
   /** Shown instead of reasons for no_match / out_of_scope. */

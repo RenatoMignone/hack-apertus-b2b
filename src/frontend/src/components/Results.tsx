@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Check, ChevronDown, ExternalLink, HelpCircle, Lightbulb, SearchX, X } from 'lucide-react';
 import type { BriefRevision, Evidence, Reason, Selection } from '../types/contract';
-import { INSTITUTION } from './ui';
+import { Link } from 'react-router-dom';
+import { INSTITUTION, StatusBadge } from './ui';
 import SearchSankey from './SearchSankey';
 
 type Open = (evidenceId: string) => void;
@@ -228,6 +229,38 @@ export default function Results({
           {[...openQuestions, ...coverage.limitations].map((q) => (
             <span key={q} className="rounded-full bg-white px-2.5 py-0.5 text-muted ring-1 ring-line">{q}</span>
           ))}
+        </div>
+      )}
+
+      {revision.similarCases && revision.similarCases.length > 0 && (
+        <div>
+          <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold tracking-tight">
+            Similar cases
+            <span title="How similar the company needs and topics are. Not a chance of success.">
+              <HelpCircle size={15} className="text-muted" />
+            </span>
+          </h2>
+          <div className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white">
+            {revision.similarCases.map((s) => (
+              <Link key={s.caseId} to={`/cases/${s.caseId}`} className="flex items-center gap-4 px-4 py-3 hover:bg-canvas">
+                <div className="w-28 shrink-0">
+                  <div className="text-lg font-semibold tabular-nums">{s.score}%</div>
+                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-canvas">
+                    <div className="h-full rounded-full bg-ink" style={{ width: `${s.score}%` }} />
+                  </div>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium">{s.companyLabel}</div>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {s.shared.map((x) => (
+                      <span key={x} className="rounded-full bg-canvas px-2 py-0.5 text-xs text-muted">{x}</span>
+                    ))}
+                  </div>
+                </div>
+                <StatusBadge status={s.status} />
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 
