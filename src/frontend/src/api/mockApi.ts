@@ -291,21 +291,6 @@ export const mockApi: NavigatorApi = {
     return clone(c);
   },
 
-  async exportDeck(caseId) {
-    await wait(700);
-    const c = get(caseId);
-    const kept = current(c)?.reasons.filter((r) => r.selection === 'kept') ?? [];
-    const used = [...new Set(kept.flatMap((r) => r.line.evidenceIds))];
-    const lines = [
-      `# Why Bern — ${c.case.companyLabel}`,
-      '',
-      ...kept.map((r) => `- **${r.headline}.** ${r.line.text} ${r.line.evidenceIds.map((id) => `[${c.evidence[id].n}]`).join('')}`),
-      '',
-      ...used.map((id) => `[${c.evidence[id].n}] ${c.evidence[id].url}`),
-    ];
-    const slug = c.case.companyLabel.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
-    return { filename: `why-bern-${slug}.md`, blob: new Blob([lines.join('\n')], { type: 'text/markdown' }) };
-  },
 
   async setCaseFlags(caseId, flags) {
     const c = get(caseId);

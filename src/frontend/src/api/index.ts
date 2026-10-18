@@ -13,7 +13,6 @@ export interface NavigatorApi {
   setSelection(caseId: string, reasonId: string, selection: Selection): Promise<CaseDetail>;
   setStatus(caseId: string, status: CaseStatus): Promise<CaseDetail>;
   setCurrentRevision(caseId: string, revisionId: string): Promise<CaseDetail>;
-  exportDeck(caseId: string): Promise<{ filename: string; blob: Blob }>;
   /** Put a case on hold / take it off hold, or record the outcome of a closed case. */
   setCaseFlags(caseId: string, flags: { onHold?: boolean; outcome?: CaseOutcome }): Promise<CaseDetail>;
   /** Mock only: restore the seeded demo data. */

@@ -158,6 +158,16 @@ app is now the cases board (home, `/`), the composer and the case page. The supp
 part, "Gaps and next steps" (questions for the company, possible introductions with
 availability not confirmed), moves into a *Next steps* block on the case page.
 
+**D17 / user decision, 18 October:** the export produces two files from the items she
+kept: a structured **PDF brief** with the supplied English agency logo, and an
+editable **PowerPoint** built from the supplied partner template (its layouts,
+master and theme; example slides removed). Both are generated client-side on the
+`ui-polish` branch (`src/frontend/src/export/`) so they work with the mock and offline.
+Open point for merging: `main` already has a backend ReportLab PDF renderer, with PPTX
+listed there as later work. The team must choose one PDF path (backend renderer, or
+this client-side brief) and whether PPTX stays client-side or moves to the backend.
+Template and logo remain challenge-only (N1).
+
 **18 October user answers (U2):** recorded below. The agent selected the delegated
 medical slice and evaluation protocol in [PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md).
 Selected scope is diabetes technology; English outputs are required and DE/FR/IT

@@ -88,8 +88,34 @@ acknowledged without changing the brief.
 
 ### Export
 
-Uses only the ✓ kept reasons. The mock downloads a Markdown outline with sources;
-PowerPoint rendering with the partner template is backend work.
+The Export dialog offers two files, built in the browser from the case data
+(`src/frontend/src/export/`, loaded on demand; nothing is sent anywhere). Both use
+only the items she **kept** (✓ Keep), the sources those items cite (renumbered 1..n)
+and the case's next steps. Hidden items, her chat, similar cases and the search
+trace are internal and never exported. With nothing kept, both options are disabled.
+
+- **PDF brief** (`why-bern-<company>.pdf`, pdfmake): agency logo, "Bern opportunity
+  brief" label, *Why Bern for {company}*, company box (from her message), *At a
+  glance* (top 3), sections People · Research groups · Projects and studies ·
+  Infrastructure and services · Ideas to explore (with a "to be validated"
+  caveat), *Next steps* (questions to clarify, possible introductions with
+  availability not confirmed), and a *Sources* appendix with clickable URLs,
+  retrieval dates and the exact quoted passage. Footer: agency, snapshot date and
+  page x / y. Colours follow the template theme (#3C505A, #EA161F, #63737B).
+- **PowerPoint** (`why-bern-<company>.pptx`, JSZip): opens the partner template
+  itself, removes its 19 example slides with their charts and notes, and adds
+  our slides on the template's own layouts (Titelfolie, Titel und Inhalt, Titel/
+  Untertitel/Inhalt, Zwei Inhalte), so master, theme, fonts and logo come from
+  the template and everything stays editable. Slides: title, At a glance, People
+  (3 per slide), Research groups and projects, Infrastructure, Ideas, Next steps,
+  Sources (6 per slide, hyperlinked) and a Contact slide with bracketed placeholders
+  for her own details (no contact data is invented). The "Klassifizierung" footer
+  is replaced by "Public sources · retrieved {date}".
+
+Template and logo are challenge-only assets (see `docs/provided_material/README.md`).
+On `main`, the backend also has a ReportLab PDF renderer
+(`src/backend/reports/rendering/pdf.py`) and lists PPTX as later work; when merging,
+the team must pick one PDF path (D17).
 
 ## Data contract
 
