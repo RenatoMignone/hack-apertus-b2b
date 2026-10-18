@@ -1,0 +1,800 @@
+00:00:00,960 --> 00:00:01,860 [Speaker 0]
+We need the different options. 
+
+00:00:01,900 --> 00:00:05,060 [Speaker 1]
+Can, can I just-- Can we come here so that I just put the... [banging] 
+
+00:00:05,080 --> 00:00:05,920 [Speaker 0]
+We need the different options. 
+
+00:00:05,960 --> 00:00:12,280 [Speaker 2]
+A super certain thing is that we need to store and save in our database cases. 
+
+00:00:12,400 --> 00:00:13,000 [Speaker 3]
+Yeah, that's for sure. 
+
+00:00:13,060 --> 00:00:13,600 [Speaker 2]
+That's for sure, yes. 
+
+00:00:13,620 --> 00:00:15,580 [Speaker 1]
+Cases, it's a hundred percent sure. That's something that we embrace anyway. 
+
+00:00:15,580 --> 00:00:17,000 [Speaker 0]
+And the, and the, and the verity score, the risk code- 
+
+00:00:17,000 --> 00:00:17,120 [Speaker 2]
+Exactly. Yeah 
+
+00:00:17,120 --> 00:00:18,040 [Speaker 0]
+...the cases is very important. 
+
+00:00:18,060 --> 00:00:27,800 [Speaker 2]
+And what then? Uh, not only the final report, but maybe, maybe useful sort of to store the previous elements, the, um, uh- 
+
+00:00:27,920 --> 00:00:29,960 [Speaker 3]
+See, like the case evidence, everything. 
+
+00:00:29,980 --> 00:00:30,460 [Speaker 2]
+The back, uh- 
+
+00:00:30,480 --> 00:00:32,619 [Speaker 1]
+And this will be updated by our own system. 
+
+00:00:32,680 --> 00:00:36,800 [Speaker 2]
+Exactly. So, uh, this may, this may be how when you create a new one- 
+
+00:00:36,820 --> 00:00:36,980 [Speaker 3]
+Whenever you- 
+
+00:00:36,980 --> 00:00:38,520 [Speaker 2]
+No, whenever you create a new one, you put it. 
+
+00:00:38,540 --> 00:00:40,480 [Speaker 3]
+Or when you update a, a case state. If you complete it- 
+
+00:00:40,480 --> 00:00:43,680 [Speaker 0]
+Oh, yeah. This is-- Okay, we're talking about the database for the cases. Yeah, sure, sure, sure. 
+
+00:00:43,680 --> 00:00:46,800 [Speaker 3]
+Okay. You complete a case, you put the case into the database, you delete it, that's it. 
+
+00:00:46,800 --> 00:00:52,420 [Speaker 2]
+Then, then we, we said that we would like to create this ontology, this ontology. 
+
+00:00:52,480 --> 00:00:52,940 [Speaker 3]
+Mm-hmm. 
+
+00:00:53,040 --> 00:01:03,700 [Speaker 2]
+Uh, this is, uh, use... The main objective for the ontology, in my opinion, is not for the, uh, keyword expansion, might be for the keyword resolution. 
+
+00:01:03,740 --> 00:01:04,980 [Speaker 3]
+Might be. What does that mean? 
+
+00:01:05,040 --> 00:01:15,500 [Speaker 2]
+It, it may mean if a keyword, a keyword in a prompt without the proper context, maybe, um, maybe misunderstood too. 
+
+00:01:15,520 --> 00:01:16,160 [Speaker 0]
+Yes. 
+
+00:01:16,280 --> 00:01:21,620 [Speaker 2]
+Uh, so, uh, we will check that keyword across, 
+
+00:01:23,080 --> 00:01:27,940 [Speaker 2]
+uh... If, for example, uh, one keyword is shared among two different topics- 
+
+00:01:28,320 --> 00:01:28,460 [Speaker 3]
+Mm-hmm 
+
+00:01:28,460 --> 00:01:36,240 [Speaker 2]
+...we will search, uh, in those two different topics for the other keywords, and we will check the other keywords in the original prompt- 
+
+00:01:36,380 --> 00:01:36,540 [Speaker 3]
+Okay 
+
+00:01:36,540 --> 00:01:41,460 [Speaker 2]
+...to seek, to catego-- to correctly categorize the original prompt in the main. 
+
+00:01:41,500 --> 00:01:45,760 [Speaker 3]
+In each topic. So, there are two, two aspects. The problem is then what do we do? How, how do we store that one? 
+
+00:01:45,800 --> 00:01:54,420 [Speaker 2]
+So we have these two things that we need to store: the cases and this ontology. This ontology may be either a graph, either whatever. It's not important. 
+
+00:01:54,420 --> 00:01:56,100 [Speaker 3]
+Taxonomy, metadata, taxonomy, whatever. 
+
+00:01:56,100 --> 00:01:56,100 [Speaker 2]
+Exactly. 
+
+00:01:56,140 --> 00:01:56,620 [Speaker 3]
+Yeah. 
+
+00:01:56,680 --> 00:02:05,760 [Speaker 2]
+The main problem is for the, uh, sources against we would like to check the, uh, new company. 
+
+00:02:05,800 --> 00:02:11,200 [Speaker 1]
+Okay. Well, to start from scratch, our objective is we have a company X- 
+
+00:02:11,440 --> 00:02:11,580 [Speaker 2]
+Yes 
+
+00:02:11,580 --> 00:02:16,520 [Speaker 1]
+...that would like to expand as a branch or would like to create a business, uh, whatever in Bern- 
+
+00:02:16,700 --> 00:02:16,940 [Speaker 3]
+Mm-hmm 
+
+00:02:16,940 --> 00:02:18,880 [Speaker 1]
+...or that we would like to bring in Bern. 
+
+00:02:18,920 --> 00:02:19,520 [Speaker 3]
+Ah, yes. 
+
+00:02:19,600 --> 00:02:20,080 [Speaker 2]
+Yes. Yes. 
+
+00:02:20,080 --> 00:02:20,200 [Speaker 1]
+So- 
+
+00:02:20,320 --> 00:02:21,460 [Speaker 2]
+What would you like to check? 
+
+00:02:21,720 --> 00:02:22,740 [Speaker 3]
+You know better. 
+
+00:02:22,800 --> 00:02:23,500 [Speaker 1]
+Uh, yeah, I mean, in general- 
+
+00:02:23,520 --> 00:02:24,400 [Speaker 2]
+What would you like to check? 
+
+00:02:24,520 --> 00:02:26,180 [Speaker 3]
+I think we need to check all the things that regulate it. 
+
+00:02:26,200 --> 00:02:29,020 [Speaker 1]
+Sorry. The point is that we need to bring this fucking company to Bern. 
+
+00:02:29,600 --> 00:02:29,640 [Speaker 2]
+Yeah. 
+
+00:02:29,640 --> 00:02:31,320 [Speaker 1]
+So we need to understand what the fuck there is in Bern. 
+
+00:02:31,520 --> 00:02:31,740 [Speaker 3]
+Mm-hmm. 
+
+00:02:32,100 --> 00:02:36,540 [Speaker 0]
+Okay. And here, uh, here, like, what's our, uh, source of knowledge for our- 
+
+00:02:36,980 --> 00:02:38,380 [Speaker 2]
+Exactly. There is a, there is a problem. 
+
+00:02:38,380 --> 00:02:41,600 [Speaker 0]
+Okay. The man-- The option that we mentioned are either list of sources- 
+
+00:02:41,660 --> 00:02:43,580 [Speaker 3]
+The problem is how scalable we want this to be. 
+
+00:02:43,620 --> 00:02:48,820 [Speaker 0]
+Ah, exactly. My problem with just listing list of sources, and by sources you mean like URLs or stuff like that- 
+
+00:02:48,820 --> 00:02:49,380 [Speaker 3]
+Yeah, yeah, yeah 
+
+00:02:49,380 --> 00:02:53,580 [Speaker 0]
+...I don't completely agree with this because we would be doing a lot of repetitive work. For exa-- 'Cause 
+
+00:02:54,660 --> 00:03:03,940 [Speaker 0]
+th-there's this source. I think from a source we could extract different knowledges, like different, uh, pieces of knowledge, and store that in the database. 
+
+00:03:04,180 --> 00:03:04,340 [Speaker 3]
+Exactly. 
+
+00:03:04,340 --> 00:03:11,420 [Speaker 0]
+And then for each, uh, case w-we have, like each new case we have, we pull the necessary from the place- 
+
+00:03:11,420 --> 00:03:12,700 [Speaker 3]
+It was our option A. 
+
+00:03:12,740 --> 00:03:14,040 [Speaker 0]
+Yeah, I think that's why... That's why- 
+
+00:03:14,040 --> 00:03:14,640 [Speaker 3]
+It was our option A. 
+
+00:03:14,640 --> 00:03:16,080 [Speaker 0]
+Because pulling like every URL costs a lot. 
+
+00:03:16,120 --> 00:03:20,680 [Speaker 3]
+The only problem is from this, since the mo-- the moment you put something into the database, uh, your, uh- 
+
+00:03:20,720 --> 00:03:20,820 [Speaker 1]
+It's fixed 
+
+00:03:20,820 --> 00:03:24,280 [Speaker 3]
+...that, that is fixed and no-- uh, there's no update until someone does it. 
+
+00:03:24,320 --> 00:03:26,560 [Speaker 2]
+It is d-- very difficult to update a huge- 
+
+00:03:26,720 --> 00:03:27,140 [Speaker 3]
+I mean, yes. 
+
+00:03:27,500 --> 00:03:29,420 [Speaker 2]
+If we, if we became a huge data, uh, database. 
+
+00:03:29,560 --> 00:03:37,220 [Speaker 3]
+If scalability wasn't an issue here, it's perfect. You leave it here, you have it forever, and that's it. But it's not scalable because it never updates basically. 
+
+00:03:37,220 --> 00:03:47,420 [Speaker 0]
+We do hybrid. Then we-- Like, you have the source and then, like, you have the, you have your URL. From the URL, there are, like, all these, uh, different things extracted. 
+
+00:03:47,480 --> 00:03:47,640 [Speaker 3]
+Mm-hmm. 
+
+00:03:47,760 --> 00:03:51,160 [Speaker 0]
+And if, uh, like, w-when we're researching on a new case... 
+
+00:03:51,160 --> 00:04:02,820 [Speaker 3]
+'Cause according to what you're saying now, I was suggesting the second version. I was suggesting is, okay, instead of keeping all the content mapped, because our scripting is, is super difficult, first of all, and it, uh- 
+
+00:04:02,900 --> 00:04:09,180 [Speaker 1]
+The point of scraping is that compared to a simple fucking database query, it takes a hundred times more. 
+
+00:04:10,160 --> 00:04:22,320 [Speaker 3]
+For that exact-- That's why, that's why I was saying to, um, instead of having all this content scraped, to have the URLs categorized by this, uh, ontology. So when I have the keywords, I know which URLs I have to consult, and I can map them directly. 
+
+00:04:22,380 --> 00:04:26,020 [Speaker 0]
+How expensive would that be? Like, uh, how much time would it take for each, uh- 
+
+00:04:26,080 --> 00:04:27,740 [Speaker 3]
+Develop each issue with that this time. 
+
+00:04:27,840 --> 00:04:33,500 [Speaker 2]
+No. Against everything we have discussed, the best option is the, the very first option A with everything- 
+
+00:04:33,580 --> 00:04:34,420 [Speaker 1]
+Repeat again this first option. 
+
+00:04:34,920 --> 00:04:41,760 [Speaker 2]
+The first option A is to get everything in Bern that may be useful, uh- 
+
+00:04:41,840 --> 00:04:42,940 [Speaker 1]
+In medical stuff. 
+
+00:04:42,940 --> 00:04:46,360 [Speaker 2]
+In medical stuff. So all the professor, all that. And 
+
+00:04:47,380 --> 00:05:00,800 [Speaker 2]
+we should add the capability to the model to say, "I think that this content is insufficient." Because either, either we say the model, this information inside the DB is the latest. 
+
+00:05:01,440 --> 00:05:02,080 [Speaker 3]
+Hmm. 
+
+00:05:02,140 --> 00:05:04,020 [Speaker 2]
+And so the model trust us. 
+
+00:05:04,020 --> 00:05:05,020 [Speaker 1]
+But this is impossible. 
+
+00:05:05,060 --> 00:05:11,660 [Speaker 2]
+This is impossible. Otherwise, you need either to, to let the model understand if it is sufficient- 
+
+00:05:11,820 --> 00:05:12,020 [Speaker 3]
+Yes 
+
+00:05:12,020 --> 00:05:15,800 [Speaker 2]
+...but there might be a professor that is a perfect match that is not in the DB. 
+
+00:05:15,820 --> 00:05:38,720 [Speaker 1]
+For me, you know what's the point for me? Whenever you get a prompt, you use the model to understand the context of the prompt, and you have, for example, a rag or the base, whatever you want, to do this initial fetching in which there is this database or rag, and there are the information of the companies or laboratories or whatever that are in, in Bern, and they're able to fetch for those specific ones. So do the query and fetch the URLs, fetch whatever. 
+
+00:05:39,860 --> 00:05:42,060 [Speaker 1]
+If- Uh, apart from the RAG itself- 
+
+00:05:42,380 --> 00:05:42,580 [Speaker 2]
+Mm-hmm. 
+
+00:05:42,580 --> 00:05:46,460 [Speaker 1]
+-the model may also be able to do a kind of Boolean search online. 
+
+00:05:46,500 --> 00:05:53,320 [Speaker 3]
+Sí, but it needs to know... It's what Elias said, we have to put the capability that it must know when-- to understand when it is insufficient and when it can go there because sometimes- 
+
+00:05:53,420 --> 00:05:56,720 [Speaker 2]
+Ehh, here live, ehh, here live level, like I asked you. If, if, if you suppose- 
+
+00:05:56,720 --> 00:05:59,640 [Speaker 1]
+No, the point is that in any case, it may be able to do a simple- 
+
+00:05:59,700 --> 00:06:01,380 [Speaker 3]
+Yeah, Renata. Let me open this. 
+
+00:06:01,520 --> 00:06:14,620 [Speaker 0]
+An important factor, an important factor to consider is that I think it's best to make something that looks best for presentation, and then we could talk about the scalability aspects of it. 
+
+00:06:14,800 --> 00:06:15,100 [Speaker 2]
+Okay. 
+
+00:06:15,100 --> 00:06:16,840 [Speaker 0]
+What would, what would look best? 
+
+00:06:17,140 --> 00:06:17,560 [Speaker 2]
+Okay, but so- 
+
+00:06:17,580 --> 00:06:20,540 [Speaker 0]
+The presentation tab, like, the spee-- the fastest and- 
+
+00:06:20,580 --> 00:06:32,680 [Speaker 2]
+It makes-- everything makes super sense. So we are creating a da-- a dataset, a DB, a database with everything we can found in Bern related to medical, med tech. Yes. 
+
+00:06:32,700 --> 00:06:33,400 [Speaker 0]
+Yes. 
+
+00:06:33,420 --> 00:06:36,460 [Speaker 2]
+Okay. Where are we-- When are we stopping? Because it may be infinite. 
+
+00:06:36,760 --> 00:06:38,500 [Speaker 3]
+Why? Select the main sources. 
+
+00:06:38,920 --> 00:06:41,300 [Speaker 0]
+I doubt it. Uh, they give us, like, some sort of- 
+
+00:06:41,360 --> 00:06:41,820 [Speaker 3]
+From these sources- 
+
+00:06:41,880 --> 00:06:42,980 [Speaker 1]
+Some learning school, I guess, no? 
+
+00:06:43,740 --> 00:06:48,220 [Speaker 2]
+So, so we start, uh, we create a sample, uh, a sort of- 
+
+00:06:48,220 --> 00:06:50,580 [Speaker 3]
+See, I, I have twenty sources identified already. 
+
+00:06:50,940 --> 00:07:08,660 [Speaker 2]
+Okay. So we, we will do it with everything we have and adding the capability to the model to, at the same time, search it, search if there is a super relevant thing and check if, if it is in the DB. If it's not- 
+
+00:07:08,780 --> 00:07:09,680 [Speaker 3]
+If you want to internet. 
+
+00:07:09,680 --> 00:07:23,640 [Speaker 2]
+No, if it-- No, no, no. It is, it is already in the internet. It has already found something in the internet that is not in the DB. If it's not, are we adding the at runtime ingestion for this new source or not? 
+
+00:07:23,680 --> 00:07:28,100 [Speaker 3]
+I will say no, because maybe it needs human approval because maybe it's, uh, that source is wrong. 
+
+00:07:28,400 --> 00:07:32,120 [Speaker 0]
+Yeah, the human approval is very important, she said. That's an aspect we cannot ignore. 
+
+00:07:32,200 --> 00:07:32,400 [Speaker 2]
+Okay. Okay. 
+
+00:07:32,400 --> 00:07:32,640 [Speaker 0]
+So- 
+
+00:07:32,660 --> 00:07:41,340 [Speaker 3]
+I mean, you can include it into the, into the-- We can include into the reference, say this source is not, uh, validated, uh, in the, uh, in the previous, in the previous allow list. 
+
+00:07:41,380 --> 00:07:50,939 [Speaker 0]
+Okay. The most important aspects we need to consider, uh, to make the decision how the database looks like this, we need something that looks the best to present right now in twenty-four hours. 
+
+00:07:50,980 --> 00:07:51,520 [Speaker 2]
+Mm-hmm. 
+
+00:07:51,600 --> 00:07:59,840 [Speaker 0]
+And something that we can say is scalable and that we can show is scalable. Like I said, with these knowledge graphs and everything, I, I can, like- 
+
+00:08:00,160 --> 00:08:10,020 [Speaker 2]
+No, we can put, uh, the graph lag and that's it. It doesn't, it doesn't need to be complex. It doesn't-- It does need to work, function, and be expanded in future. 
+
+00:08:10,020 --> 00:08:18,360 [Speaker 3]
+See, the thing is, like, in doing inges-- That's why to accelerate the search, since we're going to have a lot of things, that's what I was saying, to categorize the, the ingestion. So then when you- 
+
+00:08:18,380 --> 00:08:19,960 [Speaker 2]
+What do you mean by categorize the ingestion? 
+
+00:08:19,960 --> 00:08:32,280 [Speaker 3]
+When you do the ingestion, instead of, uh, scripting and directly putting into the rack to have this layer of classification. So later when you do the, the keywords against keywords, they know that they have the same ontology, both of them. So it's easier- 
+
+00:08:32,620 --> 00:08:33,200 [Speaker 2]
+Say it again. 
+
+00:08:33,540 --> 00:08:38,920 [Speaker 3]
+So, um, Renat, uh, I-- When I ingest the LLM reads the sup-- 
+
+00:08:39,060 --> 00:08:44,320 [Speaker 2]
+But if you ingest, it is not part of our pipeline. You see right now. No. 
+
+00:08:44,320 --> 00:08:45,180 [Speaker 3]
+For the right feeds. 
+
+00:08:45,760 --> 00:08:45,880 [Speaker 2]
+No. 
+
+00:08:46,060 --> 00:08:48,040 [Speaker 3]
+We're ingesting the data for the pages, we're saying. 
+
+00:08:48,040 --> 00:08:56,140 [Speaker 2]
+Hey, but we're-- It is not part of the, the, uh, application pipeline. Something we're doing external now with Codex or OpenAI product. 
+
+00:08:56,140 --> 00:08:57,000 [Speaker 1]
+We just put in web. 
+
+00:08:57,000 --> 00:09:02,560 [Speaker 2]
+He's saying that-- No, this, this plan to sort, to create the rag. To get, uh- 
+
+00:09:02,620 --> 00:09:05,340 [Speaker 3]
+To populate the rag, you need to put all the con-- all the content inside. 
+
+00:09:05,340 --> 00:09:05,740 [Speaker 2]
+Of course. 
+
+00:09:05,740 --> 00:09:06,460 [Speaker 3]
+This is called ingestion. 
+
+00:09:06,460 --> 00:09:07,980 [Speaker 1]
+He's calling this ingestion. 
+
+00:09:08,040 --> 00:09:19,340 [Speaker 3]
+Okay. And then to accelerate the search once the user puts the input, because we're passing through this ontology, the inputs, uh, the ingestion needs to go through the same ontology. So then it matches apple, apple with apples, uh, peaches with peaches. 
+
+00:09:19,360 --> 00:09:28,400 [Speaker 2]
+He's seeing that. But there is a problem. If one source is a professor, a professor cannot be categorized in a specific topic. 
+
+00:09:28,460 --> 00:09:30,060 [Speaker 3]
+Yes, because he don't research on only natural language. 
+
+00:09:30,060 --> 00:09:33,580 [Speaker 2]
+He cannot be categorized if he's working, if he's working on multiple things. 
+
+00:09:33,600 --> 00:09:35,340 [Speaker 0]
+He can be mapped to all of them. 
+
+00:09:35,400 --> 00:09:35,480 [Speaker 2]
+Yes. 
+
+00:09:35,480 --> 00:09:37,540 [Speaker 0]
+We will find him, uh, like, mentioned in multiple topics. 
+
+00:09:37,580 --> 00:09:38,420 [Speaker 3]
+I mean, if, uh- 
+
+00:09:39,200 --> 00:09:43,880 [Speaker 2]
+So, so you're doing an hybrid, uh, an hybrid rag with filtering, meta filtering. 
+
+00:09:44,220 --> 00:09:45,560 [Speaker 1]
+My point is, it was, it was done- 
+
+00:09:46,160 --> 00:09:49,840 [Speaker 0]
+My thought process, like each entry in this database is, for example, a paper. 
+
+00:09:49,900 --> 00:09:50,820 [Speaker 2]
+Yeah, yeah, we have tags, yes. 
+
+00:09:50,860 --> 00:10:07,280 [Speaker 0]
+Yes. So there's like an ar-- an article about, uh, the univers-- what the University of Bern is doing related to diabetes. In this article, there's a lot of stuff mentioned. There's like, uh, a mention that Professor A is working on this aspect or-- and that, uh, this department is with this aspect. 
+
+00:10:07,280 --> 00:10:09,860 [Speaker 3]
+You don't have to put it up to the competition. You can put five. 
+
+00:10:09,880 --> 00:10:12,220 [Speaker 1]
+But the keyword ma-- You, you named the ontology, no? 
+
+00:10:12,480 --> 00:10:13,060 [Speaker 2]
+Yes. 
+
+00:10:13,060 --> 00:10:16,720 [Speaker 1]
+We named that for the keyword matching, we do a query in this database. 
+
+00:10:16,840 --> 00:10:17,060 [Speaker 2]
+Mm-hmm. 
+
+00:10:17,200 --> 00:10:22,360 [Speaker 1]
+We understand the context by means of, for example, more words in, in a, in a sentence. So something like, okay, 
+
+00:10:23,480 --> 00:10:24,180 [Speaker 1]
+which is the purpose? 
+
+00:10:24,780 --> 00:10:25,960 [Speaker 3]
+If, if the purpose was search. 
+
+00:10:25,960 --> 00:10:28,220 [Speaker 1]
+Doesn't, doesn't the model does the work? 
+
+00:10:29,020 --> 00:10:36,320 [Speaker 3]
+But if you have it, yes, it does for the-- It does it for the-- for when you search. But if the other part is not the same, it will be more difficult. 
+
+00:10:36,380 --> 00:10:36,760 [Speaker 1]
+Repeat. 
+
+00:10:37,300 --> 00:10:46,000 [Speaker 3]
+Um, so in this ontology, the beneficial thing it has is that if you had your database already classified, when you do the search with this classification, it will match the same. 
+
+00:10:47,580 --> 00:10:48,000 [Speaker 3]
+Do you get? 
+
+00:10:48,240 --> 00:10:48,480 [Speaker 1]
+No. 
+
+00:10:48,680 --> 00:10:51,840 [Speaker 3]
+Okay. Imagine that, um, I have, I have a- 
+
+00:10:52,920 --> 00:10:57,280 [Speaker 2]
+Now he's saying that, for example, in-- if in the prompt there is blood- 
+
+00:10:57,840 --> 00:10:58,320 [Speaker 1]
+Yeah. 
+
+00:10:58,320 --> 00:11:00,120 [Speaker 2]
+-and it is-- It may be 
+
+00:11:01,380 --> 00:11:02,140 [Speaker 2]
+misunderstanding. 
+
+00:11:03,280 --> 00:11:11,840 [Speaker 2]
+Creating a double check with the list of the ontology, you-- and the other context of the prompt, you will get to, uh- 
+
+00:11:11,880 --> 00:11:14,600 [Speaker 3]
+Blood vessels, blood, blood clot, blood syringe. 
+
+00:11:14,600 --> 00:11:14,900 [Speaker 2]
+Give me a 
+
+00:11:16,660 --> 00:11:18,280 [Speaker 2]
+disease. Give me a disease. Blood. 
+
+00:11:18,380 --> 00:11:20,320 [Speaker 1]
+HIV. HIV. 
+
+00:11:20,380 --> 00:11:20,620 [Speaker 2]
+Huh? 
+
+00:11:20,640 --> 00:11:21,380 [Speaker 1]
+HIV. 
+
+00:11:21,500 --> 00:11:22,660 [Speaker 2]
+HIV, exactly. 
+
+00:11:22,740 --> 00:11:22,940 [Speaker 1]
+Ben. 
+
+00:11:23,000 --> 00:11:24,180 [Speaker 2]
+So you will, you will 
+
+00:11:25,900 --> 00:11:26,200 [Speaker 2]
+get to 
+
+00:11:27,260 --> 00:11:27,400 [Speaker 2]
+HIV. 
+
+00:11:27,400 --> 00:11:29,260 [Speaker 3]
+Because it was talking about, uh, the HIV area. 
+
+00:11:29,260 --> 00:11:30,000 [Speaker 2]
+In the, in the 
+
+00:11:31,340 --> 00:11:42,500 [Speaker 2]
+rag, inside the database, uh, on the-- you will have a column that for each sources, you will add a set of tags, a set of keywords. 
+
+00:11:42,520 --> 00:11:43,140 [Speaker 1]
+Perfecto. 
+
+00:11:43,400 --> 00:11:43,520 [Speaker 2]
+So- 
+
+00:11:43,540 --> 00:11:43,980 [Speaker 1]
+Bro, bro, bro. 
+
+00:11:43,980 --> 00:11:45,660 [Speaker 2]
+These keywords are not just thoughts of this group. 
+
+00:11:45,680 --> 00:11:46,720 [Speaker 1]
+Do you think that- 
+
+00:11:47,180 --> 00:11:48,080 [Speaker 2]
+In my opinion, yes. 
+
+00:11:48,080 --> 00:11:50,760 [Speaker 1]
+Do you think that the capabilities of keyword matching- 
+
+00:11:50,820 --> 00:11:52,540 [Speaker 3]
+It goes, it goes faster. I have tried it. 
+
+00:11:52,600 --> 00:11:54,260 [Speaker 1]
+It goes faster, okay. But do you think that- 
+
+00:11:54,460 --> 00:11:55,640 [Speaker 2]
+No, it is accurate about accuracy. 
+
+00:11:55,700 --> 00:11:59,740 [Speaker 1]
+The model does 100% better the work. If you just, if you just- 
+
+00:12:00,060 --> 00:12:05,060 [Speaker 2]
+But you, you're using the same model in both places. It's not that you're putting them randomly. The model has tagged them accordingly, though. 
+
+00:12:05,740 --> 00:12:06,180 [Speaker 1]
+Sorry? 
+
+00:12:06,220 --> 00:12:08,620 [Speaker 2]
+The, the, the, the, the, the model is saying that- 
+
+00:12:08,680 --> 00:12:10,100 [Speaker 1]
+The con- to contextualize the prompt. 
+
+00:12:10,500 --> 00:12:17,120 [Speaker 2]
+It's saying that it is completely futile. It doesn't mean that you will get the same results even if you don't put the keywords in the, at the start. 
+
+00:12:17,120 --> 00:12:20,440 [Speaker 1]
+It's completely useless because if you just give the prompt to the model- 
+
+00:12:20,800 --> 00:12:20,920 [Speaker 2]
+Mm-hmm. 
+
+00:12:20,920 --> 00:12:24,540 [Speaker 1]
+-the model is 100% better in contextualizing the prompt rather than- 
+
+00:12:24,780 --> 00:12:25,480 [Speaker 2]
+And then there is a problem. 
+
+00:12:25,520 --> 00:12:33,560 [Speaker 1]
+Yes, but you don't... You need to know that, uh, it uses always the same word for that concept because it's not ten different ones. But that's why we need the ontology because it's not gonna use different words. 
+
+00:12:33,560 --> 00:12:41,060 [Speaker 2]
+But there, there is a huge problem using the ontology for the RAG, which is, if you update the ontology, you are fucked, and you need to update the whole RAG. 
+
+00:12:41,100 --> 00:12:48,560 [Speaker 1]
+And also, the RAG allows contextualized search. And the model does be-- does a better query compared to simple, uh, uh- 
+
+00:12:48,580 --> 00:12:48,700 [Speaker 2]
+Yeah. 
+
+00:12:48,700 --> 00:13:06,440 [Speaker 1]
+-keyword stuff. If you... The idea is, is this one. You take the prompt, you pass it through the model, and maybe also with the classes. You let it classify, you take the context, and you do the query by means of the model into the RAG. You take the docs, and then you cross-check everything into the additional co-- model. 
+
+00:13:06,740 --> 00:13:10,380 [Speaker 2]
+You do the check with the ontology after I've retrieved the, the, the things. 
+
+00:13:10,760 --> 00:13:14,640 [Speaker 1]
+Why do you need to contextualize the, the prompt by means of keyword, uh, co-search? 
+
+00:13:14,720 --> 00:13:25,840 [Speaker 2]
+You may, you may extract tags in the, in the data, but not, not, uh, strictly related to the, uh, updated ontology. You simply extract, um, keywords. 
+
+00:13:25,900 --> 00:13:26,440 [Speaker 1]
+Okay. 
+
+00:13:26,440 --> 00:13:30,160 [Speaker 2]
+So you use them to do an hybrid RAG, to do keywords plus- 
+
+00:13:30,200 --> 00:13:34,160 [Speaker 3]
+The only thing is, if you're doing that after the research, you're adding an overhead in, I, I think it's- 
+
+00:13:34,300 --> 00:13:34,660 [Speaker 2]
+No, no, no, no. 
+
+00:13:34,660 --> 00:13:41,000 [Speaker 1]
+Unless, unless Apertus is not disabled. [laughing] It is 200%- 
+
+00:13:41,060 --> 00:13:47,720 [Speaker 0]
+But also, the text, uh, shouldn't be, like, just, uh, mapped to the ontology. Maybe, like, also saying it's about a professor, like, uh, it's less about- 
+
+00:13:47,740 --> 00:13:48,940 [Speaker 1]
+Okay, yeah, yeah. They also do, uh- 
+
+00:13:48,980 --> 00:13:58,180 [Speaker 2]
+You, you can do it to do a normal, classic hybrid RAG. Hybrid RAG means you first do a pre-filtering based on keywords, and then you do the, the RAG thing. 
+
+00:13:58,240 --> 00:13:59,020 [Speaker 0]
+Okay, okay. 
+
+00:13:59,080 --> 00:14:06,319 [Speaker 3]
+Also, we have to think it, it's not one search. It's an, an agent that can do three or four queries, eh? It's not that, uh, when it, it's only to be only one query. 
+
+00:14:06,340 --> 00:14:07,020 [Speaker 1]
+Adaptive. 
+
+00:14:07,060 --> 00:14:08,400 [Speaker 3]
+Yeah, yeah, it's adaptive. That's for sure. 
+
+00:14:08,620 --> 00:14:10,160 [Speaker 2]
+You can do it this way. In my opinion, this- 
+
+00:14:10,420 --> 00:14:11,560 [Speaker 1]
+That's what I was talking about. 
+
+00:14:11,620 --> 00:14:20,440 [Speaker 2]
+In my opinion, it is better to, to add this overhead before to do this classification based on the ontology to build the RAG. 
+
+00:14:20,560 --> 00:14:23,540 [Speaker 3]
+Yeah, yeah, yeah. But that's, that's something I was also expecting. 
+
+00:14:23,600 --> 00:14:24,060 [Speaker 2]
+Okay. 
+
+00:14:24,080 --> 00:14:25,640 [Speaker 3]
+But then you put the tags in the RAG. 
+
+00:14:25,700 --> 00:14:26,100 [Speaker 1]
+But, uh, it's not- 
+
+00:14:26,120 --> 00:14:29,540 [Speaker 3]
+But the tags are normal tags based on hybrid search, not- 
+
+00:14:29,940 --> 00:14:30,960 [Speaker 0]
+Not hyper-specified. 
+
+00:14:31,000 --> 00:14:31,700 [Speaker 3]
+No, no, no. To not refer to the ontology. 
+
+00:14:31,740 --> 00:14:35,820 [Speaker 1]
+But the point, what, what's not still clear is the content of the RAG. 
+
+00:14:36,360 --> 00:14:39,360 [Speaker 3]
+It says, uh, no, for example, all the professor things and whatever. 
+
+00:14:40,260 --> 00:14:41,180 [Speaker 0]
+Yeah, like, like, in article- 
+
+00:14:41,180 --> 00:14:42,560 [Speaker 1]
+And so, so also, also description, the sources. 
+
+00:14:42,580 --> 00:14:48,480 [Speaker 0]
+Yeah, like, a URL has different tags. It has, has different, like, entries. Like, from one URL, you extract different entries. 
+
+00:14:48,480 --> 00:14:59,360 [Speaker 1]
+The point is that, the point is that if you just, uh, increase a bit the, um, scope of the work itself, the... to build the RAG, it's bit becomes huge. 
+
+00:14:59,900 --> 00:15:03,400 [Speaker 2]
+It is what I was saying, that the RAG, it doesn't make any sense in general, but- 
+
+00:15:04,060 --> 00:15:09,200 [Speaker 3]
+But that's why we can do the, uh, another RAG with the database of, of URLs with the categories, and that's it. It's easier. 
+
+00:15:09,920 --> 00:15:10,840 [Speaker 2]
+But at, at that- 
+
+00:15:10,980 --> 00:15:13,240 [Speaker 0]
+We could say that that's more scalable, like, present it as, as- 
+
+00:15:13,440 --> 00:15:14,940 [Speaker 2]
+Yes, but the fact is that 
+
+00:15:15,980 --> 00:15:27,520 [Speaker 2]
+you will have a bunch of, uh, of URLs that you may claim that they are official/trustable, okay? But at the end, you will need to scrape them at a time. 
+
+00:15:27,540 --> 00:15:29,320 [Speaker 0]
+Once again, like, exact-- That's my problem. 
+
+00:15:29,360 --> 00:15:32,920 [Speaker 2]
+And it is the same thing. You, you can basically- 
+
+00:15:32,980 --> 00:15:37,320 [Speaker 3]
+What do you want to pay the cost? If you want to pay the cost at every query, or you want to pay the cost at the beginning? 
+
+00:15:37,380 --> 00:15:41,160 [Speaker 0]
+Exactly. So, like, that we have to make a balance between scalability and accuracy. 
+
+00:15:41,200 --> 00:15:47,380 [Speaker 3]
+And in this case, I think it's better to pay the cost at the, at the beginning because if not, it will... Tomorrow, if you do the demo, it will take a lot to search. 
+
+00:15:47,580 --> 00:15:49,660 [Speaker 0]
+Oui, Ahmed, he heard that as well. I don't know. 
+
+00:15:50,300 --> 00:15:50,760 [Speaker 3]
+I mean, we can- 
+
+00:15:50,800 --> 00:15:54,780 [Speaker 2]
+No, no, we can create a DB, but, uh, but we need to, to 
+
+00:15:55,960 --> 00:16:08,780 [Speaker 2]
+define the limitation. We can create a DB to have a function pipeline and this application, and that's it. At the end, we need to deep think, uh, all the limitation and the possible solution for the future to make them clear. That's it. 
+
+00:16:10,540 --> 00:16:15,559 [Speaker 0]
+Let's, uh, consult an agent about this. Like, with every... consult, like, the best solution. 
+
+00:16:15,600 --> 00:16:17,880 [Speaker 2]
+Do you have a solution that we have not complained yet? 
+
+00:16:18,059 --> 00:16:19,380 [Speaker 3]
+Like, put it in text at the end.
