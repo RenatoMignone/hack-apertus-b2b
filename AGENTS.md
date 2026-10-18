@@ -15,9 +15,11 @@ to your task rather than reading the entire knowledge base every time.
   8B/optional 70B, EmbeddingGemma 2 candidate, and BGE reranking. Exact model
   sources/tokenizer packages/revisions are deferred; see the data-layer router.
   Deployment, roster and project name remain open.
-- Current authorized work is **documentation and agent context only**. Implement
-  features when a subsequent user task authorizes them. Do not treat proposed
-  designs or acceptance checks in these docs as implemented behavior.
+- Current authorized work is **documentation and directory scaffolding only**.
+  `src/frontend/` and `src/backend/` contain folder guidance and `.gitkeep` files;
+  no application code, dependencies or runnable server/UI exists. Implement
+  features only after a subsequent task authorizes them. Do not treat proposed
+  designs or acceptance checks as implemented behavior.
 - Work in this repository. The sibling `hack-apertus-liebefeld` is historical
   preparation context: **do not modify it**. Relevant context has been summarized
   here; routine work should not require reopening it.
@@ -37,6 +39,9 @@ Proposed primary target is an air-gapped independent runtime; not yet tested.
 
 | Your task | Read |
 | --- | --- |
+| Add source components or hand off a backend task | [Source structure](docs/plans/SOURCE_STRUCTURE.md), [source router](src/README.md), then the component README |
+| Integrate the frontend with the HTTP backend | [Frontend/backend API handoff](docs/plans/FRONTEND_BACKEND_API.md), [backend router](src/backend/README.md) |
+| Design retrieved evidence → pack or pack → report processing | [Processing boundaries and open mapping work](docs/plans/REPORT_PROCESSING_BOUNDARIES.md), then the existing architecture/operations contracts |
 | Understand the selected challenge | [Challenge brief](docs/challenge/CHALLENGE_BRIEF.md), [requirements](docs/challenge/PRODUCT_REQUIREMENTS.md) |
 | Find the Notion supporting files or check branding restrictions | [Notion text snapshot](docs/sources/NOTION_CHALLENGE_2026-10-18.md), [data and provenance](docs/data/DATA_AND_PROVENANCE.md) |
 | Understand stakeholder intent or check a recording claim | [Recording insights](docs/recordings/RECORDING_INSIGHTS.md), then the linked [original transcript](docs/recordings/README.md) |
@@ -86,6 +91,13 @@ Proposed primary target is an air-gapped independent runtime; not yet tested.
 8. LangGraph checkpoints and Langfuse traces are not the evidence store.
    Self-host Langfuse and its required services inside the deployment boundary;
    trace eligible, masked data only. Tracing failure must not stop a case.
+9. Keep frontend/backend independent through HTTP. Backend code is split by
+   responsibility under `src/backend/`; use narrow contracts/ports and focused
+   files. No frontend internals/framework, scraper selection, executable code or
+   package setup is authorized by the current scaffold task (U7/D11).
+10. Retrieved hits must become a supported, frozen `ReportEvidencePack` before
+    report generation. Detailed processing for retrieval → pack and pack → output
+    still needs mapping; do not mistake high-level plans for settled algorithms.
 
 ## Keeping context reliable
 
@@ -108,6 +120,9 @@ Proposed primary target is an air-gapped independent runtime; not yet tested.
 - Logical payload contracts remain in ingestion plan section 7; physical storage,
   retrieval, case persistence and tracing belong to the focused data specs.
   Update these owners and the visual together; avoid competing schemas.
+- Source/component ownership belongs to `docs/plans/SOURCE_STRUCTURE.md`; HTTP
+  handoff is a draft, with framework/auth/OpenAPI details still open. Keep local
+  source READMEs aligned; create `.gitkeep` only for otherwise empty directories.
 - For documentation changes, check relative links, evidence references and
   template/transcript preservation. Do not claim application tests or results
   before an implementation exists.

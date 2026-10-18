@@ -89,7 +89,19 @@ from shared snapshots. Reranking is not factual verification. No automatic corpu
 updates from reports, user corrections or web discoveries. The focused
 [data-layer specs](../data/DATA_LAYER.md) own physical schemas, search, cases,
 tracing and build/restore gates; ingestion section 7 retains logical interfaces.
-Current authorization is documentation and AGENTS routing, not implementation.
+Current authorization at U6 was documentation and AGENTS routing, not implementation.
+
+**D11 / source scaffold and HTTP boundary, U7, 18 October:** separate
+`src/frontend/` and `src/backend/`; backend components have narrow responsibilities,
+explicit contracts and folder-local guidance. HTTP is the frontend/backend
+boundary. This update authorizes directories, READMEs and `.gitkeep` placeholders
+only, superseding D04's docs-only scope for that limited purpose. No application
+code, package setup or frontend internals. [Source structure](../plans/SOURCE_STRUCTURE.md)
+owns the scaffold; [API handoff](../plans/FRONTEND_BACKEND_API.md) is a draft surface.
+Retrieval feeds a frozen `ReportEvidencePack`; detailed processing both before
+and after the pack still requires [mapping](../plans/REPORT_PROCESSING_BOUNDARIES.md).
+Scraper choice/behavior is deliberately deferred; older acquisition plans remain
+proposals, not an implementation selection.
 
 **18 October user answers (U2):** recorded below. The agent selected the delegated
 medical slice and evaluation protocol in [PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md).
@@ -123,6 +135,8 @@ ask again for facts already supplied.
 | Q14 | Collection extent, formats and freshness | Website/public-source priority resolved; refresh policy proposed | Collect relevant accessible public information, websites first, linked PDFs next; use safe engineering budgets and report omissions. Dated snapshot and conditional pre-demo refresh proposed, no freshness SLA selected. |
 | Q15 | Exact model/tokenizer sources, revisions, compatible adapters and limits | Explicitly deferred by U6 | Named roles/candidates are documented; resolve immutable configs before real embeddings/inference, without guessing artifact URLs. |
 | Q16 | PostgreSQL/framework versions, Langfuse resources, trace/backup retention and deployment | Implementation/deployment handoff | Logical services and failure/isolation contracts selected; no provisioned database, working instrumentation or recovery test claimed. |
+| Q17 | Backend language/framework, HTTP schemas, caller/session integration and frontend tooling | Team implementation handoff | U7 selects HTTP separation and modular folders only. API handoff proposes routes/projections; no OpenAPI/server or frontend setup yet. |
+| Q18 | Exact retrieval → pack and pack → final output transformations | Dedicated processing design work | High-level content/invariants exist; intermediate DTOs, stage algorithms, support/repair/review rules and run/export mapping need worked examples before implementation. |
 
 ## Suggested next work after a new implementation task
 

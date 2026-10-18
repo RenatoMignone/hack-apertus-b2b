@@ -13,6 +13,11 @@ replaces BGE-M3 as the initial embedding candidate. Exact model/tokenizer source
 revisions and deployment resources are deferred. [Data-layer router](../data/DATA_LAYER.md)
 owns physical specs; logical payloads remain in ingestion section 7.
 
+**U7/D11 source scaffold:** [source structure](SOURCE_STRUCTURE.md) maps components
+to `src/frontend/` and `src/backend/`, with HTTP separation documented in the
+[frontend handoff](FRONTEND_BACKEND_API.md). Only directories/READMEs/placeholders
+exist. Backend/framework, frontend internals and scraper implementation remain open.
+
 ## Input and output boundary
 
 The business developer reads the confidential business plan and one-pager
@@ -88,6 +93,11 @@ an immutable snapshot and switch the active pointer. Keep old builds for rollbac
 subject to access/retention rules. Rebuilding an index is distinct from fine-tuning.
 
 ## Evidence pack: the report-generation gate
+
+The table below defines content and invariants. The detailed transformations
+retrieved records → `ReportEvidencePack` and pack → final output still require
+separate mapping; [processing boundaries](REPORT_PROCESSING_BOUNDARIES.md) records
+owners and remaining design work. A high-level stage is not a selected algorithm.
 
 | Record | Minimum contents | Report use |
 | --- | --- | --- |

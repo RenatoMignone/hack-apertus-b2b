@@ -80,5 +80,6 @@ through every handoff, including when producing multiple search queries.
 
 Medical pilot, three institutional families, public-only input and independent
 deployment constraints remain in [architecture](../plans/ARCHITECTURE.md) and
-[evidence policy](DATA_AND_PROVENANCE.md). This task creates specs only; future
-agents implement code under `src/` after an implementation task authorizes it.
+[evidence policy](DATA_AND_PROVENANCE.md). U7 adds a directory-only
+[source scaffold](../plans/SOURCE_STRUCTURE.md); future agents implement code
+under `src/` after an implementation task authorizes it.

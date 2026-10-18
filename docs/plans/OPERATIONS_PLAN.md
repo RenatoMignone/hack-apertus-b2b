@@ -172,9 +172,13 @@ No automatic public-memory updates or model training from conversational edits.
 
 ## 7. Implementation and validation gates
 
-Logical modules under `src/`: intake/case repository, interpretation, public
-company research, memory client, ranking/support validation, calculations,
-report/revision and export. These need not be separate services. LangGraph owns
+The selected [source structure](SOURCE_STRUCTURE.md) places HTTP transport,
+application use cases, contracts, workflows, data/model adapters, evidence and
+reports under `src/backend/`, with an independent `src/frontend/`. Read the
+[HTTP handoff](FRONTEND_BACKEND_API.md) before integrating UI/server. Only folder
+guidance/placeholders exist. Detailed [evidence/report processing](REPORT_PROCESSING_BOUNDARIES.md)
+remains to be mapped; scraper choice/behavior is deferred in this scaffold task.
+These modules need not be separate services. LangGraph owns
 bounded state/checkpoints, not the corpus. Keep credentials server-side,
 authorization/access-aware caches and cancellation/retries. Disable external
 tracing and runtime downloads for the isolated target.

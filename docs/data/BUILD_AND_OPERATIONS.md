@@ -49,9 +49,12 @@ names are `DATABASE_URL`, `LANGGRAPH_DATABASE_URL`, `ARTIFACT_ROOT`,
 `LANGFUSE_SECRET_KEY`; final naming must agree with the implemented adapters.
 No credentials or real deployment endpoints belong in committed examples.
 
-Suggested modules under `src/` (logical boundaries, not mandatory services):
-storage/repositories, collection/normalization, enrichment, model adapters,
-hybrid retrieval, cases/graph state, evidence validation, exports and tracing.
+The selected [source structure](../plans/SOURCE_STRUCTURE.md) now places backend
+components under `src/backend/` and the independent HTTP client under
+`src/frontend/`. See local folder READMEs for ownership. This is a directory-only
+scaffold; scraper behavior, backend tooling and detailed evidence/report
+transformations remain undecided. Components are logical boundaries, not
+mandatory separate services.
 Use parameterized SQL and validated DTOs; retrieval tools accept structured
 queries, not arbitrary model-generated SQL. Direct SQL repositories are sufficient;
 ORM/migration tooling and exact package versions are implementation choices.
