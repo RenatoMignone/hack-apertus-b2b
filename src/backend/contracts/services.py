@@ -154,6 +154,7 @@ class PdfInput(Contract):
     result_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     selection_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     draft: DraftRevision
+    claims: list[SupportedClaim] = Field(default_factory=list)
     kept_reason_keys: list[str] = Field(min_length=1)
     evidence: list[EvidenceRecord]
     limitations: list[str] = Field(default_factory=list)
