@@ -1,0 +1,111 @@
+# Evaluation plan and evidence requirements
+
+**Status: proposed protocol; no evaluation has run and no performance is claimed.**
+The numerical targets come from [B1 §4](CHALLENGE_BRIEF.md); the recordings supply
+no labeled evaluation dataset and suggest constructing a pilot or synthetic
+examples. [E20](RECORDING_INSIGHTS.md#e20--evaluation-needs-to-be-constructed)
+
+## Official targets versus proposed measurements
+
+| Requirement | Proposed measurement | Interpretation/limit |
+| --- | --- | --- |
+| At least 80% of expected experts/units in top 10 | Recall@10 per query, plus macro/micro aggregate | Official wording does not specify aggregation; agree with the partner and report both rather than invent an official pass formula |
+| Equivalent wording finds the same experts | Expected-set recall for paired terminology variants; optionally top-10 set overlap | Same-intent pairs share gold entities; broader related terms need separate judgments |
+| 100% traceable source-supported results | Result-level supporting-link rate and factual claim-support audit | A valid/reachable URL alone is insufficient; a supported name does not validate all of a result's roles/projects |
+| Structured results where source provides fields | Supported-field completeness, missing-value accuracy, unsupported-field count | Judge availability from checked source material; do not reward fabricated completeness |
+| All three source families covered | Collected/extracted/indexed counts plus actual retrieved evidence per family | Document overlap and failures; three configured seeds alone do not demonstrate coverage |
+| Easy extension | Add a verified institutional source through documented configuration/short step | Record actual changes and observed result; do not claim extensibility from design alone |
+| Fair discoverability | Audit coverage and retrieval by institution/group, including less prominent units | Diagnostic fairness evidence; no official numerical fairness threshold is supplied |
+
+For query `q`, with independently verified expected entities `G(q)` and up to
+ten **unique** returned entities `R10(q)`:
+
+```text
+Recall@10(q) = |G(q) ∩ R10(q)| / |G(q)|
+Macro Recall@10 = mean of Recall@10(q) over positive queries
+Micro Recall@10 = sum of matched expected entities / sum of expected entities
+```
+
+Specify whether experts and units are judged separately or as typed entities;
+do not silently count one unit as every expected person within it. Duplicated
+profiles do not create extra hits. Queries with no gold match are assessed for
+abstention separately, not divided by zero or counted as perfect recall.
+
+If a query has more than 12 expected entities, a top-10 list cannot reach 80%
+recall. Surface that mismatch, report the attainable bound and resolve the
+intended query/granularity with the partner; do not cherry-pick gold labels to
+make the target achievable. Unjudged novel results are **unjudged**, not
+automatically incorrect; audit them before revising a versioned expected set.
+
+## Build a small defensible pilot
+
+1. **Fix the scope and snapshot.** Name medical topic, source families,
+   collection dates, indexed pages and coverage exclusions.
+2. **Create query cases.** Start with C01–C13 in
+   [WORKFLOWS_AND_CASES.md](WORKFLOWS_AND_CASES.md), including same-intent pairs,
+   related concepts, multiple result types, ambiguity and negative cases.
+3. **Check expected results independently.** A person/partner reviewer should
+   validate real identities, types, roles and relevance from public evidence.
+   Record who/which reviewer role judged them and uncertain labels. Model-generated
+   expected answers alone are not ground truth.
+4. **Separate tuning from final checks.** Keep a small held-out query set if
+   feasible. Freeze query/gold versions before the reported run; disclose any
+   source-driven gold revisions.
+5. **Run a baseline and the selected system.** Use the same corpus, expected
+   entities and timing boundary. Record lexical baseline behavior before
+   attributing improvements to Apertus or semantic retrieval.
+6. **Audit all returned results in the small pilot.** Check links and actual
+   field/claim support; human-review adjacent-application explanations and
+   understandable wording.
+7. **Report exact counts and failures.** Publish measured values only where
+   tested, with sample size, protocol and limits. A small synthetic-query pilot
+   is preliminary evidence, not proof of production-wide 80% recall.
+
+Suggested case record: case ID, intent, synthetic/public input provenance,
+query/variant group, expected typed entity IDs, supporting URLs/passages,
+relevance labels, corpus/version, reviewer/date and unresolved judgments.
+Use real verified expertise even when the company/query is synthetic.
+
+## Reliability and workflow checks
+
+Proposed checks beyond the formal metric wording:
+
+- **No-match discipline:** test a known-unrepresented capability in the fixed
+  corpus, a wrong-region request and a broad medical question. Avoid asserting
+  that the capability is absent from all of Bern.
+- **Field/evidence behavior:** missing contacts, similarly named people,
+  cross-listed profiles, stale/conflicting affiliations and inaccessible pages.
+- **Bounded inference:** confirm that related technologies remain suggestions,
+  with no invented completed applications, clinical claims or availability.
+- **Source safety:** if agent tools are used, test that instructions embedded
+  in page content cannot override the evidence-only task or tool boundaries.
+- **Usability pilot:** ask a business developer to identify relevant items from
+  a public/synthetic brief; note readability, selection effort and irrelevant
+  matches. A proposed keep/reject UI need not exist to conduct this review.
+- **Performance/cost:** measure collection separately from query time, report
+  latency distribution and query/model-call volume for the pilot, and label
+  hardware/hosting costs as measured or estimated. About 300 cases/year is not
+  300 queries/year and provides no measured time-saving estimate.
+- **Deployment:** reproduce a clean run with the documented dependencies. Test
+  network-disabled execution only if claiming air-gapped runtime; use actual
+  hosting evidence for an independent/Swiss-cloud claim.
+
+## Evidence for the six main-jury dimensions
+
+M1 lists six dimensions scored **0–5**. It provides no weights. The older
+photographed Finals-slide summary gives useful questions but does not override
+this local scoring-scale statement. Stage-specific details remain unverified.
+
+| Dimension | Evidence to prepare | Current status |
+| --- | --- | --- |
+| Purposeful use of AI | Observed Apertus contribution and comparison/justification for its chosen role | Not assessed; implementation absent |
+| Technical rigour | Reproducible working pipeline, pilot metrics, evidence audit and known failures | Not assessed |
+| Value, cost & scalability | Operator benefit, measured/estimated costs with assumptions, coverage/extension behavior | Stakeholder need documented; product evidence absent |
+| Sovereign deployability | Selected target, full dependency map and verified operation for claimed mode | Not selected or tested |
+| Implementation feasibility | Run instructions, data/rights boundary, maintenance and partner handoff requirements | Not demonstrated |
+| Pitch & presentation | Clear, truthful working demo and coherent report/video within actual limits | Not produced |
+
+Do not fabricate internal judge scores or imply that documentation proves a
+working prototype. The report should state corpus size/coverage, query counts,
+recall protocol, support/completeness results, baseline comparison, cost basis,
+deployment evidence and limitations **once available**.

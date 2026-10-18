@@ -1,0 +1,647 @@
+00:00:00,060 --> 00:00:03,120 [Speaker 0]
+For now, do you manually search for companies? 
+
+00:00:03,200 --> 00:00:13,780 [Speaker 1]
+Well, I use, um, of course, modeling doing this, not a model. Uh, but yes, actually, this is, uh, I try with my own keywords, without using a, uh... 
+
+00:00:15,520 --> 00:00:21,040 [Speaker 1]
+Well, we get... It's not that I'm not unable to do it, but, uh, the aim is to do it automatically. 
+
+00:00:21,140 --> 00:00:22,560 [Speaker 0]
+Okay. Yeah, yeah. All right. 
+
+00:00:22,560 --> 00:00:54,840 [Speaker 1]
+So the, the idea is to have a kind of an optimized system for any kind of, um, request from the life science point of view, where with just a few keywords, but the system would understand, okay, if we speak... I just take example, diabetes. This is glucose monitoring, this is also med tech device, this is also biosensors. Um, this is, um, I don't know, maybe, um, gender, women and diabetes. So, you know, find all kind of, um, connects, um, 
+
+00:00:56,520 --> 00:01:03,160 [Speaker 1]
+words, type of words, where actually that could be relevant to what I'm actually looking for. Because I, I, 
+
+00:01:04,480 --> 00:01:10,480 [Speaker 1]
+I need to have as many arguments as possible, but they need to be relevant to the, to the company. 
+
+00:01:10,480 --> 00:01:12,240 [Speaker 2]
+Because... Oh, please, please, sorry. 
+
+00:01:12,260 --> 00:01:13,860 [Speaker 1]
+The, the aim of the company 
+
+00:01:14,900 --> 00:01:18,920 [Speaker 1]
+is basically to make sure that if it decides to establish in the Canton of Bern- 
+
+00:01:19,060 --> 00:01:19,440 [Speaker 2]
+Okay. 
+
+00:01:19,440 --> 00:01:56,040 [Speaker 1]
+-that we find the, uh, right, um, scientific expertise, um, that we also have the people who are able actually to develop, um, if this is a medical device, the medical device. Um, maybe it could also be the suppliers, you know, if... For, for, for, for the different parts of the medical device. So you, you need to find, um, similarities also in project. Like, for instance, for, for diabetes, you have a insulin pump, but maybe you have already a pump which has been used for, I don't know, drug, um, injection for specific- 
+
+00:01:56,380 --> 00:01:56,700 [Speaker 2]
+Yeah. 
+
+00:01:56,700 --> 00:02:11,720 [Speaker 1]
+-disease. And you say, "Okay, this is a very similar system, so we are in a similar field, so this is also relevant." So this is really quite broad, um, I'm aware of this. [laughs] And the idea is to come with, um, 
+
+00:02:12,760 --> 00:02:38,060 [Speaker 1]
+a systematic reporting, uh, of everything that you can scan, uh, on those websites. And then, of course, we ourselves manually, we have to read and say, "Okay, this seems to be out of scope. This is really within the scope." Uh, we don't ask you to be perfect in the results because it's impossible. Um, but at, at least it needs to feed up, um, uh... 
+
+00:02:39,460 --> 00:02:51,020 [Speaker 1]
+I need to gain time. I need to have as many information possible about the specific topic that I can choose from. And then I need those to actually present when my sales are coming for our location. 
+
+00:02:52,180 --> 00:03:03,260 [Speaker 2]
+Can I say something for the medical part of you? So as well, I think this is one... I think this is the difficult challenge here in the three because, um, there are a lot of things which are missing. Uh, which is not your fault. 
+
+00:03:03,280 --> 00:03:04,960 [Speaker 1]
+No, no, no. [laughs] It's not available. 
+
+00:03:05,680 --> 00:03:08,620 [Speaker 2]
+So the first, the first things, it's, uh, 
+
+00:03:09,900 --> 00:03:15,780 [Speaker 2]
+it's a really broad things. So I think it's restricted to, um, medicine. Can I say that? 
+
+00:03:15,780 --> 00:03:15,800 [Speaker 1]
+Yes. 
+
+00:03:15,800 --> 00:03:45,640 [Speaker 2]
+To this user case, uh, for example. Second, there is no, uh, really easy way to retrieve data. There is no API, there are a lot of information. So also one point is what is the good architecture to, to retrieve this data. You could say, "Okay, I need a, a model, like an instrument, really good instrument to retrieve data and whatever." Or I just retrieve data beforehand, I create a database, and then I search in my database. Um, I give the model to absolutely accept my database, and then they do whatever, and I can say, "Okay, what do I use?" And so how I, 
+
+00:03:47,400 --> 00:03:56,420 [Speaker 2]
+you know, how I do pre-preprocessing of the data before I, I put in the... There are a lot of questions about that, and I think it's... Oh, thank you. I think it's 
+
+00:03:57,820 --> 00:04:02,760 [Speaker 2]
+really important that, that there is okay. You said that you want as much as information, uh, as possible, 
+
+00:04:03,980 --> 00:04:21,019 [Speaker 2]
+but a lot of information is not mean that it's useful. So you want to... I would say you want as much information as possible, as precise as possible. So what this means... And there is no evaluation for that. So it's totally a green field, so you cannot say, "I try against this, uh, dataset and then see what happens." So 
+
+00:04:22,300 --> 00:04:34,720 [Speaker 2]
+I think it's really a, um, real world use case now. Uh, you can be a startup and then come and say, "Ask, I want that," and you have to provide the beauty. So for that point, it's really interesting. So just to point out that. 
+
+00:04:35,780 --> 00:04:39,800 [Speaker 3]
+And our, uh, main users of what we're creating would be you guys? Like, 
+
+00:04:40,840 --> 00:04:41,060 [Speaker 3]
+just- 
+
+00:04:41,060 --> 00:05:03,540 [Speaker 1]
+I would be me. This is a stupid person who has no idea about oncology, about diabetes. And, you know, this is... I'm not a medical doctor, so I, I, I'm... I need you to be the expert for me. If I speak diabetes, you know, if you say, "Okay, this is, uh, blood, this is, uh, this is medical device, this is insulin, this is pumping, this is maybe gender because, uh, in diabetes-" 
+
+00:05:03,540 --> 00:05:07,440 [Speaker 2]
+So is there also, like, a little enforcing a type of style in the answers of the model? 
+
+00:05:08,180 --> 00:05:12,600 [Speaker 1]
+Yes, it could be. Uh, of course, what I don't want is to have a fifty pages report. 
+
+00:05:12,620 --> 00:05:13,720 [Speaker 2]
+Yeah, like technical and- 
+
+00:05:13,800 --> 00:05:14,000 [Speaker 1]
+Yes. 
+
+00:05:14,000 --> 00:05:15,140 [Speaker 2]
+-ununderstandable. 
+
+00:05:15,580 --> 00:05:20,200 [Speaker 1]
+So it needs to be in a format, uh, where I actually gain time because- 
+
+00:05:20,240 --> 00:05:20,400 [Speaker 2]
+Yeah. 
+
+00:05:20,400 --> 00:05:21,580 [Speaker 1]
+-I don't need... I don't want- 
+
+00:05:21,640 --> 00:05:22,040 [Speaker 2]
+Yeah, of course. 
+
+00:05:22,040 --> 00:05:23,040 [Speaker 1]
+-to read all those pages. 
+
+00:05:23,100 --> 00:05:25,660 [Speaker 3]
+Are you using this then to, uh, find people or... 
+
+00:05:26,060 --> 00:05:34,400 [Speaker 2]
+So just before you dive very much deep into the topic, please, uh, wait until you're assigned- Yeah, yeah. -to a challenge because it might be that you won't be- Yeah, yeah. 
+
+00:05:34,660 --> 00:05:35,740 [Speaker 3]
+It's, it's better because- 
+
+00:05:35,900 --> 00:05:36,880 [Speaker 2]
+Just to make it clear. 
+
+00:05:37,560 --> 00:05:47,380 [Speaker 3]
+Understood. And, um, then, uh, the main use cases, what you would use this for is looking for people that are related to the... Like, we're talking about the medical field. Are you looking for people? 
+
+00:05:47,520 --> 00:06:21,416 [Speaker 1]
+It can be, it can be used, uh, ex-exactly to find people, key opinion leader, you know, really expert in the field. Uh, you know, if you have someone who is internationally recognized in diabetes, that's good to have it and to name it. Uh, but it could also be an important research on diabetes where it was a breakthrough that we can mention. Okay, this division of the University of Bern, they have studied this specific field. ... this is relevant to you or what may be, you know, in future interesting for you for further development of your solution. 
+
+00:06:21,476 --> 00:06:36,276 [Speaker 4]
+And you use this product to find talent, let's say, or let's say I want to... What I'm searching, I want to bring a company, someone to Bern. I use this product to find this person or the contrary, I have this application and then I have to justify why to come to Bern to that person or people. 
+
+00:06:36,956 --> 00:06:40,996 [Speaker 1]
+I think the, um, the company who is willing to come to Bern- 
+
+00:06:41,176 --> 00:06:41,356 [Speaker 4]
+Mm-hmm 
+
+00:06:41,356 --> 00:06:45,636 [Speaker 1]
+... needs to be certain that they- 
+
+00:06:45,696 --> 00:06:46,436 [Speaker 4]
+You have to offer them certain- 
+
+00:06:46,436 --> 00:06:51,656 [Speaker 1]
+... will get access to talent, but, you know, talent, um, to the knowledge. 
+
+00:06:51,716 --> 00:06:52,096 [Speaker 4]
+Mm-hmm. 
+
+00:06:52,096 --> 00:06:53,756 [Speaker 1]
+But yes, maybe to future talent. 
+
+00:06:53,756 --> 00:07:03,116 [Speaker 4]
+But then you don't use it for scouting possibilities of calling this company to... I, I know I have your profile, and I know that this opportunity here could fit you, for example. 
+
+00:07:03,616 --> 00:07:05,536 [Speaker 1]
+This is what we also do, of course. 
+
+00:07:05,556 --> 00:07:05,656 [Speaker 4]
+Okay. 
+
+00:07:05,656 --> 00:07:10,756 [Speaker 1]
+But, uh, but basically here, that's not to scout them. This is really... They have been scouted. 
+
+00:07:10,796 --> 00:07:11,216 [Speaker 4]
+Mm-hmm. 
+
+00:07:11,276 --> 00:07:14,136 [Speaker 1]
+And now we need to actually prove them that- 
+
+00:07:14,196 --> 00:07:15,096 [Speaker 4]
+That we have, that we are matching them for- 
+
+00:07:15,096 --> 00:07:17,256 [Speaker 1]
+... Bern is the right landing place for them. 
+
+00:07:17,316 --> 00:07:17,876 [Speaker 3]
+Mm-hmm. Okay. 
+
+00:07:17,896 --> 00:07:20,076 [Speaker 4]
+Okay. So it, it focuses on the other end of the- 
+
+00:07:20,176 --> 00:07:32,876 [Speaker 1]
+Yes. So it could be for everything. It could be for people, for, for, for, um, study which are relevant to the field. It could also be for, uh, finding suppliers that will be very relevant to them. 
+
+00:07:33,196 --> 00:07:33,396 [Speaker 3]
+Okay. 
+
+00:07:33,396 --> 00:07:35,616 [Speaker 1]
+Um, it could also be customers. 
+
+00:07:35,656 --> 00:07:36,036 [Speaker 4]
+Yeah. 
+
+00:07:36,036 --> 00:07:38,876 [Speaker 3]
+Could you tell me please the name of your position then? Like, just so I- 
+
+00:07:39,096 --> 00:07:40,656 [Speaker 2]
+Sorry, sorry to interrupt. 
+
+00:07:40,716 --> 00:07:42,736 [Speaker 3]
+Oh, sorry. Sorry. I, I hear you. 
+
+00:07:42,796 --> 00:07:54,576 [Speaker 0]
+Um, I think, uh, I would love to take a step back and talk about your current workflow and maybe some pain points you have right now when you try to solve this issue. 
+
+00:07:54,676 --> 00:07:57,476 [Speaker 1]
+Okay. So basically, I receive a, 
+
+00:07:59,456 --> 00:08:02,736 [Speaker 1]
+a project description, which is the company name, 
+
+00:08:04,376 --> 00:08:23,256 [Speaker 1]
+um, with a few details about the company, when it was founded, where the founders, what is their background, uh, how many people, what is their turnover. Then I have, um, a description maybe of, uh, what they are doing, uh, with specific projects and what they are looking for. 
+
+00:08:24,376 --> 00:09:03,556 [Speaker 1]
+Um, and based on that, um, the idea is, for me, is to sell this company, to give them the best arguments why they should come to Bern. Uh, we want to promote R&D in Bern, so this is why we very often go to, uh, the University of Bern, to ARTORG. You have a list of URL, which I've mentioned, which are basically where we find the information. But it's not limited to that. Um, we also, of course, want to help our company, which are based in the Canton of Bern, to be involved into pure further developments in R&D for local-based companies or foreign-based companies. 
+
+00:09:03,556 --> 00:09:03,976 [Speaker 3]
+Okay. 
+
+00:09:03,976 --> 00:09:20,876 [Speaker 1]
+So for instance, if we speak about diabetes, of course, we have Ypsomed, which is a large, uh, company based here in, in Bern, which is specializing in, uh, insulin pumps. Um, but so they are making some medical device. So of course, they need to be listed, uh, because this has base value for us. 
+
+00:09:21,176 --> 00:09:21,476 [Speaker 3]
+Mm-hmm. 
+
+00:09:22,836 --> 00:09:29,196 [Speaker 1]
+So you need to imagine yourself as being... You must sell the Canton of Bern as the best place to come for 
+
+00:09:31,056 --> 00:09:41,536 [Speaker 1]
+many, many different field of areas. It could be neurology, epilepsy, or it could be for [laughs] anything related to what is life science, actually. 
+
+00:09:41,756 --> 00:09:50,256 [Speaker 3]
+But for the sake of this challenge today, let's focus on medical and, like, that's what our, uh, the accuracy of our model would be, like, uh, tested upon, like the medical field. 
+
+00:09:50,836 --> 00:09:51,316 [Speaker 1]
+That's what I do. 
+
+00:09:51,356 --> 00:09:55,296 [Speaker 3]
+Do, do we, like, uh, make the focus of today, uh, just the medical field? 
+
+00:09:55,536 --> 00:09:55,576 [Speaker 4]
+Yeah. 
+
+00:09:55,576 --> 00:09:55,856 [Speaker 1]
+Yes, yes. 
+
+00:09:55,856 --> 00:09:56,476 [Speaker 3]
+That's what the accuracy- 
+
+00:09:56,496 --> 00:09:59,036 [Speaker 1]
+Because it's, it's too broad. Yes, uh, yes. 
+
+00:09:59,036 --> 00:10:16,756 [Speaker 2]
+I think the interesting things of that is, is, uh, is the challenge, think about architecture you want to set such that if tomorrow someone want to do something similar for everything, can just scale. How easy is it to scale? I think this is also important. If you like this kind of stuff, it's, uh, interesting. 
+
+00:10:16,756 --> 00:10:17,236 [Speaker 3]
+Nice. 
+
+00:10:17,236 --> 00:10:41,036 [Speaker 1]
+And then if you think this is too broad, uh, because I have no idea what you will have to be doing to be able to actually, uh, retrieve all this information, you could maybe start with, with one specific field of medicine. It could be oncology or diabetes, and then do the ontology and everything so that you can cover and then the idea that it could be scaled to other things. But I don't know. 
+
+00:10:42,236 --> 00:10:47,756 [Speaker 1]
+You have to say, but, uh, that could also be one way if you don't want to get lost in information. 
+
+00:10:49,716 --> 00:11:15,716 [Speaker 0]
+Yeah. So you brought up how you, you get that project, um, I guess, ask. So then you try to... You get the request, and then you try to find resources to answer the ask. How... Is there available, um, material on what that ask really looks like? Like, is it in the form? Like, like, so I feel like it would be easier to understand what type of answer we'd like to give if, if we under- could understand the question. 
+
+00:11:16,576 --> 00:11:18,776 [Speaker 4]
+I think we have to build the forms and try that. 
+
+00:11:19,016 --> 00:11:20,556 [Speaker 0]
+Is, is it in the forms? Or is it in the- 
+
+00:11:20,556 --> 00:11:26,856 [Speaker 4]
+No, it's not there, but I think we will have to simulate them ourself to create pro- fake profiles and to show, like, how it works. 
+
+00:11:26,936 --> 00:11:27,096 [Speaker 0]
+Okay. 
+
+00:11:27,136 --> 00:11:28,176 [Speaker 2]
+Or do, or do you have some- 
+
+00:11:28,216 --> 00:11:28,636 [Speaker 4]
+Or you have- 
+
+00:11:28,636 --> 00:11:30,056 [Speaker 2]
+... some kind of measure- 
+
+00:11:30,076 --> 00:11:30,476 [Speaker 1]
+Forms is- 
+
+00:11:30,476 --> 00:11:32,116 [Speaker 2]
+... that you could use to optimize? 
+
+00:11:32,116 --> 00:11:32,616 [Speaker 4]
+They're not forms. 
+
+00:11:32,736 --> 00:11:33,156 [Speaker 1]
+No. 
+
+00:11:33,216 --> 00:11:33,476 [Speaker 2]
+No. 
+
+00:11:33,616 --> 00:11:33,876 [Speaker 1]
+But, um- 
+
+00:11:34,476 --> 00:11:38,696 [Speaker 0]
+Like, what kind of... Remember earlier you brought up how, like, oh, you receive a question or, like, an ask, and then you have to- 
+
+00:11:38,716 --> 00:11:41,336 [Speaker 1]
+There is no question. There is never any question. 
+
+00:11:41,356 --> 00:11:41,536 [Speaker 0]
+Oh, okay. 
+
+00:11:41,536 --> 00:11:46,436 [Speaker 1]
+This, this is really like, you know, um, I don't know, um, yeah, a company- 
+
+00:11:46,456 --> 00:11:47,336 [Speaker 0]
+Oh, project description. 
+
+00:11:47,756 --> 00:11:47,796 [Speaker 1]
+Hmm? 
+
+00:11:48,036 --> 00:11:49,616 [Speaker 0]
+You receive a, a project description? 
+
+00:11:50,416 --> 00:12:02,716 [Speaker 1]
+We, we don't even have a project description. This is company. We are a med tech company specialized in diabetes, and we do, uh, produce, um, uh, insulin pump, for instance. 
+
+00:12:02,856 --> 00:12:03,016 [Speaker 0]
+Mm-hmm. 
+
+00:12:03,496 --> 00:12:08,916 [Speaker 1]
+So we want to come to Bern- Because, uh, we think we could, um, actually improve our R&D. 
+
+00:12:09,176 --> 00:12:09,336 [Speaker 3]
+Mm-hmm. 
+
+00:12:09,836 --> 00:12:32,056 [Speaker 1]
+And, uh, there is a market, and then we could develop into Europe. So this is what we have. So we, we just need actually to persuade this person they have made the right decision, um, because we have everything related to diabetes in Bern that is going to be relevant and allow them to expand and to, to do their R&D and to scale, actually. 
+
+00:12:32,096 --> 00:12:48,776 [Speaker 3]
+Could you name... Uh, sorry. Could, uh, could you name a few things that are relevant that you will give these companies, like, re-- usually give them, like a list of people who are successful in the, in your area here, list of other companies who are successful in your area here? Like, do you have a certain framework you go to, that you go through in your workflow right now? 
+
+00:12:49,076 --> 00:12:53,556 [Speaker 1]
+Yes. Uh, well, it-- there is no standard because we don't have any standard questions. 
+
+00:12:53,576 --> 00:12:54,976 [Speaker 3]
+Of course. Yeah, of course. 
+
+00:12:54,976 --> 00:13:24,896 [Speaker 1]
+Uh, but basically, yes, what, what we try to find, if there is a key opinion leader within the scientific, um, um, arena around Bern, you know, uh, someone who is really well-known, uh, in any specific field that is relevant to our company, we would mention it. Uh, if there are some study papers where we know, okay, this is, um... that could be the next step for this company, we would also try to list it. Um, if, um, 
+
+00:13:25,956 --> 00:13:26,756 [Speaker 1]
+there is, um, 
+
+00:13:29,056 --> 00:13:34,876 [Speaker 1]
+a device, if we speak about a med tech device which has been developed, uh, that could be 
+
+00:13:36,716 --> 00:14:05,356 [Speaker 1]
+also relevant because with a few modification, you think that it could be actually, uh, also applicable to the field. Like, if we have a request, an organ on a chip for lungs, and, uh, we have another company which is, uh, interested then for, um, for liver applications, then we say, "If they have made it for lung, maybe there is also a possibility that organ on a chip, but on liver, would make sense to them." 
+
+00:14:05,596 --> 00:14:10,056 [Speaker 3]
+Okay. Could you also, uh, once again tell me the name of your position here? Uh, just so I can research it better. 
+
+00:14:10,076 --> 00:14:10,936 [Speaker 1]
+I'm a business developer. 
+
+00:14:10,996 --> 00:14:11,936 [Speaker 3]
+Business developer. Okay. 
+
+00:14:13,696 --> 00:14:13,756 [Speaker 1]
+Yes. 
+
+00:14:13,756 --> 00:14:36,296 [Speaker 5]
+Couple of questions. So, be-before you also mentioned that you like this to be accessible to anyone, kinda everybody that want to explore these type of topics. Can you separate for the challenge being just internal usage? And I'm thinking more in terms of data governance, because I imagine that you will have either specific documents that are only internal to your platform, and just at least simply having on this- 
+
+00:14:36,296 --> 00:14:52,096 [Speaker 1]
+Yeah. So basically, yes, you can. Actually, what information we have, sometimes we have also, um, business plans, of course, of the company, what we are going to invest, what we are going to do in the future. And this information we cannot upload into, uh, of course, the system for obvious reasons. 
+
+00:14:52,456 --> 00:14:59,976 [Speaker 5]
+But for the challenging fields, you provide just open source resource, so it's just the what you find, right? 
+
+00:15:00,056 --> 00:15:00,236 [Speaker 1]
+Yeah. 
+
+00:15:00,776 --> 00:15:01,076 [Speaker 3]
+So would- 
+
+00:15:01,096 --> 00:15:02,956 [Speaker 5]
+This will be another step, but we cannot- 
+
+00:15:02,976 --> 00:15:03,816 [Speaker 3]
+No, no, no. It's just- 
+
+00:15:03,816 --> 00:15:04,576 [Speaker 5]
+-tell access to that. 
+
+00:15:04,616 --> 00:15:05,096 [Speaker 1]
+Yeah. 
+
+00:15:05,096 --> 00:15:05,516 [Speaker 5]
+Yeah. 
+
+00:15:05,536 --> 00:15:14,336 [Speaker 3]
+It's just because if you think in terms of this platform needs to be scaled also between data governance, it's way different than just being, let's say, open source. 
+
+00:15:14,336 --> 00:15:14,796 [Speaker 5]
+Yeah. 
+
+00:15:14,796 --> 00:15:16,136 [Speaker 3]
+So that's why I was raising this. 
+
+00:15:16,356 --> 00:15:24,596 [Speaker 5]
+Yeah. But you can raise actually this interest, and you could raise that in the technical report from just theoretical. Okay, if you want to scale and I have this, uh- 
+
+00:15:24,716 --> 00:15:25,556 [Speaker 3]
+Yeah, yeah, yeah. 
+
+00:15:25,556 --> 00:15:26,696 [Speaker 5]
+-for example, this will be also interesting. 
+
+00:15:26,836 --> 00:15:27,256 [Speaker 3]
+Okay. But for- 
+
+00:15:27,256 --> 00:15:27,976 [Speaker 5]
+But it's just like- 
+
+00:15:27,976 --> 00:15:35,036 [Speaker 6]
+[background chatter] 
+
+00:15:35,036 --> 00:15:49,336 [Speaker 7]
+Uh, yeah. I just wanted to ask, like, a general user would come to the platform and might ask anything about diabetes as well, rather than just being specific to the documentation we are referring to, the URL, the set of URLs you are giving. 
+
+00:15:49,776 --> 00:15:50,056 [Speaker 1]
+Yes. 
+
+00:15:50,056 --> 00:15:56,996 [Speaker 7]
+A user might come and ask, uh, general questions about, uh, diabetes or oncology in between, right? Like- 
+
+00:15:57,056 --> 00:15:57,536 [Speaker 1]
+Yes. 
+
+00:15:57,536 --> 00:16:02,816 [Speaker 7]
+So we might... Like, the LLM might have to access some other websites, uh, [static noise] in the process, 
+
+00:16:03,936 --> 00:16:08,076 [Speaker 7]
+uh, of explaining the user about their query. Like, sometimes it might- 
+
+00:16:08,116 --> 00:16:12,796 [Speaker 1]
+It's chatbot, you mean, to have kind of, uh, to, to, to, to be more specific about the questions or- 
+
+00:16:12,916 --> 00:16:13,196 [Speaker 7]
+Uh- 
+
+00:16:13,196 --> 00:16:13,816 [Speaker 1]
+-is it prompting? 
+
+00:16:14,556 --> 00:16:17,136 [Speaker 5]
+I, I mean, do you mind if someone asks a general question about diabetes? 
+
+00:16:17,796 --> 00:16:23,015 [Speaker 7]
+But that is not in the documentation. Uh, let's say, very specific, not very specific. 
+
+00:16:23,015 --> 00:16:24,195 [Speaker 3]
+There is no documentation. 
+
+00:16:24,195 --> 00:16:28,556 [Speaker 7]
+So the answer should always be in the closed source documents list, or it can- 
+
+00:16:28,856 --> 00:16:28,856 [Speaker 3]
+No 
+
+00:16:28,856 --> 00:16:30,776 [Speaker 7]
+... like, go outside and search for different answers? 
+
+00:16:30,796 --> 00:16:32,596 [Speaker 3]
+Yeah, yeah. There is no closed source. 
+
+00:16:32,916 --> 00:16:33,536 [Speaker 1]
+No. It, it- 
+
+00:16:33,556 --> 00:16:34,876 [Speaker 3]
+There is a set of URLs. 
+
+00:16:34,876 --> 00:16:46,356 [Speaker 1]
+-the, the, the idea is to, to limit ourselves to, to, to our region because of, of course, there is, is Zurich could have better solution than Bern. That's possible, but we want to stay in Bern. 
+
+00:16:46,436 --> 00:16:59,696 [Speaker 5]
+Okay. But still is a problem. Yeah, you cannot ask a general question about diabetes because what you will answer as an answer is [static noise] on some strict approach. If you ask a general question, one Bern, we have this piece. It's not- 
+
+00:17:00,016 --> 00:17:01,196 [Speaker 1]
+It's a farm state. 
+
+00:17:01,196 --> 00:17:06,056 [Speaker 5]
+It's this thing. Diabetes open source, so it's not a problem for now. 
+
+00:17:07,356 --> 00:17:18,936 [Speaker 7]
+Yeah, but, but general questions, it would answer just, like, general answers, like about diabetes if someone would ask. If it's a... that is not domain-specific questions, it would just answer generic answers. 
+
+00:17:19,516 --> 00:17:29,896 [Speaker 5]
+But, but I think you are going to find... I mean, just think about a person which come to ask really question for Bern. Then you can think about query to domain this scale to, uh- 
+
+00:17:30,376 --> 00:17:36,596 [Speaker 7]
+But also still say that this is not available or something like that, maybe. Is that like a valid response? 
+
+00:17:36,756 --> 00:17:44,656 [Speaker 1]
+Yes. If there is nothing, there is nothing. This is also for us important and not to oversell. And, and if there is nothing, there is nothing. 
+
+00:17:44,736 --> 00:17:46,916 [Speaker 3]
+Was that the case in the past and sometimes really- 
+
+00:17:46,936 --> 00:18:02,396 [Speaker 1]
+Well, in general, we already know because w-we know what's more or less what's going on, and, uh, we also know where we are good and where we are bad at. And, uh, yeah. But yes, it, it, it is a valid response to say, "No, there is no specific, uh, um, 
+
+00:18:03,676 --> 00:18:07,696 [Speaker 1]
+expertise on, uh, EEG for epilepsy." I don't know. 
+
+00:18:07,936 --> 00:18:10,676 [Speaker 5]
+But the, the point here is that everything you-
+
+00:18:11,256 --> 00:18:12,876 [Speaker 2]
+Give back through the references. 
+
+00:18:13,136 --> 00:18:13,376 [Speaker 8]
+Yes. 
+
+00:18:13,416 --> 00:18:13,776 [Speaker 9]
+Yeah, yeah, yeah. 
+
+00:18:13,856 --> 00:18:20,596 [Speaker 2]
+Otherwise, it's not true [laughs] because they will go and search if they think that this is suspicious. Yeah. 
+
+00:18:20,596 --> 00:18:21,696 [Speaker 3]
+And, and, and, and so- 
+
+00:18:22,456 --> 00:18:31,516 [Speaker 10]
+Right. No, I think it was a valid point because especially if you think in terms of papers or you want to link something stuff, either you have it... I mean, either you're able to access them or- 
+
+00:18:31,776 --> 00:18:32,236 [Speaker 2]
+Yeah. 
+
+00:18:32,236 --> 00:18:35,616 [Speaker 10]
+We limit just for the available documents for now. 
+
+00:18:35,616 --> 00:18:36,076 [Speaker 2]
+But if you pay, 
+
+00:18:38,696 --> 00:18:41,036 [Speaker 2]
+it's easy because everything is online. 
+
+00:18:41,096 --> 00:18:47,076 [Speaker 3]
+Yeah, exactly. That was my question. I wasn't sure, like, is there actually a set of closed documents that you have to use? Like, where... Everything's online, right? 
+
+00:18:47,096 --> 00:18:47,256 [Speaker 2]
+No, no, no, no. 
+
+00:18:47,256 --> 00:18:49,116 [Speaker 3]
+But you just provide references online, I guess. 
+
+00:18:49,156 --> 00:19:02,616 [Speaker 2]
+Yeah, everything is online. It's open source now and just focused on this case. And you can speak about, okay, if we suppose we have also private data that we can inject, and this is available... If it's just internal, you don't care, right? 
+
+00:19:02,616 --> 00:19:02,736 [Speaker 3]
+Gotcha. 
+
+00:19:02,736 --> 00:19:19,676 [Speaker 2]
+But if it's available for external, you should think about some kind of protection. So, and this is just a point you can point out to your technical part. If you want to add personal data, we should make a difference who is using this tool and how can we mask this information for external user. 
+
+00:19:19,756 --> 00:19:21,676 [Speaker 3]
+Understood. That makes a lot of sense. 
+
+00:19:21,816 --> 00:19:36,816 [Speaker 2]
+I just gotta go. [microphone rustling] 
+
+00:19:36,816 --> 00:19:37,096 [Speaker 11]
+[background chatter] 
+
+00:19:37,116 --> 00:19:38,156 [Speaker 3]
+Chocolate, you got two. 
+
+00:19:38,376 --> 00:19:42,196 [Speaker 4]
+There's a third one. [laughs] I will, I will ask again. 
+
+00:19:42,876 --> 00:19:44,376 [Speaker 3]
+Yeah, no. No. 
+
+00:19:44,496 --> 00:19:47,796 [Speaker 1]
+So we, so we will check, but first we have to- 
+
+00:19:47,816 --> 00:19:47,816 [Speaker 4]
+Okay. 
+
+00:19:47,836 --> 00:19:50,176 [Speaker 3]
+Thank you. That would be great. 
+
+00:19:50,176 --> 00:19:52,156 [Speaker 4]
+[laughs] Yeah, yeah, yeah, yeah. 
+
+00:19:52,156 --> 00:19:53,236 [Speaker 3]
+Yeah, please. First one. 
+
+00:19:53,236 --> 00:19:54,756 [Speaker 0]
+You're the only one who got the third option. 
+
+00:19:54,816 --> 00:19:56,016 [Speaker 3]
+Yeah, generally. But please- 
+
+00:19:56,576 --> 00:19:57,936 [Speaker 0]
+What, what case do you want? 
+
+00:19:57,996 --> 00:19:58,776 [Speaker 3]
+We want first. 
+
+00:19:58,776 --> 00:20:00,336 [Speaker 4]
+First one. Or second one. 
+
+00:20:00,336 --> 00:20:00,676 [Speaker 3]
+First one. 
+
+00:20:00,676 --> 00:20:01,276 [Speaker 1]
+First one. 
+
+00:20:01,276 --> 00:20:01,936 [Speaker 4]
+First one, yeah. 
+
+00:20:02,056 --> 00:20:03,136 [Speaker 1]
+First one is first one. 
+
+00:20:03,136 --> 00:20:04,676 [Speaker 0]
+Uh, research and expertise in the beginning? 
+
+00:20:04,736 --> 00:20:04,876 [Speaker 3]
+Yeah. 
+
+00:20:04,916 --> 00:20:07,176 [Speaker 4]
+Yeah, because we have been in, in the workshop for three-
