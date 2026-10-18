@@ -10,7 +10,7 @@ composition/contract gaps.
 | `backend/runtime` / `8b434c6` | FastAPI, authenticated application, durable LangGraph worker and export gates |
 | `backend/intelligence` / `f1a7b61` | Apertus transport, extraction/assessment, pack/draft reasoning and actual PDF |
 | `backend/backbone` / `ba77ea8` | Corpus ingestion, taxonomy, hybrid/relationship retrieval and scoped evidence persistence |
-| `ui-polish` / `469c98d` | Polished React screens; integration adds the HTTP transport |
+| `ui-polish` / `a5bd5d5` | Polished React screens and latest Sankey layout; integration adds the HTTP transport |
 
 ## Compatibility fixes
 
