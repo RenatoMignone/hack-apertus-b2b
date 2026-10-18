@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand: #e30613;
+  --color-brand-dark: #b8050f;
+  --color-brand-soft: #fdecec;
+
+  --color-ink: #1a1d23;
+  --color-muted: #5f6672;
+  --color-line: #e4e6ea;
+  --color-canvas: #f6f7f9;
+
+  /* Institution colours (kept distinct from the brand red). */
+  --color-unibe: #2557c7;
+  --color-unibe-soft: #e8eefb;
+  --color-artorg: #0f8a7e;
+  --color-artorg-soft: #e3f4f2;
+  --color-dcb: #b45f06;
+  --color-dcb-soft: #fbefe2;
+  --color-other: #6b7280;
+  --color-other-soft: #eef0f2;
+
+  --color-ok: #15803d;
+  --color-ok-soft: #e7f6ec;
+  --color-warn: #a16207;
+  --color-warn-soft: #fdf4dc;
+  --color-bad: #b91c1c;
+  --color-bad-soft: #fdeaea;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Temporary highlight when the agent changes a section. */
+@keyframes changed-flash {
+  0% { background-color: #fff6c7; box-shadow: 0 0 0 3px #f5d547; }
+  70% { background-color: #fffbe6; box-shadow: 0 0 0 3px #f5d54766; }
+  100% { background-color: transparent; box-shadow: 0 0 0 0 transparent; }
+}
+.changed-flash {
+  animation: changed-flash 3.2s ease-out;
+  border-radius: 12px;
+}
+
+@keyframes slide-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.slide-in {
+  animation: slide-in 0.2s ease-out;
+}
+
+mark.ev {
+  background: #fff1a8;
+  padding: 0 2px;
+  border-radius: 3px;
+}

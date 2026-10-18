@@ -1,0 +1,143 @@
+// Frontend ↔ backend data contract. The mock API serves these shapes from
+// fixtures; the real backend should return the same shapes.
+// Output design (D10): a short list of reasons why Bern fits the company, each
+// backed by Bern entries and their source passages, plus a search trace
+// (message → ontology terms → source entries) shown as a Sankey.
+
+export type CaseStatus =
+  | 'draft'
+  | 'researching'
+  | 'in_review'
+  | 'pitch_sent'
+  | 'closed_visit'
+  | 'closed_no_interest'
+  | 'on_hold';
+
+export type Institution = 'UniBE' | 'ARTORG' | 'DCB' | 'Other';
+export type Selection = 'kept' | 'rejected' | 'none';
+
+export interface CaseSummary {
+  id: string;
+  companyLabel: string;
+  oneLineNeed: string;
+  status: CaseStatus;
+  createdAt: string;
+  updatedAt: string;
+  keptCount: number;
+}
+
+/** One entry extracted from a public URL. Every statement cites one or more of these. */
+export interface Evidence {
+  id: string;
+  /** Stable citation number shown as [n]. */
+  n: number;
+  /** Short entry name, e.g. "SPN-005 pilot study". */
+  label: string;
+  url: string;
+  title: string;
+  institution: Institution;
+  fetchedAt: string;
+  sourceDate?: string;
+  /** Literal passage from the page. */
+  excerpt: string;
+  /** Part of the excerpt that carries the claim. */
+  highlight?: string;
+  /** One line: why this matters for the company. */
+  relevance: string;
+}
+
+export interface CitedText {
+  text: string;
+  evidenceIds: string[];
+}
+
+/** A Bern unit, project or person backing a reason. */
+export interface ReasonEntry {
+  id: string;
+  name: string;
+  institution: Institution;
+  evidenceIds: string[];
+}
+
+/** One clear way in which Bern is good for this company. */
+export interface Reason {
+  id: string;
+  headline: string;
+  line: CitedText;
+  entries: ReasonEntry[];
+  /** "idea" = possible adjacent application that needs expert validation. */
+  kind: 'direct' | 'idea';
+  /** Set when the reason confirms a lead the operator suggested. */
+  fromLead?: boolean;
+  selection: Selection;
+}
+
+/** Search trace for the Sankey: message phrases → ontology terms → source entries (evidence ids). */
+export interface SearchTrace {
+  inputs: { id: string; label: string }[];
+  terms: { id: string; label: string }[];
+  /** term → evidence links; input → term links. */
+  links: { source: string; target: string; value: number }[];
+}
+
+export interface Coverage {
+  snapshotDate: string;
+  institutions: Institution[];
+  /** Short notes, e.g. "No named contacts on the retrieved pages." */
+  limitations: string[];
+  resultKind: 'ok' | 'partial' | 'no_match' | 'out_of_scope' | 'source_failure';
+}
+
+export interface BriefRevision {
+  id: string;
+  version: number;
+  parentId?: string;
+  createdAt: string;
+  changeNote: string;
+  /** Reasons added or changed in this version (highlighted in the UI). */
+  changedReasonIds: string[];
+  /** Short description of the company, derived from the operator's message. */
+  company?: { summary: string; facts: string[] };
+  reasons: Reason[];
+  openQuestions: string[];
+  trace: SearchTrace;
+  coverage: Coverage;
+  /** Shown instead of reasons for no_match / out_of_scope. */
+  emptyMessage?: string;
+}
+
+export interface FollowUpQuestion {
+  id: string;
+  question: string;
+  choices: string[];
+  answer?: string;
+}
+
+export interface DialogueTurn {
+  id: string;
+  role: 'operator' | 'agent';
+  text: string;
+  createdAt: string;
+  revisionId?: string;
+  followUp?: FollowUpQuestion;
+}
+
+export interface CaseDetail {
+  case: CaseSummary;
+  revisions: BriefRevision[];
+  currentRevisionId?: string;
+  turns: DialogueTurn[];
+  evidence: Record<string, Evidence>;
+}
+
+/** A question the operator should ask an agency colleague, drafted per case. */
+export interface ActionItem {
+  id: string;
+  caseId: string;
+  question: string;
+  /** Colleague role to ask, e.g. "Account owner". */
+  askRole: string;
+  status: 'open' | 'asked' | 'done';
+}
+
+export type RunStage = 'interpreting' | 'searching' | 'validating' | 'drafting' | 'done';

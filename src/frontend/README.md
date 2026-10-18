@@ -1,10 +1,18 @@
 # Frontend workspace
 
-Reserved for the browser UI. Framework, internal folders, styling, build system
-and implementation are deliberately undecided; no frontend files are scaffolded.
+Browser UI (Vite + React + TypeScript + Tailwind), currently running on **seeded
+mock data**: it is not connected to the backend. Screens, data contract and demo
+data are described in [FRONTEND_PLAN.md](../../docs/plans/FRONTEND_PLAN.md).
 
-The browser communicates exclusively through the backend's HTTP API. Start with
-[frontend/backend handoff](../../docs/plans/FRONTEND_BACKEND_API.md) for proposed
-routes, input/output views, polling, questions, revisions, review and downloads.
-Agree the typed API before parallel UI/server implementation. Never connect the
-browser directly to storage/models or expose backend credentials.
+```text
+npm install
+npm run dev     # http://localhost:5173
+npm run build
+```
+
+The UI talks to the backend only through the `NavigatorApi` interface in
+`src/api/index.ts`, which `src/api/mockApi.ts` currently implements. To integrate,
+implement it over the HTTP routes in
+[frontend/backend handoff](../../docs/plans/FRONTEND_BACKEND_API.md); the two still
+need to be reconciled. Never connect the browser directly to storage/models or
+expose backend credentials.

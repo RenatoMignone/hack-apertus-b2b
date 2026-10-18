@@ -103,6 +103,33 @@ and after the pack still requires [mapping](../plans/REPORT_PROCESSING_BOUNDARIE
 Scraper choice/behavior is deliberately deferred; older acquisition plans remain
 proposals, not an implementation selection.
 
+**D12 / user decision, 18 October:** the user and agent build the **frontend only**,
+on seeded mock data. Teammates build the backend. Stack: Vite + React + TypeScript
++ Tailwind in `src/frontend/`, bundled for offline use. Layout: brief in the centre
+and agent chat on the right. Agent edits apply immediately, with highlighted
+sections and a version history. Sources appear as inline citation chips, an
+evidence drawer and a per-case source map. Workflow statuses: Draft, Researching,
+In review, Pitch sent, Closed (visit / no interest), On hold. PowerPoint export is a
+low-priority button. A global field/knowledge map is pitch-only, not part of the
+operator's navigation. Contract and screens: [FRONTEND_PLAN.md](../plans/FRONTEND_PLAN.md).
+Mock data uses synthetic companies and public page excerpts; no backend integration is claimed.
+The UI's `NavigatorApi` still has to be mapped to the draft HTTP routes in
+[FRONTEND_BACKEND_API.md](../plans/FRONTEND_BACKEND_API.md) (D11).
+
+**D13 / user decision, 18 October (supersedes D12's layout details):** minimise text.
+The output is a list of **reasons why Bern fits the company**, grouped by need. Each
+reason is a headline, one cited sentence and its Bern entries; sources open on
+click. The graph source map is replaced by a collapsible **"How I searched" Sankey**
+at the bottom: message phrases → ontology terms → source entries, each entry
+extracted from one URL. The 7-section brief in OUTPUT_REPORT_STRUCTURE.md stays a
+content reference for backend/export, not the screen layout. See [FRONTEND_PLAN.md](../plans/FRONTEND_PLAN.md).
+
+**D14 / user decision, 18 October:** a top navigation bar with three pages: **My desk**
+(home cards: New case, My cases, Action items), **My cases** (a kanban board by
+status, drag to move) and **Action items** (questions for agency colleagues, drafted
+per case, marked Asked/Done). The case page opens with a short company description
+from the operator's message, before the reasons.
+
 **18 October user answers (U2):** recorded below. The agent selected the delegated
 medical slice and evaluation protocol in [PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md).
 Selected scope is diabetes technology; English outputs are required and DE/FR/IT

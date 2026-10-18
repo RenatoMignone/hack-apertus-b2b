@@ -15,11 +15,11 @@ to your task rather than reading the entire knowledge base every time.
   8B/optional 70B, EmbeddingGemma 2 candidate, and BGE reranking. Exact model
   sources/tokenizer packages/revisions are deferred; see the data-layer router.
   Deployment, roster and project name remain open.
-- Current authorized work is **documentation and directory scaffolding only**.
-  `src/frontend/` and `src/backend/` contain folder guidance and `.gitkeep` files;
-  no application code, dependencies or runnable server/UI exists. Implement
-  features only after a subsequent task authorizes them. Do not treat proposed
-  designs or acceptance checks as implemented behavior.
+- Authorized work: documentation, directory scaffolding (`src/backend/` has
+  folder guidance and `.gitkeep` files only), and a **runnable frontend in
+  `src/frontend/` on mock data** (D12–D14), not yet connected to any backend.
+  Implement other features only after a subsequent task authorizes them. Do not
+  treat proposed designs or acceptance checks as implemented behavior.
 - Work in this repository. The sibling `hack-apertus-liebefeld` is historical
   preparation context: **do not modify it**. Relevant context has been summarized
   here; routine work should not require reopening it.
@@ -46,6 +46,7 @@ Proposed primary target is an air-gapped independent runtime; not yet tested.
 | Find the Notion supporting files or check branding restrictions | [Notion text snapshot](docs/sources/NOTION_CHALLENGE_2026-10-18.md), [data and provenance](docs/data/DATA_AND_PROVENANCE.md) |
 | Understand stakeholder intent or check a recording claim | [Recording insights](docs/recordings/RECORDING_INSIGHTS.md), then the linked [original transcript](docs/recordings/README.md) |
 | Design a user flow, result presentation or demo scenario | [Workflows and cases](docs/challenge/WORKFLOWS_AND_CASES.md), [requirements](docs/challenge/PRODUCT_REQUIREMENTS.md) |
+| Work on the UI or connect the backend to it | [Frontend plan and data contract](docs/plans/FRONTEND_PLAN.md), code in `src/frontend/` |
 | Plan crawling, extraction, entities or citations | [Data and provenance](docs/data/DATA_AND_PROVENANCE.md) |
 | Build the data layer or change persistence | [Data-layer router](docs/data/DATA_LAYER.md), then its owning focused spec |
 | Implement database migrations or evidence/taxonomy tables | [Relational schema](docs/data/RELATIONAL_SCHEMA.md) |
