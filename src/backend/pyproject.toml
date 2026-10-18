@@ -11,13 +11,16 @@ dependencies = [
   "psycopg[binary,pool]>=3.2,<4", "pgvector>=0.3,<1",
   "SQLAlchemy>=2.0.36,<3", "langgraph-checkpoint-postgres>=2,<4",
   "langfuse>=3,<5", "PyYAML>=6,<7",
+  "fastapi>=0.115,<1", "uvicorn>=0.34,<1", "langgraph>=1,<2",
+  "langchain-core>=1,<2", "langchain>=1,<2",
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=8,<10", "moto[s3]>=5,<6"]
+test = ["pytest>=8,<10", "moto[s3]>=5,<6", "httpx>=0.28,<1", "pytest-asyncio>=0.25,<2"]
 
 [project.scripts]
 navigator = "backend.data.cli:main"
+navigator-runtime = "backend.application.cli:main"
 
 [tool.setuptools]
 packages = { find = { where = [".."], include = ["backend*"] } }

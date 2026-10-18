@@ -38,3 +38,17 @@ class BoundCheckpoint:
 
     def put_writes(self, writes, task_id):
         return self._saver.put_writes(self.configuration, writes, task_id)
+
+
+# Async graph execution uses the same authorized thread identity; saver migrations
+# are an explicit operator command, never an HTTP startup side effect.
+from contextlib import asynccontextmanager
+import asyncio
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+
+
+@asynccontextmanager
+async def async_checkpoint(port, access, run_id, *, authorize):
+    config = await asyncio.to_thread(authorize, access, run_id)
+    async with AsyncPostgresSaver.from_conn_string(port.checkpoint_url) as saver:
+        yield saver, config

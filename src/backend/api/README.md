@@ -1,13 +1,18 @@
 # HTTP transport
 
-Own future routes, request validation, response projections, error/status mapping
-and request correlation. Delegate to application use cases; no SQL, model prompts
-or workflow stages inside route handlers. No endpoints are implemented yet.
+`app.py:create_app` builds the FastAPI application. `routes.py` exposes `/api/v1`;
+`schemas.py` defines validated inputs and frontend projections. OpenAPI is served
+at `/openapi.json`. Routes delegate to application use cases: no SQL, model prompts
+or workflow stages belong here. Inference runs in the separate durable worker.
 
-Follow [HTTP handoff](../../../docs/plans/FRONTEND_BACKEND_API.md). Inputs are
-versioned requests and trusted caller context; outputs are authorized views or
-accepted durable operation IDs. Authentication transport/framework, OpenAPI
-schemas, size limits and pagination still need implementation-time agreement.
+`security.py` maps bearer-token digests to server-configured identities and requires
+idempotency keys for mutations. `middleware.py` limits bodies and correlates requests;
+`errors.py` maps failures without echoing prompts, credentials or provider responses.
+List endpoints have bounded pagination; CORS requires explicit origins.
+
+Read the implemented [HTTP handoff](../../../docs/team/runtime/HTTP.md) and
+[runtime setup](../../../docs/team/runtime/HANDOFF.md) before extending endpoints.
+Keep the separately owned frontend unchanged; propose client updates in that handoff.
 
 ## Parallel feature routing
 
