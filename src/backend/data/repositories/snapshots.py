@@ -20,6 +20,10 @@ class SnapshotRepository:
             profile = connection.execute(select(tables.profiles).where(tables.profiles.c.profile_id == profile_id)).mappings().one()
             if profile["namespace"] != access.namespace:
                 raise PermissionError("profile namespace mismatch")
+            taxonomy = connection.execute(select(tables.taxonomies).where(
+                tables.taxonomies.c.taxonomy_version_id == taxonomy_version_id)).mappings().one()
+            if taxonomy["status"] != "reviewed":
+                raise ValueError("snapshot requires a reviewed pinned taxonomy")
             build_id, snapshot_id = uuid4(), uuid4()
             search_hash = configuration_hash({"lexical": "v1-A-B-D"})
             members = connection.execute(select(tables.chunks, tables.embeddings.c.embedding_id).join(
@@ -29,6 +33,9 @@ class SnapshotRepository:
                 raise ValueError("every member requires exactly one compatible embedding")
             for member in members:
                 require_scope(connection, member["scope_id"], write=True)
+                if connection.execute(select(tables.scopes.c.kind).where(
+                        tables.scopes.c.scope_id == member["scope_id"])).scalar_one() != "public":
+                    raise ValueError("case-scoped evidence cannot be published to the shared corpus")
                 if member["chunker_hash"] != chunker_hash:
                     raise ValueError("chunker configuration mismatch")
             manifest = {"chunks": sorted(str(member["chunk_id"]) for member in members),

@@ -5,6 +5,7 @@ from uuid import UUID
 from sqlalchemy import bindparam, select, text
 
 from backend.contracts.data import EvidenceHit, QueryPlan, SearchResult, validate_vector
+from backend.contracts.services import ServiceUnavailable
 from backend.data import schema as tables
 from backend.data.database import transaction
 
@@ -115,7 +116,10 @@ class HybridSearch:
                     break
         passages = [f"Title: {row['title']}\nHeadings: {' / '.join(row['heading_path'])}\nPassage: {row['literal_text']}"
                     for row in rows_by_id.values()]
-        reranked = self.reranker.score(plan.original_request, passages) if self.reranker and passages else None
+        try:
+            reranked = self.reranker.score(plan.original_request, passages) if self.reranker and passages else None
+        except ServiceUnavailable:
+            reranked = None
         if reranked is not None and (len(reranked) != len(passages) or not all(math.isfinite(score) for score in reranked)):
             raise ValueError("reranker returned invalid scores")
         hits = []
@@ -133,4 +137,4 @@ class HybridSearch:
             for row in rows_by_id.values():
                 from backend.data.database import require_scope
                 require_scope(connection, row["scope_id"])
-        return SearchResult(hits=hits, limitations=[] if reranked is not None else ["reranker_unavailable", "scores_are_not_confidence"])
+        return SearchResult(hits=hits, limitations=["scores_are_not_confidence"] + ([] if reranked is not None else ["reranker_unavailable"]))
