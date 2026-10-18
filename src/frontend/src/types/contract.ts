@@ -156,16 +156,4 @@ export interface CaseDetail {
   evidence: Record<string, Evidence>;
 }
 
-/** A question the operator should ask an agency colleague, drafted per case. */
-export interface ActionItem {
-  id: string;
-  caseId: string;
-  question: string;
-  /** Colleague role to ask, e.g. "Account owner". */
-  askRole: string;
-  status: 'open' | 'asked' | 'done';
-  /** Optional note with the colleague's answer. */
-  answer?: string;
-}
-
 export type RunStage = 'interpreting' | 'searching' | 'validating' | 'drafting' | 'done';

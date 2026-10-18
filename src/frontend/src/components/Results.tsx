@@ -223,6 +223,13 @@ export default function Results({
 }) {
   const [traceOpen, setTraceOpen] = useState(false);
   const { reasons, coverage, openQuestions, trace } = revision;
+  // People she might ask the agency to introduce (hidden ones excluded, kept ones first).
+  const introductions = reasons
+    .filter((r) => r.category === 'people' && r.selection !== 'rejected')
+    .sort((a, b) => Number(b.selection === 'kept') - Number(a.selection === 'kept'))
+    .map((r) => r.entries[0])
+    .filter(Boolean)
+    .slice(0, 4);
   // Groups and projects are numbered as one running list; people and ideas use icons.
   const numbered = reasons.filter((r) => r.category === 'groups' || r.category === 'projects').map((r) => r.id);
   const sourceCount = new Set(trace.links.map((l) => l.target).filter((id) => evidence[id])).size;
@@ -299,13 +306,37 @@ export default function Results({
         })}
       </div>
 
-      {(openQuestions.length > 0 || coverage.limitations.length > 0) && (
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <HelpCircle size={15} className="text-muted" />
-          {[...openQuestions, ...coverage.limitations].map((q) => (
-            <span key={q} className="rounded-full bg-white px-2.5 py-0.5 text-muted ring-1 ring-line">{q}</span>
-          ))}
-        </div>
+      {(openQuestions.length > 0 || introductions.length > 0) && (
+        <section id="sec-next" className="scroll-mt-16 rounded-xl border border-line bg-white p-4">
+          <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold tracking-tight">
+            <HelpCircle size={17} className="text-muted" aria-hidden /> Next steps
+          </h2>
+          <div className="grid gap-4 text-sm sm:grid-cols-2">
+            {openQuestions.length > 0 && (
+              <div>
+                <h3 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted">Ask the company</h3>
+                <ul className="list-inside list-disc space-y-1">
+                  {openQuestions.map((q) => <li key={q}>{q}</li>)}
+                </ul>
+              </div>
+            )}
+            {introductions.length > 0 && (
+              <div>
+                <h3 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted">Possible introductions</h3>
+                <ul className="space-y-1">
+                  {introductions.map((p) => (
+                    <li key={p.id} className="flex items-center gap-1.5">
+                      <span className={`h-2 w-2 shrink-0 rounded-full ${INSTITUTION[p.institution].dot}`} aria-hidden />
+                      {p.name} <span className="text-muted">· {INSTITUTION[p.institution].short}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-1.5 text-xs text-muted">Availability not confirmed. The agency makes contact.</p>
+              </div>
+            )}
+          </div>
+          {coverage.limitations.length > 0 && <p className="mt-3 text-xs text-muted">{coverage.limitations.join(' ')}</p>}
+        </section>
       )}
 
       {revision.similarCases && revision.similarCases.length > 0 && (

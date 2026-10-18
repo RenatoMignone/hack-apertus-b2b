@@ -1,4 +1,4 @@
-import type { ActionItem, BriefRevision, CaseDetail, CaseOutcome, CaseStatus, Coverage, Institution, Reason, SearchTrace } from '../types/contract';
+import type { BriefRevision, CaseDetail, CaseOutcome, CaseStatus, Coverage, Institution, Reason, SearchTrace } from '../types/contract';
 import { EVIDENCE } from './evidence';
 
 // Seeded demo cases. Company names are synthetic. Institutions, projects and
@@ -458,19 +458,6 @@ function miniCase(
 const W: Mini = ['people', 'Prof. Dr. Lilian Witthauer', 'Holds DCB’s sensor-technology professorship.', 'Prof. Dr. Lilian Witthauer', 'DCB', ['ev-dcb-profs-a'], 'DCB professorship · Sensortechnologie'];
 const K: Mini = ['people', 'Prof. Dr. Lisa Koch', 'Holds DCB’s data-science and machine-learning professorship.', 'Prof. Dr. Lisa Koch', 'DCB', ['ev-dcb-profs-a'], 'DCB professorship · Data Science und Machine Learning'];
 const G: Mini = ['people', 'Prof. Dr. José Garcia', 'Holds DCB’s professorship for automated insulin therapy.', 'Prof. Dr. José Garcia', 'DCB', ['ev-dcb-profs-b'], 'DCB professorship · automatisierte Insulintherapie'];
-
-// ---------- Action items: questions for agency colleagues ----------
-
-export const SEED_ACTIONS: ActionItem[] = [
-  { id: 'a1', caseId: 'case-glucowave', question: 'Do we already know anyone at Diabetes Center Berne?', askRole: 'Life-sciences lead', status: 'open' },
-  { id: 'a2', caseId: 'case-glucowave', question: 'Has SGE shared their timeline for a Swiss R&D site?', askRole: 'Account owner', status: 'asked' },
-  { id: 'a3', caseId: 'case-glucowave', question: 'Which sensing method do they use?', askRole: 'Account owner', status: 'open' },
-  { id: 'a4', caseId: 'case-pumpline', question: 'Do they already have a Swiss entity?', askRole: 'Account owner', status: 'open' },
-  { id: 'a5', caseId: 'case-pumpline', question: 'Have we pitched closed-loop research to a pump maker before?', askRole: 'Life-sciences lead', status: 'open' },
-  { id: 'a6', caseId: 'case-d1', question: 'Did the company reply to the pitch?', askRole: 'Account owner', status: 'done' },
-  { id: 'a7', caseId: 'case-d4', question: 'Any update on the planned visit date?', askRole: 'Account owner', status: 'open' },
-  { id: 'a8', caseId: 'case-d3', question: 'Is the project still funded?', askRole: 'Investment team', status: 'done' },
-];
 
 export const SEED_CASES: CaseDetail[] = [
   caseA,

@@ -150,6 +150,14 @@ compact version menu, toasts with Undo, keyboard focus, WCAG AA contrast and
 per-browser demo persistence were added. Audit and rationale: the approved UX plan,
 summarised in [FRONTEND_PLAN.md](../plans/FRONTEND_PLAN.md).
 
+**D16 / user decision, 18 October (supersedes D14's page set):** remove *My desk* and
+*Action items*. No recording asks for a dashboard or for tracking questions to
+colleagues. Meetings, outreach and relationship follow-up are the agency's job and
+outside the challenge (T03 11:04–12:09, 21:45–22:26; PRODUCT_REQUIREMENTS scope). The
+app is now the cases board (home, `/`), the composer and the case page. The supported
+part, "Gaps and next steps" (questions for the company, possible introductions with
+availability not confirmed), moves into a *Next steps* block on the case page.
+
 **18 October user answers (U2):** recorded below. The agent selected the delegated
 medical slice and evaluation protocol in [PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md).
 Selected scope is diabetes technology; English outputs are required and DE/FR/IT

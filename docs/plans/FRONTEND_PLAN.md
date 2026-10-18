@@ -2,7 +2,7 @@
 
 **18 October 2026 · Status: implemented on seeded mock data in `src/frontend/`.
 Not connected to the backend. No retrieval, model or evaluation results are claimed.**
-Decisions: D12–D14 in [DECISIONS_AND_OPEN_QUESTIONS.md](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
+Decisions: D12–D16 in [DECISIONS_AND_OPEN_QUESTIONS.md](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
 Backend integration: map `NavigatorApi` onto the draft routes in
 [FRONTEND_BACKEND_API.md](FRONTEND_BACKEND_API.md) (not done yet).
 
@@ -28,15 +28,12 @@ pages only when clicked.
 
 ## Screens
 
-Top navigation bar: logo, *My desk*, *My cases*, *Action items* (with an open-items badge),
-a *Demo* menu (explanation + *Reset demo data*), *New case*. Labels collapse to icons
-below 768 px.
+Two places only (D16): her cases, and one case. Top navigation bar: logo, *My cases*,
+a *Demo* menu (explanation + *Reset demo data*), *New case*.
 
 | Route | Screen |
 | --- | --- |
-| `/` | **My desk.** Greeting, a slim *Start a new case* banner, then two cards: *My cases* (count, status bar, *Continue: last opened case*, 3 latest, link to board) and *Action items* (top open questions with inline Done checkboxes) |
-| `/cases` | **My cases board.** 4 columns: To research · In review · Pitch sent · Closed (with Visit / No interest outcome). *On hold* is a flag shown as a badge. Move cards by drag-and-drop or the card's ⋯ menu (Move to, Closed · outcome, Put on hold); every move shows a toast with Undo. Search box |
-| `/actions` | **Action items.** Grouped by case: Done checkbox, *Mark asked* (shows "Awaiting answer"), answer note once done, and *+ Add question* (question + colleague role) per open case. Open / Done tabs |
+| `/` | **My cases board (home).** 4 columns: To research · In review · Pitch sent · Closed (with Visit / No interest outcome). *On hold* is a flag shown as a badge. Move cards by drag-and-drop or the card's ⋯ menu (Move to, Closed · outcome, Put on hold); every move shows a toast with Undo. Search box. `/cases` redirects here |
 | `/cases/new` | **Composer.** One text box, a "Public information only" note, a Ctrl+Enter hint, and example chips that never overwrite her text without asking (E03, E28) |
 | `/cases/:id` | **Workspace.** Results in the centre. Header: company name, status, outcome/hold badges, compact version menu (v2 ▾), Export. A sticky jump bar links to the sections present. Chat on the right, collapsible (remembered), and an overlay drawer below 1100 px |
 
@@ -63,7 +60,9 @@ below 768 px.
    has **✓ Keep** and **Hide** text buttons (Hide shows a toast with Undo and leaves a
    "hidden · Show again" line). The chevron or a click on the card expands the
    literal source quotes with the supporting span highlighted, plus page links.
-3. **Open questions / limitations** as small pills on one line.
+3. **Next steps** (output section 6, "Gaps and next steps"): *Ask the company*
+   (open questions) and *Possible introductions* (the people found, kept ones first,
+   marked "Availability not confirmed. The agency makes contact."), plus short limitations.
 4. **Similar cases** (only when some exist): earlier agency cases with a 0–100
    similarity score and bar, shared aspects as chips, and their status. Clicking
    one opens that case. The score measures how similar the needs and topics are,
@@ -100,7 +99,6 @@ Defined in `src/frontend/src/types/contract.ts`:
 | --- | --- |
 | `CaseSummary` | Cases row: id, companyLabel, oneLineNeed, `status` researching / in_review / pitch_sent / closed, optional `outcome` visit / no_interest, `onHold`, timestamps, keptCount |
 | `CaseDetail` | summary, `revisions[]`, `currentRevisionId`, `turns[]`, `evidence` map |
-| `ActionItem` | id, caseId, question, askRole (colleague role), status open / asked / done, optional `answer` |
 | `SimilarCase` | caseId, companyLabel, score 0–100, shared[], status, optional outcome |
 | `BriefRevision` | `company` (summary, facts[]), `reasons[]`, `similarCases[]`, `openQuestions[]`, `trace`, `coverage`, `changeNote`, `changedReasonIds`, optional `emptyMessage` |
 | `Reason` | `category` people / groups / projects / ideas, headline (a person's name for people), `line` (`CitedText`), `entries[]` (name, optional `role`, institution, evidenceIds), `kind` direct/idea, `fromLead`, selection |
@@ -111,9 +109,7 @@ Defined in `src/frontend/src/types/contract.ts`:
 
 API (`src/frontend/src/api/index.ts`): `listCases`, `getCase`, `createCase`,
 `runCase`, `sendMessage`, `answerFollowUp`, `setSelection`, `setStatus`,
-`setCurrentRevision`, `exportDeck`, `getLastOpened`, `setCaseFlags` (onHold / outcome),
-`listActionItems`, `setActionStatus` (with optional answer), `addActionItem`,
-`subscribe` (change notifications) and, mock only, `resetDemo`; long calls report `RunStage`. To connect the
+`setCurrentRevision`, `exportDeck`, `setCaseFlags` (onHold / outcome), `subscribe` (change notifications) and, mock only, `resetDemo`; long calls report `RunStage`. To connect the
 backend, implement `NavigatorApi` over HTTP and swap it in `api/index.ts`.
 
 ## Demo data

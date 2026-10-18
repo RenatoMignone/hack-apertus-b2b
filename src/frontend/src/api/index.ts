@@ -1,4 +1,4 @@
-import type { ActionItem, CaseOutcome, CaseDetail, CaseStatus, CaseSummary, RunStage, Selection } from '../types/contract';
+import type { CaseOutcome, CaseDetail, CaseStatus, CaseSummary, RunStage, Selection } from '../types/contract';
 import { mockApi } from './mockApi';
 
 /** Everything the UI needs from the backend. Swap mockApi for an HTTP client when the brain is ready. */
@@ -14,13 +14,8 @@ export interface NavigatorApi {
   setStatus(caseId: string, status: CaseStatus): Promise<CaseDetail>;
   setCurrentRevision(caseId: string, revisionId: string): Promise<CaseDetail>;
   exportDeck(caseId: string): Promise<{ filename: string; blob: Blob }>;
-  /** The case the user opened most recently, for "Continue where you left off". */
-  getLastOpened(): Promise<CaseSummary | null>;
   /** Put a case on hold / take it off hold, or record the outcome of a closed case. */
   setCaseFlags(caseId: string, flags: { onHold?: boolean; outcome?: CaseOutcome }): Promise<CaseDetail>;
-  listActionItems(): Promise<ActionItem[]>;
-  setActionStatus(id: string, status: ActionItem['status'], answer?: string): Promise<ActionItem[]>;
-  addActionItem(caseId: string, question: string, askRole: string): Promise<ActionItem[]>;
   /** Mock only: restore the seeded demo data. */
   resetDemo(): Promise<void>;
   /** Called after any change, so pages and the sidebar can refresh. Returns an unsubscribe function. */
