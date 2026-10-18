@@ -20,6 +20,7 @@ been filled with unbuilt features or unmeasured results.
 | [RECORDING_INSIGHTS.md](RECORDING_INSIGHTS.md) | Timestamped evidence from all four supplied transcripts; interpretation and authority caveats |
 | [PRODUCT_REQUIREMENTS.md](PRODUCT_REQUIREMENTS.md) | Needs, scope, required outputs, constraints and acceptance conditions |
 | [WORKFLOWS_AND_CASES.md](WORKFLOWS_AND_CASES.md) | Current workflow, intended assisted workflow, concrete cases and failure behavior |
+| [OUTPUT_REPORT_STRUCTURE.md](OUTPUT_REPORT_STRUCTURE.md) | Proposed Bern opportunity brief structure, match cards, priorities and optional extensions; not implemented behavior |
 | [DATA_AND_PROVENANCE.md](DATA_AND_PROVENANCE.md) | Source inventory status, collection boundaries and proposed evidence/data contracts |
 | [TECHNICAL_OPTIONS.md](TECHNICAL_OPTIONS.md) | Architecture alternatives and implementation handoff; no stack selected |
 | [EVALUATION.md](EVALUATION.md) | Challenge metrics, proposed pilot protocol and evidence needed for judging |
