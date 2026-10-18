@@ -1,5 +1,10 @@
 # Runtime lane A handoff
 
+> **Historical lane record — completed and merged, 18 October 2026.**
+> Original instructions/results below describe that lane before integration.
+> Its pending integration requests and ownership freezes are superseded by the
+> [merged baseline](../INTEGRATION.md) and [current status](../../project/STATUS.md). Do not rerun this as a new task.
+
 Lane A only, branch `backend/runtime`. Shared contracts were published separately:
 `77bf4f8` (v1 DTOs/ports) and `1216c23` (additive PDF claim support). Merge those
 exact commits before B/C production imports. Runtime code, tests and configuration

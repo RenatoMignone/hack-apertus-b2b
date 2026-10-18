@@ -1,9 +1,11 @@
 # Apertus inference: CSCS through Keera
 
-**18 October 2026 · U9 supplied endpoint/model list; unauthenticated route checked.**
+**18 October 2026 · Implemented Apertus transport; authenticated synthetic probes recorded.**
 This owns provider connection details. [Model/build contracts](BUILD_AND_OPERATIONS.md)
 own identity, compatibility and pinned configuration; [module handoffs](../plans/MODULE_HANDOFFS.md)
-route implementation. No live inference adapter or authenticated test exists yet.
+route implementation. `models/reasoning/transport.py` and task services are wired
+through `application.factories`. [Measured synthetic probes](../team/intelligence/MODEL_COMPARISON.md)
+confirm authenticated calls; they do not establish full-case quality or current quotas.
 
 ## Team connection
 
@@ -14,8 +16,9 @@ route implementation. No live inference adapter or authenticated test exists yet
 | `LLM_NAME` | `apertus-v1-5-8b` (default) |
 | `LLM_API_KEY` | Team-specific key, supplied privately after check-in |
 
-Request the team key from **Sabine Wildemann on-site/Discord**, per the user-supplied
-hackathon instructions. This is a team action; no message was sent by the agent.
+Use the existing privately supplied team key if still valid. The original
+hackathon contact for key provisioning was **Sabine Wildemann on-site/Discord**;
+confirm through the team if replacement is needed. No message was sent by the agent.
 Copy root [.env.example](../../.env.example) to an ignored `.env`, or use the
 [backend developer example](../../src/backend/.env.example) for team-host tunnels.
 Never put the key in frontend variables, committed examples, traces or screenshots.
@@ -38,7 +41,7 @@ Use the OpenAI-compatible **Chat Completions** convention: bearer authorization,
 `stream: false` for the first adapter. SDK/framework base URL includes `/api/v1`;
 append `/chat/completions` or `/models` exactly once. The convention is supported
 by [CSCS's API documentation](https://docs.cscs.ch/services/inference/api/);
-Keera-specific authenticated payload behavior still needs the team-key smoke test.
+Keera-specific behavior has only the limited synthetic probes linked below.
 Do not assume `/responses`, native JSON Schema, parallel tools, streaming usage,
 max context, token-count routes or embeddings from the base URL alone.
 
@@ -51,7 +54,7 @@ curl --fail-with-body --silent --show-error \
 ```
 
 ```python
-# Reference request, not installed/wired application code.
+# Standalone diagnostic; production uses the injected reasoning adapter.
 import os
 import httpx
 
@@ -72,8 +75,8 @@ response.raise_for_status()
 answer = response.json()["choices"][0]["message"]["content"]
 ```
 
-The future LangChain adapter uses the same base URL/key/model (for example a
-compatible chat client); LangGraph owns tool execution and branching. Validate
+The implemented task adapter uses this base URL/key/model; LangGraph owns tool
+execution and branching. Validate
 returned arguments and JSON with our contracts. A tool-call response proposes
 work; the graph executes an allowed tool and returns a tool result. Never parse
 or execute arbitrary code from model output. Thinking variants have no tools.
@@ -98,12 +101,15 @@ output strategy; use bounded validation/repair rather than assuming it exists.
   returned model/version information when available and label revision unknown
   until CSCS/organizers confirm it. No made-up commit hash or verified flag.
 
-## Current parallel-build model comparison
+## Measured model comparison and remaining limits
 
-The existing 8B default is a provisional baseline, not a benchmark-backed choice
-over 70B. It is not a 7B model. For hosted connected reasoning, evaluate the supplied
-70B alias first on extraction, semantic assessment and drafting; compare grounded
-quality, schema reliability, latency and actual team quotas with 8B. Prefer 70B
-when that measured trade-off fits the case budget. Both remain configurable via
-LLM_NAME; only the runtime integrator changes shared defaults after the comparison.
-No key-based benchmark or 70B performance advantage has been established here.
+The [18 October comparison](../team/intelligence/MODEL_COMPARISON.md) used a private
+team key and fictional public-style passages. Both 8B and 70B returned authenticated
+responses, with task-specific failures; neither completed a verified full case.
+An 8B allowlisted tool proposal worked; 70B returned no proposal in that probe.
+Thinking variants were fixture-tested locally, not exercised live with tools.
+
+Keep the explicit 8B default; no automatic model switching or overall winner is
+established. Current key validity, sustained quotas, concurrency, immutable served
+revision, native structured-output support and representative-case quality still
+need verification. Do not repeat paid/live probes during a docs-only audit.

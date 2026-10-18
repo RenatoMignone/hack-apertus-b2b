@@ -149,8 +149,9 @@ access and time permit. Display retrieval dates and source dates separately.
 Treat inaccessible updates as stale/unknown, not freshly verified. No continuous
 refresh schedule or freshness SLA has been promised by the user.
 
-The user will provide inference access details and deployment/hardware choices
-before development. Keep adapters/deployment configurable until then. PowerPoint
-export is in scope; the [partner logo and template](../provided_material/README.md)
+Keera access details and configurable adapters are supplied; authenticated
+synthetic probes passed. Shared hardware, local embedding assets, real corpus
+publication and full-case quality remain to verify. PDF is implemented; PowerPoint
+export is a later feature. The [partner logo and template](../provided_material/README.md)
 have now arrived and form the export baseline. Partner example needs/expected
 entities and historical-case data remain absent from the supplied files.

@@ -1,5 +1,12 @@
 # Backbone implementation handoff
 
+> **Historical lane record — completed and merged, 18 October 2026.**
+> Original instructions/results below describe that lane before integration.
+> Its pending integration requests and ownership freezes are superseded by the
+> [merged baseline](../INTEGRATION.md) and [current status](../../project/STATUS.md). Do not rerun this as a new task.
+> Case-scope provisioning and historical evidence reads were fixed in integration;
+> 0004 was the last observation then, not a fresh statement about the host today.
+
 18 October 2026. Lane C, isolated `backend/backbone` worktree. Integrated A's exact
 contracts-only commit `77bf4f8`. No frontend, shared DTO, environment/lock,
 submission-template, historical migration or finalized-schema changes.

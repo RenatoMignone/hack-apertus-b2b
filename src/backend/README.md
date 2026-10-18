@@ -19,8 +19,9 @@ navigator-runtime --env-file .env worker
 Copy root `.env.example` privately and fill identity/token bindings, application
 DSN, checkpoint DB, artifact access, published profile and verified embedding
 configuration/assets. Startup never migrates, ingests a corpus or downloads weights.
-The maintainer must explicitly apply migrations through `0007_frontend_lifecycle`
-and set up the separate framework database. See [deployment](../../docs/data/DEPLOYMENT.md).
+Eric will coordinate the shared migration through `0007_frontend_lifecycle`;
+confirm actual revision first. Set up the separate framework database explicitly.
+See [live setup](../../docs/data/LIVE_SETUP.md) and [deployment](../../docs/data/DEPLOYMENT.md).
 
 Core/test dependencies are locked. Local embedding/reranker and connected web
 packages are optional `.[local-models,web]` extras; provision and lock them for the
@@ -34,7 +35,7 @@ target platform before offline packaging. Their model assets remain external.
 | LangGraph coordination | [workflows](workflows/README.md) |
 | PostgreSQL, retrieval and artifacts | [data](data/README.md) |
 | Model adapters | [models](models/README.md) |
-| Acquisition boundary, deferred | [ingestion](ingestion/README.md) |
+| Public acquisition and explicit corpus build | [ingestion](ingestion/README.md) |
 | Retrieved material → evidence pack | [evidence](evidence/README.md) |
 | Evidence pack → final output | [reports](reports/README.md) |
 | Local tracing | [observability](observability/README.md) |

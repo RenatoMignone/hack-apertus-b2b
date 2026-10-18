@@ -193,3 +193,21 @@ implementation prompts with standardized interfaces. One contributor owns
 ingestion/database/graph-supported retrieval/embedding; two own the rest, with
 frontend excluded. User asks why 8B rather than 70B (referring to it as 7B).
 D19 records boundaries and an unmeasured 70B-first comparison recommendation.
+
+## U12 / D20 — integrated backend and HTTP frontend
+
+18 October 2026: user requests compatibility review/fixes and merging all three
+backend lanes plus `ui-polish`; explicitly selects implementing the HTTP connection.
+[Integration evidence](../team/INTEGRATION.md) records branch tips, tests and limits.
+B's [authenticated synthetic comparison](../team/intelligence/MODEL_COMPARISON.md)
+supersedes earlier statements that no key-based inference had been attempted.
+No shared-host upgrade or real corpus publication follows from a local merge.
+
+## U13 / D21 — post-integration documentation audit
+
+18 October 2026: user requests reconciling all docs/TODOs/migrations/team guidance
+and explaining whether they can perform setup. [Current status](STATUS.md) and
+[live setup](../data/LIVE_SETUP.md) derive from code and dated integration records.
+The audit does not make a fresh observation of Eric's host or execute migration.
+The user subsequently assigns Eric the migration and requests the complete
+[rollout prompt](../team/prompts/04_SHARED_HOST_MIGRATION.md).

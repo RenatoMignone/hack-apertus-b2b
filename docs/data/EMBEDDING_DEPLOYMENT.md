@@ -71,6 +71,12 @@ hosted experiments when finished.
 - Verify vector shape/non-finite/zero rejection, query/document space parity,
   synonym queries, EN/DE/FR/IT and pilot recall. Cache by full encoding/input hash.
 
-No live adapter consumes the proposed `EMBEDDING_*` environment keys yet. Examples
-are a handoff, not implemented model serving. Keera's four supplied chat models
-are not embedding models; do not send embedding requests to them.
+The local adapter and runtime factory are implemented. Runtime requires
+`EMBEDDING_CONFIGURATION` (path to verified `ModelConfiguration` JSON) and
+`EMBEDDING_MODEL_PATH` (local assets), matching the published snapshot exactly.
+`EMBEDDING_MODEL_ID`, revision and dimension hints alone do not configure it.
+The current factory loads the model in the API/worker process, not a remote
+embedding service. Running it on this Mac therefore requires compatible local
+packages/assets too; remote PostgreSQL stores vectors but does not encode queries.
+No real local runtime/quality result is claimed. Keera chat aliases are not
+embedding models. See [live setup](LIVE_SETUP.md).

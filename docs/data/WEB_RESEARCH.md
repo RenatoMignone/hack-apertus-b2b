@@ -1,20 +1,24 @@
 # Case-local public web research
 
-**18 October 2026 · U8/D16 design; persistence only, no live scraper/search adapter.**
+**18 October 2026 · Controlled-fetch, conversion and optional discovery adapters implemented.**
 
 ## Selected approach and research
 
-Recommend self-hosted [Crawl4AI](https://github.com/unclecode/crawl4ai) for Python
-browser-backed page extraction and LLM-ready Markdown. Its README lists v0.9.5
-(14 October 2026) and Apache-2.0 licensing. This is a suitability decision, not a
-measured benchmark. [Scrapling](https://github.com/D4Vinci/Scrapling) is an
-alternative with adaptive selectors, HTTP/browser fetchers and BSD-3-Clause
-licensing. [Firecrawl](https://github.com/firecrawl/firecrawl) offers an integrated
-API/service; its repository distinguishes AGPL-3.0 server code from cloud
-features. No package is installed by this persistence-only change.
-URL discovery is a separate `SearchProvider` port; do not assume installing a
-scraper supplies an independent web index. Provider credentials/selection remain
-a later integration input. Disabled adapters return explicit unavailable status.
+The current implementation is `ingestion/web.py`: robots-aware, IP-pinned public
+HTTP acquisition, redirect/DNS/byte/time limits and faithful normalization.
+Crawl4AI converts sanitized extracted content to Markdown; page JavaScript and
+browser subresources are not executed. This is narrower than a browser crawler.
+`BraveDiscovery` provides explicitly enabled URL discovery; snippets are leads,
+not evidence. Production config is in [live setup](LIVE_SETUP.md).
+
+The earlier selection considered [Crawl4AI](https://github.com/unclecode/crawl4ai),
+[Scrapling](https://github.com/D4Vinci/Scrapling) and
+[Firecrawl](https://github.com/firecrawl/firecrawl). Package/license observations
+were dated 18 October; this audit did not recheck vendor versions or terms.
+Optional web packages need a target-platform lock/runtime check. Lane C collected
+three pilot pages; no exhaustive crawl, configured live discovery or integrated
+provider run is claimed. [Collection observations](../team/backbone/RESULTS.md)
+retain that limited scope.
 
 ## Tool contract
 
@@ -58,6 +62,6 @@ with the snapshot. Search timeouts can yield partial results without losing DB w
 distinguishes provider-native and tool strategies; endpoint support must be
 verified. The [Apertus card](https://huggingface.co/swiss-ai/Apertus-v1.5-8B)
 provides tool-call serving flags and states thinking-mode tool calling is
-unsupported. Use non-thinking calls for tool selection. Future pauses use
+unsupported. Use non-thinking calls for tool selection. Implemented clarification pauses use
 [LangGraph interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts).
 These sources were checked on 18 October 2026; exact serving revisions remain open.

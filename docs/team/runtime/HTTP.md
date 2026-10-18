@@ -1,5 +1,10 @@
 # Runtime HTTP integration for the frontend owner
 
+> **Historical lane record — completed and merged, 18 October 2026.**
+> Original instructions/results below describe that lane before integration.
+> Its pending integration requests and ownership freezes are superseded by the
+> [merged baseline](../INTEGRATION.md) and [current status](../../project/STATUS.md). Do not rerun this as a new task.
+
 The HTTP client is now implemented in `src/frontend/src/api/httpApi.ts` under the
 user-authorized integration. [Current API](../../plans/FRONTEND_BACKEND_API.md)
 and [integration notes](../INTEGRATION.md) supersede the original pending-client

@@ -98,7 +98,7 @@ adapters record explicit assessments whose quality still requires evaluation.
 - Review/export binds exact revision/hash and selection set; subsequent selections
   invalidate the old approval for new exports. Stale answers/results cannot win.
 
-## Frontend and future HTTP projection
+## Frontend and implemented HTTP projection
 
 Keep the existing `BriefRevision`, `Reason`, `ReasonEntry`, `Evidence`, `Coverage`
 and `SearchTrace` projections. Each reason has underlying atomic claim links;

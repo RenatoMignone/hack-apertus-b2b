@@ -1,6 +1,6 @@
 # Technical choices and implementation handoff
 
-**18 October 2026 · Selected architecture with candidate models; not implemented.**
+**18 October 2026 · Core choices implemented; model assets and live quality remain to validate.**
 The main reference is [the visual pipeline](../architecture.html), backed by
 [ARCHITECTURE.md](ARCHITECTURE.md). These choices are user-selected starting
 points, not measured superiority or verified hosting capabilities.
@@ -16,7 +16,7 @@ points, not measured superiority or verified hosting capabilities.
 | Workflow and resumable dialogue | LangGraph with PostgreSQL checkpointer in separate database | Revision/thread isolation, idempotent recovery across application/checkpoint commits and bounded retries |
 | Raw/evidence/claim storage | Artifact volume + PostgreSQL canonical records/jobs/cases | Reference integrity, atomic publication pointer, access-aware retention and restore |
 | Tracking/evaluation observations | Self-hosted Langfuse | Local web/worker, PostgreSQL, ClickHouse, Redis/Valkey and S3-compatible storage; masked payloads and non-blocking failure |
-| Interface/export | React frontend on mocks; HTTP/PDF renderer not selected; editable PowerPoint later | Rendered report/slide QA, editability, citations, local assets and licensing |
+| Interface/export | React/Vite HTTP client, FastAPI and ReportLab PDF; editable PowerPoint later | Synthetic browser-to-PDF and layout checks passed; partner acceptance and larger real reports pending |
 
 Detailed records, payloads, indexing and initial budgets live in
 [INGESTION_PLAN.md](INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2).
@@ -52,16 +52,16 @@ No target is yet demonstrated. Preserve `LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY
 do not infer credentials, endpoint compatibility, quotas or modality support.
 All development/deployment stays outside cantonal ICT/internal networks.
 
-## Implementation order once authorized
+## Next validation order
 
-1. Obtain promised endpoint/hardware details; review profile/taxonomy and gold examples.
-2. Build shared evidence contracts and faithful collection across the three families.
-3. Publish a validated snapshot and one complete case with honest unknown/no-match behavior.
-4. Add questions/revisions and reviewed export; evaluate support, Recall@10 and cost.
-5. Test second-profile fixtures/rebuilds and actual disconnected cold start.
+1. Confirm shared-host revision; back up and migrate to current head with its owner.
+2. Verify matching embedding assets/configuration; publish a reviewed pilot snapshot.
+3. Configure runtime identities/checkpoints/storage and complete one live public case.
+4. Measure support, intent-balanced Recall@10, latency/cost and failure behavior.
+5. Verify second-profile behavior and an actual disconnected cold start before claims.
 
-Record results and choices in [decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
-No application implementation is authorized by this documentation update.
+The [live setup runbook](../data/LIVE_SETUP.md) owns commands and prerequisites;
+[active questions](../project/OPEN_QUESTIONS.md) owns the remaining backlog.
 
 ## U8 selected runtime processing
 
@@ -69,9 +69,10 @@ Use bounded LangGraph stages and LangChain adapters for all agentic execution.
 Primary Apertus 8B handles interpretation, batched extraction/assessment and draft
 synthesis; optional 70B fallback has identical checks. Large context length does
 not demonstrate one-call pack reliability. Exact model artifacts remain deferred.
-Self-hosted Crawl4AI is the selected future fetch adapter;
+Controlled HTTP acquisition plus Crawl4AI conversion is implemented;
 [comparison and primary sources](../data/WEB_RESEARCH.md). PDF first, PPTX later.
-Only contracts and persistence are implemented in this phase.
+Graph, services, semantic assessment and rendering are integrated; real model
+quality and deployment are separate acceptance gates.
 
 U9: [Keera settings](../data/INFERENCE_CONFIGURATION.md) own provider details;
 [embedding deployment](../data/EMBEDDING_DEPLOYMENT.md) compares local, HF Providers,

@@ -1,10 +1,11 @@
 # Data layer build, models and operational gates
 
-**18 October 2026 · U9 provider handoff; live model adapters still pending.**
+**18 October 2026 · Adapters and application integrated; live assets/quality/rollout pending.**
 Read [data router](DATA_LAYER.md), [inference configuration](INFERENCE_CONFIGURATION.md)
 and [embedding deployment](EMBEDDING_DEPLOYMENT.md). Keera endpoint/model aliases
-and `google/embeddinggemma-2` are known. Keys, immutable revisions, supported
-runtime packages, service limits and measured performance remain unresolved.
+and `google/embeddinggemma-2` are known. Authenticated synthetic Keera probes
+passed; current key/quotas, immutable served revision, local model packages/assets
+and representative performance still need validation.
 Do not download weights/provision endpoints as part of documentation work.
 
 ## Model roles and required interfaces
@@ -44,32 +45,34 @@ different mutable model identities in ingestion, graph nodes and tracing.
 ## Configuration and module boundaries
 
 Preserve `LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY` for the primary Apertus adapter.
-Additional embedding/reranking config, database DSNs, artifact root, deployment
-mode and local Langfuse endpoint/keys remain server-side configuration. Suggested
-names are `DATABASE_URL`, `LANGGRAPH_DATABASE_URL`, `ARTIFACT_ROOT`,
-`DOMAIN_PROFILE_PATH`, `LANGFUSE_BASE_URL`, `LANGFUSE_PUBLIC_KEY`,
-`LANGFUSE_SECRET_KEY`; final naming must agree with the implemented adapters.
-Public provider endpoints/model aliases belong in committed examples; real keys and
-private deployment credentials do not. Root `.env.example` and the backend/deploy
-examples agree on Keera. Current `Settings` consumes storage fields only; the LLM
-and proposed embedding/deployment keys await their scoped adapters.
+Additional configuration stays server-side. `config/settings.py` owns storage/
+DB settings; `config/runtime.py` owns mode, bindings, factories, model endpoint,
+budgets, `RUNTIME_PROFILE_ID`, CORS and tracing. `EMBEDDING_CONFIGURATION` and
+`EMBEDDING_MODEL_PATH` configure the local query encoder; optional reranking has
+matching `RERANKER_*` settings. Use root [.env.example](../../.env.example) and
+[config README](../../src/backend/config/README.md), not guessed variable names.
+Public aliases/endpoints may be committed; real keys/credentials may not.
 
-The selected [source structure](../plans/SOURCE_STRUCTURE.md) now places backend
-components under `src/backend/` and the independent HTTP client under
-`src/frontend/`. See local folder READMEs for ownership. Python persistence/contracts and the React mock frontend exist. Stage design is
-agreed in [processing](../plans/REPORT_PROCESSING_BOUNDARIES.md); live tools/models,
-HTTP orchestration and rendering are pending. Crawl4AI is selected for case-time
-fetching; bulk ingestion is separate. Components are logical boundaries, not
-mandatory separate services.
+[Source structure](../plans/SOURCE_STRUCTURE.md) maps the integrated FastAPI,
+worker, evidence/report/model adapters and independent HTTP frontend. Ingestion
+has explicit collect/registry/build/publication entry points; case-time web is
+optional controlled HTTP plus Crawl4AI conversion with separately provisioned
+Brave discovery. See [integration](../team/INTEGRATION.md) and [live setup](LIVE_SETUP.md).
+Components are logical boundaries, not mandatory separate services.
 Use parameterized SQL and validated DTOs; retrieval tools accept structured
 queries, not arbitrary model-generated SQL. Direct SQL repositories are sufficient;
 SQLAlchemy Core, psycopg and Alembic are implemented; package pins are in the
-backend lock file. Missing service ports and provider packages are feature work.
+backend lock file. Optional heavy model/web extras require a resolved target-platform
+lock; the core lock alone does not provision those runtimes or model assets.
 
-## Build order and acceptance gates
+## Build and acceptance sequence
 
-1. **Contracts/configuration:** resolve model/deployment inputs; implement DTOs,
-   profile loading and SQL migrations for `navigator`; install pgvector. Bootstrap
+Core stages are implemented and fixture-tested. This sequence also includes
+real corpus/provider/target acceptance work that remains to run. Do not rebuild existing modules simply because an old lane
+prompt described them as future work.
+
+1. **Contracts/configuration:** configure existing DTOs, profile and SQL migrations
+   for `navigator`; install pgvector on a new host. Bootstrap
    separate framework DBs/users and their supported migration paths. Reject
    unresolved inference configuration with useful errors.
 2. **One faithful ingestion slice:** use representative HTML/public-PDF fixtures
@@ -82,9 +85,9 @@ backend lock file. Missing service ports and provider packages are feature work.
    validate quality/coverage and atomically switch the active profile pointer.
    Verify a failed publication leaves the previous snapshot usable.
 5. **One complete case:** PostgreSQL case state + LangGraph checkpointer, pinned
-   run, bounded retrieval, validated pack and reviewed editable export. Exercise
+   run, bounded retrieval, validated pack and reviewed PDF export (editable slides later). Exercise
    restart, required questions, refocusing, concurrent cases and idempotent writes.
-6. **Tracing:** add sanitized local Langfuse integration, custom retrieval spans
+6. **Tracing:** verify the masked local Langfuse integration, custom retrieval spans
    and known evaluation results. Verify payload masking and trace outage handling.
 7. **Deployment and quality evidence:** reproduce the selected target, test a
    network-disabled run if claiming air-gap, then report actual pilot metrics.

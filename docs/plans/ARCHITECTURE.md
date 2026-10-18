@@ -15,10 +15,11 @@ replaces BGE-M3 as the initial embedding candidate. U9 supplies Keera model alia
 reference; immutable revisions, tokenizer/runtime versions and resources remain open. [Data-layer router](../data/DATA_LAYER.md)
 owns physical specs; logical payloads remain in ingestion section 7.
 
-**U7/D11 source scaffold:** [source structure](SOURCE_STRUCTURE.md) maps components
+**Implemented source boundaries:** [source structure](SOURCE_STRUCTURE.md) maps components
 to `src/frontend/` and `src/backend/`, with HTTP separation documented in the
-[frontend handoff](FRONTEND_BACKEND_API.md). Python persistence is implemented and the React frontend runs on mocks. HTTP and model integrations remain open;
-Crawl4AI is selected for future case-time fetching (U8); ingestion implementation is separate.
+[frontend handoff](FRONTEND_BACKEND_API.md). FastAPI, the durable LangGraph worker, model/retrieval adapters, PDF and the HTTP
+frontend are integrated. Connected web acquisition and bulk ingestion have separate
+entry points; deployment configuration and real corpus publication remain open.
 
 ## Input and output boundary
 
@@ -55,8 +56,10 @@ gaps/next steps; sources/coverage; optional economic contribution and prior case
 | Self-hosted Langfuse | Sanitized execution/model/retrieval observations and evaluation events | Runtime boundary; web/worker, PostgreSQL, ClickHouse, Redis/Valkey and S3-compatible storage |
 | Calculator + export worker | Validated formulas, chart datasets, report rendering, editable slides | Runtime boundary with packaged template, logo, fonts and renderer |
 
-Logical components may share a host/process. Hardware, serving endpoints and
-React/Vite is implemented on mocks; HTTP/export libraries remain open; do not read this table as a deployed topology.
+Logical components may share a host/process. React/Vite, FastAPI and ReportLab
+are selected and implemented. The table includes target capabilities: numeric
+impact calculations, chart generation, OCR and editable slides remain later work.
+Actual host placement and a full live deployment are still to be verified.
 Preserve `LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY`; credentials stay server-side.
 
 ## Data-independent core and configurable domain profile
@@ -186,7 +189,7 @@ Owners: [ingestion/contracts](INGESTION_PLAN.md), [case operations](OPERATIONS_P
 [data-layer implementation](../data/DATA_LAYER.md), [evaluation](../challenge/EVALUATION.md),
 [decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
 
-## Team feature and model handoff (U9)
+## Feature and deployment handoff
 
 [Module handoffs](MODULE_HANDOFFS.md) route feature agents to focused owners and
 contracts. Frontend ownership is separate: backend agents read but do not edit it.

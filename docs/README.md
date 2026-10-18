@@ -6,10 +6,9 @@ Current pilot: Bern diabetes technology; the engine must support other domains
 through versioned profiles and rebuildable retrieval indexes.
 
 Start with the [integration baseline and deployment gates](team/INTEGRATION.md).
-The original three-person backend build used the
-[exclusive lane plan and prompts](team/PARALLEL_BACKEND.md) and
-[v1 service interfaces](team/SERVICE_CONTRACTS.md). They give each agent an explicit
-path allowlists, shared contract bootstrap and independent handoffs.
+Read [current status and next tasks](project/STATUS.md), then the
+[live setup runbook](data/LIVE_SETUP.md) for rollout. [Team documents](team/README.md)
+separate current interfaces/integration evidence from the completed lane history.
 
 ## Start here
 
@@ -58,7 +57,8 @@ path allowlists, shared contract bootstrap and independent handoffs.
   silently broaden scope. English output is baseline; DE/FR/IT are extensions.
 - Proposed primary deployment target: air-gapped case runtime on independent
   infrastructure outside cantonal ICT. Collection/build are connected, separate
-  stages. No deployment or quality result is yet measured.
+  stages. Synthetic local integration and earlier storage/restore checks are recorded;
+  shared live deployment, model quality and air-gap operation remain unverified.
 - The company brief/PowerPoint is distinct from the hackathon technical report
   and pitch. Preserve root [README](../README.md), [report](../technical_report.md),
   [LICENSE](../LICENSE) and `src/`; code belongs in `src/`.
@@ -79,9 +79,10 @@ case persistence and tracing belong to the focused data specs. Keera endpoint/mo
 authenticated behavior, immutable revisions and hardware still need validation. Evaluation/source history retain audit detail.
 Update the visual and its owning focused document together when architecture changes.
 
-## U8 implementation boundary
+## Current implementation boundary
 
-The agreed [case pipeline](plans/REPORT_PROCESSING_BOUNDARIES.md) defines interpretation, parallel DB/web research,
-supported frozen packs, reason-card review and PDF-first export. This change
-implements contracts and persistence only; frontend remains on mocks. Live models,
-search/scraping, HTTP, LangGraph execution and rendering are future integrations.
+FastAPI/authentication, durable LangGraph, reasoning/retrieval/web adapters,
+evidence assessment, reviewed PDF export and the HTTP frontend are implemented.
+Migration head is `0007_frontend_lifecycle`. The [status page](project/STATUS.md)
+separates these capabilities from real corpus publication, model asset verification,
+shared-host rollout and quality evaluation. Historical handoffs are dated records.

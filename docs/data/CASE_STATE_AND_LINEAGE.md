@@ -1,6 +1,6 @@
 # Case persistence, checkpoints and output lineage
 
-**18 October 2026 · Case persistence implemented; live workflow/model integration pending.**
+**18 October 2026 · Case persistence and durable workflow integrated; live pilot validation pending.**
 Read [data layer](DATA_LAYER.md), [schema](RELATIONAL_SCHEMA.md), and
 [Phase 2](../plans/OPERATIONS_PLAN.md) for workflow semantics. PostgreSQL owns
 business records; the LangGraph PostgreSQL saver owns resumable graph state.
@@ -10,7 +10,7 @@ Langfuse observations are linked diagnostics, not recoverable business state.
 
 | Table | Key fields / relationships |
 | --- | --- |
-| `cases` | Case ID, owner ID, namespace, status/revision, current input/result pointers |
+| `cases` | Case ID, owner ID, namespace, status/revision, independent on_hold/outcome, current input/result pointers |
 | `input_revisions` | Immutable input ID, case ID, parent ID, permitted full message/context, creation time |
 | `dialogue_turns` | Turn/case ID, role, message, optional input ID, timestamp; role text is not public evidence |
 | `runs` | Run ID, case/input/snapshot IDs, pinned configuration JSON, status, thread/trace IDs, last stage/failure |
@@ -102,7 +102,9 @@ No historical dataset currently exists. Unknown outcomes remain unknown.
 - Trace the exact reviewed pack/result/template to an export and its citations.
 - Revoke supporting evidence and block dependent reads even for an old snapshot.
 
-These are acceptance cases for future implementation, not completed tests.
+These behaviors have synthetic runtime/repository coverage; see the
+[integration test scope](../team/INTEGRATION.md). Real provider quality, target-host
+restarts and full retention/deletion propagation still require deployment checks.
 
 ## U8 case pipeline extension
 

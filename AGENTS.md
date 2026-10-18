@@ -7,19 +7,17 @@ Work here; the sibling `hack-apertus-liebefeld` is historical and must not chang
 ## Integrated baseline
 
 The three backend lanes and `ui-polish` are integrated. Read the
+[current status](docs/project/STATUS.md), then the
 [integration handoff](docs/team/INTEGRATION.md) before starting new work. Create
-fresh feature branches from current `main`; completed lane prompts/handoffs below
+fresh feature branches from current `main`; completed lane prompts/handoffs
 are historical ownership records, not a ban on separately authorized integration.
 
-## Original three-person backend build
+## Team coordination
 
-Use [exclusive lane ownership and Git workflow](docs/team/PARALLEL_BACKEND.md)
-and [v1 service contracts](docs/team/SERVICE_CONTRACTS.md) for this parallel pass.
-[Three copyable prompts](docs/team/prompts/01_RUNTIME.md) assign runtime (A),
-intelligence/reports (B), and data backbone (C). Their narrower path allowlists
-override the generic feature examples below; each lane edits only its own
-READMEs/handoff docs. A alone publishes shared service DTOs/config/dependency locks.
-Existing data/pipeline DTOs and the separately owned frontend stay read-only.
+The original lane plan and prompts in `docs/team/` are historical. They no longer
+freeze shared docs/config or assign engineer A permanent exclusive authority.
+Use the [team index](docs/team/README.md), current module boundaries and one
+assigned integrator for shared changes. Start fresh branches from updated `main`.
 
 ## Start a feature task
 
@@ -55,9 +53,8 @@ never overwrite another agent's work or independently rename shared fields.
   verified local model assets and a combined live provider run remain prerequisites.
 - Connected inference: CSCS via Keera, `https://gateway.keera.ch/api/v1`, default
   `apertus-v1-5-8b`. Four supplied aliases and tool/thinking rules are in
-  [inference configuration](docs/data/INFERENCE_CONFIGURATION.md). Key and quotas
-  remain unverified for deployment; limited synthetic inference probes are in B's
-  handoff. Use root [.env.example](.env.example); no real secrets in git.
+  [inference configuration](docs/data/INFERENCE_CONFIGURATION.md). Authenticated synthetic Keera probes passed; broader quality, current key validity
+  and quotas remain unverified for deployment. Results are in B's handoff. Use root [.env.example](.env.example); no real secrets in git.
 - Embedding proposal: `google/embeddinggemma-2`, local text-only/shared host first;
   [deployment comparison](docs/data/EMBEDDING_DEPLOYMENT.md). Artifact reference is
   verified; exact revision/runtime/host and performance remain open. BGE reranker

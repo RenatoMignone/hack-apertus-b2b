@@ -13,6 +13,8 @@ identity in [model/build contracts](../../../docs/data/BUILD_AND_OPERATIONS.md).
 Adapters receive permitted text and task contracts, return typed outputs/errors,
 and never own case access, graph routing or corpus publication. Each model uses
 its compatible tokenizer. Do not use chat output/token IDs as dense embeddings.
-No live adapter, weights or inference benchmark exists yet. Source credentials
+Adapters are implemented; local weights/runtime and full-case quality remain
+unverified. Limited authenticated Keera probes are recorded in the provider docs.
+Source credentials
 from backend env only; hosted providers require connected mode. Expose unavailable
 when unconfigured, never fake a result or silently select hosted fallback.

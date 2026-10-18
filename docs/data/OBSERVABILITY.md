@@ -1,15 +1,15 @@
 # Langfuse tracing and evaluation specification
 
-**18 October 2026 · Selected tracing platform; not deployed or instrumented.**
+**18 October 2026 · Masked SafeTracer/runtime integration implemented; shared trace operations to confirm.**
 LangGraph controls execution; Langfuse observes it. Application evidence and case
 history remain in PostgreSQL/artifact storage. Read [data layer](DATA_LAYER.md)
-and [case lineage](CASE_STATE_AND_LINEAGE.md) before implementing instrumentation.
+and [case lineage](CASE_STATE_AND_LINEAGE.md) before extending instrumentation.
 
 ## Integration and trace contract
 
-Use the supported Langfuse LangChain/LangGraph callback integration for compatible
-model/retriever calls, with explicit observations for custom SQL retrieval,
-normalization, validation, publication and rendering. Do not assume callbacks
+The runtime uses explicit masked observations through `SafeTracer`. Automatic
+LangChain/LangSmith payload tracing is disabled. Additional detailed spans for SQL retrieval,
+normalization, validation, publication and rendering are a coverage target; do not assume callbacks
 automatically instrument every custom function or plain HTTP Apertus adapter.
 Propagate trace context explicitly and avoid duplicate automatic/manual spans.
 
@@ -59,8 +59,8 @@ Application / LangGraph → local Langfuse ingestion endpoint
 
 These are documented platform dependencies, not optional replacements for one
 PostgreSQL database. Use separate DB users/buckets from `navigator`, private
-service networking and persistent volumes. Choose actual versions/resource
-budgets during implementation. Application artifact storage may share the blob
+service networking and persistent volumes. Container digests are pinned in `deploy/images.lock.json`; confirm resource
+budgets and enabled services on the actual host. Application artifact storage may share the blob
 service with isolated buckets, but framework data stays framework-owned.
 
 Air-gapped mode runs all tracing services inside the independent boundary or

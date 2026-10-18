@@ -1,5 +1,10 @@
 # Prompt C — ingestion, database, hybrid/graph retrieval and embeddings
 
+> **Historical lane record — completed and merged, 18 October 2026.**
+> Original instructions/results below describe that lane before integration.
+> Its pending integration requests and ownership freezes are superseded by the
+> [merged baseline](../INTEGRATION.md) and [current status](../../project/STATUS.md). Do not rerun this as a new task.
+
 You are backend engineer C for hack-apertus-submission. Build/populate the data
 backbone and expose it through the agreed ports. A owns HTTP/application/LangGraph/
 shared contracts/config; B owns Apertus/evidence reasoning/reports. Frontend is

@@ -114,7 +114,8 @@ a fresh schedule verification. Confirm live changes with organizers. T01
 
 P1 also records an organizer statement that CSCS inference keys would be provided
 after team formation. U9 now supplies the Keera endpoint and model aliases below;
-credentials, quotas and authenticated access remain unverified. No model weights
+authenticated synthetic probes subsequently passed; current credentials/quotas
+remain deployment inputs. No model weights
 have been downloaded as part of documentation work.
 
 ## Delivery checklist for later implementation work
@@ -141,5 +142,6 @@ The user now supplies CSCS inference through Keera at
 `https://gateway.keera.ch/api/v1`, with Apertus 8B/70B and separate thinking aliases.
 See [inference configuration](../data/INFERENCE_CONFIGURATION.md) for exact names,
 team-key contact and protocol verification status. This supersedes earlier
-“endpoint not supplied” statements; key access/quotas remain unverified. Hosted
+“endpoint not supplied” statements. [Authenticated synthetic probes](../team/intelligence/MODEL_COMPARISON.md)
+passed; current key/quotas and full-case quality remain to verify. Hosted
 inference is connected-only and does not imply local weights are already packaged.

@@ -1,18 +1,18 @@
 # Source structure and component boundaries
 
-**18 October 2026 · Scaffold followed by authorized database implementation.**
-The backend data layer now uses Python 3.12, SQLAlchemy Core, psycopg, Alembic
-and Pydantic, with Docker Compose and an administrative CLI. See
-[deployment](../data/DEPLOYMENT.md). The React/Vite frontend is implemented on mocks and separately owned. HTTP
-framework remains open. Start feature work with [module handoffs](MODULE_HANDOFFS.md).
-Keep the submission template: application work stays under root `src/`.
+**18 October 2026 · Integrated application source.** Python 3.12–3.14 uses
+FastAPI, LangGraph/LangChain, SQLAlchemy Core, psycopg, Alembic and Pydantic.
+React/Vite defaults to HTTP; mock mode is explicit. API and worker are separate
+processes. [Integration](../team/INTEGRATION.md) records verified scope;
+[live setup](../data/LIVE_SETUP.md) lists rollout prerequisites. Start feature
+work with [module handoffs](MODULE_HANDOFFS.md). Preserve root `src/`.
 
 ## Directory map
 
 ```text
 src/
   README.md
-  frontend/                 React browser client on mocks
+  frontend/                 React browser client over HTTP; explicit demo mode
   backend/
     api/                    HTTP transport validation, routes and response mapping
     application/            Use cases, access checks and transaction coordination
@@ -27,7 +27,7 @@ src/
       reasoning/            Apertus adapter
       embeddings/           EmbeddingGemma 2 adapter; revision/runtime pending
       reranking/            Reranker adapter
-    ingestion/              Reserved acquisition/normalization integration
+    ingestion/              Public acquisition, normalization, registry and build CLI
     evidence/               Retrieved evidence → frozen ReportEvidencePack
     reports/
       generation/           Pack → structured report revision
@@ -38,18 +38,16 @@ src/
       profiles/             Versioned domain-profile configuration
 ```
 
-Every component directory has a local README or an empty `.gitkeep`. Subfolders
-are ownership boundaries, not separate deployed services. Module/file names and
-package conventions come with the implementation language. Do not create empty
-source files or pretend placeholders are implemented features. Python data packages
-and the React frontend exist; backend tasks do not edit `src/frontend/`.
+Component READMEs describe actual inputs/outputs and configuration. Subfolders
+are module boundaries, not separate deployed services. Backend/docs tasks do not
+edit `src/frontend/`; coordinate consumer changes with its owner.
 
 ## Communication and dependency rules
 
 The browser communicates with the backend through versioned HTTP APIs. It never
 connects directly to PostgreSQL, artifact volumes, models, LangGraph or Langfuse.
-Backend capabilities can share one application initially; worker/process separation
-is an implementation decision. An accepted asynchronous HTTP request does not
+Backend capabilities can share one application initially; the durable worker runs
+separately from the HTTP server. An accepted asynchronous HTTP request does not
 imply an in-memory background task is durable.
 
 ```text
@@ -78,11 +76,11 @@ expose a smaller eligible view without changing its identity.
 | `contracts` | Shared DTOs, validation definitions and narrow service/repository/model/storage ports | No framework, database, UI or model-client dependencies |
 | `data` | PostgreSQL repositories, artifacts and hybrid retrieval | Contracts; retrieval uses injected embedding/reranking ports, never HTTP routes or graphs |
 | `models` | Reasoning, embedding and reranking adapter behavior | Validated model configs; no routing, case ownership or publication policy |
-| `ingestion` | Future acquisition/normalization integration | Publication contracts; Crawl4AI selected for future case-time fetching; bulk ingestion separate |
+| `ingestion` | Public acquisition/normalization and explicit corpus build | Controlled HTTP, Crawl4AI conversion, registry/MeSH/build CLI; case web never auto-publishes |
 | `evidence` | Assessment and frozen pack boundary | Retrieval/record/model ports; does not generate the final report |
 | `reports` | Drafting, claim/citation checks and rendering from a pack | Model/artifact ports; cannot silently search or mutate its pack |
 | `observability` | Masked traces and diagnostic correlation | Local Langfuse; no authority over facts or run completion |
-| `config` | Validated server settings and versioned profiles | No secrets in repository/frontend; future bootstrap wires adapters |
+| `config` | Validated server settings and versioned profiles | No secrets in repository/frontend; `application.factories` wires adapters |
 
 Application services and workflows use repository/storage ports rather than SQL
 scattered across graph nodes or report functions. `data/` owns implementations;
@@ -94,17 +92,16 @@ outside application SQL migrations.
 
 - One file has one purpose: route group, use case, record/port, adapter, stage or
   transformation. Split responsibilities; avoid one backend/model/report file.
-- Keep imports acyclic. Contracts cannot import concrete adapters. A small future
-  bootstrap/composition entry point may wire services when authorized.
+- Keep imports acyclic. Contracts cannot import concrete adapters. `application.bootstrap` /
+  `application.factories` own composition.
 - Maintain the nearest README with public inputs/outputs, dependencies, unresolved
   choices and focused spec links. Central specs remain authoritative.
 - Add meaningful contract/integration checks with implementation. No invented
-  runnable commands or fake successful model responses in this scaffold.
-- Future executable placeholders fail explicitly; unresolved models/processing
+  runnable commands or production fixture fallbacks.
+- Unconfigured adapters fail explicitly; unresolved models/processing
   must never fabricate data or silently return success.
 
-U8 defines the [processing stages](REPORT_PROCESSING_BOUNDARIES.md) and extends
-contracts/data persistence; the React client remains on mocks. HTTP, live tools,
-models, orchestration and rendering are subsequent integrations. Agentic work must
-use LangGraph/LangChain. Keep fixtures explicitly synthetic and production adapters
-unavailable until configured; do not return fake success.
+The [processing stages](REPORT_PROCESSING_BOUNDARIES.md) are integrated through
+application services and LangGraph. Synthetic fixtures exercise real module
+boundaries; they do not establish model quality or a deployed shared runtime.
+Keep missing dependencies unavailable in production until explicitly configured.

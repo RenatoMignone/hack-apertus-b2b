@@ -16,7 +16,8 @@ Langfuse retain their own migration tools and framework-owned tables.
 
 ## U8 persistence implementation
 
-U8 adds interpretations, case web research, supported claim assessments, case manifests, typed packs, draft reasons, editorial selections and PDF export lineage. Use migration 0005 and focused case repositories; populated retired workflow tables are owner-only history outside the application schema.
+U8 adds interpretations, case web research, supported claim assessments, case manifests, typed packs, draft reasons, editorial selections and PDF export lineage. Current head is `0007_frontend_lifecycle` (including restricted case-scope/runtime
+RLS and independent UI flags/action notes). Use focused case repositories; populated retired workflow tables are owner-only history outside the application schema.
 
 ## Parallel feature routing
 

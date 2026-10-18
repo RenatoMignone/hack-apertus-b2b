@@ -1,12 +1,14 @@
 # Decisions, unknowns and next work
 
 **Updated: 18 October 2026.** This records actual user choices and known gaps.
-Proposed designs in other docs are not team decisions or completed work.
+This is a chronological record: older implementation/authorization statements
+describe their original task, not the current development boundary.
+[Current status](STATUS.md) and [active questions](OPEN_QUESTIONS.md) take precedence.
 
 **Current routing:** [active questions](OPEN_QUESTIONS.md) is the authoritative
 unresolved-design register; [module handoffs](../plans/MODULE_HANDOFFS.md) routes
-feature work. Keera endpoint/aliases are supplied under U9; authentication/quotas
-and immutable revisions remain open.
+feature work. Integration D20 supersedes the completed lane assignments. Limited
+authenticated probes passed; quotas, immutable revisions and live deployment remain open.
 
 ## Confirmed decisions
 
@@ -296,7 +298,7 @@ New source-derived case claims must preserve same-scope evidence and origin line
 Only task-owned Docker resources may be stopped; local inspection found no running
 containers and the prior schema test container had already been removed.
 
-## D19 — Integrate the backend lanes and HTTP frontend (18 October 2026)
+## D20 — Integrate the backend lanes and HTTP frontend (18 October 2026)
 
 Provenance: the user requested review/fixes and merge of `backend/runtime`,
 `backend/intelligence`, `backend/backbone` and `ui-polish`, then explicitly chose
@@ -315,3 +317,20 @@ Disposable PostgreSQL tests and browser smoke use synthetic model/embedding adap
 they establish integration behavior, not research quality or a live shared-host
 deployment. No shared migration, ingestion/index publication or model download.
 Future work starts in fresh branches from updated main, retaining completed lanes.
+
+## D21 — Reconcile current documentation and rollout guidance (18 October 2026)
+
+Provenance: user requests a full docs/status/TODO/team/migration audit after the
+merge and asks whether they can perform the remaining setup. Code and reviewed
+handoffs at main `4c6cfe2` establish the integrated baseline; current shared-host
+state is not inferred. [Status](STATUS.md), [team index](../team/README.md) and
+[live setup](../data/LIVE_SETUP.md) separate current tasks from historical lane
+instructions and tests. Retain team provenance; no directory deletion is needed.
+
+The user subsequently assigns the migration to Eric; the
+[complete migration prompt](../team/prompts/04_SHARED_HOST_MIGRATION.md) bounds the
+backup, upgrade, verification and handoff. Execution requires migration credentials
+and a coordinated backup/window. Ordinary developer credentials remain the runtime
+identity. No shared migration, ingestion, model download or service operation is
+authorized/performed by this docs audit. Integration uses D20 (the earlier
+parallel-build decision already used D19).

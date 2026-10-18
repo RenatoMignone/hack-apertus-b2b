@@ -1,11 +1,19 @@
 # Collection and normalization specification
 
-**18 October 2026 · Proposed technical reference; no collector implemented.**
+**18 October 2026 · Collection reference; implemented subset and deferred crawler features distinguished below.**
 This is the acquisition substage of [Phase 1](../../plans/INGESTION_PLAN.md), not
 a competing phase definition. Start with the [visual reference](../../architecture.html).
 The Phase 1 shared contract owns document/evidence/chunk schemas; this file owns
 faithful extraction and crawl behavior. Code belongs under `src/`.
 The [data-layer spec](../DATA_LAYER.md) owns PostgreSQL persistence and build gates.
+
+Implemented now: explicit single-URL collection, safe HTTP, faithful HTML/text-PDF
+normalization, registry/MeSH import, embedding benchmark and reviewed corpus build/
+publication. See the [CLI README](../../../src/backend/ingestion/README.md).
+Broad persistent crawling, conditional-fetch scheduling, OCR and generic portable
+sidecar/JSONL packaging below remain design targets, not a claim of implemented
+commands. Existing `ops.ingest_jobs` is not a persistent crawl frontier; the unused
+frontier table was retired at 0005.
 
 ## 1. Inputs and source configuration
 
@@ -105,8 +113,9 @@ controlled-data/                       # outside public artifacts unless license
 ```
 
 Storage path is configurable; these are planned artifacts, not existing output.
-PostgreSQL `corpus`/`ops` tables track sources, frontier, fetches, raw/body
-versions, links, runs and failures; no separate SQLite state store is selected.
+PostgreSQL `corpus`/`ops` tables track sources, fetches, raw/body versions and
+jobs. A durable crawl frontier/link inventory would need a separately implemented
+contract; no separate SQLite state store is selected.
 JSONL points to immutable artifacts, with optional literal text export.
 Include sidecars/locators in portable packages. Validate typed schemas and hashes.
 Legacy `version_id` maps to shared `document_version_id` at one adapter boundary.
@@ -134,10 +143,11 @@ The UI must distinguish a failed source from no supported expertise.
 
 ## 7. Commands and acceptance scenarios
 
-Future collector should expose validation, no-network dry-run, bounded crawl,
-resume, offline reprocessing, export and audit. No working CLI is claimed here.
-Packages/parsers remain implementation choices; optional browser/OCR binaries
-must be included in the build/runtime dependency inventory.
+The working CLI exposes `collect`, `mesh-import`, `benchmark` and `build`
+(with explicit `--publish`). Validation/dry-run, persistent bounded crawl/resume,
+general offline reprocessing/export and audit commands remain later work.
+Optional package/model assets belong in the dependency inventory; OCR and a
+browser acquisition fallback are not implemented.
 
 Use reusable offline HTML/PDF fixtures for:
 

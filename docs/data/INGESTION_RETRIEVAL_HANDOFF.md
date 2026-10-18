@@ -1,6 +1,6 @@
 # Ingestion and hybrid retrieval: implementation handoff
 
-**18 October 2026 · Final schema contract v1 / migration 0005.**
+**18 October 2026 · Corpus contract v1; application head `0007_frontend_lifecycle`.**
 Scope: populate the public knowledge corpus, build a compatible search snapshot,
 and improve hybrid retrieval. Leave frontend, case/report orchestration and
 schema design to their owners. Read this file, [retrieval](RETRIEVAL_SPEC.md),
@@ -20,7 +20,7 @@ ad hoc columns or alternate databases while filling the corpus.
 
 The maintainer provisions a DB principal, grants a writable public scope,
 imports a versioned domain profile and reviewed taxonomy, and migrates to
-`0005_finalize_schema`. The worker receives `AccessContext`, `scope_id`,
+the current head, `0007_frontend_lifecycle`. The worker receives `AccessContext`, `scope_id`,
 `profile_id`, `taxonomy_version_id`, artifact store and a resolved embedding config.
 `access_policy_id` is a descriptive policy reference, not an authorization rule;
 actual access is enforced through scope grants/RLS/revocation. Never bypass it
@@ -32,8 +32,8 @@ with a superuser connection in application workers.
    `canonical_origin`, `registry_ref`; status defaults active. Register source-family
    names `UniBE`, `ARTORG`, `DCB`, then join via `source_family_memberships`.
    Multiple families may share a source. Use the inventory/config as discovery,
-   not evidence of a particular capability. Source/taxonomy registry import is
-   currently a maintainer SQL/config task; no full importer API exists yet.
+   not evidence of a particular capability. `RegistryImporter.sources` imports these records; `mesh-import` imports
+   reviewed profile/taxonomy pins. See the [ingestion CLI and manifest](../../src/backend/ingestion/README.md).
 2. **Fetch and normalize:** call `CorpusRepository.stage_document(...)` with
    scope/source IDs, canonical URL, title, language, raw bytes/MIME, faithful body,
    exact `Span` records and parser hash. This writes artifact references, document,

@@ -1,6 +1,6 @@
 # Phase 2 — Case research, matching and presentation
 
-**18 October 2026 · U8 agreed workflow; contracts/persistence implemented, live execution pending.**
+**18 October 2026 · Workflow implemented and integrated; real-corpus deployment pending.**
 Start with the [visual pipeline](../architecture.html). The
 [architecture contract](ARCHITECTURE.md) owns component placement, domain profiles,
 evidence-pack requirements and deployment. [Phase 1](INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2)
@@ -183,9 +183,11 @@ No automatic public-memory updates or model training from conversational edits.
 The selected [source structure](SOURCE_STRUCTURE.md) places HTTP transport,
 application use cases, contracts, workflows, data/model adapters, evidence and
 reports under `src/backend/`, with an independent `src/frontend/`. Read the
-[HTTP handoff](FRONTEND_BACKEND_API.md) before integrating UI/server. Only folder
-guidance/placeholders exist. Detailed [evidence/report processing](REPORT_PROCESSING_BOUNDARIES.md)
-is defined in [case processing](REPORT_PROCESSING_BOUNDARIES.md). Crawl4AI is selected for future case-time fetching; live adapters remain unimplemented.
+[HTTP handoff](FRONTEND_BACKEND_API.md) before extending UI/server. The graph,
+adapters and PDF are implemented; [integration evidence](../team/INTEGRATION.md)
+records synthetic end-to-end checks. Optional web uses controlled HTTP acquisition
+and Crawl4AI conversion. Real corpus/models and target-host operation remain
+[live setup prerequisites](../data/LIVE_SETUP.md).
 These modules need not be separate services. LangGraph owns
 bounded state/checkpoints, not the corpus. Keep credentials server-side,
 authorization/access-aware caches and cancellation/retries. Disable external
@@ -197,8 +199,9 @@ persist stage outputs idempotently and reconcile on resume. Instrument stages
 through local Langfuse with masked/allowlisted metadata. Its outage must not
 block search or export, and traces cannot replace canonical evidence.
 
-Build text intake and one fixed-snapshot case first; then research/matching,
-questions/revisions, optional cases/figures and presentation. Future attachments
+Text intake, fixed-snapshot research, clarification/revisions and reviewed PDF
+export are integrated. Next validate them against the published pilot corpus;
+historical cases, numeric figures and editable slides remain optional later work. Future attachments
 remain outside this implementation baseline until separately authorized.
 
 Acceptance scenarios: synonyms/negation, multiple needs, ambiguous company,

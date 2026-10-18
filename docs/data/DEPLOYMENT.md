@@ -1,11 +1,11 @@
-# Running the data layer
+# Data services, shared access and recovery
 
-Application/API, worker, adapters, PDF and HTTP frontend are now integrated;
-see [current integration gates](../team/INTEGRATION.md) and
-[backend startup](../../src/backend/README.md). Migration head is
-`0007_frontend_lifecycle`. Only the maintainer may back up and explicitly migrate
-the shared target; this integration did not do so. Live corpus/model deployment
-remains unverified. Historical data-layer results below retain their original scope.
+Application/API, worker, adapters, PDF and HTTP frontend are integrated.
+Application head is **`0007_frontend_lifecycle`**. Start at the
+[first live run checklist](LIVE_SETUP.md) for existing deployments and Mac-to-host
+setup. A new data stack follows the commands below; do not reinitialize Eric's
+existing secrets/volumes. A shared migration needs an agreed backup/window and
+migration-role access; Eric can run it or explicitly delegate it.
 
 Commands below run from the repository root in PowerShell. Use
 Python 3.12–3.14 and Docker Desktop with its WSL2 Linux engine enabled. Linux hosts
@@ -40,7 +40,7 @@ Docker Engine installation inside WSL when using Docker Desktop's engine.
 PostgreSQL 17 and pgvector 0.8.2 use a Docker volume. Its three databases have
 separate owners: `navigator_migrator`, `langgraph` and `langfuse`. The application
 role `navigator_app` has no login; individual developers inherit its DML access.
-Only the maintainer applies migrations. Startup calls `check_schema`, which
+The host maintainer or an explicitly delegated migration operator applies migrations. Startup calls `check_schema`, which
 checks the Alembic head without migrating. Migrations use a PostgreSQL advisory
 lock. Use additive migrations when branches must share the same database.
 
@@ -140,8 +140,8 @@ S3_SECRET_ACCESS_KEY=<application artifact secret>
 ```
 
 The artifact credential is a trusted backend/developer credential. Product end
-users receive no database or object-store credentials; a future HTTP backend
-must authorize artifact reads through scoped repository records. SSH keys and
+users receive no database or object-store credentials; the implemented HTTP backend
+authorizes artifact reads through scoped repository records. SSH keys and
 database logins are individual. Framework database credentials stay with the
 shared workflow host, rather than all teammates. No public IP or router port
 forward is needed. The host must remain awake while others work.
@@ -161,9 +161,10 @@ queue, and degrades without stopping a case. Full model callbacks/payload captur
 are deliberately not enabled. Do not point it at a hosted Langfuse service.
 
 Model adapters consume the existing `LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY`
-configuration interface when integrated. Actual Apertus, EmbeddingGemma and BGE
-artifacts/tokenizers remain unresolved. Real index builds fail until verified
-model configuration is supplied. No weights are downloaded by this deployment.
+configuration interface through implemented adapters. Authenticated synthetic
+Apertus probes are recorded; EmbeddingGemma/BGE local runtime/assets still need
+validation. Real index builds fail until verified configuration is supplied.
+No weights are downloaded by this deployment.
 
 ## Backup and restore
 
@@ -203,11 +204,12 @@ recovery. PostgreSQL dump files alone do not back up artifacts or tracing stores
 ## Local and LAN product hosting
 
 The data services are portable to an independent Linux machine using the same
-Compose file. Future single-user hosting exposes the web application on
-localhost. Future LAN hosting exposes only its authenticated HTTPS application
-entry point; PostgreSQL and storage remain private. The HTTP application and
-its authentication are outside this data-layer change. Real four-computer SSH
-reachability needs the team's accounts, keys and network addresses.
+Compose file. The implemented API and React client can run on localhost. For LAN
+hosting expose the authenticated application through a configured HTTPS entry
+point; PostgreSQL and storage remain private. Current host placement, peer SSH
+reachability, application port forwarding and user acceptance require confirmation.
+The [runtime container notes](../../src/backend/deploy/README.runtime.md) describe
+optional API/worker containers; no runtime image build is claimed by integration.
 
 Preload locked Python wheels, images and verified model artifacts before an
 offline deployment. Fixture retrieval needs no network calls, but passing these
@@ -218,39 +220,27 @@ References: [Docker WSL2](https://docs.docker.com/desktop/features/wsl/),
 [Windows OpenSSH](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse),
 [Langfuse deployment](https://langfuse.com/self-hosting/deployment/docker-compose).
 
-## Final schema update and validation
+## Schema upgrades and measured history
 
-Use the existing maintainer migration command to advance to `0005_finalize_schema`
-when deploying this change. Retired populated tables move to owner-only `legacy`;
-fresh installs create no empty archive. Back up first and read the
-[upgrade behavior](RELATIONAL_SCHEMA.md#removed-structures-and-upgrade-behavior). Existing case records remain;
-legacy results require a validated v2 draft before new approval/export. No shared
-team-host database was migrated as part of this change.
+Always target the current Alembic head, now `0007_frontend_lifecycle`; the
+[runbook](LIVE_SETUP.md#2-upgrade-only-if-behind-eric-or-his-delegated-operator)
+explains migration credentials and sequencing. Migration 0005 archives populated
+retired structures; 0006 adds restricted case-scope/runtime access; 0007 adds UI
+lifecycle fields. Existing case history remains; legacy results need a validated
+v2 draft before new approval/export. Read [upgrade behavior](RELATIONAL_SCHEMA.md#removed-structures-and-upgrade-behavior).
 
-The isolated validation uses a disposable PostgreSQL 17 + pgvector container and
-`NAVIGATOR_TEST_ADMIN_DSN`, then `PYTHONPATH=src python -m pytest src/backend/tests -q`.
-Initialize the `navigator_app` NOLOGIN role as in the deployment bootstrap before
-running role tests. Model/scraper/PDF calls are not live: assertions and bytes in
-fixtures are explicitly synthetic. Tests cover fresh install, upgrades from 0003 and 0004, exact schema/reference parity,
-RLS isolation, manifest/citation access, revision and selection invalidation,
-revocation and PDF artifact registration. This does not test PDF rendering.
+Dated checks, all on 18 October 2026:
 
-## U9 model connection handoff
+| Checkpoint | Environment / result | Scope |
+| --- | --- | --- |
+| Original data deployment | Docker PostgreSQL/pgvector: 26 tests and isolated backup/restore checks above | Storage/checkpoints/tracing, not product/model quality |
+| Finalized schema 0005 | Disposable PostgreSQL 17 + pgvector: 42 tests | Fresh/upgrade/schema reference and owner-only legacy preservation |
+| Integrated application 0007 | Disposable PostgreSQL 18.0 + pgvector 0.8.1: 153 backend tests; browser-to-PDF with synthetic inference/embeddings | Real module composition, restricted roles and actual PDF rendering |
 
-Root [.env.example](../../.env.example), the backend/tunnel example and deployment
-example contain the supplied public Keera base URL, default model and a key
-placeholder. Host initialization still generates infrastructure settings; fill
-its initially empty model values privately from the examples afterward.
-See [inference configuration](INFERENCE_CONFIGURATION.md) for the four aliases
-and smoke checks. No key was supplied or inference tested; current data settings
-do not yet construct model clients. Hosted Keera is connected-only. Local
-[embedding deployment](EMBEDDING_DEPLOYMENT.md) is recommended pending host tests.
-
-## Schema contract v1 validation, 18 October 2026
-
-42 backend checks passed on disposable PostgreSQL 17 + pgvector after migration
-0005. Includes fresh schema/metadata/reference parity, upgrades from 0003/0004,
-owner-only preservation of populated retired tables/encoding fields, source
-publication dates, affiliation relations, complete snapshot support, existing
-RLS/revocation and case/review/export checks. No shared team database was migrated.
-No real corpus import or model/retrieval quality benchmark is claimed.
+See [integration verification](../team/INTEGRATION.md#verification) for exact
+commands and limits. Do not combine historical counts as a new test total.
+Eric's last reported lane-C revision was 0004; current shared state is unverified.
+No shared-host migration, real corpus publication or full live-model run was
+performed by integration or this docs audit. Inference settings and optional
+local-model/web provisioning are in [provider configuration](INFERENCE_CONFIGURATION.md)
+and the [live runbook](LIVE_SETUP.md).

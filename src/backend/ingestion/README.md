@@ -1,7 +1,8 @@
 # Public-source ingestion
 
-Implemented lane-C adapters; deployment gates and factories are in
-[the backbone handoff](../../../docs/team/backbone/HANDOFF.md).
+Implemented acquisition/build adapters; [current setup](../../../docs/data/LIVE_SETUP.md)
+owns deployment gates. The [backbone handoff](../../../docs/team/backbone/HANDOFF.md)
+records the original lane results.
 
 - `normalize.py`: faithful HTML/public-PDF body, headings, exact Unicode/page
   spans and publication metadata. Scanned PDFs without text fail; no OCR.
@@ -11,14 +12,15 @@ Implemented lane-C adapters; deployment gates and factories are in
   four attributes each. Parents are derived, not extra topic slots. Meaning,
   negation and exact support matter; unknowns can remain unclassified.
 - `pipeline.py`: exact-input embeddings, unchanged-input cache reuse, reviewed
-  supported knowledge and explicit immutable publication on finalized schema 0005.
+  supported knowledge and explicit immutable publication; current application
+  migration head is `0007_frontend_lifecycle`.
 - `web.py`: robots-aware IP-pinned HTTP and Crawl4AI conversion without page JS.
   Discovery is explicitly configured; offline/unconfigured tools are unavailable.
 - `evaluation.py`: unique-entity, reviewed, intent-balanced Recall@10.
 
 `python -m backend.ingestion --help` exposes collect, mesh-import, benchmark and
-build. DB commands check schema, never migrate. Optional packages are proposals
-in `requirements.in`; A owns the shared lock. No confidential company-plan intake.
+build. DB commands check schema, never migrate. Optional packages are declared by the `local-models` / `web` extras. They need a
+target-platform lock and verified local assets before live/offline deployment. No confidential company-plan intake.
 
 ## Build manifest
 

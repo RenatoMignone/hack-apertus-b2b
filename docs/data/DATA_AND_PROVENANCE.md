@@ -1,9 +1,11 @@
 # Data, evidence and provenance
 
-**18 October 2026 · Design; no corpus, extraction or clearance results claimed.**
+**18 October 2026 · Evidence/rights policy; collection adapters implemented, published pilot corpus unverified.**
 Start with the [visual pipeline](../architecture.html). The
 [Phase 1 shared contract](../plans/INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2)
 owns schemas/interfaces; this file owns evidence and rights rules.
+[Three-page collection observations](../team/backbone/RESULTS.md) are a limited
+source slice, not a published knowledge corpus or exhaustive coverage.
 Physical storage/search/case/tracing contracts are routed through
 [DATA_LAYER.md](DATA_LAYER.md): PostgreSQL + pgvector, artifact storage,
 LangGraph PostgreSQL checkpoints and self-hosted Langfuse.

@@ -1,16 +1,15 @@
 # Agent work routing and module handoffs
 
-**18 October 2026 · U9 current team handoff.** Start at root `AGENTS.md`, then
+**18 October 2026 · Post-integration feature routing.** Start at root `AGENTS.md`, then
 read this table and only the focused owners for the assigned feature. The
 [execution graph](EXECUTION_GRAPH.md) and [processing contract](REPORT_PROCESSING_BOUNDARIES.md)
 are the common system design. These are logical modules in one backend, not a
 requirement to deploy a service for every row.
 
 The [integration handoff](../team/INTEGRATION.md) describes the merged baseline.
-For the original three-backend-person pass, the
-[exclusive ownership plan](../team/PARALLEL_BACKEND.md) and its three prompts
-supersede the broad example write boundaries below. Use its shared
-[service contracts](../team/SERVICE_CONTRACTS.md); do not independently define ports.
+The [team index](../team/README.md) marks completed lane assignments as historical.
+Use the implemented [service contracts](../team/SERVICE_CONTRACTS.md) and current
+code; allocate shared changes to one integrator for each new task.
 
 ## Current baseline and boundaries
 
@@ -57,9 +56,9 @@ Use the actual contracts/repositories as implementation truth; docs describe int
   artifact port and immutable model configuration. Reuse their actual signatures.
 - `contracts/pipeline.py`: implemented interpretation, fetched source, claim/draft
   assessments, supported claims, pack, reasons/revision and export request.
-- `contracts/frontend.py`: pure projection helpers; these are not a complete
-  `CaseDetail` HTTP implementation. The frontend's existing types remain the
-  consumer reference; additions are documented in the HTTP handoff.
+- `contracts/frontend.py`: pure projection helpers; full authorized
+  `CaseDetail` responses are assembled in `application/projections.py`. Frontend
+  types and the implemented HTTP handoff describe the consumer interface.
 - Ingestion §7 owns shared source/read semantics; physical tables and policy live
   in the focused data specs. Do not implement a second evidence or case database.
 - A needed port not yet in code is an explicit new contract, not an assumed

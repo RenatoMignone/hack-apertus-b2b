@@ -1,6 +1,6 @@
 # Final application schema
 
-**18 October 2026 · D18 · Contract v1, migration `0005_finalize_schema`.**
+**18 October 2026 · Contract v1 finalized at 0005; current head `0007_frontend_lifecycle`.**
 This is the schema for the agreed case → research → evidence pack → draft →
 reason review → PDF pipeline. The executable table definitions are
 [`schema.py`](../../src/backend/data/schema.py); the generated
@@ -110,6 +110,17 @@ identity); graph checkpoints hold resumable state, Langfuse holds masked diagnos
 - Existing RLS, immutability, scope, slice, embedding and lineage triggers remain.
   Repositories additionally validate pack hashes and semantic-assessment records;
   raw SQL writes do not replace those checks.
+
+## Additions after contract v1
+
+- `0006_runtime_access`: owner-checked case-scope provisioning and restrictive
+  run/command RLS; application workers retain ordinary credentials.
+- `0007_frontend_lifecycle`: independent case `on_hold` / closed `outcome` and
+  action-item `answer`; migrates former combined statuses.
+
+New installations and upgrades target **head**, currently 0007, rather than
+stopping at 0005. See [live setup](LIVE_SETUP.md) for the coordinated rollout.
+Neither integration nor this documentation audit migrated Eric's host.
 
 ## Removed structures and upgrade behavior
 

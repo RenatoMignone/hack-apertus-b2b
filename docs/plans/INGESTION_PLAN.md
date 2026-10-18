@@ -1,6 +1,6 @@
 # Phase 1 — Ingestion, taxonomy and memory
 
-**18 October 2026 · Collection/build design; PostgreSQL persistence implemented, live acquisition/model adapters pending.**
+**18 October 2026 · Collection/build adapters implemented; real corpus publication and model validation pending.**
 Start with the [stacked visual diagrams](../architecture.html) and
 [architecture/deployment contract](ARCHITECTURE.md). This plan owns the shared
 records and memory interfaces. [Phase 2](OPERATIONS_PLAN.md) consumes them.
@@ -417,8 +417,8 @@ dependency inventory and disconnected-run proof. No deployment has been tested.
 Collection is connected; isolated case runtime must bundle models, evidence,
 indexes, taxonomy/profile, UI and rendering assets without remote fallbacks.
 
-Await the user's endpoint/hardware handoff, reviewed taxonomy and partner gold
-examples. Historical-case data remains independently absent. Record actual
+Keera endpoints/aliases and configurable adapters are supplied. Confirm actual
+hardware/model assets, reviewed taxonomy contents and partner gold examples. Historical-case data remains independently absent. Record actual
 choices in [decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
 
 ## U8 runtime contracts
@@ -427,4 +427,6 @@ Existing source/read contracts above remain valid. New case processing DTOs
 are implemented in `src/backend/contracts/pipeline.py`; frontend projections
 are in `contracts/frontend.py`. [Case processing](REPORT_PROCESSING_BOUNDARIES.md)
 owns interpretation/assessment/pack/draft stages. [Web research](../data/WEB_RESEARCH.md)
-selects Crawl4AI for future case-time fetches; this does not settle bulk ingestion.
+documents the implemented controlled-fetch/Crawl4AI adapter; bulk ingestion has
+its own explicit CLI. See the [current status](../project/STATUS.md) and
+[ingestion README](../../src/backend/ingestion/README.md) for supported commands.

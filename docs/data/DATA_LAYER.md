@@ -1,6 +1,6 @@
 # Data layer architecture and build router
 
-**18 October 2026 · Data-layer implementation added; model/product integration pending.** Authority: U6/D09 in
+**18 October 2026 · Data and product modules integrated; shared live rollout pending.** Authority: U6/D09 in
 [decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md). PostgreSQL + pgvector
 replace the earlier Weaviate/SQLite design. LangGraph orchestrates the workflow;
 self-hosted Langfuse records execution. U9 supplies Keera endpoint/model aliases
@@ -11,7 +11,8 @@ revisions, runtime packages and hardware benchmarks remain open.
 
 [Final schema contract v1](RELATIONAL_SCHEMA.md), [exact field inventory](SCHEMA_REFERENCE.md)
 and [ingestion/retrieval handoff](INGESTION_RETRIEVAL_HANDOFF.md) are authoritative
-for new queries at migration `0005_finalize_schema`. Seven unused/duplicate tables
+for new queries. Contract v1 was finalized at 0005; current head is
+`0007_frontend_lifecycle` (runtime access and UI lifecycle additions). Seven unused/duplicate tables
 and two redundant chunk fields are retired; populated history stays owner-only,
 outside the application schema. Model choices remain configuration, not new tables.
 
@@ -99,12 +100,13 @@ deployment constraints remain in [architecture](../plans/ARCHITECTURE.md) and
 implemented Python data modules and the separately owned React frontend. Use
 [module handoffs](../plans/MODULE_HANDOFFS.md) for scoped backend feature work.
 
-## U8 implementation boundary
+## Integrated implementation boundary
 
-The agreed [case pipeline](../plans/REPORT_PROCESSING_BOUNDARIES.md) defines interpretation, parallel DB/web research,
-supported frozen packs, reason-card review and PDF-first export. This change
-implements contracts and persistence only; frontend remains on mocks. Live models,
-search/scraping, HTTP, LangGraph execution and rendering are future integrations.
+FastAPI, LangGraph, A/B/C adapters and reviewed PDF export use this data layer;
+the frontend defaults to HTTP. See [current status](../project/STATUS.md) for
+measured scope and [live setup](LIVE_SETUP.md) for migrations, publication and
+model configuration. Storage tests and synthetic execution do not establish real
+corpus coverage, model quality or shared-host readiness.
 
 ## Feature handoff and provider settings
 

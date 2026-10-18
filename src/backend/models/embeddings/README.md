@@ -16,9 +16,10 @@ hosted fallback. `embed_documents` accepts already formatted actual input text,
 not raw chunks to prefix twice. Token limits are counted with the own tokenizer;
 `benchmark` measures actual timings only after real artifacts are provisioned.
 
-Implement the existing `Embedder` port in `contracts/data.py`: `config_hash` and
-`embed_query(text)`. Add an agreed document/batch-encoding port for index builds;
-do not invent a second query interface. Pin exact model/tokenizer/runtime and
+The adapter implements the existing `Embedder` port in `contracts/data.py`:
+`config_hash` and `embed_query(text)`, plus document/batch encoding for index builds.
+Runtime loads it in-process through the integrated factory; the model assets must
+exist on whichever machine runs API/worker. Do not invent a second query interface. Pin exact model/tokenizer/runtime and
 query/document prefixes. Validate shape, finite nonzero vectors, normalization,
 input-token budget and corpus/query configuration parity. No silent truncation
 or hosted fallback. Keep model initialization/caching out of every query call.

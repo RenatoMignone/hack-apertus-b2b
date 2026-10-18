@@ -70,16 +70,17 @@ or paid provisioning was performed. No Docker runtime image was built on this PC
 
 ## Run and deployment gates
 
-1. Maintainer backs up and explicitly migrates the application database to
-   `0007_frontend_lifecycle`. Eric's last reported host was still on 0004; confirm
-   its current state before scheduling. Never point disposable tests at it.
-2. Provision application-role identity/token bindings, checkpoint database and
-   artifact access. Publish an authorized corpus snapshot/profile separately.
-3. Supply verified local embedding configuration/assets matching that snapshot.
-   Optional reranker/web dependencies and provider settings need separate setup.
-4. Start API and worker using [backend instructions](../../src/backend/README.md),
-   then the [frontend](../../src/frontend/README.md). Run a small authorized live
-   smoke before claiming connected/offline deployment or research quality.
+Use the [first live run runbook](../data/LIVE_SETUP.md) and [current status](../project/STATUS.md).
+Repository migration head is `0007_frontend_lifecycle`; Eric's **current** host
+revision is unverified. Lane C last reported 0004 before integration. If behind,
+Eric or his delegated migration operator coordinates a backup/window and upgrades
+with the migration-role DSN. Developer SSH/app credentials alone are insufficient.
+
+Next configure real identity/token/DB bindings, checkpoints/artifacts and a
+published reviewed corpus/profile. Supply compatible verified embedding assets
+where the API/worker runs. Start the backend/frontend and complete one authorized
+public live case before claiming deployment or research quality. Neither the
+integration nor the subsequent documentation audit changed Eric's host.
 
 ## After merging
 

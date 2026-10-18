@@ -1,10 +1,10 @@
 # Backend service boundary v1
 
-18 October 2026. **Interface specification, not implemented Python ports.**
-A materializes this document in its first, contracts-only commit at
-`src/backend/contracts/services.py`. All three lanes then import those exact
-interfaces. Existing `contracts/data.py` and `contracts/pipeline.py` remain frozen.
-Do not add schemas/tables to implement these in-process service boundaries.
+18 October 2026. **Implemented in-process service boundary v1.**
+[`contracts/services.py`](../../src/backend/contracts/services.py) owns exact DTOs,
+limits and Protocol signatures. [`application/factories.py`](../../src/backend/application/factories.py)
+composes the adapters. This document explains intent; the completed A/B/C lane
+assignments are historical. Coordinate additive changes with their consumers.
 
 ## Calling convention
 
@@ -45,7 +45,7 @@ reranker reports that limitation explicitly. A service failure is not no-match.
   `object_key` or `typed_literal` (explicit `type`/`value`), `statement`,
   `evidence_ids`, `kind: direct|adjacent`. Local keys refer only to this extraction
   batch's entities. A statement must have exact supporting evidence references.
-- `ExtractionBatch`: `entities`, `claims`, `gaps: list[str]`. No canonical UUIDs are
+- `ExtractionBatch`: up to 30 `entities`, 60 `claims`, `gaps: list[str]`. No canonical UUIDs are
   minted by the model. Candidate display labels and attributes also need support.
 - `PersistedClaims`: `claims: list[SupportedClaim]`, `entity_ids: dict[str, UUID]`.
   Returned claims are pending assessment proposals, not factual acceptance. C
@@ -61,14 +61,17 @@ reranker reports that limitation explicitly. A service failure is not no-match.
 - `RegisteredResearch`: `evidence: list[EvidenceRecord]`, `limitations`. Canonical duplicates prefer pinned corpus versions; do not store
   duplicate live text as a second authoritative copy.
 - `PdfInput`: exact result/review IDs and hashes, a validated `DraftRevision`,
-  only kept reason keys, authorized evidence records, limitations and template
-  version. A constructs this after repository approval/access checks. B renders
+  optional frozen-pack `interpretation` (attributed company summary/needs),
+  supported pack `claims` (claim IDs → evidence IDs), only kept reason keys,
+  authorized evidence records, limitations and template version. Application code
+  constructs this after repository approval/access checks. The renderer returns
   bytes without inference, retrieval or unapproved claims.
 
 ## B: reasoning and report ports
 
-Factories/dependencies are injected; these names are the v1 contract, not guesses
-about already existing APIs. B implements factories under its owned folders.
+Factories/dependencies are injected. Implementations live in `evidence/`,
+`models/reasoning/` and `reports/`; the composition wrappers expose the loader
+signature `(*, settings, engine, artifacts)`.
 
 ```python
 class ReasoningServices(Protocol):
@@ -115,8 +118,8 @@ class WebResearchTools(Protocol):
     async def fetch(self, urls: list[str], context: RunContext) -> WebResearchResult: ...
 ```
 
-C wraps the existing search/catalog/corpus/research repositories; methods above
-are new adapters, not replacements for their current signatures. `retrieve`
+The backbone implements these ports over search/catalog/corpus/research
+repositories without replacing their lower-level signatures. `retrieve`
 returns real EvidenceRecord projections and neighboring support within budgets.
 Taxonomy context is reviewed/version-pinned data. An unconfigured discovery
 provider fails unavailable; no silent alternative external search service.
@@ -154,7 +157,9 @@ and draft repositories. Do not freeze before extraction/assessment or hide a
 scope mismatch by disabling constraints. A publishes draft/review/export through
 HTTP; B renders only after A's exact review gate. C never runs another case graph.
 
-A supplies the backend composition root, dependency settings and real adapter
-factories after B/C handoff. Fixtures may implement these same ports before live
-adapters exist. Contract version changes are A-owned and coordinated; no
-production copy of a port/DTO inside a lane just to avoid integration.
+`application.factories` supplies the production composition wrappers for these
+ports. Explicit synthetic adapters are test-only. `read_evidence` authorizes
+historical pack reads without requiring the old input to remain current;
+research writes still require active input. Migration 0006 provisions case scopes
+through an owner-checked restricted function, not direct app-role grant writes.
+Shared contract/configuration changes have one integrator per new task.

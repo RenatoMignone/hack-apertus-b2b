@@ -1,4 +1,4 @@
-# Frontend — screens, data contract and mock-to-backend handoff
+# Frontend — screens, HTTP behavior and demo mode
 
 **18 October 2026 · Status: HTTP-connected UI; explicit seeded demo mode remains available.**
 Decisions: D12–D14 in [DECISIONS_AND_OPEN_QUESTIONS.md](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
@@ -79,22 +79,22 @@ line, *Open page*, institution and retrieval date. Esc closes it and returns foc
 
 ### Chat and versions
 
-Agent replies are one or two lines. Follow-up questions come with answer buttons.
-Each change creates a version (v1, v2, …) in the header menu. Changed reasons
-flash and scroll into view. Suggestion chips are derived from the case (e.g.
-*Exclude <first idea>*, *Focus on <first group>*). The mock understands *exclude …*
-(any topic), *focus on …*, *make it shorter* (top 2 per section), contact/availability
-questions (it answers that pages don't say), and *explain simpler*. Anything else is
-acknowledged without changing the brief.
+Live chat submits explicit focus/research edits and shows backend clarification
+questions with their durable IDs. Formatting-only edits exist in the HTTP API;
+an explicit UI mode remains future work. Live behavior comes from the model and
+server, not the demo's keyword rules. Revisions persist server-side and stale
+hashes cannot select/export a replacement report silently.
+
+Demo mode has scripted examples for exclude/focus/shortening/simple language and
+contact questions. Those examples do not establish live reasoning capabilities.
 
 ### Export
 
-Uses only the ✓ kept reasons. The mock downloads a Markdown outline with sources;
-PDF is now the first real export target; PowerPoint with the partner template follows later.
-U8 requires every reason reviewed and at least one kept for export; the existing
-mock only checks for a kept reason, so that behavior still needs UI integration.
-New-source badges will read explicit origin/review status. Keep/reject is editorial,
-not a factual assessment. No HTTP wiring or renderer is implemented in U8.
+HTTP export requires every card reviewed and at least one kept. The client
+accepts review against the exact displayed result/selection hashes, queues PDF,
+polls the worker and downloads authenticated PDF bytes. Source origin/review
+badges are implemented. Keep/reject remains editorial, not factual certification.
+Explicit mock mode downloads a Markdown outline; editable PowerPoint is later.
 
 ## Data contract
 
@@ -117,8 +117,8 @@ API (`src/frontend/src/api/index.ts`): `listCases`, `getCase`, `createCase`,
 `runCase`, `sendMessage`, `answerFollowUp`, `setSelection`, `setStatus`,
 `setCurrentRevision`, `exportDeck`, `getLastOpened`, `setCaseFlags` (onHold / outcome),
 `listActionItems`, `setActionStatus` (with optional answer), `addActionItem`,
-`subscribe` (change notifications) and, mock only, `resetDemo`; long calls report `RunStage`. To connect the
-backend, implement `NavigatorApi` over HTTP and swap it in `api/index.ts`.
+`subscribe` (change notifications) and, mock only, `resetDemo`; long calls report
+`RunStage`. `api/httpApi.ts` implements HTTP and `api/index.ts` selects it by default.
 
 ## Demo data
 

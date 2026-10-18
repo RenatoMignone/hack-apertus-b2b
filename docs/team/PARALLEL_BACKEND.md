@@ -1,5 +1,10 @@
 # Three exclusive backend work lanes
 
+> **Historical lane record — completed and merged, 18 October 2026.**
+> Original instructions/results below describe that lane before integration.
+> Its pending integration requests and ownership freezes are superseded by the
+> [merged baseline](INTEGRATION.md) and [current status](../project/STATUS.md). Do not rerun this as a new task.
+
 18 October 2026. This is the ownership plan for the current three-person backend
 build. It overrides the broader example write boundaries in MODULE_HANDOFFS for
 these three tasks. It does not assign frontend work. Implementation has not been

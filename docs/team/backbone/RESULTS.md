@@ -1,5 +1,10 @@
 # Backbone validation results
 
+> **Historical lane record — completed and merged, 18 October 2026.**
+> Original instructions/results below describe that lane before integration.
+> Its pending integration requests and ownership freezes are superseded by the
+> [merged baseline](../INTEGRATION.md) and [current status](../../project/STATUS.md). Do not rerun this as a new task.
+
 Measured 18 October 2026; branch `backend/backbone` plus A's exact `77bf4f8`
 contracts-only commit. No application-schema DDL was added or altered.
 

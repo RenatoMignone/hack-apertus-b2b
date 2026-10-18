@@ -1,6 +1,6 @@
 # Evaluation plan and evidence requirements
 
-**Status: proposed protocol; no evaluation has run and no performance is claimed.**
+**Status: pilot-quality protocol remains to run; synthetic engineering checks and limited model probes are recorded.**
 
 **18 October decision:** the user delegated aggregation/entity counting. Use
 intent-balanced macro Recall@10 >= 0.80 for the English positive-query suite as
@@ -115,11 +115,11 @@ this local scoring-scale statement. Stage-specific details remain unverified.
 
 | Dimension | Evidence to prepare | Current status |
 | --- | --- | --- |
-| Purposeful use of AI | Observed Apertus contribution and comparison/justification for its chosen role | Not assessed; implementation absent |
-| Technical rigour | Reproducible working pipeline, pilot metrics, evidence audit and known failures | Not assessed |
-| Value, cost & scalability | Operator benefit, measured/estimated costs with assumptions, coverage/extension behavior | Stakeholder need documented; product evidence absent |
+| Purposeful use of AI | Observed Apertus contribution and comparison/justification for its chosen role | Integrated task adapter; tiny authenticated probes show mixed failures, no overall model winner |
+| Technical rigour | Reproducible working pipeline, pilot metrics, evidence audit and known failures | Synthetic cross-module tests/browser-to-PDF passed; real pilot metrics pending |
+| Value, cost & scalability | Operator benefit, measured/estimated costs with assumptions, coverage/extension behavior | Stakeholder need and workflow implemented; operator benefit/cost measurements pending |
 | Sovereign deployability | Selected target, full dependency map and verified operation for claimed mode | Air-gapped primary design proposed; no deployment tested |
-| Implementation feasibility | Run instructions, data/rights boundary, maintenance and partner handoff requirements | Not demonstrated |
+| Implementation feasibility | Run instructions, data/rights boundary, maintenance and partner handoff requirements | Local synthetic integration demonstrated; shared real-provider deployment pending |
 | Pitch & presentation | Clear, truthful working demo and coherent report/video within actual limits | Not produced |
 
 Do not fabricate internal judge scores or imply that documentation proves a
@@ -145,7 +145,9 @@ Additional user design gates, not new organizer metrics:
   Swiss operator/jurisdiction/residency and every runtime dependency.
 
 [Architecture/dependency inventory](../plans/ARCHITECTURE.md#target-architecture-mandatory).
-No checks in this section have been executed.
+Synthetic integration verifies manual intake, revised inputs and pack → reviewed
+PDF lineage. Broader second-domain, full deletion/retention and disconnected
+cold-start checks are not established. See [verification scope](../team/INTEGRATION.md).
 
 ## Data-layer implementation checks
 
