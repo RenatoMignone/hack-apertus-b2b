@@ -1,10 +1,16 @@
 """Explicit API/worker/checkpoint commands, independent from the data maintainer CLI."""
 import argparse
 import asyncio
+import sys
 
 from backend.application.bootstrap import Registry
 from backend.application.worker import Worker
 from backend.config.runtime import RuntimeSettings
+
+
+def run_async(coroutine):
+    # Psycopg's asynchronous connections cannot use Windows' Proactor loop.
+    return asyncio.run(coroutine, loop_factory=asyncio.SelectorEventLoop if sys.platform == "win32" else None)
 
 
 async def work(registry, once):
@@ -42,7 +48,7 @@ def main():
         import uvicorn
         uvicorn.run("backend.api.app:create_app", factory=True, host=args.host, port=args.port)
     elif args.command == "worker":
-        asyncio.run(work(Registry(), args.once))
+        run_async(work(Registry(), args.once))
     else:
         from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
         settings = RuntimeSettings.from_env()
@@ -51,7 +57,7 @@ def main():
         async def setup():
             async with AsyncPostgresSaver.from_conn_string(settings.langgraph_database_url) as saver:
                 await saver.setup()
-        asyncio.run(setup())
+        run_async(setup())
 
 
 if __name__ == "__main__":

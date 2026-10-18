@@ -1,5 +1,13 @@
 # Frontend and backend HTTP contract
 
+Live ingestion development (18 October, authorized by Eric): backend
+`RUNTIME_CORPUS_MODE=live` uses the existing HTTP contracts. New runs capture ready
+readable chunks without publication. The server authorizes each immutable case
+capture. Review, citations and PDF gates bind exact evidence/result hashes.
+New runs see later ingestion; resumes/wording edits retain their capture.
+`live_corpus_incomplete_coverage` is an explicit research limitation. No frontend
+transport change is required. See [deployment](../data/LIVE_CORPUS_RUNTIME.md).
+
 18 October 2026. Implemented FastAPI `/api/v1` and React `NavigatorApi` HTTP
 adapter. `/openapi.json` and `src/backend/api/schemas.py` are the machine-readable
 authority. [Integration status](../team/INTEGRATION.md) records tests and live

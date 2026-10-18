@@ -59,10 +59,10 @@ def main():
     args = parser.parse_args()
     rendered = render()
     if args.check:
-        if not REFERENCE.exists() or REFERENCE.read_text() != rendered:
+        if not REFERENCE.exists() or REFERENCE.read_text(encoding="utf-8") != rendered:
             raise SystemExit("schema reference is stale; run python -m backend.data.schema_docs")
     else:
-        REFERENCE.write_text(rendered)
+        REFERENCE.write_text(rendered, encoding="utf-8")
 
 
 if __name__ == "__main__":

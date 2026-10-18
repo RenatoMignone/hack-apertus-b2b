@@ -1,6 +1,6 @@
 # Exact application schema reference
 
-Generated from `src/backend/data/schema.py`; migration head **`0007_frontend_lifecycle`**.
+Generated from `src/backend/data/schema.py`; migration head **`0008_live_corpus`**.
 Do not edit by hand. Regenerate with `PYTHONPATH=src python -m backend.data.schema_docs`.
 
 **63 application tables.** Read [schema decisions](RELATIONAL_SCHEMA.md) and
@@ -304,7 +304,7 @@ Primary key: `snapshot_id, entity_id`.
 
 Primary key: `snapshot_id`.
 
-- Check: `status IN ('draft','published','failed')`.
+- Check: `status IN ('draft','published','failed','live')`.
 - Index: `build_id`.
 - Index: `profile_id`.
 - Index: `taxonomy_version_id`.
@@ -548,7 +548,7 @@ Primary key: `embedding_id`.
 
 Primary key: `build_id`.
 
-- Check: `status IN ('draft','published','failed')`.
+- Check: `status IN ('draft','published','failed','live')`.
 - Index: `config_id`.
 
 ### `retrieval.search_documents`

@@ -1,5 +1,12 @@
 # Ingestion and hybrid retrieval: implementation handoff
 
+Development runtime update (18 October, Eric's authorization): users may work
+while ingestion continues through `RUNTIME_CORPUS_MODE=live` and migration 0008.
+The application captures ready authorized chunks per case without publishing or
+advancing shared pointers. The publication steps below remain the reviewed-release
+workflow. See [live runtime](LIVE_CORPUS_RUNTIME.md) and
+[host verification](../team/RUNTIME_ACCESS_STATUS.md).
+
 **18 October 2026 · Corpus contract v1; application head `0007_frontend_lifecycle`.**
 Scope: populate the public knowledge corpus, build a compatible search snapshot,
 and improve hybrid retrieval. Leave frontend, case/report orchestration and

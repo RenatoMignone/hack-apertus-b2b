@@ -1,5 +1,7 @@
 """Runtime-local fixtures; shared backend bootstrap remains untouched."""
 import hashlib
+import asyncio
+import sys
 from types import SimpleNamespace
 from uuid import UUID
 
@@ -13,6 +15,13 @@ from backend.config.runtime import IdentityBinding, RuntimeSettings
 from backend.tests.runtime.fakes import FixtureBackbone, FixturePdf, FixtureReasoning
 from backend.application.worker import Worker
 from contextlib import asynccontextmanager
+
+
+@pytest.fixture(scope="session")
+def event_loop_policy():
+    # Match the CLI worker's selector loop for Psycopg on Windows.
+    return (asyncio.WindowsSelectorEventLoopPolicy() if sys.platform == "win32"
+            else asyncio.DefaultEventLoopPolicy())
 
 
 @pytest.fixture

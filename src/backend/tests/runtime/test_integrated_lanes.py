@@ -85,9 +85,20 @@ def synthetic_transport(request):
     return httpx.Response(200, json={"choices": [{"message": {"role": "assistant", "content": json.dumps(result)}}]})
 
 
-async def test_real_lanes_restricted_role_review_and_actual_pdf(harness, restricted):
+@pytest.mark.parametrize("corpus_mode", ["published", "live"])
+async def test_real_lanes_restricted_role_review_and_actual_pdf(harness, restricted, corpus_mode, tmp_path):
     from backend.api.app import create_app
     store, access = restricted[0]
+    if corpus_mode == "live":
+        from backend.data.fixtures import FIXTURE_MODEL
+        from sqlalchemy import delete
+        configuration = tmp_path / "synthetic-embedding.json"
+        configuration.write_text(FIXTURE_MODEL.model_dump_json(), encoding="utf-8")
+        store.settings = replace(store.settings, corpus_mode="live", embedding_configuration=str(configuration),
+            live_taxonomy_version_id=UUID(harness.fixture["taxonomy_version_id"]))
+        # A published active pointer must not be needed for the live path.
+        with harness.store.engine.begin() as c:
+            c.execute(delete(t.active_snapshots).where(t.active_snapshots.c.profile_id == store.settings.default_profile_id))
     token = "explicit-integration-token"
     binding = IdentityBinding(token_sha256=hashlib.sha256(token.encode()).hexdigest(),
         principal_id=access.principal_id, namespace=access.namespace)

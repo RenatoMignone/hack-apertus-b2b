@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 from pgvector.sqlalchemy import Vector
 
 
-SCHEMA_REVISION = "0007_frontend_lifecycle"
+SCHEMA_REVISION = "0008_live_corpus"
 
 metadata = MetaData(naming_convention={"ix": "ix_%(table_name)s_%(column_0_name)s",
                                       "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -245,7 +245,7 @@ claims.append_constraint(CheckConstraint("typed_literal IS NULL OR (jsonb_typeof
 for target, expression, name in (
     (assignments, "status IN ('draft','accepted','needs_review','rejected')", "assignment_state"),
     (claims, "status IN ('draft','accepted','needs_review','rejected')", "claim_state"),
-    (snapshots, "status IN ('draft','published','failed')", "snapshot_state"),
+    (snapshots, "status IN ('draft','published','failed','live')", "snapshot_state"),
     (attempts, "status IN ('pending','running','committed','failed')", "attempt_state"),
     (outbox, "status IN ('pending','running','delivered','failed')", "outbox_state"),
 ):
@@ -258,7 +258,7 @@ for target, expression, name in (
     (entities, "entity_type IN ('person','unit','organization','project','facility','service')", "entity_type_allowed"),
     (entities, "length(btrim(display_label)) > 0", "entity_label_required"),
     (claims, "length(btrim(predicate)) > 0", "claim_predicate_required"),
-    (builds, "status IN ('draft','published','failed')", "build_state"),
+    (builds, "status IN ('draft','published','failed','live')", "build_state"),
     (reviews, "decision IN ('accepted','rejected')", "review_decision_allowed"),
     (versions, "status IN ('accepted','needs_review','rejected')", "document_version_state"),
 ):

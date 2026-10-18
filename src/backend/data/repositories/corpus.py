@@ -176,7 +176,7 @@ class CorpusRepository:
             statement = select(tables.spans).select_from(tables.spans.join(tables.snapshot_documents,
                 tables.snapshot_documents.c.document_version_id == tables.spans.c.document_version_id).join(tables.snapshots)).where(
                 tables.snapshot_documents.c.snapshot_id == snapshot_id, tables.spans.c.evidence_id.in_(evidence_ids),
-                tables.snapshots.c.status == "published", tables.snapshots.c.namespace == access.namespace)
+                tables.snapshots.c.status.in_(["published", "live"]), tables.snapshots.c.namespace == access.namespace)
             rows = connection.execute(statement).mappings().all()
             for row in rows:
                 require_scope(connection, row["scope_id"])
