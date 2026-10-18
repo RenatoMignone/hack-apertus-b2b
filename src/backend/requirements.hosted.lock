@@ -1,0 +1,9 @@
+# Supplemental hosted-embedding runtime; measured on macOS arm64 / Python 3.13.
+# Base/test pins remain authoritative. Verify target-platform wheels before packaging.
+-r requirements.lock
+filelock==4.2.2
+fsspec==2026.9.0
+hf-xet==1.7.0
+huggingface-hub==2.2.0
+tokenizers==0.23.3
+tqdm==4.70.1

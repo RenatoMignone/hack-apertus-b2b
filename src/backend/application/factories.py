@@ -7,8 +7,8 @@ from backend.contracts.data import ModelConfiguration
 from backend.contracts.services import ServiceUnavailable
 
 
-class LocalEmbedding:
-    """Load approved local assets on first search, never during API construction."""
+class ConfiguredEmbedding:
+    """Load the explicitly selected encoder on first search, never at API construction."""
     def __init__(self, settings):
         self.settings, self.loaded, self.lock = settings, None, Lock()
         self.configuration = None
@@ -26,13 +26,12 @@ class LocalEmbedding:
         return self.configuration.config_hash
 
     def embed_query(self, text):
-        if self.configuration is None or not self.settings.embedding_model_path:
+        if self.configuration is None:
             raise ServiceUnavailable()
         with self.lock:
             if self.loaded is None:
-                from backend.models.embeddings.local import load_embeddinggemma
-                self.loaded = load_embeddinggemma(self.configuration, self.settings.embedding_model_path,
-                    device=self.settings.model_device)
+                from backend.models.embeddings.configured import load_configured
+                self.loaded = load_configured(self.configuration, self.settings)
         return self.loaded.embed_query(text)
 
 
@@ -56,7 +55,7 @@ def backbone(*, settings, engine, artifacts):
         if configuration.test_only:
             raise ValueError("production factory refuses fixture reranker configurations")
         reranker = load_reranker(configuration, settings.reranker_model_path, device=settings.model_device)
-    return create_backbone(engine, artifacts, LocalEmbedding(settings), reranker=reranker)
+    return create_backbone(engine, artifacts, ConfiguredEmbedding(settings), reranker=reranker)
 
 
 def web(*, settings, engine, artifacts):

@@ -6,7 +6,7 @@ Start with the [stacked visual diagrams](../architecture.html) and
 records and memory interfaces. [Phase 2](OPERATIONS_PLAN.md) consumes them.
 
 Selected stack: PostgreSQL + pgvector, LangGraph PostgreSQL checkpoints and
-self-hosted Langfuse; Apertus v1.5 8B / optional 70B, EmbeddingGemma 2 candidate
+self-hosted Langfuse; Apertus v1.5 (current connected configuration: 70B), EmbeddingGemma 2 candidate
 and BGE reranking. U9 supplies Keera aliases/base URL and the EmbeddingGemma 2
 reference; exact revisions/runtime packages, measured hardware and actual reviewed
 taxonomy remain open. [Data-layer specs](../data/DATA_LAYER.md) own physical
@@ -331,7 +331,7 @@ generated expansion terms are hypotheses rather than company facts.
    [ARCHITECTURE.md](ARCHITECTURE.md#evidence-pack-the-report-generation-gate) to
    synthesis: current intent/company facts, needs, accepted matches, argument
    derivations, optional numerical/case records, literal passages, locators,
-   sources, conflicts, coverage and missing evidence. Use 8B initially; 70B is optional for difficult synthesis
+   sources, conflicts, coverage and missing evidence. Use the explicit configured model; current connected examples select 70B
    if access/resources permit. Validate answer claims against the pack.
 
 Thirty candidates/eight context passages are initial passage budgets, not an

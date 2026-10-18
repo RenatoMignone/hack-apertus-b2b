@@ -334,3 +334,19 @@ and a coordinated backup/window. Ordinary developer credentials remain the runti
 identity. No shared migration, ingestion, model download or service operation is
 authorized/performed by this docs audit. Integration uses D20 (the earlier
 parallel-build decision already used D19).
+
+## D22 — Hosted encoder and Windows shell checkout (18 October 2026)
+
+User requests permanent LF shell checkouts, implementation of Eric's supplied HF
+endpoint, private env updates and commit/push to main. Explicit connected settings
+select Apertus 70B and the supplied hf-serve CPU deployment/model revision.
+The shared hosted encoder serves ingestion and runtime, with a pinned tokenizer,
+exact remote usage checks and strict config hashes. [Live synthetic verification](../data/HOSTED_EMBEDDINGS.md)
+establishes protocol/parity, not real corpus quality. Local models remain explicit
+for offline operation. The user separately plans runtime identity/storage/checkpoint
+configuration next; no shared DB writes/publication/deployment are inferred here.
+
+Root `.gitattributes` enforces LF for shell scripts; simulated Windows-style Git
+checkout and shell syntax passed. Eric must rewrite his existing checked-out script
+and verify normal bootstrap before removing his temporary override. Secrets remain
+only in ignored `.env`; public examples contain no private keys.

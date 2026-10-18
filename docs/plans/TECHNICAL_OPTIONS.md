@@ -9,7 +9,7 @@ points, not measured superiority or verified hosting capabilities.
 
 | Responsibility | Initial choice | Validation still needed |
 | --- | --- | --- |
-| Interpretation, extraction, reasoning, writing | Apertus v1.5 8B; bounded optional 70B fallback | Keera alias/base supplied; verify authenticated schema/tool behavior, served revision, quality/cost |
+| Interpretation, extraction, reasoning, writing | Apertus v1.5; connected env explicitly selects 70B, 8B remains configurable | Keera alias/base supplied; verify authenticated schema/tool behavior, served revision, quality/cost |
 | Original-text embeddings | `google/embeddinggemma-2`, proposed text-only local, native 768d | Reference verified; pin revision/runtime/encoding before ingestion and evaluate pilot retrieval |
 | Lexical + vector retrieval | PostgreSQL full-text search + pgvector cosine, fused with RRF | Full-text ranking is not BM25; validate language configs, access/snapshot filters and exact baseline before optional HNSW |
 | Passage reranking | BGE-reranker-v2-m3 | Pair-token budget, ranking quality and latency; scores are not calibrated probabilities |
@@ -66,8 +66,8 @@ The [live setup runbook](../data/LIVE_SETUP.md) owns commands and prerequisites;
 ## U8 selected runtime processing
 
 Use bounded LangGraph stages and LangChain adapters for all agentic execution.
-Primary Apertus 8B handles interpretation, batched extraction/assessment and draft
-synthesis; optional 70B fallback has identical checks. Large context length does
+Configured Apertus (currently 70B in connected examples) handles interpretation,
+batched extraction/assessment and draft synthesis with identical evidence checks. Large context length does
 not demonstrate one-call pack reliability. Exact model artifacts remain deferred.
 Controlled HTTP acquisition plus Crawl4AI conversion is implemented;
 [comparison and primary sources](../data/WEB_RESEARCH.md). PDF first, PPTX later.

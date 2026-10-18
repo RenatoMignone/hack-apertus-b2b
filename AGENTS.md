@@ -49,16 +49,17 @@ never overwrite another agent's work or independently rename shared fields.
   retrieval work and use the generated [field reference](docs/data/SCHEMA_REFERENCE.md).
   Synthetic integration checks are not a quality/model benchmark.
 - Cross-lane execution is tested with synthetic model responses/embeddings and
-  real disposable PostgreSQL. Shared-host migration, real corpus/index population,
-  verified local model assets and a combined live provider run remain prerequisites.
-- Connected inference: CSCS via Keera, `https://gateway.keera.ch/api/v1`, default
-  `apertus-v1-5-8b`. Four supplied aliases and tool/thinking rules are in
+  real disposable PostgreSQL. Eric migrated the shared host to 0007 (see migration status). Real corpus/index
+  publication and a combined live provider-backed case remain prerequisites.
+- Connected inference: CSCS via Keera, `https://gateway.keera.ch/api/v1`, connected examples now select
+  `apertus-v1-5-70b` explicitly (user configuration; no automatic fallback). Four supplied aliases and tool/thinking rules are in
   [inference configuration](docs/data/INFERENCE_CONFIGURATION.md). Authenticated synthetic Keera probes passed; broader quality, current key validity
   and quotas remain unverified for deployment. Results are in B's handoff. Use root [.env.example](.env.example); no real secrets in git.
-- Embedding proposal: `google/embeddinggemma-2`, local text-only/shared host first;
-  [deployment comparison](docs/data/EMBEDDING_DEPLOYMENT.md). Artifact reference is
-  verified; exact revision/runtime/host and performance remain open. BGE reranker
-  is a candidate. Each model uses its own compatible tokenizer.
+- Connected embeddings: Eric's HF endpoint, pinned EmbeddingGemma 2 revision,
+  shared ingestion/query adapter and local tokenizer; [configuration and live
+  verification](docs/data/HOSTED_EMBEDDINGS.md). Local assets remain the offline
+  option. Protocol/parity checks passed; retrieval quality remains unmeasured.
+  BGE reranker is optional. Each model uses its own compatible tokenizer.
 - Pilot: Bern diabetes technology, covering UniBE, ARTORG and DCB as one ecosystem.
   Development host is shared Windows/WSL2/Docker with individual SSH tunnels;
   running end-to-end connected/offline deployments have not been established.

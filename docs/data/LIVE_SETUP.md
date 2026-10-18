@@ -4,19 +4,20 @@
 file have been executed on the shared host by this documentation audit.
 [Current status](../project/STATUS.md) separates implementation from rollout.
 
-**You can operate the backend from your Mac.** A successful PostgreSQL connection
-alone does not establish readiness: the current factory loads the embedding
-model in the local API/worker processes, and the worker also needs the separate
-LangGraph database. Running the full backend on Eric's host is another option;
-it keeps shared model assets/checkpoint credentials there, but needs an agreed
-application entry point/tunnel. Pick one worker placement for the first run.
+**You can operate the backend from your Mac.** PostgreSQL access alone is
+insufficient: configure [hosted HF embeddings](HOSTED_EMBEDDINGS.md) with a pinned
+local tokenizer (no model weights), or choose local model assets explicitly.
+The worker also needs the separate LangGraph database. A host-run backend is
+another option, requiring an agreed application entry point/tunnel. Pick one
+worker placement for the first run. Eric's [migration](../team/MIGRATION_STATUS.md)
+is complete; do not repeat it. Sections 1–2 remain recovery/inspection guidance.
 
 ## 1. Confirm what actually exists (read-only)
 
-Eric will perform the migration using the [complete rollout prompt](../team/prompts/04_SHARED_HOST_MIGRATION.md).
-Ask him for the current schema revision and whether his ingestion/index build
-has published a usable snapshot. The lane-C handoff last observed 0004; that is a
-historical observation, not a fresh check. Do not assume either 0004 or 0007.
+Eric reports shared head **0007** with backup/preservation checks. He is now
+ingesting base sources; ask for the **published** profile/snapshot/config pins
+when ready. A one-source build is not full pilot publication. The migration
+prompt is completed history; do not rerun it without an actual new requirement.
 
 With your existing developer `.env`, activated backend environment and SSH tunnel,
 this optional check reads only database identity/revision, without printing passwords:
@@ -91,7 +92,7 @@ The corpus owner must supply these real, mutually compatible items:
 | --- | --- |
 | DB principal ID, namespace, application-role DSN and public scope grants | Server-side identity/access; shared profile must be visible in this namespace |
 | Published profile UUID, snapshot/build IDs, taxonomy version and config hash | `RUNTIME_PROFILE_ID` selects the profile; new runs pin its published snapshot |
-| Verified `ModelConfiguration` JSON and local embedding asset directory | `EMBEDDING_CONFIGURATION` / `EMBEDDING_MODEL_PATH`; exact model, tokenizer, templates and dimension must match the index |
+| Verified shared `ModelConfiguration` JSON and selected encoder setup | HF endpoint/token + pinned tokenizer, or local assets; model, tokenizer, templates and dimension must match the index |
 | Artifact endpoint/bucket and backend application credentials | Reads source artifacts and writes reports; SSH forwarding does not grant object permissions |
 | Checkpoint database access and agreed worker location | `LANGGRAPH_DATABASE_URL`; use a plain psycopg `postgresql://...` DSN for the saver |
 | Coverage/failures and reviewed example query | Establish that sources/claims are usable, not merely that tables contain rows |
@@ -106,9 +107,10 @@ Do not publish synthetic fixtures into the real pilot namespace.
 1. Reinstall the merged core lock and editable backend using the [backend README](../../src/backend/README.md),
    even if the older lane environment already passed tests. Missing
    `navigator-runtime` or `langgraph.types` indicates an outdated environment.
-   Provision compatible optional `local-models` dependencies and verified assets
-   for this Mac; the core lock alone does not include the heavy model runtime.
-   Optional dependencies still need a target-platform lock before deployment.
+   For hosted embeddings install `src/backend/requirements.hosted.lock` and provision
+   the pinned tokenizer; see [HF setup](HOSTED_EMBEDDINGS.md). Local mode instead
+   needs optional `local-models` dependencies and full assets. Verify target-platform
+   wheels before deployment; startup downloads neither tokenizer nor weights.
 2. Keep your tunnel open, replacing the username with the account Eric supplied:
 
    ```text
@@ -122,7 +124,7 @@ Do not publish synthetic fixtures into the real pilot namespace.
    explicitly extend that policy; do not assume it is allowed.
 3. Copy root [.env.example](../../.env.example) to a private ignored file without
    replacing existing secrets. Set application DB/S3 credentials, permitted
-   checkpoint DSN, profile UUID, verified embedding JSON/assets, current private
+   checkpoint DSN, profile UUID, verified embedding JSON and HF/tokenizer or local assets, current private
    Keera key and the integrated factories/PDF versions/logo path.
 4. Generate a private random operator token; put only its SHA-256 digest in
    `RUNTIME_AUTH_BINDINGS`, with the real principal ID/namespace. Keep the raw

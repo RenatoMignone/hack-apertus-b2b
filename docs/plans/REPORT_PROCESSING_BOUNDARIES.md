@@ -68,8 +68,8 @@ Use focused stages: interpretation/query planning; batched claim extraction;
 claim/fit assessment; draft synthesis. Neither one enormous call nor one call per
 field is the default. Code assembles identifiers, dates, provenance, manifests and
 hashes. Validate Pydantic outputs and bound repairs; grammar-constrained output
-is endpoint dependent, not assumed. Apertus 8B is primary; a configured 70B
-fallback remains optional and subject to the same evidence checks. U9 supplies [Keera model aliases/base URL](../data/INFERENCE_CONFIGURATION.md)
+is endpoint dependent, not assumed. The current connected environment explicitly selects Apertus 70B; 8B remains
+configurable and both use the same evidence checks. There is no automatic fallback. U9 supplies [Keera model aliases/base URL](../data/INFERENCE_CONFIGURATION.md)
 and the [EmbeddingGemma 2 reference](../data/EMBEDDING_DEPLOYMENT.md); exact revisions,
 compatible runtimes and authenticated limits remain open. Embeddings/reranking use their
 own compatible models/tokenizers.

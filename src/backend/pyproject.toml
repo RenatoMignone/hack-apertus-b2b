@@ -19,6 +19,7 @@ dependencies = [
 [project.optional-dependencies]
 test = ["pytest>=8,<10", "moto[s3]>=5,<6", "pytest-asyncio>=0.25,<2", "pypdfium2>=4,<6"]
 local-models = ["sentence-transformers>=5,<6", "transformers>=5,<6", "torch>=2.6,<3"]
+hosted-embeddings = ["tokenizers>=0.22,<0.24"]
 web = ["crawl4ai>=0.9.5,<0.10"]
 
 [project.scripts]

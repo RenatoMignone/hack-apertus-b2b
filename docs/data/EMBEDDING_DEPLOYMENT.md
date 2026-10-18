@@ -1,38 +1,24 @@
-# EmbeddingGemma 2: deployment recommendation
+# EmbeddingGemma 2: deployment choices
 
-**18 October 2026 · U9 proposal; no weights downloaded or endpoint provisioned.**
+**18 October 2026 · Hosted connected adapter verified; local offline alternative remains.**
 The verified model reference is [google/embeddinggemma-2](https://huggingface.co/google/embeddinggemma-2).
 It is distinct from `google/embeddinggemma-300m`. Use the model's own tokenizer,
 not Apertus token IDs. This recommendation does not establish measured retrieval
 quality or hardware throughput.
 
-## Recommendation
+## Current connected choice
 
-**Run the text-only embedder locally on the shared team host first**, behind the
-existing embedding port. Batch corpus embeddings once, persist them, and encode
-only new/changed documents and user queries afterward. This avoids per-developer
-endpoints and is compatible with an eventual offline runtime. Benchmark CPU
-latency/memory before deciding on a GPU or hosted fallback.
+The user selected Eric's existing HF endpoint and supplied the CPU image/model
+revision. [Hosted setup and evidence](HOSTED_EMBEDDINGS.md) is authoritative for
+this deployment: ingestion and runtime share the adapter, verified JSON and
+pinned local tokenizer. Live synthetic requests passed dimensionality, exact-token
+usage and same-input vector parity. No real corpus retrieval quality is claimed.
 
-The [Google developer guide](https://developers.googleblog.com/embeddinggemma-2-the-developer-guide/)
-describes an on-device embedding model. The [model card](https://huggingface.co/google/embeddinggemma-2)
-provides text-only encoder loading (270M active parameters), 768-dimensional
-output, an 8,192-token context and separate query/document task formatting.
-Those properties make local text-only serving a reasonable starting point;
-they do not guarantee performance on the team's host.
-
-| Option | When it fits | Remaining checks |
-| --- | --- | --- |
-| Local/shared host (recommended) | One corpus/query embedding space, no hosted runtime dependency, no credit burn | Actual CPU/RAM/GPU, supported package versions, warm latency, batch throughput |
-| HF Inference Providers | Quick connected experiments if this exact model/task is available to the account | Feature-extraction API semantics, revision/prefix/normalization control, quota and eligible credits |
-| HF dedicated Inference Endpoint | Shared remote service when local performance fails the target | Compatible container/engine, region, billing, cold starts, exact encoder config and team authorization |
-| HF Space | Explicitly managed experiment/service, not an assumed managed endpoint | Hardware/credit eligibility, sleep/auth/concurrency and operations |
-
-A Hugging Face repository stores weights; it does not itself provide a dedicated
-server. The model page currently exposes an HF feature-extraction inference
-option, but account access and exact request/encoding parity are untested. Keep
-local and hosted adapters interchangeable only after matching model revision,
-processor, input templates, normalization, dimension and measured vector parity.
+Hosted clients need no full local model weights. Local/shared-host encoding is
+still supported explicitly for disconnected runtime, with independent hardware/
+package verification. Switching transport/configuration does not permit mixing
+incompatible existing vectors. Hosted runtime is connected-only; Swiss locality,
+quotas/billing and broader quality remain to verify with the endpoint owner.
 
 ## Budget and hosting
 
@@ -71,12 +57,10 @@ hosted experiments when finished.
 - Verify vector shape/non-finite/zero rejection, query/document space parity,
   synonym queries, EN/DE/FR/IT and pilot recall. Cache by full encoding/input hash.
 
-The local adapter and runtime factory are implemented. Runtime requires
-`EMBEDDING_CONFIGURATION` (path to verified `ModelConfiguration` JSON) and
-`EMBEDDING_MODEL_PATH` (local assets), matching the published snapshot exactly.
-`EMBEDDING_MODEL_ID`, revision and dimension hints alone do not configure it.
-The current factory loads the model in the API/worker process, not a remote
-embedding service. Running it on this Mac therefore requires compatible local
-packages/assets too; remote PostgreSQL stores vectors but does not encode queries.
-No real local runtime/quality result is claimed. Keera chat aliases are not
-embedding models. See [live setup](LIVE_SETUP.md).
+Both local and hosted adapters are implemented. `EMBEDDING_BACKEND` selects them
+explicitly through `models/embeddings/configured.py` for build/benchmark/query.
+All paths require `EMBEDDING_CONFIGURATION` matching the published snapshot.
+HF additionally requires endpoint/token, supplied model revision and pinned local
+tokenizer JSON; local mode requires full assets. Model-name/dimension hints alone
+cannot configure a valid index. See [HF setup](HOSTED_EMBEDDINGS.md) and
+[live setup](LIVE_SETUP.md). Keera chat aliases are not embedding models.

@@ -10,6 +10,8 @@ and [open questions](../project/OPEN_QUESTIONS.md).
 | [INTEGRATION.md](INTEGRATION.md) | Current merged baseline, reviewed tips, fixes and dated verification |
 | [SERVICE_CONTRACTS.md](SERVICE_CONTRACTS.md) | In-process service boundaries; executable DTOs/ports are authoritative |
 | [Eric migration prompt](prompts/04_SHARED_HOST_MIGRATION.md) | Current bounded backup/upgrade/verification task |
+| [Migration outcome](MIGRATION_STATUS.md) | Completed 0004 → 0007, backup/preservation and services |
+| [Hosted embeddings](../data/HOSTED_EMBEDDINGS.md) / [LF fix](../data/WINDOWS_SHELL_FIX.md) | Current adapter and Windows follow-up |
 | [Live setup](../data/LIVE_SETUP.md) | Current rollout steps, migration authority and local/shared prerequisites |
 | [PARALLEL_BACKEND.md](PARALLEL_BACKEND.md), [original prompts](prompts/01_RUNTIME.md) | Historical completed assignments, not instructions for the next feature |
 | [Runtime handoff](runtime/HANDOFF.md), [original HTTP map](runtime/HTTP.md) | Historical lane-A snapshot; use the [current HTTP contract](../plans/FRONTEND_BACKEND_API.md) for client work |

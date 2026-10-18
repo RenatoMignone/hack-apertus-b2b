@@ -4,8 +4,10 @@ Application/API, worker, adapters, PDF and HTTP frontend are integrated.
 Application head is **`0007_frontend_lifecycle`**. Start at the
 [first live run checklist](LIVE_SETUP.md) for existing deployments and Mac-to-host
 setup. A new data stack follows the commands below; do not reinitialize Eric's
-existing secrets/volumes. A shared migration needs an agreed backup/window and
-migration-role access; Eric can run it or explicitly delegate it.
+existing secrets/volumes. Eric's [completed migration](../team/MIGRATION_STATUS.md) is at 0007. Future shared
+migrations still require a backup/window and migration-role access. Windows
+checkouts should apply the [LF fix](WINDOWS_SHELL_FIX.md); hosted encoder setup
+is in [HF configuration](HOSTED_EMBEDDINGS.md).
 
 Commands below run from the repository root in PowerShell. Use
 Python 3.12–3.14 and Docker Desktop with its WSL2 Linux engine enabled. Linux hosts
@@ -239,7 +241,8 @@ Dated checks, all on 18 October 2026:
 
 See [integration verification](../team/INTEGRATION.md#verification) for exact
 commands and limits. Do not combine historical counts as a new test total.
-Eric's last reported lane-C revision was 0004; current shared state is unverified.
+Eric subsequently migrated the shared host 0004 → 0007; see [the measured
+rollout](../team/MIGRATION_STATUS.md). The integration's original tests remain dated.
 No shared-host migration, real corpus publication or full live-model run was
 performed by integration or this docs audit. Inference settings and optional
 local-model/web provisioning are in [provider configuration](INFERENCE_CONFIGURATION.md)

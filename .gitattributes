@@ -1,0 +1,2 @@
+# Linux container entrypoints must also check out correctly on Windows.
+*.sh text eol=lf

@@ -151,7 +151,7 @@
 <div class="down">Transfer before isolated runtime · no live collection across this boundary</div>
 <div class="runtime-box"><div class="boundary-label">Independent runtime host(s) · outside cantonal ICT / internal networks</div><h3>Operator browser → application API / LangGraph</h3>
 <div class="runtime-grid">
-<div class="runtime-cell">Model adapters<small>Connected Apertus: CSCS through Keera. Offline: separate packaged local server. EmbeddingGemma 2 text-only local recommended; BGE reranker candidate. Revisions/benchmarks pending.</small></div>
+<div class="runtime-cell">Model adapters<small>Connected Apertus: CSCS through Keera. Offline: separate packaged local server. Connected embedding: configured HF endpoint with pinned tokenizer and shared build/query adapter. Offline: explicit local assets. BGE optional; corpus quality pending.</small></div>
 <div class="runtime-cell">Evidence + search<small>PostgreSQL canonical records + pgvector + full-text search; controlled raw/normalized artifact storage</small></div>
 <div class="runtime-cell">Case + export workers<small>PostgreSQL case records + separate LangGraph checkpoint database; calculations, charts, PDF report first; editable PowerPoint later</small></div>
 <div class="runtime-cell">Local observability<small>Langfuse web/worker + PostgreSQL, ClickHouse, Redis/Valkey and S3-compatible storage; masked traces</small></div>

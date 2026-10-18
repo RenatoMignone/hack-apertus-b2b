@@ -13,7 +13,7 @@ confirm authenticated calls; they do not establish full-case quality or current 
 | --- | --- |
 | Provider / gateway | CSCS inference, through Keera Gateway |
 | `LLM_BASE_URL` | `https://gateway.keera.ch/api/v1` |
-| `LLM_NAME` | `apertus-v1-5-8b` (default) |
+| `LLM_NAME` | `apertus-v1-5-70b` (current user-selected connected examples) |
 | `LLM_API_KEY` | Team-specific key, supplied privately after check-in |
 
 Use the existing privately supplied team key if still valid. The original
@@ -25,9 +25,9 @@ Never put the key in frontend variables, committed examples, traces or screensho
 
 | Keera served model ID | Tools | Intended routing |
 | --- | --- | --- |
-| `apertus-v1-5-8b` | Yes | Default typed interpretation/extraction/drafting and tool selection |
+| `apertus-v1-5-8b` | Yes | Available explicit alternative for typed tasks and tool selection |
 | `apertus-v1-5-8b-thinking` | No | Optional reasoning-only task; no tools/tool_choice supplied |
-| `apertus-v1-5-70b` | Yes | Optional bounded fallback, configured explicitly |
+| `apertus-v1-5-70b` | Yes | Current explicit connected setting; bounded typed tasks |
 | `apertus-v1-5-70b-thinking` | No | Optional reasoning-only fallback |
 
 Use these exact gateway aliases, not Hugging Face artifact IDs. The direct CSCS
@@ -109,7 +109,8 @@ responses, with task-specific failures; neither completed a verified full case.
 An 8B allowlisted tool proposal worked; 70B returned no proposal in that probe.
 Thinking variants were fixture-tested locally, not exercised live with tools.
 
-Keep the explicit 8B default; no automatic model switching or overall winner is
-established. Current key validity, sustained quotas, concurrency, immutable served
+The user subsequently supplied 70B for connected deployment; examples/private
+settings select it explicitly. This is a configuration decision, not an overall
+benchmark winner; there is no automatic model switching. Current key validity, sustained quotas, concurrency, immutable served
 revision, native structured-output support and representative-case quality still
 need verification. Do not repeat paid/live probes during a docs-only audit.

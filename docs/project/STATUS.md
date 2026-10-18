@@ -1,6 +1,7 @@
 # Current development status
 
-18 October 2026 · Documentation audit against integrated `main` at `4c6cfe2`.
+18 October 2026 · Integrated baseline plus Eric's published migration outcome
+(`9367b9b`) and the connected embedding/shell-checkout fix.
 This is the current status entry point; the [open register](OPEN_QUESTIONS.md)
 owns remaining decisions and the [integration record](../team/INTEGRATION.md)
 owns merge/test evidence. Historical lane docs describe earlier checkpoints.
@@ -9,10 +10,10 @@ owns merge/test evidence. Historical lane docs describe earlier checkpoints.
 | --- | --- | --- |
 | Backend | Authenticated FastAPI, durable LangGraph worker, real reasoning/retrieval adapters, exact evidence assessment, frozen packs, drafts and reviewed PDF | Run against the actual corpus and providers on the selected host |
 | Frontend | HTTP by default; explicit mock mode, polling/clarification, history, flags/actions, source badges and authenticated PDF download | Shared-environment acceptance; detailed real Sankey lineage and explicit formatting-only chat UX |
-| Database | Migration head `0007_frontend_lifecycle`; fresh/upgrade and restricted-role tests | Confirm Eric's actual revision; coordinate backup/upgrade if behind |
-| Corpus / RAG | Collection, registry/MeSH, build/publication CLI, hybrid/relationship retrieval and local model adapters | Reviewed pilot corpus, compatible real embeddings and published snapshot/profile pins |
+| Database | Migration head `0007_frontend_lifecycle`; fresh/upgrade and restricted-role tests | Shared host upgraded 0004 → 0007; backup/restore and preserved artifact checks recorded in [migration status](../team/MIGRATION_STATUS.md) |
+| Corpus / RAG | Collection, registry/MeSH, build/publication CLI, hybrid/relationship retrieval and local model adapters | Real HF encoding/parity verified; Eric is ingesting. Reviewed pilot corpus and published snapshot/profile pins remain |
 | Inference | Configurable Keera Apertus; authenticated synthetic 8B/70B probes | Current key/quotas, tokenizer/revision provenance, full-case quality and resource budgets |
-| Infrastructure | Compose definitions, individual SSH access design, storage/checkpoint/tracing adapters | Confirm actual services, runtime placement, credentials and restart behavior |
+| Infrastructure | Compose definitions, individual SSH access design, storage/checkpoint/tracing adapters | Data/tracing services restored; runtime placement/bindings remain. Apply [LF checkout fix](../data/WINDOWS_SHELL_FIX.md) on the Windows host |
 | Offline / Swiss target | Mode checks, disabled web offline, local-assets policy and dependency inventory | Full packaged, network-disabled run; any Swiss residency/jurisdiction claim needs evidence |
 | Later outputs | PDF implemented | Editable PPTX, supported numeric impact/charts and eligible historical-case similarity |
 
@@ -25,12 +26,11 @@ establish real-model accuracy, target-host readiness or a submission-ready packa
 
 ## Next actions
 
-1. **Eric + rollout operator:** confirm host schema/service state, agree a backup
-   and upgrade window. Eric will perform the migration; use the [complete prompt](../team/prompts/04_SHARED_HOST_MIGRATION.md).
-   Migration execution can be delegated; SSH access alone
-   does not supply the required database role. Follow [live setup](../data/LIVE_SETUP.md).
-2. **Corpus/model owner:** verify embedding runtime/assets and publish the reviewed
-   UniBE/ARTORG/DCB snapshot. Deliver profile/snapshot/build/config IDs and coverage.
+1. **Eric:** migration is complete. Pull the [hosted embedding adapter](../data/HOSTED_EMBEDDINGS.md),
+   use the same verified configuration for ingestion/queries and apply the
+   [Windows LF checkout fix](../data/WINDOWS_SHELL_FIX.md) before retiring the override.
+2. **Eric / corpus owner:** complete a one-source build without publication, then
+   publish the reviewed UniBE/ARTORG/DCB snapshot and deliver pins/coverage.
 3. **Backend operator (you can do this):** configure private runtime bindings,
    matching embedding assets, storage and checkpoints; start API + worker.
 4. **Frontend/backend owners:** test one public permitted company case through

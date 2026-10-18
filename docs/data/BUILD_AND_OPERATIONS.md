@@ -12,8 +12,8 @@ Do not download weights/provision endpoints as part of documentation work.
 
 | Logical role | Intended model | Input → output | Resolution still needed |
 | --- | --- | --- | --- |
-| `reasoning_primary` | Keera `apertus-v1-5-8b` | Permitted request or bounded source passages → structured interpretation, enrichment, support assessment or grounded prose | Authenticated gateway behavior, served revision, tokenizer/chat template and resource limits |
-| `reasoning_fallback` | Keera `apertus-v1-5-70b`, optional and bounded | Difficult permitted task → same validated output contract | Availability, routing criteria, resources, quality/cost |
+| `reasoning_primary` | Keera `apertus-v1-5-70b` (current explicit env) | Permitted request or bounded source passages → structured interpretation, enrichment, support assessment or grounded prose | Authenticated gateway behavior, served revision, tokenizer/chat template and resource limits |
+| `reasoning_fallback` | No automatic fallback; 8B/70B are explicit configurations | Difficult permitted task → same validated output contract | Availability, routing criteria, resources, quality/cost |
 | `embedding` | `google/embeddinggemma-2`, proposed local text-only | Original document chunks or contextual queries → finite dense vectors | Immutable revision/runtime and local benchmark; encoding defaults in embedding deployment; native dimension 768 |
 | `reranking` | BGE-reranker-v2-m3, initial candidate | Contextual request + original passage → relevance score | Source/revision, tokenizer/pair limit, score handling and latency |
 

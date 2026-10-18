@@ -5,6 +5,7 @@ from pathlib import Path
 from uuid import UUID
 
 from backend.config.settings import Settings
+from backend.config.runtime import RuntimeSettings
 from backend.contracts.data import AccessContext, ModelConfiguration, Span, content_hash
 from backend.data.cli import load_environment
 from backend.data.database import check_schema, engine_for
@@ -43,7 +44,7 @@ def main():
     collect.add_argument("--output", required=True, type=Path)
     benchmark = commands.add_parser("benchmark")
     benchmark.add_argument("--configuration", required=True, type=Path)
-    benchmark.add_argument("--model-path", required=True, type=Path)
+    benchmark.add_argument("--model-path", type=Path, help="Required for local backend; hf uses configured tokenizer/endpoint")
     benchmark.add_argument("--inputs", required=True, type=Path)
     benchmark.add_argument("--output", required=True, type=Path)
     build = commands.add_parser("build")
@@ -52,7 +53,7 @@ def main():
     build.add_argument("--sources", required=True, type=Path)
     build.add_argument("--mesh-pins", required=True, type=Path)
     build.add_argument("--configuration", required=True, type=Path)
-    build.add_argument("--model-path", required=True, type=Path)
+    build.add_argument("--model-path", type=Path, help="Required for local backend; hf uses configured tokenizer/endpoint")
     build.add_argument("--confirm-public-sources", action="store_true", required=True)
     build.add_argument("--publish", action="store_true")
     build.add_argument("--expected-active", type=UUID)
@@ -76,9 +77,9 @@ def main():
         return
     load_environment(arguments.env_file)
     if arguments.command == "benchmark":
-        from backend.models.embeddings.local import load_embeddinggemma
+        from backend.models.embeddings.configured import load_configured
         configuration = ModelConfiguration.model_validate(read_json(arguments.configuration))
-        embedder = load_embeddinggemma(configuration, arguments.model_path)
+        embedder = load_configured(configuration, RuntimeSettings.from_env(), local_path=arguments.model_path)
         inputs = read_json(arguments.inputs)
         embedder.encode_inputs(inputs[:1])
         write_json(arguments.output, embedder.benchmark(inputs))
@@ -93,9 +94,9 @@ def main():
         vocabulary = mesh_vocabulary(arguments.trees.read_bytes(), read_json(arguments.manifest))
         write_json(arguments.output, registry.profile(access, vocabulary, reviewer=arguments.reviewer))
         return
-    from backend.models.embeddings.local import load_embeddinggemma
+    from backend.models.embeddings.configured import load_configured
     configuration = ModelConfiguration.model_validate(read_json(arguments.configuration))
-    embedder = load_embeddinggemma(configuration, arguments.model_path)
+    embedder = load_configured(configuration, RuntimeSettings.from_env(), local_path=arguments.model_path)
     builder = CorpusBuilder(engine, settings.artifact_store(), embedder, configuration)
     pins = read_json(arguments.mesh_pins)
     records = []

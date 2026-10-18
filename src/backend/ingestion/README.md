@@ -19,8 +19,12 @@ records the original lane results.
 - `evaluation.py`: unique-entity, reviewed, intent-balanced Recall@10.
 
 `python -m backend.ingestion --help` exposes collect, mesh-import, benchmark and
-build. DB commands check schema, never migrate. Optional packages are declared by the `local-models` / `web` extras. They need a
-target-platform lock and verified local assets before live/offline deployment. No confidential company-plan intake.
+build. DB commands check schema, never migrate. Hosted embeddings use
+`requirements.hosted.lock`; `local-models` / `web` extras remain optional.
+`EMBEDDING_BACKEND=hf` selects the same encoder as runtime queries and makes
+`--model-path` unnecessary for benchmark/build. Supply the pinned tokenizer,
+private HF token and shared verified JSON from the [HF handoff](../../../docs/data/HOSTED_EMBEDDINGS.md).
+No confidential company-plan intake.
 
 ## Build manifest
 

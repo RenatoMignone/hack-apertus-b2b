@@ -124,3 +124,11 @@ and its adapter, reviewed MeSH-tagged corpus publication, remote checkpoint acce
 and a combined provider-backed case remain gates. This database migration alone
 does not prove the complete application is live. Teammate writers remain paused
 pending their operators' compatibility/readiness checks; DBeaver may reconnect.
+
+## Subsequent repository fixes
+
+The LF checkout rule and host rewrite instructions are now in
+[Windows shell fix](../data/WINDOWS_SHELL_FIX.md); normal bootstrap still needs
+host-side verification before retiring the private override. The shared hosted
+encoder is implemented and protocol/parity tested: [HF handoff](../data/HOSTED_EMBEDDINGS.md).
+The recorded migration results above retain their original scope.

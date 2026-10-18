@@ -11,7 +11,11 @@ Root [.env.example](../../../.env.example) and the backend example contain publi
 Keera settings, a team-key placeholder and integrated factory/version fields.
 Keep `LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY`; an explicit alias is honored and
 pinned per run. `EMBEDDING_CONFIGURATION` points to verified ModelConfiguration JSON;
-`EMBEDDING_MODEL_PATH` contains already-provisioned local assets. Optional reranking
+`EMBEDDING_BACKEND=hf` uses `EMBEDDING_ENDPOINT_URL`, secret `HF_TOKEN`,
+`EMBEDDING_MODEL_REVISION` and hash-checked `EMBEDDING_TOKENIZER_PATH`; local mode
+uses `EMBEDDING_MODEL_PATH`. Both build and runtime use `load_configured`; hosted
+mode is forbidden offline. [HF handoff](../../../docs/data/HOSTED_EMBEDDINGS.md)
+owns the verified configuration. Optional reranking
 uses the equivalent `RERANKER_*` fields. These must match the published snapshot;
 legacy model-name/dimension hints alone cannot configure an index. See the
 [integration handoff](../../../docs/team/INTEGRATION.md).

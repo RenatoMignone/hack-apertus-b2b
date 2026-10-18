@@ -6,7 +6,7 @@ assigned adapter's local README. Provider details belong in
 in [embedding deployment](../../../docs/data/EMBEDDING_DEPLOYMENT.md), and pinned
 identity in [model/build contracts](../../../docs/data/BUILD_AND_OPERATIONS.md).
 
-- `reasoning/`: connected Keera Apertus 8B, explicit optional 70B; thinking is no-tools.
+- `reasoning/`: connected Keera Apertus, current env examples select 70B; thinking is no-tools.
 - `embeddings/`: proposed local text-only `google/embeddinggemma-2`; revision/runtime pending.
 - `reranking/`: BGE-reranker-v2-m3 candidate; artifact/runtime still to validate.
 

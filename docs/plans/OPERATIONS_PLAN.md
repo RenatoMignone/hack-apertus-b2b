@@ -26,7 +26,7 @@ Public linked research PDFs remain eligible for Phase 1 collection.
 
 Selected stack: LangGraph with PostgreSQL checkpoints, Phase 1 PostgreSQL
 full-text + pgvector retrieval with RRF fusion, EmbeddingGemma 2 candidate,
-BGE reranking, Apertus v1.5 8B and optional bounded 70B fallback; local Langfuse
+BGE reranking, Apertus v1.5 with explicit connected 70B configuration and no automatic fallback; local Langfuse
 observes execution. [Keera aliases/base URL](../data/INFERENCE_CONFIGURATION.md) are supplied; exact
 revisions, compatible runtime/tokenizer packages and limits remain open.
 The engine is domain-independent; pilot concepts, sources, geography, validation

@@ -48,7 +48,7 @@ gaps/next steps; sources/coverage; optional economic contribution and prior case
 | Application/API + LangGraph | Case revisions, bounded workflow, authorization, cancellation and checkpoints | Independent runtime host, outside cantonal ICT |
 | Collection worker | Discovery, robots/access checks, safe fetch, public company research | Connected collection host; optional runtime tool only in connected mode |
 | Parsers/normalizers | HTML/text-PDF extraction, tables, locators, quality checks; OCR later | Collection host or local case-research worker |
-| Apertus v1.5 8B / optional 70B | Interpretation, evidence-linked enrichment, match reasoning, report writing | Local serving inside the deployment boundary for disconnected mode; otherwise only a verified compliant endpoint |
+| Apertus v1.5, explicit 70B connected setting / 8B alternative | Interpretation, evidence-linked enrichment, match reasoning, report writing | Local serving inside the deployment boundary for disconnected mode; otherwise only a verified compliant endpoint |
 | EmbeddingGemma 2 candidate + BGE reranker | Document/query embeddings and passage reranking through separate adapters/tokenizers | Local runtime workers; embedding also runs during index build; exact artifacts deferred |
 | Artifact store + PostgreSQL canonical records | Raw/normalized bytes, exact evidence, entities, claims, derivations, manifests | Controlled persistent storage inside the boundary |
 | PostgreSQL + pgvector | Full-text lexical + vector cosine retrieval, RRF fusion, snapshot/access filtering | Runtime boundary; supplied vectors and versioned search configs |
@@ -194,7 +194,7 @@ Owners: [ingestion/contracts](INGESTION_PLAN.md), [case operations](OPERATIONS_P
 [Module handoffs](MODULE_HANDOFFS.md) route feature agents to focused owners and
 contracts. Frontend ownership is separate: backend agents read but do not edit it.
 Connected Apertus calls use [Keera](../data/INFERENCE_CONFIGURATION.md); offline
-requires a separate packaged local inference service. Local text-only
-[EmbeddingGemma 2](../data/EMBEDDING_DEPLOYMENT.md) is recommended, with hosting
-and performance still to validate. [Open questions](../project/OPEN_QUESTIONS.md)
+requires a separate packaged local inference service. [Hosted EmbeddingGemma 2](../data/HOSTED_EMBEDDINGS.md) now has a shared build/query
+adapter and synthetic parity checks; real-corpus quality remains to validate.
+Local assets remain the offline option. [Open questions](../project/OPEN_QUESTIONS.md)
 is the sole active unresolved-design register.

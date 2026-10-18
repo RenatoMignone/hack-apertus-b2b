@@ -28,6 +28,8 @@ separate current interfaces/integration evidence from the completed lane history
 5. **[Inference settings](data/INFERENCE_CONFIGURATION.md)** — supplied Keera
    endpoint/model IDs; [embedding recommendation](data/EMBEDDING_DEPLOYMENT.md).
    Root [.env.example](../.env.example) contains placeholders, not a working key.
+   [Hosted embeddings](data/HOSTED_EMBEDDINGS.md) documents the configured HF
+   endpoint; [Windows LF fix](data/WINDOWS_SHELL_FIX.md) replaces the temporary workaround.
 6. **[Active open questions](project/OPEN_QUESTIONS.md)** — integration decisions,
    prerequisites and recommended defaults; [history](project/DECISIONS_AND_OPEN_QUESTIONS.md)
    records provenance rather than another competing current backlog.

@@ -28,8 +28,9 @@ population and taxonomy contents, not alternative database designs.
 Keera URL and four model aliases are supplied (Q05 partially resolved). A private
 key worked for the [synthetic comparison](../team/intelligence/MODEL_COMPARISON.md);
 current key validity, sustained quotas and broader gateway behavior remain open. EmbeddingGemma 2
-artifact reference is verified; **local text-only hosting is a recommendation**,
-not a measured winner or an already running service.
+artifact/revision and tokenizer are pinned; user-selected HF hosting and the
+shared adapter passed synthetic protocol/parity checks. [Hosted configuration](../data/HOSTED_EMBEDDINGS.md)
+records the evidence; real corpus retrieval quality remains unmeasured.
 
 ## Active engineering decisions
 
@@ -38,11 +39,11 @@ not a measured winner or an already running service.
 | O01 / Q05 | Current team-key validity, quotas/rate/concurrency limits and expiry | Reuse the privately supplied team key; limited 8B/70B calls passed. Confirm deployment limits through [inference config](../data/INFERENCE_CONFIGURATION.md); no confidential inputs | Models/operations; live deployment input, not missing transport code |
 | O02 / Q05,Q15 | Keera JSON Schema/tool dialect, usage, max input/output, streaming and timeout behavior | Chat Completions non-streaming first, non-thinking tools; verify actual responses before selecting structured-output mode | Models/workflows |
 | O03 / Q15 | Served Apertus weight revision, prompt/template versions and tokenizer access | Record aliases as served IDs, obtain version provenance; never invent immutable hashes; use compatible tokenizer limits | Models/evaluation |
-| O04 / Q06,Q15 | Embedding host/device and supported runtime packages/model commit | Benchmark local text-only `google/embeddinggemma-2` first; 768d/float32 CPU baseline; decide only after latency/RAM/recall checks | Embeddings; blocks first real index build |
-| O05 / Q15 | Hosted embedding fallback, exact HF credit eligibility/account/region and request parity | Keep unused unless local results require it; verify $10 credit terms; one shared endpoint owner; no assumed credit pooling | Embeddings/operations |
+| O04 / Q06,Q15 | Corpus/query acceptance and throughput for the configured HF encoder | Endpoint/image/model revision supplied; 768d exact-token query/document parity passed. Use identical verified JSON for build and runtime; evaluate real corpus latency/recall | Embeddings/data; no remaining missing HTTP adapter |
+| O05 / Q15 | Actual HF endpoint billing, credit eligibility, region, quotas and data handling | Hosted use explicitly selected; confirm with endpoint owner. No assumption of Swiss residency, pooled credits or offline operation | Embeddings/operations |
 | O06 / Q15 | Reranker artifact/revision, tokenizer/pair limit, hardware and measured latency | Validate BGE-reranker-v2-m3 candidate independently of embedding/model services | Reranking |
 | O07 / Q17 | Deploy and supervise the implemented API/worker on the actual host | FastAPI/CLI/LangGraph are integrated; assign process owner and verify restart behavior on target infrastructure | API/operations |
-| O08 / Q17 | Provision real user/token/DB bindings and confirm access lifecycle | Owner isolation and restricted scope provisioning pass disposable tests; schedule 0006/0007 migration, HTTPS/CORS and real-user acceptance | API/security/deployment |
+| O08 / Q17 | Provision real user/token/DB bindings and confirm access lifecycle | Owner isolation and restricted scope provisioning pass disposable tests; 0007 is deployed; configure runtime bindings, HTTPS/CORS and real-user acceptance | API/security/deployment |
 | O09 / Q17 | Validate integrated HTTP frontend against the populated shared environment | OpenAPI, safe errors, pagination, polling and real client are implemented; local synthetic browser smoke passed | API/frontend/deployment |
 | O10 / Q18 | Evaluate prompt/task quality and resource budgets on representative corpus cases | Ports, graph and bounded settings are implemented; benchmark passage/context sizes, retry costs and evidence coverage before tuning defaults | Workflows/models/evaluation |
 | O11 / Q18 | Representative quality and thresholds for implemented extraction/support/draft tasks | Fixed prompts, bounded repair and independent semantic assessment exist; evaluate omissions, contradictions and exact wording on reviewed real cases | Evidence/validation; synthetic labels alone do not establish accuracy |
@@ -51,7 +52,7 @@ not a measured winner or an already running service.
 | O14 / Q18 | Published reviewed taxonomy/profile pins and corpus assignments | MeSH category/subcategory + document subject support is implemented; import/review actual contents, preserve broader/related distinctions and unknowns; other domains use profiles | Taxonomy/interpretation |
 | O15 / Q08 | Partner acceptance of implemented PDF layout and larger real reports | Deterministic renderer, company introduction, kept-only citations, fonts/logo and visual fixtures verified; PPTX remains later | Reports/evaluation |
 | O16 / Q18 | Detailed recorded Sankey lineage, explicit formatting-only chat UX and PPTX | HTTP, source badges, review/hash gates, persisted flags/actions and PDF are implemented; do not invent missing trace links | Frontend/API |
-| O17 / Q06,Q16 | Team-host migrations through 0007, hardware, worker placement and full offline model packaging | Eric owns the migration; confirm actual revision first (0004 was a historical observation) and use the [prompt](../team/prompts/04_SHARED_HOST_MIGRATION.md) / [live setup](../data/LIVE_SETUP.md). Keera is connected only; offline needs packaged inference/embedding assets | Operations |
+| O17 / Q06,Q16 | Runtime placement, Windows normal bootstrap verification and offline packaging | Migration complete: [host result](../team/MIGRATION_STATUS.md). Apply [LF fix](../data/WINDOWS_SHELL_FIX.md). Hosted HF/Keera require connected mode; offline needs local assets | Operations |
 | O18 / Q16 | Trace/backup/artifact/checkpoint retention, gateway data handling/locality, restore policy and resource monitoring | Local masked tracing and nonblocking outages; select concrete durations/capacity with host owner; respect revocation | Operations/observability |
 | O19 / Q03,Q04 | Gold queries, expected experts/units, approved examples and measured quality | Obtain partner examples; evaluate intent-balanced Recall@10 ≥ .80 and claim support/coverage; synthetic fixtures are not a benchmark | Evaluation |
 | O20 | Final prompts for adjacent opportunities and source conflicts | Keep direct/idea labels and unresolved contradictions visible; never imply availability, willingness or clinical suitability | Evidence/reports |

@@ -19,13 +19,15 @@ navigator-runtime --env-file .env worker
 Copy root `.env.example` privately and fill identity/token bindings, application
 DSN, checkpoint DB, artifact access, published profile and verified embedding
 configuration/assets. Startup never migrates, ingests a corpus or downloads weights.
-Eric will coordinate the shared migration through `0007_frontend_lifecycle`;
-confirm actual revision first. Set up the separate framework database explicitly.
+Eric completed the shared migration through `0007_frontend_lifecycle`;
+see [host status](../../docs/team/MIGRATION_STATUS.md). Set up the separate framework database explicitly.
 See [live setup](../../docs/data/LIVE_SETUP.md) and [deployment](../../docs/data/DEPLOYMENT.md).
 
-Core/test dependencies are locked. Local embedding/reranker and connected web
-packages are optional `.[local-models,web]` extras; provision and lock them for the
-target platform before offline packaging. Their model assets remain external.
+Core/test dependencies are locked. Hosted embeddings use
+`requirements.hosted.lock` (tokenizer runtime, no local model weights);
+[HF setup](../../docs/data/HOSTED_EMBEDDINGS.md) documents endpoint/config/tokenizer
+requirements. Local models and connected web remain optional extras requiring
+target-platform packaging. Hosted services require connected mode.
 
 | Component | Local guidance |
 | --- | --- |

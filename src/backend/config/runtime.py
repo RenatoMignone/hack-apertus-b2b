@@ -48,6 +48,11 @@ class RuntimeSettings:
     pdf_logo_path: str = ""
     embedding_configuration: str = ""
     embedding_model_path: str = ""
+    embedding_backend: str = "local"
+    embedding_endpoint_url: str = ""
+    embedding_model_revision: str = ""
+    embedding_tokenizer_path: str = ""
+    hf_token: str = field(default="", repr=False)
     reranker_configuration: str = ""
     reranker_model_path: str = ""
     model_device: str = "cpu"
@@ -66,6 +71,10 @@ class RuntimeSettings:
             raise ValueError("worker lease must be 15–3600 seconds")
         if self.mode == "offline" and not local_inference_url(self.llm_base_url):
             raise ValueError("offline inference requires an explicit local model endpoint")
+        if self.embedding_backend not in {"local", "hf"}:
+            raise ValueError("EMBEDDING_BACKEND must be local or hf")
+        if self.mode == "offline" and self.embedding_backend == "hf":
+            raise ValueError("hosted embeddings are forbidden offline")
         if "*" in self.cors_origins:
             raise ValueError("CORS requires explicit origins")
         import re
@@ -102,6 +111,11 @@ class RuntimeSettings:
             pdf_logo_path=os.getenv("RUNTIME_PDF_LOGO_PATH", ""),
             embedding_configuration=os.getenv("EMBEDDING_CONFIGURATION", ""),
             embedding_model_path=os.getenv("EMBEDDING_MODEL_PATH", ""),
+            embedding_backend=os.getenv("EMBEDDING_BACKEND", "local"),
+            embedding_endpoint_url=os.getenv("EMBEDDING_ENDPOINT_URL", ""),
+            embedding_model_revision=os.getenv("EMBEDDING_MODEL_REVISION", ""),
+            embedding_tokenizer_path=os.getenv("EMBEDDING_TOKENIZER_PATH", ""),
+            hf_token=os.getenv("HF_TOKEN", ""),
             reranker_configuration=os.getenv("RERANKER_CONFIGURATION", ""),
             reranker_model_path=os.getenv("RERANKER_MODEL_PATH", ""),
             model_device=os.getenv("MODEL_DEVICE", "cpu"), web_user_agent=os.getenv("WEB_USER_AGENT", ""),

@@ -1,0 +1,17 @@
+{
+  "role": "embedding",
+  "logical_name": "embeddinggemma-2-hf",
+  "artifact": "google/embeddinggemma-2",
+  "revision": "914f7f89142e33e77833254d9c9b90c3cef7303b",
+  "adapter_version": "hf-serve/b805e0ccb5659d44f3ae384858900273d7965076;raw-openai-v1",
+  "tokenizer": "google/embeddinggemma-2@914f7f89142e33e77833254d9c9b90c3cef7303b",
+  "input_limit": 8192,
+  "dimension": 768,
+  "normalization": "l2",
+  "query_template": "task: search result | query: {text}",
+  "document_template": "title: {title} | text: {text}",
+  "precision": "float32",
+  "license": "apache-2.0",
+  "verified": false,
+  "test_only": false
+}

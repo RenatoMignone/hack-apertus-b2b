@@ -3,7 +3,7 @@ from dataclasses import replace
 import pytest
 
 from backend.application.adapters import Services
-from backend.application.factories import LocalEmbedding
+from backend.application.factories import ConfiguredEmbedding
 from backend.config.runtime import RuntimeSettings
 from backend.contracts.services import ServiceUnavailable
 from backend.models.reasoning import KeeraChatModel, ModelSettings
@@ -20,7 +20,7 @@ def test_production_factories_match_runtime_signature_and_share_fetch_observatio
     assert services.backbone.repository.observations is services.web.fetcher.observations
     assert services.pdf.logo_path == tmp_path / "logo.png"
     with pytest.raises(ServiceUnavailable):
-        LocalEmbedding(settings).embed_query("No hidden embedding fallback")
+        ConfiguredEmbedding(settings).embed_query("No hidden embedding fallback")
     offline = Services.configured(replace(settings, mode="offline", llm_base_url="http://llm:8080/v1"),
         object(), FilesystemArtifactStore(tmp_path))
     assert offline.web is None and offline.reasoning.tasks.model.settings.local

@@ -35,3 +35,8 @@ project's resources. Do not run broad prune/stop commands or remove shared data
 volumes. Container configuration is supplied for integration; no image was built,
 registered or deployed in this task. Offline deployment additionally requires
 local model/adapters/assets and host-enforced network isolation.
+
+For Windows-mounted shell entrypoints, root `.gitattributes` now enforces LF.
+Existing host checkouts may need a one-time rewrite; [host instructions](../../../docs/data/WINDOWS_SHELL_FIX.md)
+explain when the temporary migration override can be retired. Hosted embeddings
+need the supplemental lock plus tokenizer/config mounts; they remain connected-only.
