@@ -1,10 +1,24 @@
 # Workflows and use cases
 
 **Status:** current workflow is recording-derived; assisted workflow and test
-cases are proposals. Evidence IDs link to [recording insights](RECORDING_INSIGHTS.md).
+cases are proposals. Evidence IDs link to [recording insights](../recordings/RECORDING_INSIGHTS.md).
 No authentic company brief, verified expert list or application result was supplied.
 
+**18 October update:** the user confirms partner example needs and expected
+entities can be supplied, but none has arrived. The selected pilot is
+[diabetes technology](PILOT_SCOPE.md); C01–C04 are useful starter designs, not
+executed cases. Automatic PowerPoint export and case operations are now planned
+in [OPERATIONS_PLAN.md](../plans/OPERATIONS_PLAN.md), superseding the earlier optional
+feature descriptions below. English is the baseline presentation language.
+
 ## Current workflow
+
+**Conversational refinement:** user instructions can change emphasis, exclusions
+or report wording after a result is produced. The agent can ask focused follow-up
+questions, then resume the appropriate case revision. Preserve intent/answers,
+evidence references and export lineage as specified in OPERATIONS_PLAN. T05
+04:24–04:41 confirms iterative direction changes; follow-up questions are also
+an explicit current user requirement.
 
 1. **Receive a lead/company description.** Often through Switzerland Global
    Enterprise; inbound approaches also happen. Existing staff carry out

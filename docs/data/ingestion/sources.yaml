@@ -1,0 +1,252 @@
+# Bern Research & Economic Development Navigator — Phase 1 source registry
+# Initial crawl config. These seeds are not blanket crawling authorization.
+# Verify each origin's robots.txt and website terms at runtime.
+schema_version: "1.0"
+
+settings:
+  user_agent: "BernResearchNavigator/0.1 (+REPLACE-WITH-REAL-CONTACT-URL)"
+  data_dir: "data"
+  respect_robots_txt: true
+  block_unreviewed_terms: true
+  allow_private_ips: false
+  allowed_schemes: ["https", "http"]
+  allowed_content_types: ["text/html", "application/xhtml+xml", "application/pdf"]
+  concurrency_per_host: 2
+  requests_per_second_per_host: 1.0
+  connect_timeout_seconds: 10
+  read_timeout_seconds: 30
+  max_redirects: 5
+  retries: 3
+  default_max_depth: 3
+  default_max_pages: 100
+  default_max_pdfs: 30
+  max_html_mb: 8
+  max_pdf_mb: 35
+  deny_query_params: ["fbclid", "gclid", "session", "sessionid"]
+  strip_tracking_param_prefixes: ["utm_"]
+  deny_path_regex:
+    - '(?i)/(?:login|logout|signin|register|account|cart|checkout)(?:/|$)'
+    - '(?i)/(?:calendar|events)/\d{4}/\d{1,2}/\d{1,2}(?:/|$)'
+  # An external URL is always candidate-only until registered explicitly.
+  follow_unregistered_external_links: false
+
+sources:
+  - id: berninvest
+    organization: Bern Economic Development Agency
+    enabled: true
+    priority: P0
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://www.berninvest.be.ch/en/start/standort/innovationsoekosystem.html
+      - https://www.berninvest.be.ch/en/start/standort/innovationsoekosystem/forschung-entwicklung.html
+      - https://www.berninvest.be.ch/en/start/dienstleistungen.html
+    allowed_hosts: [www.berninvest.be.ch]
+    allowed_path_prefixes:
+      www.berninvest.be.ch:
+        - /en/start/standort/innovationsoekosystem
+        - /en/start/dienstleistungen
+    max_depth: 3
+    max_pages: 100
+    max_pdfs: 20
+    language_hints: [en]
+
+  - id: unibe_directory
+    organization: University of Bern — Institute Directory
+    enabled: true
+    priority: P0
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://www.institutionensuche.unibe.ch/neu/index.php?lang=en
+    allowed_hosts: [www.institutionensuche.unibe.ch]
+    allowed_path_prefixes:
+      www.institutionensuche.unibe.ch: [/neu/]
+    max_depth: 3
+    max_pages: 100
+    max_pdfs: 0
+    language_hints: [en, de]
+    adapter: university_institute_directory
+
+  - id: unibe_research
+    organization: University of Bern — Research
+    enabled: true
+    priority: P0
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://www.unibe.ch/research/at_a_glance/index_eng.html
+      - https://www.unibe.ch/research/strategy_and_focus/research_focus/centers_and_interfaculty_units/index_eng.html
+      - https://www.unibe.ch/research/strategy_and_focus/projects_and_publications/eu/index_eng.html
+    allowed_hosts: [www.unibe.ch]
+    allowed_path_prefixes:
+      www.unibe.ch:
+        - /research/at_a_glance/
+        - /research/strategy_and_focus/
+        - /dam/
+    max_depth: 3
+    max_pages: 120
+    max_pdfs: 25
+    language_hints: [en]
+
+  - id: unibe_innovation
+    organization: University of Bern — Innovation Ecosystem
+    enabled: true
+    priority: P0
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://www.unibe.ch/innovation/innovationunibe/ecosystem/index_eng.html
+    allowed_hosts: [www.unibe.ch]
+    allowed_path_prefixes:
+      www.unibe.ch:
+        - /innovation/innovationunibe/ecosystem/
+    max_depth: 2
+    max_pages: 40
+    max_pdfs: 10
+    language_hints: [en]
+
+  - id: bfh_research
+    organization: Bern University of Applied Sciences
+    enabled: true
+    priority: P0
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://www.bfh.ch/ti/en/research/
+      - https://www.bfh.ch/ti/en/research/range-of-services/
+      - https://www.bfh.ch/ti/en/research/research-areas/
+      - https://www.bfh.ch/ti/de/forschung/projekte/
+    allowed_hosts: [www.bfh.ch]
+    allowed_path_prefixes:
+      www.bfh.ch:
+        - /ti/en/research/
+        - /ti/de/forschung/
+        - /dam/
+    max_depth: 4
+    max_pages: 200
+    max_pdfs: 40
+    language_hints: [en, de]
+
+  - id: csem
+    organization: CSEM — Bern-relevant Expertise
+    enabled: true
+    priority: P0
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://www.csem.ch/en/our-expertise/
+      - https://www.csem.ch/en/press/extension-bern-medtech-agreement/
+    allowed_hosts: [www.csem.ch]
+    allowed_path_prefixes:
+      www.csem.ch:
+        - /en/our-expertise/
+        - /en/press/extension-bern-medtech-agreement/
+    max_depth: 3
+    max_pages: 100
+    max_pdfs: 15
+    language_hints: [en]
+
+  - id: sipbb
+    organization: Switzerland Innovation Park Biel/Bienne
+    enabled: true
+    priority: P0
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://sipbb.ch/
+      - https://sipbb.ch/research/
+    allowed_hosts: [sipbb.ch]
+    allowed_exact_paths:
+      sipbb.ch: [/]
+    allowed_path_prefixes:
+      sipbb.ch:
+        - /research/
+        - /research-technology/
+        - /projects/
+        - /technology/
+    max_depth: 3
+    max_pages: 100
+    max_pdfs: 20
+    language_hints: [en, de, fr]
+
+  - id: sitem
+    organization: Swiss Institute for Translational and Entrepreneurial Medicine
+    enabled: false
+    priority: P1
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://www.berninvest.be.ch/en/start/standort/innovationsoekosystem/sitem-insel-ag.html
+      - https://www.sitem.unibe.ch/index_eng.html
+    allowed_hosts: [www.berninvest.be.ch, www.sitem.unibe.ch]
+    allowed_exact_paths:
+      www.sitem.unibe.ch: [/index_eng.html]
+    allowed_path_prefixes:
+      www.berninvest.be.ch:
+        - /en/start/standort/innovationsoekosystem/sitem-insel-ag.html
+      www.sitem.unibe.ch:
+        - /school/
+    max_depth: 2
+    max_pages: 40
+    max_pdfs: 10
+    language_hints: [en, de]
+
+  - id: empa_thun
+    organization: Empa — Thun
+    enabled: false
+    priority: P1
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://www.empa.ch/web/s604/new-laboratories-at-thun-site
+      - https://www.empa.ch/web/s604/30-jahre-empa-standort-thun
+    allowed_hosts: [www.empa.ch]
+    allowed_path_prefixes:
+      www.empa.ch:
+        - /web/s604/
+    max_depth: 2
+    max_pages: 60
+    max_pdfs: 10
+    language_hints: [en, de]
+
+  - id: wyss
+    organization: Wyss Academy for Nature
+    enabled: false
+    priority: P1
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://www.wyssacademy.org/en/research
+      - https://www.wyssacademy.org/en/where-we-work/switzerland
+    allowed_hosts: [www.wyssacademy.org]
+    allowed_path_prefixes:
+      www.wyssacademy.org:
+        - /en/research
+        - /en/where-we-work/switzerland
+    max_depth: 3
+    max_pages: 80
+    max_pdfs: 15
+    language_hints: [en]
+
+  - id: insel_research
+    organization: Inselspital Research Groups
+    enabled: false
+    priority: P1
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://tumorzentrum.insel.ch/en/research/network/research-groups-institutions-services
+    allowed_hosts: [tumorzentrum.insel.ch]
+    allowed_path_prefixes:
+      tumorzentrum.insel.ch:
+        - /en/research/
+    max_depth: 2
+    max_pages: 50
+    max_pdfs: 10
+    language_hints: [en]
+
+  - id: bfh_startups
+    organization: BFH Startup and Industry Collaboration
+    enabled: false
+    priority: P1
+    terms_review_status: pending  # change to approved only after human review
+    seed_urls:
+      - https://www.bfh.ch/ti/en/research/entrepreneurship-at-the-bfh-ti/
+    allowed_hosts: [www.bfh.ch]
+    allowed_path_prefixes:
+      www.bfh.ch:
+        - /ti/en/research/entrepreneurship-at-the-bfh-ti/
+    max_depth: 2
+    max_pages: 35
+    max_pdfs: 5
+    language_hints: [en]

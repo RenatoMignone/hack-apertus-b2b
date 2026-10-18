@@ -2,16 +2,16 @@
 
 **Status:** contract proposal derived from B1, N1 and recording evidence E03,
 E07–E11, E15, E18–E22. No source collection, entity extraction or rights clearance
-has been performed. See [SOURCES.md](SOURCES.md) for context-source provenance.
+has been performed. See [SOURCES.md](../project/SOURCES.md) for context-source provenance.
 
 ## Source inventory
 
 | Source family required by B1 | Discovery input | Current status |
 | --- | --- | --- |
-| University of Bern | Public `unibe.ch` discovery inventory `unibe_sous_domaines_publics_etendus.xlsx`, named in N1; faculties, institutes, centres, groups, laboratories, services/platforms | Filename known; workbook/download URL absent and contents not inspected. `unibe.ch` alone is not a complete crawl configuration |
-| ARTORG Center for Biomedical Engineering Research | Official website and associated research, team and project pages | Exact seed URLs, domain/path boundaries and language variants not supplied/verified |
-| Diabetes Center Berne | Official website and research, expertise, team, project and service pages | Exact seed URLs, domain/path boundaries and language variants not supplied/verified |
-| Additional Bern institutions/companies | Configurable future source entries | Stakeholder interest; no additional mandatory domain list or verified seeds |
+| University of Bern | Partner workbook, supplemented by relevant public links/sitemaps and DBMR/medical seeds | 42 actual workbook entries including external DCB; best-effort list, Notes count of 71 inconsistent. Import URL column with row provenance; apply per-origin policy. |
+| ARTORG Center for Biomedical Engineering Research | Official website and associated research, team and project pages | Research directory and diabetes/nutrition pages inspected; links in PILOT_SCOPE; bulk crawl policies not tested |
+| Diabetes Center Berne | Official website and research, expertise, team, project and service pages | Official English research entry is `https://www.dcberne.com/en/projects/`; inspected, not a completed crawl |
+| Additional Bern institutions/companies | Partner references first, then relevant public healthcare sources | User allows expansion with evidenced Canton of Bern operations; affiliation alone does not prove locality |
 
 Resolve redirects and actual institutional site ownership before configuring
 collection. ARTORG may overlap the UniBE web ecosystem: source families describe
@@ -19,12 +19,25 @@ institutional coverage, not necessarily disjoint hosts or datasets. Deduplicate
 physical pages without losing institutional attribution. Do not count duplicate
 copies as extra experts or fabricate three separate databases.
 
+See [PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md) for dated discovery evidence and selected
+diabetes-technology scope. The user authorizes public robots-allowed collection;
+do not require separate blanket per-origin approval. Check actual access rules
+and escalate real ambiguity/blocks; redistribution rights remain separate.
+English is the output baseline; preserve DE/FR/IT original source text where
+collected and keep translations as evidence-linked derivations.
+
+The [provided-material inventory](../provided_material/README.md) records original
+file hashes and handling rules. The workbook provides discovery candidates,
+not accepted expertise claims or evaluation labels. Logo and slide template are
+presentation assets; keep them outside the research-evidence index.
+
 ## Proposed source configuration and collection record
 
-Before collection, obtain the named workbook, record its origin/date/hash, inspect
-its sheets and columns, and validate the actual domains/URLs. Its filename does
-not establish a schema, entry count, completeness or crawl permission. The N1
-[page-text snapshot](sources/NOTION_CHALLENGE_2026-10-18.md) is context evidence,
+The named workbook has now been received and inspected; its origin/date/hash,
+sheets, columns and count discrepancy are documented in the provided-material
+inventory. Validate actual domains/URLs before collection; supplied rows do not
+establish live reachability, completeness or crawl permission. The N1
+[page-text snapshot](../sources/NOTION_CHALLENGE_2026-10-18.md) is context evidence,
 not the inventory itself or evidence of any researcher's expertise.
 
 A new source should need a small configuration entry and, only where necessary,
@@ -50,7 +63,7 @@ indexed and rejected pages. Keep failures visible in coverage reporting.
 
 ## Proposed knowledge and evidence contract
 
-The required result fields are in [PRODUCT_REQUIREMENTS.md](PRODUCT_REQUIREMENTS.md).
+The required result fields are in [PRODUCT_REQUIREMENTS.md](../challenge/PRODUCT_REQUIREMENTS.md).
 The internal representation should support these additional provenance concepts:
 
 | Record | Suggested contents and rules |
@@ -106,8 +119,8 @@ Do not relicense crawled pages, photos, PDFs, logos or transcripts under the cod
 license. Redistribution permissions and the current T&C wording remain unresolved.
 
 N1 explicitly limits `powerpoint_template.pptx` and `Logo_SF_BE_EN.png` to use
-for this challenge. Their names and that restriction are known; the files and
-embedded notices have not been inspected. Do not assume general reuse rights or
+for this challenge. The supplied files have now been inspected structurally and their hashes
+recorded; visual export checks remain to be performed during implementation. Do not assume general reuse rights or
 include these branding assets in the search evidence corpus.
 
 The supplied transcripts are working context, not source facts for expertise

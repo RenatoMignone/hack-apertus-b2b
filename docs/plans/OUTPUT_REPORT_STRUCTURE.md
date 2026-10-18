@@ -1,3 +1,10 @@
+# Bern opportunity brief — Proposed output structure
+
+**Status:** supporting content design, aligned with the paired implementation
+plans. The agent accepts user refocusing/edit instructions and asks targeted
+follow-up questions; revisions retain citations and regenerate affected exports.
+The supplied template and logo are challenge-only assets.
+
 **The main output should be a company-specific “Bern opportunity brief”: help her understand the company’s needs, identify relevant Bern capabilities, and select credible arguments for a pitch.** Understanding the company is the starting point; connecting it to Bern’s ecosystem is the workshop’s central objective.
 
 The immediate pitch audience is primarily the company’s CEO/C-level decision-makers considering a visit or establishment in Bern.
@@ -26,7 +33,7 @@ A compact, repeatable card:
 - **Fit:** direct / adjacent / exploratory, with a short explanation.
 - **Evidence:** supporting links and any limitations.
 
-This covers the written challenge’s required fields. A numerical matching score is optional; initially, **explained fit labels are more useful than an unsupported “87% match.”** Keep relevance separate from strength of evidence. [Challenge brief, §4](CHALLENGE_BRIEF.md).
+This covers the written challenge’s required fields. A numerical matching score is optional; initially, **explained fit labels are more useful than an unsupported “87% match.”** Keep relevance separate from strength of evidence. [Challenge brief, §4](../challenge/CHALLENGE_BRIEF.md).
 
 ### How to handle your additional ideas
 
@@ -35,11 +42,11 @@ This covers the written challenge’s required fields. A numerical matching scor
 | **Previous companies and outcomes** | Useful later, but the workshop supplied no historical case database. Similarity must not imply the new company will achieve the same outcome. |
 | **Metrics, charts and plots** | Include only when they communicate real supplied data: planned hiring over time, investment phases or development milestones. Label actuals, company plans and assumptions distinctly. |
 | **Economic impact** | Start with **planned direct contribution**, such as jobs and investment. Broader GDP, tax or indirect-job estimates need a separate evidenced methodology; they should not be LLM guesses. |
-| **PowerPoint generation** | Make it a second output generated from her reviewed selections. The LLM can draft content; a slide-generation component applies the template. The listed template has not yet been supplied or inspected. |
+| **PowerPoint generation** | Make it a second output generated from her reviewed selections. The LLM can draft content; a slide-generation component applies the template. The partner template has now been supplied and structurally inspected; use it with the English logo and validate generated slides. |
 | **Incoming emails and internal notes** | Use a human-prepared, non-confidential summary for this prototype. Internal company records are beyond the confirmed public-source scope; confidential business plans must stay out of every model. |
 
 ### Where the workshop says to focus
 
-The stakeholder emphasized **short explanations, useful scientific connections, source links and human selection**. She explicitly wanted more than bare links, accepted honest no-match results, and described an outgoing teaser of **five to ten pages maximum**. Historical-case scoring and economic-impact modelling were not established priorities. [Workshop findings E09–E16](RECORDING_INSIGHTS.md).
+The stakeholder emphasized **short explanations, useful scientific connections, source links and human selection**. She explicitly wanted more than bare links, accepted honest no-match results, and described an outgoing teaser of **five to ten pages maximum**. Historical-case scoring and economic-impact modelling were not established priorities. [Workshop findings E09–E16](../recordings/RECORDING_INSIGHTS.md).
 
 **For the first version:** deliver sections 1–7 as a concise, reviewable brief, with expertise matching taking most of the space. Then offer a company-facing PDF or PowerPoint assembled from the items she selects.

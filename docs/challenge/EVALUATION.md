@@ -1,15 +1,25 @@
 # Evaluation plan and evidence requirements
 
 **Status: proposed protocol; no evaluation has run and no performance is claimed.**
+
+**18 October decision:** the user delegated aggregation/entity counting. Use
+intent-balanced macro Recall@10 >= 0.80 for the English positive-query suite as
+the internal primary gate, with unique typed person/unit IDs in one shared top
+ten. Average frozen wording variants within each intent, then average intents;
+report per-variant, per-type and micro diagnostics. Assess DE/FR/IT extensions
+separately. Full details and broad-query handling are in
+[PILOT_SCOPE.md](PILOT_SCOPE.md#evaluation-decision). This is our operational
+definition, not an organizer-supplied aggregation clarification.
+
 The numerical targets come from [B1 §4](CHALLENGE_BRIEF.md); the recordings supply
 no labeled evaluation dataset and suggest constructing a pilot or synthetic
-examples. [E20](RECORDING_INSIGHTS.md#e20--evaluation-needs-to-be-constructed)
+examples. [E20](../recordings/RECORDING_INSIGHTS.md#e20--evaluation-needs-to-be-constructed)
 
 ## Official targets versus proposed measurements
 
 | Requirement | Proposed measurement | Interpretation/limit |
 | --- | --- | --- |
-| At least 80% of expected experts/units in top 10 | Recall@10 per query, plus macro/micro aggregate | Official wording does not specify aggregation; agree with the partner and report both rather than invent an official pass formula |
+| At least 80% of expected experts/units in top 10 | Per-query recall and primary intent-balanced macro Recall@10 >= 0.80; micro/type diagnostics | Aggregation defined under user delegation; not an official organizer formula |
 | Equivalent wording finds the same experts | Expected-set recall for paired terminology variants; optionally top-10 set overlap | Same-intent pairs share gold entities; broader related terms need separate judgments |
 | 100% traceable source-supported results | Result-level supporting-link rate and factual claim-support audit | A valid/reachable URL alone is insufficient; a supported name does not validate all of a result's roles/projects |
 | Structured results where source provides fields | Supported-field completeness, missing-value accuracy, unsupported-field count | Judge availability from checked source material; do not reward fabricated completeness |
@@ -26,8 +36,14 @@ Macro Recall@10 = mean of Recall@10(q) over positive queries
 Micro Recall@10 = sum of matched expected entities / sum of expected entities
 ```
 
-Specify whether experts and units are judged separately or as typed entities;
-do not silently count one unit as every expected person within it. Duplicated
+The plain per-query macro above is a descriptive diagnostic when wording variants
+are listed individually. The selected primary gate groups variants within each
+intent first, as specified in PILOT_SCOPE; label both aggregates explicitly.
+Use the same frozen variant suite when comparing systems.
+
+Use typed entities in the shared top ten, and report separate person/unit
+diagnostics where their gold subsets exist. Do not count one unit as every
+expected person within it. Duplicated
 profiles do not create extra hits. Queries with no gold match are assessed for
 abstention separately, not divided by zero or counted as perfect recall.
 
@@ -39,7 +55,8 @@ automatically incorrect; audit them before revising a versioned expected set.
 
 ## Build a small defensible pilot
 
-1. **Fix the scope and snapshot.** Name medical topic, source families,
+1. **Fix the scope and snapshot.** Use the selected diabetes-technology topic;
+   name source families,
    collection dates, indexed pages and coverage exclusions.
 2. **Create query cases.** Start with C01–C13 in
    [WORKFLOWS_AND_CASES.md](WORKFLOWS_AND_CASES.md), including same-intent pairs,

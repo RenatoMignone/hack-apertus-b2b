@@ -2,8 +2,8 @@
 
 **Status:** requirements extracted; no product has been implemented. B1 refers
 to the [supplied challenge brief](CHALLENGE_BRIEF.md), confirmed by the complete
-[Notion text N1](sources/NOTION_CHALLENGE_2026-10-18.md). E01–E26 refer to
-[recording evidence](RECORDING_INSIGHTS.md). Proposed checks below are internal
+[Notion text N1](../sources/NOTION_CHALLENGE_2026-10-18.md). E01–E26 refer to
+[recording evidence](../recordings/RECORDING_INSIGHTS.md). Proposed checks below are internal
 acceptance guidance, not additional organizer rules.
 
 ## Users, needs and desired outcome
@@ -65,7 +65,7 @@ Every result should expose these fields **where the source provides them**:
 
 The brief does not require every result to be a person or every source to
 contain every field. Suggested missing-value behavior and claim-level evidence
-are described in [DATA_AND_PROVENANCE.md](DATA_AND_PROVENANCE.md).
+are described in [DATA_AND_PROVENANCE.md](../data/DATA_AND_PROVENANCE.md).
 
 ## Stakeholder expectations beyond the formal baseline
 
@@ -74,15 +74,26 @@ are described in [DATA_AND_PROVENANCE.md](DATA_AND_PROVENANCE.md).
 | S01 | Condensed, jargon-light descriptions, more than bare links (E12, E14) | Important usability condition for the core search results |
 | S02 | Human assessment of relevance remains part of work (E04, E14) | Support inspection and selection; no specific keep/reject UI was mandated |
 | S03 | Discover useful adjacent capabilities and future R&D directions (E10) | Valuable when labeled as a possible connection and grounded in actual capabilities |
-| S04 | Company-facing PDF/PowerPoint teaser, often 5–10 pages maximum (E13) | Downstream workflow; export implementation is a team scope decision |
+| S04 | Company-facing PDF/PowerPoint teaser, often 5–10 pages maximum (E13) | User selected automatic PowerPoint export; partner template and English logo now supplied in provided_material/ |
 | S05 | Suppliers/companies can strengthen the case (E09, E22) | Extension after core institutional source coverage; exact sites are unconfirmed |
 | S06 | Multiple cases sometimes run concurrently, about 300/year overall (E06) | Context for future workflow; no required case-management feature or load target |
 
 ## Scope boundaries
 
-**Confirmed focus:** medical/life-science expertise in Bern and the three
-institutional source families. A diabetes-only or oncology-only demonstration
-is permissible but **not yet selected**. It must state its limits. [E07]
+**Additional user requirements, 18 October:** the operator can issue natural-
+language instructions to modify/refocus existing results/reports, and the agent
+can ask follow-up questions. Preserve revision history, answered context,
+supporting evidence and export consistency. Implement these through the dialogue
+and memory handoffs in the paired plans; the supplied T05 transcript reinforces
+the terminology bridge and public-only input boundary.
+
+**Confirmed focus:** medical/life-science expertise in Bern and all three
+institutional source families. Under user-delegated selection, the pilot is
+**diabetes technology**, especially glucose monitoring, automated insulin delivery
+and supporting digital tools. Evidence and boundaries are in
+[PILOT_SCOPE.md](PILOT_SCOPE.md). English UI/results/slides are the baseline;
+German/French/Italian source/query support is desirable. Additional ecosystem
+organizations must be healthcare-related with evidenced Canton of Bern activity.
 
 **Outside current scope:** confidential document uploads, lead scouting and due
 diligence, automatic outreach or meeting scheduling, CRM/relationship maintenance,
@@ -92,6 +103,7 @@ a product interpretation of the regional expertise-search objective.
 
 **Not prescribed:** programming language, frontend, database, ontology technology,
 knowledge graph, embedding model, live browsing, fine-tuning, Docker, authentication,
-response language or a fixed teaser template. Decide based on evidence and the
+or a fixed teaser template. English-first response language is now selected.
+Decide remaining technologies based on evidence and the
 team's remaining time; record choices in
-[DECISIONS_AND_OPEN_QUESTIONS.md](DECISIONS_AND_OPEN_QUESTIONS.md).
+[DECISIONS_AND_OPEN_QUESTIONS.md](../project/DECISIONS_AND_OPEN_QUESTIONS.md).

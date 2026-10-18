@@ -10,9 +10,9 @@ The following files and directory must keep their names and positions:
 
 | Path | Template role |
 | --- | --- |
-| [../README.md](../README.md) | Challenge description and submission requirements |
-| [../technical_report.md](../technical_report.md) | Architecture, Apertus use, data, limitations and reproducibility |
-| [../LICENSE](../LICENSE) | Apache-2.0 |
+| [../README.md](../../README.md) | Challenge description and submission requirements |
+| [../technical_report.md](../../technical_report.md) | Architecture, Apertus use, data, limitations and reproducibility |
+| [../LICENSE](../../LICENSE) | Apache-2.0 |
 | `src/` | Project code |
 
 Additional working context lives in `docs/`; this pass adds a root `AGENTS.md`
@@ -64,7 +64,7 @@ lists the first five; both sources should be represented in final materials.
 
 ## Challenge presentation assets
 
-The [Notion page text N1](sources/NOTION_CHALLENGE_2026-10-18.md) lists
+The [Notion page text N1](../sources/NOTION_CHALLENGE_2026-10-18.md) lists
 `powerpoint_template.pptx` and `Logo_SF_BE_EN.png` for use **only for this
 challenge**. Actual asset files have not been supplied or inspected. Use these
 within that purpose if acquired; they do not replace M1/M2, alter report limits
