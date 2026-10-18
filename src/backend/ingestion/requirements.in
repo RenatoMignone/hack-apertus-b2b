@@ -1,0 +1,5 @@
+crawl4ai>=0.9.5,<0.10
+pypdf>=6,<7
+sentence-transformers>=5,<6
+transformers>=5,<6
+torch>=2.6,<3

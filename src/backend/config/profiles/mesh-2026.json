@@ -1,0 +1,36 @@
+{
+  "name": "mesh-category-subcategory",
+  "version": "2026-three-tier-v1",
+  "release": "2026",
+  "source_url": "https://nlmpubs.nlm.nih.gov/projects/mesh/MESH_FILES/newterms/mtrees2026.bin",
+  "source_sha256": "1ec206e5415c48fe30e0b3ef5be81ada699a04d676227003c3b506fc15339ee2",
+  "categories_source": "https://meshb.nlm.nih.gov/treeView",
+  "tag_levels": ["category", "subcategory"],
+  "tag_policy": {
+    "max_topic_labels": 3,
+    "max_parent_domains": 3,
+    "max_specific_subjects": 5,
+    "max_attributes_per_subject": 4,
+    "primary_label_first": true,
+    "classification_unit": "document_version",
+    "unclassified_allowed": true
+  },
+  "category_labels": {
+    "A": "Anatomy",
+    "B": "Organisms",
+    "C": "Diseases",
+    "D": "Chemicals and Drugs",
+    "E": "Analytical, Diagnostic and Therapeutic Techniques, and Equipment",
+    "F": "Psychiatry and Psychology",
+    "G": "Phenomena and Processes",
+    "H": "Disciplines and Occupations",
+    "I": "Anthropology, Education, Sociology, and Social Phenomena",
+    "J": "Technology, Industry, and Agriculture",
+    "K": "Humanities",
+    "L": "Information Science",
+    "M": "Named Groups",
+    "N": "Health Care",
+    "V": "Publication Characteristics",
+    "Z": "Geographicals"
+  }
+}

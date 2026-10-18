@@ -1,0 +1,50 @@
+{
+  "observed_at": "2026-10-18",
+  "status": "collected_only_not_published_or_model_indexed",
+  "raw_data_committed": false,
+  "production_snapshot_id": null,
+  "production_build_id": null,
+  "verified_embedding_config_id": null,
+  "sources": [
+    {
+      "families": ["UniBE"],
+      "url": "https://www.dbmr.unibe.ch/research/research_programs/bally_lab/index_eng.html",
+      "title": "Research: Bally Lab - Department for BioMedical Research (DBMR)",
+      "http_status": 200,
+      "fetched_at": "2026-10-18T16:47:39.004483+00:00",
+      "published_at": null,
+      "raw_sha256": "6e67ed6e557d0281a3967150af868ae51a8d3bcb65307d4ce8599411debca87f",
+      "body_sha256": "be8061b9d822db503a84e60d968899084696115db49a25044620c83ff7ca1f51",
+      "body_characters": 1401
+    },
+    {
+      "families": ["UniBE", "ARTORG"],
+      "url": "https://www.artorg.unibe.ch/research/aihn/research_activities/adaptive_diabetes_management/index_eng.html",
+      "title": "Research: Adaptive Diabetes Management - ARTORG Center for Biomedical Engineering Research",
+      "http_status": 200,
+      "fetched_at": "2026-10-18T16:47:40.131045+00:00",
+      "published_at": null,
+      "raw_sha256": "994e35863b785b18cfdc790f3bdae24013497f874f91352dd47a73fbcac599f2",
+      "body_sha256": "090ece213e0c0169e690c787f5bebe38bfe3c0f55c0be172b63d9f2f42c8685d",
+      "body_characters": 1300
+    },
+    {
+      "families": ["DCB"],
+      "url": "https://www.dcberne.com/en/projects/",
+      "title": "Research - Diabetes Center Berne",
+      "http_status": 200,
+      "fetched_at": "2026-10-18T16:47:41.310009+00:00",
+      "published_at": null,
+      "raw_sha256": "ad6d2f8df8b79fe60c2de1fb8db623597e82a4f52711a1f34342e03e418f130a",
+      "body_sha256": "04f950a5fc7635942a49baa8702f924ac6316e073a1e897d5585ad78d7f0c256",
+      "body_characters": 26272
+    }
+  ],
+  "limitations": [
+    "Three pages are not exhaustive ecosystem or expert coverage.",
+    "No independently reviewed expert/unit gold dataset is available.",
+    "No actual model inference or corpus publication was performed.",
+    "Only source-supported claims may be curated; collection does not certify page statements.",
+    "Unknown publication dates are deliberately null."
+  ]
+}
