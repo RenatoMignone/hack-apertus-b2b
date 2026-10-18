@@ -148,6 +148,15 @@ status, drag to move) and **Action items** (questions for agency colleagues, dra
 per case, marked Asked/Done). The case page opens with a short company description
 from the operator's message, before the reasons.
 
+**D15 / user decisions after a UX audit, 18 October:** board stages reduced to four
+(To research, In review, Pitch sent, Closed with Visit / No interest outcome); *On
+hold* becomes a flag. Cards move by drag or a ⋯ menu, with Undo. The case chat is
+collapsible (remembered) and becomes an overlay drawer below 1100 px. Keep/Hide get
+text labels. Case names stay auto-derived. Case-page content is unchanged; a jump bar,
+compact version menu, toasts with Undo, keyboard focus, WCAG AA contrast and
+per-browser demo persistence were added. Audit and rationale: the approved UX plan,
+summarised in [FRONTEND_PLAN.md](../plans/FRONTEND_PLAN.md).
+
 **18 October user answers (U2):** recorded below. The agent selected the delegated
 medical slice and evaluation protocol in [PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md).
 Selected scope is diabetes technology; English outputs are required and DE/FR/IT

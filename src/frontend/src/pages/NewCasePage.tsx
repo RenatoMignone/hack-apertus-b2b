@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Lock } from 'lucide-react';
 import { api } from '../api';
+import { useTitle } from '../components/ui';
 
 const EXAMPLES: { label: string; text: string }[] = [
   {
@@ -18,7 +19,9 @@ const EXAMPLES: { label: string; text: string }[] = [
 export default function NewCasePage() {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<string | null>(null);
   const navigate = useNavigate();
+  useTitle('New case');
 
   const submit = async () => {
     if (!text.trim() || busy) return;
@@ -35,6 +38,7 @@ export default function NewCasePage() {
         <div className="mt-8 rounded-2xl border border-line bg-white p-3 shadow-sm focus-within:border-ink/40">
           <textarea
             autoFocus
+            aria-label="Company description"
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => {
@@ -44,29 +48,40 @@ export default function NewCasePage() {
             placeholder="What they do, what they need, keywords, any Bern groups you suspect…"
             className="w-full resize-none bg-transparent px-2 py-1 text-[15px] leading-relaxed outline-none placeholder:text-muted/60"
           />
-          <div className="flex items-center justify-between px-2 pt-1">
-            <span className="text-xs text-muted">Public info only</span>
+          <div className="flex items-center gap-3 px-2 pt-1">
+            <span className="flex items-center gap-1.5 text-xs text-muted">
+              <Lock size={13} aria-hidden /> Public information only. No confidential documents.
+            </span>
+            <span className="ml-auto hidden text-xs text-muted sm:inline">Ctrl + Enter</span>
             <button
               onClick={submit}
               disabled={!text.trim() || busy}
               className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-40"
             >
-              Search <ArrowUp size={15} />
+              {busy ? 'Starting…' : 'Search'} <ArrowUp size={15} aria-hidden />
             </button>
           </div>
         </div>
 
-        <div className="mt-4 flex justify-center gap-2">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <span className="text-sm text-muted">Try an example:</span>
           {EXAMPLES.map((e) => (
             <button
               key={e.label}
-              onClick={() => setText(e.text)}
+              onClick={() => (text.trim() && text !== e.text ? setPending(e.text) : setText(e.text))}
               className="rounded-full border border-line bg-white px-3 py-1 text-sm text-muted hover:border-ink/30 hover:text-ink"
             >
               {e.label}
             </button>
           ))}
         </div>
+        {pending && (
+          <div className="mt-3 flex items-center justify-center gap-2 text-sm">
+            <span className="text-muted">Replace your text with the example?</span>
+            <button onClick={() => (setText(pending), setPending(null))} className="font-medium text-brand hover:underline">Replace</button>
+            <button onClick={() => setPending(null)} className="text-muted hover:text-ink">Keep mine</button>
+          </div>
+        )}
       </div>
     </div>
   );

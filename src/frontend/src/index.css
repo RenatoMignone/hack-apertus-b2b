@@ -15,16 +15,16 @@
   /* Institution colours (kept distinct from the brand red). */
   --color-unibe: #2557c7;
   --color-unibe-soft: #e8eefb;
-  --color-artorg: #0f8a7e;
+  --color-artorg: #0b6e65;
   --color-artorg-soft: #e3f4f2;
   --color-dcb: #b45f06;
   --color-dcb-soft: #fbefe2;
   --color-other: #6b7280;
   --color-other-soft: #eef0f2;
 
-  --color-ok: #15803d;
+  --color-ok: #136c34;
   --color-ok-soft: #e7f6ec;
-  --color-warn: #a16207;
+  --color-warn: #8a5300;
   --color-warn-soft: #fdf4dc;
   --color-bad: #b91c1c;
   --color-bad-soft: #fdeaea;
@@ -41,6 +41,13 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Visible keyboard focus everywhere (mouse clicks don't show it). */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
 /* Temporary highlight when the agent changes a section. */

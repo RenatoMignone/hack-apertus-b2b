@@ -1,4 +1,4 @@
-import type { ActionItem, BriefRevision, CaseDetail, CaseSummary, Coverage, Reason, SearchTrace } from '../types/contract';
+import type { ActionItem, BriefRevision, CaseDetail, CaseOutcome, CaseStatus, Coverage, Institution, Reason, SearchTrace } from '../types/contract';
 import { EVIDENCE } from './evidence';
 
 // Seeded demo cases. Company names are synthetic. Institutions, projects and
@@ -185,7 +185,7 @@ const revA1: BriefRevision = {
   similarCases: [
     { caseId: 'case-d1', companyLabel: 'NordSense', score: 78, shared: ['Non-invasive sensing', 'Metabolite monitoring'], status: 'pitch_sent' },
     { caseId: 'case-d4', companyLabel: 'MedPatch', score: 61, shared: ['Wearable device', 'Clinical validation'], status: 'pitch_sent' },
-    { caseId: 'case-d3', companyLabel: 'Diabeto App', score: 44, shared: ['Diabetes', 'Algorithms'], status: 'on_hold' },
+    { caseId: 'case-d3', companyLabel: 'Diabeto App', score: 44, shared: ['Diabetes', 'Algorithms'], status: 'researching' },
   ],
   trace: traceA,
   coverage: coverage('ok', ['Contact details: public profile pages only.']),
@@ -329,8 +329,8 @@ const revB1: BriefRevision = {
   reasons: reasonsB,
   openQuestions: ['R&D partner or clinical validation?'],
   similarCases: [
-    { caseId: 'case-d2', companyLabel: 'InsuTech Labs', score: 72, shared: ['Insulin delivery', 'R&D site'], status: 'closed_visit' },
-    { caseId: 'case-d5', companyLabel: 'Kardia Systems', score: 38, shared: ['Diabetes device'], status: 'draft' },
+    { caseId: 'case-d2', companyLabel: 'InsuTech Labs', score: 72, shared: ['Insulin delivery', 'R&D site'], status: 'closed', outcome: 'visit' },
+    { caseId: 'case-d5', companyLabel: 'Kardia Systems', score: 38, shared: ['Diabetes device'], status: 'researching' },
   ],
   trace: pruneTrace(TRACE_B, reasonEvidence(reasonsB)),
   coverage: coverage('partial', ['Waiting for your answer in the chat.']),
@@ -384,7 +384,8 @@ const caseC: CaseDetail = {
     id: 'case-grain',
     companyLabel: 'Grain trader',
     oneLineNeed: 'Commodity trading partners',
-    status: 'closed_no_interest',
+    status: 'closed',
+    outcome: 'no_interest',
     createdAt: '2026-10-18T12:00:00Z',
     updatedAt: '2026-10-18T12:01:00Z',
     keptCount: 0,
@@ -398,14 +399,65 @@ const caseC: CaseDetail = {
   evidence: EVIDENCE,
 };
 
-// ---------- List-only cases ----------
+// ---------- Smaller seeded cases ----------
+// Short briefs built only from the evidence above, so every case opens to
+// something real. Kept items are pre-selected to match the board's ✓ counts.
 
-const listOnly = (id: string, companyLabel: string, oneLineNeed: string, status: CaseSummary['status'], updatedAt: string, keptCount: number): CaseDetail => ({
-  case: { id, companyLabel, oneLineNeed, status, createdAt: updatedAt, updatedAt, keptCount },
-  revisions: [],
-  turns: [],
-  evidence: EVIDENCE,
-});
+type Mini = [category: Reason['category'], headline: string, line: string, entry: string, institution: Institution, evidence: string[], role?: string];
+
+function miniCase(
+  id: string,
+  companyLabel: string,
+  oneLineNeed: string,
+  status: CaseStatus,
+  updatedAt: string,
+  keep: number,
+  facts: string[],
+  items: Mini[],
+  opts: { outcome?: CaseOutcome; onHold?: boolean } = {},
+): CaseDetail {
+  const reasons: Reason[] = items.map(([category, headline, line, entry, institution, evidence, role], i) => ({
+    id: `${id}-r${i}`,
+    category,
+    headline,
+    line: { text: line, evidenceIds: evidence },
+    entries: [{ id: `${id}-e${i}`, name: entry, role, institution, evidenceIds: evidence }],
+    kind: category === 'ideas' ? 'idea' : 'direct',
+    selection: i < keep ? 'kept' : 'none',
+  }));
+  const evIds = [...reasonEvidence(reasons)];
+  const revId = `${id}-rev1`;
+  return {
+    case: { id, companyLabel, oneLineNeed, status, ...opts, createdAt: updatedAt, updatedAt, keptCount: Math.min(keep, reasons.length) },
+    revisions: [
+      reasons.length
+        ? {
+            id: revId,
+            version: 1,
+            createdAt: updatedAt,
+            changeNote: 'First version',
+            changedReasonIds: [],
+            company: { summary: oneLineNeed + '.', facts },
+            reasons,
+            openQuestions: [],
+            trace: {
+              inputs: [{ id: 'in-1', label: oneLineNeed.toLowerCase().split(/[:,]/)[0] }],
+              terms: [{ id: 't-1', label: facts[1]?.toLowerCase() ?? 'diabetes technology' }],
+              links: [{ source: 'in-1', target: 't-1', value: evIds.length }, ...evIds.map((e) => ({ source: 't-1', target: e, value: 1 }))],
+            },
+            coverage: coverage('ok'),
+          }
+        : emptyRevision(revId, 'no_match', 'No reliable match for this topic in the indexed UniBE, ARTORG and DCB pages.'),
+    ],
+    currentRevisionId: revId,
+    turns: [{ id: `${id}-t1`, role: 'operator', text: `${companyLabel}: ${oneLineNeed}.`, createdAt: updatedAt }],
+    evidence: EVIDENCE,
+  };
+}
+
+const W: Mini = ['people', 'Prof. Dr. Lilian Witthauer', 'Holds DCB’s sensor-technology professorship.', 'Prof. Dr. Lilian Witthauer', 'DCB', ['ev-dcb-profs-a'], 'DCB professorship · Sensortechnologie'];
+const K: Mini = ['people', 'Prof. Dr. Lisa Koch', 'Holds DCB’s data-science and machine-learning professorship.', 'Prof. Dr. Lisa Koch', 'DCB', ['ev-dcb-profs-a'], 'DCB professorship · Data Science und Machine Learning'];
+const G: Mini = ['people', 'Prof. Dr. José Garcia', 'Holds DCB’s professorship for automated insulin therapy.', 'Prof. Dr. José Garcia', 'DCB', ['ev-dcb-profs-b'], 'DCB professorship · automatisierte Insulintherapie'];
 
 // ---------- Action items: questions for agency colleagues ----------
 
@@ -424,10 +476,28 @@ export const SEED_CASES: CaseDetail[] = [
   caseA,
   caseB,
   caseC,
-  listOnly('case-d1', 'NordSense', 'Sweat-based metabolite sensing', 'pitch_sent', '2026-10-15T09:30:00Z', 6),
-  listOnly('case-d2', 'InsuTech Labs', 'Insulin stability research', 'closed_visit', '2026-10-02T16:10:00Z', 8),
-  listOnly('case-d3', 'Diabeto App', 'Clinical evidence for coaching app', 'on_hold', '2026-09-28T11:00:00Z', 3),
-  listOnly('case-d4', 'MedPatch', 'Adhesive wearable patches', 'pitch_sent', '2026-10-11T14:45:00Z', 5),
-  listOnly('case-d5', 'Kardia Systems', 'Remote monitoring: diabetes add-on', 'draft', '2026-10-17T08:20:00Z', 0),
-  listOnly('case-d6', 'Alpine Bioprint', 'Tissue models', 'closed_no_interest', '2026-09-20T10:00:00Z', 0),
+  miniCase('case-d1', 'NordSense', 'Sweat-based metabolite sensing', 'pitch_sent', '2026-10-15T09:30:00Z', 2, ['Medtech', 'metabolite sensing'], [
+    W,
+    ['ideas', 'Sensing several metabolites at once', 'Early-stage DCB chemistry for continuous multi-metabolite measurement.', 'Illuminating Personalized Medicine', 'DCB', ['ev-dcb-porphyrin']],
+    ['projects', 'Needle-free monitoring research', 'DCB runs a pilot study on painless, needle-free monitoring.', 'SPN-005 pilot study', 'DCB', ['ev-dcb-spn005']],
+  ]),
+  miniCase('case-d2', 'InsuTech Labs', 'Insulin delivery research partners', 'closed', '2026-10-02T16:10:00Z', 2, ['Medtech', 'insulin delivery'], [
+    G,
+    ['projects', 'An active automated-insulin-delivery study', 'DCB studies therapies used alongside automated insulin delivery.', 'AID-JUNCT study', 'DCB', ['ev-dcb-aidjunct']],
+    ['groups', 'Closed-loop insulin delivery research', 'Bally Lab works on closed-loop automated insulin delivery.', 'Bally Lab', 'UniBE', ['ev-bally-aid']],
+  ], { outcome: 'visit' }),
+  miniCase('case-d3', 'Diabeto App', 'Clinical evidence for a coaching app', 'researching', '2026-09-28T11:00:00Z', 1, ['Digital health', 'personalised diabetes care'], [
+    K,
+    ['groups', 'AI for personalised diabetes care', 'ARTORG builds AI for adaptive, personalised diabetes care.', 'Adaptive Diabetes Management', 'ARTORG', ['ev-adaptive-ai']],
+  ], { onHold: true }),
+  miniCase('case-d4', 'MedPatch', 'Adhesive wearable patches', 'pitch_sent', '2026-10-11T14:45:00Z', 2, ['Medtech', 'wearable sensing'], [
+    W,
+    ['groups', 'Experts who validate digital biomarkers', 'Bally Lab develops and evaluates new digital biomarkers.', 'Bally Lab', 'UniBE', ['ev-bally-biomarkers']],
+    ['projects', 'Glucose and movement during sleep', 'DCB studies how glucose values relate to motion during sleep.', 'Moonwalk Project', 'DCB', ['ev-dcb-moonwalk']],
+  ]),
+  miniCase('case-d5', 'Kardia Systems', 'Remote monitoring: diabetes add-on', 'researching', '2026-10-17T08:20:00Z', 0, ['Digital health', 'remote monitoring'], [
+    ['groups', 'AI for personalised diabetes care', 'ARTORG builds AI for adaptive, personalised diabetes care.', 'Adaptive Diabetes Management', 'ARTORG', ['ev-adaptive-ai']],
+    ['projects', 'Glucose and movement during sleep', 'DCB studies how glucose values relate to motion during sleep.', 'Moonwalk Project', 'DCB', ['ev-dcb-moonwalk']],
+  ]),
+  miniCase('case-d6', 'Alpine Bioprint', 'Tissue models', 'closed', '2026-09-20T10:00:00Z', 0, ['Biotech'], [], { outcome: 'no_interest' }),
 ];
