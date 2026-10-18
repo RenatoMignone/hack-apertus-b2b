@@ -4,14 +4,9 @@
 // backed by Bern entries and their source passages, plus a search trace
 // (message → ontology terms → source entries) shown as a Sankey.
 
-export type CaseStatus =
-  | 'draft'
-  | 'researching'
-  | 'in_review'
-  | 'pitch_sent'
-  | 'closed_visit'
-  | 'closed_no_interest'
-  | 'on_hold';
+/** Board stage. "On hold" is a separate flag; a closed case carries an outcome. */
+export type CaseStatus = 'researching' | 'in_review' | 'pitch_sent' | 'closed';
+export type CaseOutcome = 'visit' | 'no_interest';
 
 export type Institution = 'UniBE' | 'ARTORG' | 'DCB' | 'Other';
 export type Selection = 'kept' | 'rejected' | 'none';
@@ -21,6 +16,9 @@ export interface CaseSummary {
   companyLabel: string;
   oneLineNeed: string;
   status: CaseStatus;
+  /** Set when status is "closed". */
+  outcome?: CaseOutcome;
+  onHold?: boolean;
   createdAt: string;
   updatedAt: string;
   keptCount: number;
@@ -103,6 +101,7 @@ export interface SimilarCase {
   /** What the two cases have in common, e.g. "Wearable sensing". */
   shared: string[];
   status: CaseStatus;
+  outcome?: CaseOutcome;
 }
 
 export interface Coverage {
@@ -165,6 +164,8 @@ export interface ActionItem {
   /** Colleague role to ask, e.g. "Account owner". */
   askRole: string;
   status: 'open' | 'asked' | 'done';
+  /** Optional note with the colleague's answer. */
+  answer?: string;
 }
 
 export type RunStage = 'interpreting' | 'searching' | 'validating' | 'drafting' | 'done';

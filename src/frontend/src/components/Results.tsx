@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, ChevronDown, ClipboardList, ExternalLink, FlaskConical, HelpCircle, Lightbulb, SearchX, Users, X } from 'lucide-react';
+import { Check, ChevronDown, ClipboardList, ExternalLink, FlaskConical, HelpCircle, Lightbulb, SearchX, Users } from 'lucide-react';
 import type { BriefRevision, Evidence, Reason, ReasonCategory, Selection } from '../types/contract';
-import { INSTITUTION, StatusBadge } from './ui';
+import { CaseFlags, INSTITUTION, StatusBadge } from './ui';
 import SearchSankey from './SearchSankey';
 
 type Open = (evidenceId: string) => void;
@@ -28,7 +28,7 @@ function Chips({ ids, evidence, onOpen, active }: { ids: string[]; evidence: Rec
               e.stopPropagation();
               onOpen(id);
             }}
-            className={`inline-flex h-[18px] min-w-[18px] items-center justify-center rounded px-1 text-[11px] font-semibold tabular-nums ${
+            className={`inline-flex h-[18px] min-w-[18px] items-center justify-center rounded px-1 text-xs font-semibold tabular-nums ${
               active === id ? 'bg-ink text-white' : 'bg-white text-ink ring-1 ring-line hover:bg-ink hover:text-white'
             }`}
           >
@@ -84,8 +84,10 @@ function ReasonCard({
   if (r.selection === 'rejected') {
     return (
       <div className="flex items-center justify-between rounded-xl px-4 py-2 text-sm text-muted">
-        <span className="line-through">{r.headline}</span>
-        <button onClick={() => onSelect('none')} className="text-xs font-medium text-ink hover:underline">Undo</button>
+        <span>
+          <span className="line-through">{r.headline}</span> · hidden
+        </span>
+        <button onClick={() => onSelect('none')} className="text-xs font-medium text-ink hover:underline">Show again</button>
       </div>
     );
   }
@@ -119,8 +121,8 @@ function ReasonCard({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-[16px] font-semibold leading-snug">{r.headline}</h3>
-            {r.fromLead && <span className="rounded-full bg-ok-soft px-2 py-0.5 text-[11px] font-medium text-ok">Your lead ✓</span>}
-            {idea && <span className="rounded-full bg-warn-soft px-2 py-0.5 text-[11px] font-medium text-warn">Idea · to validate</span>}
+            {r.fromLead && <span className="rounded-full bg-ok-soft px-2 py-0.5 text-xs font-medium text-ok">Your lead ✓</span>}
+            {idea && <span className="rounded-full bg-warn-soft px-2 py-0.5 text-xs font-medium text-warn">Idea · to validate</span>}
           </div>
           {person?.role && (
             <div className="text-sm">
@@ -158,16 +160,26 @@ function ReasonCard({
         </div>
         <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
           <button
-            title={kept ? 'Kept' : 'Keep for pitch'}
+            aria-pressed={kept}
             onClick={() => onSelect(kept ? 'none' : 'kept')}
-            className={`rounded-lg p-1.5 ${kept ? 'bg-ok text-white' : 'text-muted ring-1 ring-line hover:text-ok hover:ring-ok'}`}
+            className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium ${
+              kept ? 'bg-ok text-white' : 'text-muted ring-1 ring-line hover:text-ok hover:ring-ok'
+            }`}
           >
-            <Check size={16} />
+            <Check size={14} aria-hidden /> {kept ? 'Kept' : 'Keep'}
           </button>
-          <button title="Not relevant" onClick={() => onSelect('rejected')} className="rounded-lg p-1.5 text-muted ring-1 ring-line hover:text-bad hover:ring-bad">
-            <X size={16} />
+          <button onClick={() => onSelect('rejected')} className="rounded-lg px-2 py-1 text-sm text-muted ring-1 ring-line hover:text-bad hover:ring-bad">
+            Hide
           </button>
-          <ChevronDown size={16} className={`ml-1 text-muted transition ${open ? 'rotate-180' : ''}`} />
+          <button
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            aria-label={open ? 'Hide sources' : 'Show sources'}
+            title={open ? 'Hide sources' : 'Show sources'}
+            className="ml-0.5 rounded-md p-1 text-muted hover:bg-canvas hover:text-ink"
+          >
+            <ChevronDown size={16} className={`transition ${open ? 'rotate-180' : ''}`} />
+          </button>
         </div>
       </div>
 
@@ -175,7 +187,7 @@ function ReasonCard({
         <div className="space-y-2 border-t border-line px-4 py-3">
           {sources.map((ev) => (
             <div key={ev.id} className="flex gap-2 text-sm">
-              <span className="mt-0.5 h-fit rounded bg-canvas px-1.5 text-[11px] font-semibold ring-1 ring-line">{ev.n}</span>
+              <span className="mt-0.5 h-fit rounded bg-canvas px-1.5 text-xs font-semibold ring-1 ring-line">{ev.n}</span>
               <div className="min-w-0">
                 <p className="leading-relaxed">“<Highlighted ev={ev} />”</p>
                 <a href={ev.url} target="_blank" rel="noreferrer" className="mt-0.5 inline-flex items-center gap-1 text-xs text-muted hover:text-ink">
@@ -241,7 +253,10 @@ export default function Results({
       )}
 
       <div className="flex items-baseline justify-between gap-4">
-        <h2 className="text-lg font-semibold tracking-tight">Why Bern</h2>
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">Why Bern</h2>
+          <p className="text-sm text-muted">Keep what you want in the pitch.</p>
+        </div>
         <span className="flex shrink-0 items-center gap-2 text-xs text-muted">
           {coverage.institutions.map((i) => (
             <span key={i} className="flex items-center gap-1">
@@ -257,7 +272,7 @@ export default function Results({
           const items = reasons.filter((r) => r.category === key);
           if (!items.length) return null;
           return (
-            <section key={key}>
+            <section key={key} id={`sec-${key}`} className="scroll-mt-16">
               <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-muted">
                 <Icon size={15} />
                 {label}
@@ -292,7 +307,7 @@ export default function Results({
       )}
 
       {revision.similarCases && revision.similarCases.length > 0 && (
-        <div>
+        <div id="sec-similar" className="scroll-mt-16">
           <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold tracking-tight">
             Similar cases
             <span title="How similar the company needs and topics are. Not a chance of success.">
@@ -316,15 +331,18 @@ export default function Results({
                     ))}
                   </div>
                 </div>
-                <StatusBadge status={s.status} />
+                <span className="flex shrink-0 items-center gap-1">
+                  <StatusBadge status={s.status} />
+                  <CaseFlags outcome={s.outcome} />
+                </span>
               </Link>
             ))}
           </div>
         </div>
       )}
 
-      <div className="rounded-xl border border-line bg-white">
-        <button onClick={() => setTraceOpen(!traceOpen)} className="flex w-full items-center gap-2 px-4 py-3 text-sm">
+      <div id="sec-search" className="scroll-mt-16 rounded-xl border border-line bg-white">
+        <button onClick={() => setTraceOpen(!traceOpen)} aria-expanded={traceOpen} className="flex w-full items-center gap-2 px-4 py-3 text-sm">
           <span className="font-medium">How I searched</span>
           <span className="text-muted">
             {trace.inputs.length} words → {trace.terms.length} terms → {sourceCount} sources

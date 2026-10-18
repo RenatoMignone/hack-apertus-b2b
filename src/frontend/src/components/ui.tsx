@@ -1,21 +1,44 @@
-import type { ReactNode } from 'react';
-import type { CaseStatus, Institution } from '../types/contract';
+import { useEffect, type ReactNode } from 'react';
+import type { CaseOutcome, CaseStatus, Institution } from '../types/contract';
+
+/** Sets the browser tab title, e.g. "My desk · Navigator". */
+export function useTitle(title: string | undefined) {
+  useEffect(() => {
+    document.title = title ? `${title} · Navigator` : 'Bern Expertise Navigator';
+  }, [title]);
+}
 
 export const STATUS: Record<CaseStatus, { label: string; cls: string; dot: string }> = {
-  draft: { label: 'Draft', cls: 'bg-other-soft text-other', dot: 'bg-other' },
-  researching: { label: 'Researching', cls: 'bg-unibe-soft text-unibe', dot: 'bg-unibe' },
+  researching: { label: 'To research', cls: 'bg-unibe-soft text-unibe', dot: 'bg-unibe' },
   in_review: { label: 'In review', cls: 'bg-warn-soft text-warn', dot: 'bg-warn' },
   pitch_sent: { label: 'Pitch sent', cls: 'bg-artorg-soft text-artorg', dot: 'bg-artorg' },
-  closed_visit: { label: 'Closed · visit', cls: 'bg-ok-soft text-ok', dot: 'bg-ok' },
-  closed_no_interest: { label: 'Closed · no interest', cls: 'bg-bad-soft text-bad', dot: 'bg-bad' },
-  on_hold: { label: 'On hold', cls: 'bg-other-soft text-muted', dot: 'bg-line' },
+  closed: { label: 'Closed', cls: 'bg-other-soft text-ink', dot: 'bg-ink' },
 };
 
-export const STATUS_ORDER: CaseStatus[] = ['draft', 'researching', 'in_review', 'pitch_sent', 'closed_visit', 'closed_no_interest', 'on_hold'];
+export const STATUS_ORDER: CaseStatus[] = ['researching', 'in_review', 'pitch_sent', 'closed'];
+
+export const OUTCOME: Record<CaseOutcome, { label: string; cls: string }> = {
+  visit: { label: 'Visit', cls: 'bg-ok-soft text-ok' },
+  no_interest: { label: 'No interest', cls: 'bg-bad-soft text-bad' },
+};
+
+/** Small badges for a case's outcome and on-hold flag. */
+export function CaseFlags({ outcome, onHold }: { outcome?: CaseOutcome; onHold?: boolean }) {
+  return (
+    <>
+      {outcome && <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${OUTCOME[outcome].cls}`}>{OUTCOME[outcome].label}</span>}
+      {onHold && <span className="rounded-full bg-other-soft px-2 py-0.5 text-xs font-medium text-muted">On hold</span>}
+    </>
+  );
+}
+
+export function Skeleton({ className = '' }: { className?: string }) {
+  return <div className={`animate-pulse rounded-xl bg-line/60 ${className}`} />;
+}
 
 export const INSTITUTION: Record<Institution, { label: string; short: string; dot: string; hex: string }> = {
   UniBE: { label: 'University of Bern', short: 'UniBE', dot: 'bg-unibe', hex: '#2557c7' },
-  ARTORG: { label: 'ARTORG Center', short: 'ARTORG', dot: 'bg-artorg', hex: '#0f8a7e' },
+  ARTORG: { label: 'ARTORG Center', short: 'ARTORG', dot: 'bg-artorg', hex: '#0b6e65' },
   DCB: { label: 'Diabetes Center Berne', short: 'DCB', dot: 'bg-dcb', hex: '#b45f06' },
   Other: { label: 'Other', short: 'Other', dot: 'bg-other', hex: '#6b7280' },
 };

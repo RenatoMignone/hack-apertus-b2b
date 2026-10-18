@@ -1,5 +1,5 @@
 import type { NavigatorApi } from './index';
-import type { ActionItem, BriefRevision, CaseDetail, DialogueTurn, RunStage, Selection } from '../types/contract';
+import type { ActionItem, BriefRevision, CaseDetail, DialogueTurn, Reason, RunStage, Selection } from '../types/contract';
 import { emptyRevision, NETWORK_REASON, pruneTrace, reasonEvidence, SEED_ACTIONS, SEED_CASES, TRACE_B } from '../mocks/cases';
 import { EVIDENCE } from '../mocks/evidence';
 
@@ -7,7 +7,36 @@ import { EVIDENCE } from '../mocks/evidence';
 // acknowledged, never faked.
 
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
-const store = new Map<string, CaseDetail>(SEED_CASES.map((c) => [c.case.id, clone(c)]));
+
+// Demo state survives reloads via localStorage (per browser only). Evidence is
+// static and re-attached on load rather than stored.
+const KEY = 'bern-navigator-demo-v3';
+type Saved = { cases: Omit<CaseDetail, 'evidence'>[]; actions: ActionItem[]; lastOpened?: string };
+
+function loadSaved(): Saved | null {
+  try {
+    const raw = localStorage.getItem(KEY);
+    return raw ? (JSON.parse(raw) as Saved) : null;
+  } catch {
+    return null;
+  }
+}
+
+const saved = loadSaved();
+const store = new Map<string, CaseDetail>(
+  (saved ? saved.cases.map((c) => ({ ...c, evidence: EVIDENCE })) : SEED_CASES.map((c) => clone(c))).map((c) => [c.case.id, c]),
+);
+let lastOpened: string | undefined = saved?.lastOpened;
+
+function persist() {
+  try {
+    const cases = [...store.values()].map(({ evidence: _e, ...rest }) => rest);
+    localStorage.setItem(KEY, JSON.stringify({ cases, actions, lastOpened } satisfies Saved));
+  } catch {
+    // Storage blocked or full: the demo keeps working in memory.
+  }
+}
+
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const now = () => new Date().toISOString();
 let seq = 0;
@@ -29,9 +58,12 @@ async function stages(onStage: (s: RunStage) => void, which: RunStage[] = ['inte
   onStage('done');
 }
 
-const actions: ActionItem[] = clone(SEED_ACTIONS);
+const actions: ActionItem[] = saved ? saved.actions : clone(SEED_ACTIONS);
 const listeners = new Set<() => void>();
-const emit = () => listeners.forEach((l) => l());
+const emit = () => {
+  persist();
+  listeners.forEach((l) => l());
+};
 
 function addActions(caseId: string, items: [string, string][]) {
   for (const [question, askRole] of items) actions.push({ id: uid('a'), caseId, question, askRole, status: 'open' });
@@ -96,7 +128,15 @@ export const mockApi: NavigatorApi = {
   async getCase(id) {
     await wait(100);
     const c = store.get(id);
+    if (c) {
+      lastOpened = id;
+      persist();
+    }
     return c ? clone(c) : null;
+  },
+
+  async getLastOpened() {
+    return lastOpened && store.has(lastOpened) ? clone(store.get(lastOpened)!.case) : null;
   },
 
   async createCase(prompt) {
@@ -128,7 +168,7 @@ export const mockApi: NavigatorApi = {
     rev.createdAt = now();
     c.revisions = [rev];
     c.currentRevisionId = rev.id;
-    c.case.status = rev.reasons.length ? 'in_review' : 'draft';
+    c.case.status = rev.reasons.length ? 'in_review' : 'researching';
     if (rev.reasons.length) {
       addActions(c.case.id, [
         ['Do we already have a contact at this company?', 'Account owner'],
@@ -162,15 +202,24 @@ export const mockApi: NavigatorApi = {
       return clone(c);
     }
 
-    if (/(exclude|remove|drop|without|leave out|ignore|disregard|no more)/.test(t) && NUTRITION.test(t)) {
-      const reasons = base.reasons.filter((r) => !NUTRITION.test(JSON.stringify(r) + JSON.stringify(r.entries.map((e) => e.evidenceIds))));
+    const exclude = t.match(/(?:exclude|remove|drop|without|leave out|ignore|disregard|no more)\s+(?:the\s+)?(.+)/);
+    if (exclude) {
+      // Nutrition has synonyms in the seed; other topics match on their first significant word.
+      const topic = exclude[1].replace(/[.!?]$/, '').trim();
+      const word = NUTRITION.test(topic) ? null : topic.split(/\s+/).find((w) => w.length > 3) ?? topic;
+      const matches = (r: Reason) => {
+        const blob = (JSON.stringify(r) + r.entries.map((e) => e.evidenceIds.join(' ')).join(' ')).toLowerCase();
+        return word ? blob.includes(word.toLowerCase()) : NUTRITION.test(blob);
+      };
+      const reasons = base.reasons.filter((r) => !matches(r));
       await stages(onStage, ['interpreting', 'drafting']);
+      const label = word ?? 'nutrition';
       if (reasons.length === base.reasons.length) {
-        say(c, 'Nothing about nutrition in this brief.');
+        say(c, `Nothing about “${label}” in this brief.`);
         return clone(c);
       }
-      const rev = addRevision(c, base, { reasons }, 'Removed nutrition');
-      say(c, 'Removed the nutrition reason.', { revisionId: rev.id });
+      const rev = addRevision(c, base, { reasons }, `Removed ${label}`);
+      say(c, `Removed ${base.reasons.length - reasons.length} item(s) about “${label}”.`, { revisionId: rev.id });
       touch(c);
       return clone(c);
     }
@@ -251,6 +300,7 @@ export const mockApi: NavigatorApi = {
   async setStatus(caseId, status) {
     const c = get(caseId);
     c.case.status = status;
+    if (status !== 'closed') delete c.case.outcome;
     touch(c);
     return clone(c);
   },
@@ -282,11 +332,41 @@ export const mockApi: NavigatorApi = {
     return clone(actions);
   },
 
-  async setActionStatus(id, status) {
+  async setActionStatus(id, status, answer) {
     const a = actions.find((x) => x.id === id);
-    if (a) a.status = status;
+    if (a) {
+      a.status = status;
+      if (answer !== undefined) a.answer = answer;
+    }
     emit();
     return clone(actions);
+  },
+
+  async addActionItem(caseId, question, askRole) {
+    actions.push({ id: uid('a'), caseId, question, askRole, status: 'open' });
+    emit();
+    return clone(actions);
+  },
+
+  async setCaseFlags(caseId, flags) {
+    const c = get(caseId);
+    if ('onHold' in flags) c.case.onHold = flags.onHold;
+    if ('outcome' in flags) c.case.outcome = flags.outcome;
+    touch(c);
+    return clone(c);
+  },
+
+  async resetDemo() {
+    try {
+      localStorage.removeItem(KEY);
+    } catch {
+      // ignore
+    }
+    store.clear();
+    SEED_CASES.forEach((c) => store.set(c.case.id, clone(c)));
+    actions.splice(0, actions.length, ...clone(SEED_ACTIONS));
+    lastOpened = undefined;
+    emit();
   },
 
   subscribe(listener) {

@@ -57,7 +57,7 @@ export default function SearchSankey({
 
   return (
     <div ref={box} className="w-full">
-      <div className="mb-2 grid grid-cols-3 text-[11px] font-medium uppercase tracking-wide text-muted">
+      <div className="mb-2 grid grid-cols-3 text-xs font-medium uppercase tracking-wide text-muted">
         <span>Your words</span>
         <span className="text-center">Terms searched</span>
         <span className="text-right">Sources</span>

@@ -3,9 +3,11 @@ import { Download, X } from 'lucide-react';
 import { api } from '../api';
 import type { BriefRevision, CaseDetail } from '../types/contract';
 import { Button } from './ui';
+import { useToast } from './Toast';
 
 export default function ExportModal({ detail, revision, onClose }: { detail: CaseDetail; revision: BriefRevision; onClose: () => void }) {
   const [busy, setBusy] = useState(false);
+  const toast = useToast();
   const kept = revision.reasons.filter((r) => r.selection === 'kept');
 
   const run = async () => {
@@ -17,6 +19,7 @@ export default function ExportModal({ detail, revision, onClose }: { detail: Cas
     a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+    toast(`Downloaded ${filename}`);
     onClose();
   };
 
