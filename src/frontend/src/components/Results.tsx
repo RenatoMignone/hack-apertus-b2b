@@ -1,11 +1,18 @@
 import { useState } from 'react';
-import { Check, ChevronDown, ExternalLink, HelpCircle, Lightbulb, SearchX, X } from 'lucide-react';
-import type { BriefRevision, Evidence, Reason, Selection } from '../types/contract';
 import { Link } from 'react-router-dom';
+import { Check, ChevronDown, ClipboardList, ExternalLink, FlaskConical, HelpCircle, Lightbulb, SearchX, Users, X } from 'lucide-react';
+import type { BriefRevision, Evidence, Reason, ReasonCategory, Selection } from '../types/contract';
 import { INSTITUTION, StatusBadge } from './ui';
 import SearchSankey from './SearchSankey';
 
 type Open = (evidenceId: string) => void;
+
+const CATEGORIES: { key: ReasonCategory; label: string; Icon: typeof Users }[] = [
+  { key: 'people', label: 'People', Icon: Users },
+  { key: 'groups', label: 'Research groups', Icon: FlaskConical },
+  { key: 'projects', label: 'Projects & studies', Icon: ClipboardList },
+  { key: 'ideas', label: 'Ideas to explore', Icon: Lightbulb },
+];
 
 function Chips({ ids, evidence, onOpen, active }: { ids: string[]; evidence: Record<string, Evidence>; onOpen: Open; active?: string }) {
   return (
@@ -64,7 +71,15 @@ function ReasonCard({
 }) {
   const [open, setOpen] = useState(false);
   const kept = r.selection === 'kept';
-  const idea = r.kind === 'idea';
+  const idea = r.category === 'ideas';
+  const person = r.category === 'people' ? r.entries[0] : undefined;
+  const initials = r.headline
+    .split(/\s+/)
+    .filter((w) => !/^(prof|dr|med|phil|pd)\.?$/i.test(w))
+    .map((w) => w[0])
+    .slice(-2)
+    .join('');
+  const profileUrl = person ? evidence[person.evidenceIds[0]]?.url : undefined;
 
   if (r.selection === 'rejected') {
     return (
@@ -85,32 +100,61 @@ function ReasonCard({
       }`}
     >
       <div className="flex cursor-pointer items-start gap-3 p-4" onClick={() => setOpen(!open)}>
-        <span
-          className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
-            idea ? 'bg-warn-soft text-warn' : 'bg-brand text-white'
-          }`}
-        >
-          {idea ? <Lightbulb size={15} /> : n}
-        </span>
+        {person ? (
+          <span
+            className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
+            style={{ background: INSTITUTION[person.institution].hex }}
+          >
+            {initials}
+          </span>
+        ) : (
+          <span
+            className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
+              idea ? 'bg-warn-soft text-warn' : 'bg-brand text-white'
+            }`}
+          >
+            {idea ? <Lightbulb size={15} /> : n}
+          </span>
+        )}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-[16px] font-semibold leading-snug">{r.headline}</h3>
             {r.fromLead && <span className="rounded-full bg-ok-soft px-2 py-0.5 text-[11px] font-medium text-ok">Your lead ✓</span>}
             {idea && <span className="rounded-full bg-warn-soft px-2 py-0.5 text-[11px] font-medium text-warn">Idea · to validate</span>}
           </div>
+          {person?.role && (
+            <div className="text-sm">
+              <span className="text-muted">{INSTITUTION[person.institution].short} · </span>
+              {person.role}
+            </div>
+          )}
           <p className="mt-0.5 text-sm text-muted">
             {r.line.text}
             <Chips ids={r.line.evidenceIds} evidence={evidence} onOpen={onOpen} active={active} />
           </p>
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            {r.entries.map((e) => (
-              <span key={e.id} className="flex items-center gap-1.5">
-                <span className={`h-2 w-2 rounded-full ${INSTITUTION[e.institution].dot}`} />
-                <span className="text-muted">{INSTITUTION[e.institution].short}</span>
-                <span className="font-medium">{e.name}</span>
-              </span>
-            ))}
-          </div>
+          {person ? (
+            profileUrl && (
+              <a
+                href={profileUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-ink hover:text-brand"
+              >
+                Source page <ExternalLink size={13} />
+              </a>
+            )
+          ) : (
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+              {r.entries.map((e) => (
+                <span key={e.id} className="flex items-center gap-1.5">
+                  <span className={`h-2 w-2 rounded-full ${INSTITUTION[e.institution].dot}`} />
+                  <span className="text-muted">{INSTITUTION[e.institution].short}</span>
+                  <span className="font-medium">{e.name}</span>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
           <button
@@ -165,8 +209,8 @@ export default function Results({
 }) {
   const [traceOpen, setTraceOpen] = useState(false);
   const { reasons, coverage, openQuestions, trace } = revision;
-  const direct = reasons.filter((r) => r.kind === 'direct');
-  const ideas = reasons.filter((r) => r.kind === 'idea');
+  // Groups and projects are numbered as one running list; people and ideas use icons.
+  const numbered = reasons.filter((r) => r.category === 'groups' || r.category === 'projects').map((r) => r.id);
   const sourceCount = new Set(trace.links.map((l) => l.target).filter((id) => evidence[id])).size;
 
   if (!reasons.length) {
@@ -208,19 +252,34 @@ export default function Results({
         </span>
       </div>
 
-      <div className="space-y-2.5">
-        {[...direct, ...ideas].map((r, i) => (
-          <ReasonCard
-            key={r.id}
-            r={r}
-            n={i + 1}
-            evidence={evidence}
-            onOpen={onOpen}
-            active={activeEvidence}
-            flash={flash.has(r.id)}
-            onSelect={(s) => onSelect(r.id, s)}
-          />
-        ))}
+      <div className="space-y-6">
+        {CATEGORIES.map(({ key, label, Icon }) => {
+          const items = reasons.filter((r) => r.category === key);
+          if (!items.length) return null;
+          return (
+            <section key={key}>
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-muted">
+                <Icon size={15} />
+                {label}
+                <span className="font-normal">{items.length}</span>
+              </h3>
+              <div className="space-y-2.5">
+                {items.map((r) => (
+                  <ReasonCard
+                    key={r.id}
+                    r={r}
+                    n={numbered.indexOf(r.id) + 1}
+                    evidence={evidence}
+                    onOpen={onOpen}
+                    active={activeEvidence}
+                    flash={flash.has(r.id)}
+                    onSelect={(s) => onSelect(r.id, s)}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </div>
 
       {(openQuestions.length > 0 || coverage.limitations.length > 0) && (

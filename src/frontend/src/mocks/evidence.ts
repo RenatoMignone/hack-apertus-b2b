@@ -27,7 +27,15 @@ const LABELS: Record<string, string> = {
   'ev-dcb-moonwalk': 'Moonwalk Project',
   'ev-dcb-porphyrin': 'Multi-metabolite sensing',
   'ev-dcb-network': 'DCB research network',
+  'ev-bally-team': 'Bally Lab · team',
+  'ev-aihn-contact': 'ARTORG AIHN · contact',
+  'ev-dcb-profs-a': 'DCB professors · sensors & ML',
+  'ev-dcb-profs-b': 'DCB professors · insulin therapy',
 };
+
+const BALLY_TEAM = 'https://www.dbmr.unibe.ch/research/research_programs/bally_lab/team/index_eng.html';
+const AIHN = 'https://www.artorg.unibe.ch/research/aihn/index_eng.html';
+const DCB_PRESS = 'https://www.pressetext.com/news/vier-professuren-staerken-den-forschungs-und-innovationsstandort-schweiz-in-der-diabetestechnologie.html';
 
 const list: Omit<Evidence, 'n' | 'label'>[] = [
   {
@@ -163,6 +171,53 @@ const list: Omit<Evidence, 'n' | 'label'>[] = [
     relevance: 'Shows the size of the diabetes-technology research network a company could connect to in Bern.',
   },
 ];
+
+// People. Names and roles exactly as the pages state them (captured 18 Oct 2026).
+list.push(
+  {
+    id: 'ev-bally-team',
+    url: BALLY_TEAM,
+    title: 'Team: Bally Lab — Department for BioMedical Research (DBMR)',
+    institution: 'UniBE',
+    fetchedAt: FETCHED,
+    excerpt: 'Dr. med. Dr. phil. Lia Bally — Group Leader. Dr. phil. David Herzig — Senior Researcher and Co-Group Leader.',
+    highlight: 'Lia Bally — Group Leader',
+    relevance: 'Names who leads the lab working on digital biomarkers and closed-loop insulin delivery.',
+  },
+  {
+    id: 'ev-aihn-contact',
+    url: AIHN,
+    title: 'Research: AI in Health and Nutrition — ARTORG Center',
+    institution: 'ARTORG',
+    fetchedAt: FETCHED,
+    excerpt:
+      'Our research focuses on developing innovative AI-powered approaches for the personalized diagnosis and management … Contact: Prof. Dr. Stavroula Mougiakakou',
+    highlight: 'Prof. Dr. Stavroula Mougiakakou',
+    relevance: 'Listed as the contact for the AI-in-health group; the page does not state her formal role.',
+  },
+  {
+    id: 'ev-dcb-profs-a',
+    url: DCB_PRESS,
+    title: 'Vier Professuren stärken den Forschungs- und Innovationsstandort Schweiz in der Diabetestechnologie (DCB, pressetext)',
+    institution: 'DCB',
+    fetchedAt: FETCHED,
+    sourceDate: '2026-04-10',
+    excerpt: 'Prof. Dr. Lilian Witthauer (Sensortechnologie), Prof. Dr. Lisa Koch (Data Science und Machine Learning)',
+    highlight: 'Lilian Witthauer (Sensortechnologie)',
+    relevance: 'Names the DCB professors for sensor technology and for data science / machine learning (German source).',
+  },
+  {
+    id: 'ev-dcb-profs-b',
+    url: DCB_PRESS,
+    title: 'Vier Professuren stärken den Forschungs- und Innovationsstandort Schweiz in der Diabetestechnologie (DCB, pressetext)',
+    institution: 'DCB',
+    fetchedAt: FETCHED,
+    sourceDate: '2026-04-10',
+    excerpt: 'Prof. Dr. Maria Louisa Balmer (Mikrobiom und Stoffwechsel) und Prof. Dr. José Garcia (automatisierte Insulintherapie)',
+    highlight: 'José Garcia (automatisierte Insulintherapie)',
+    relevance: 'Names the DCB professor for automated insulin therapy (German source).',
+  },
+);
 
 export const EVIDENCE: Record<string, Evidence> = Object.fromEntries(
   list.map((e, i) => [e.id, { ...e, n: i + 1, label: LABELS[e.id] }]),

@@ -141,7 +141,8 @@ export const mockApi: NavigatorApi = {
         followUp: { id: uid('f'), question: 'R&D partner or clinical validation?', choices: ['R&D partner', 'Clinical validation', 'Both'] },
       });
     } else if (rev.reasons.length) {
-      say(c, `Found ${rev.reasons.length} reasons. (Demo: seeded example for this topic.)`, { revisionId: rev.id });
+      const people = rev.reasons.filter((r) => r.category === 'people').length;
+      say(c, `Found ${people} people and ${rev.reasons.length - people} groups/projects. (Demo: seeded example for this topic.)`, { revisionId: rev.id });
     } else {
       say(c, 'Nothing reliable found, so no matches rather than guesses.', { revisionId: rev.id });
     }
@@ -176,8 +177,9 @@ export const mockApi: NavigatorApi = {
 
     if (/short|concise|condense|too long|fewer/.test(t)) {
       await stages(onStage, ['drafting']);
-      const rev = addRevision(c, base, { reasons: base.reasons.filter((r) => r.kind === 'direct').slice(0, 3) }, 'Top 3 only');
-      say(c, 'Kept the 3 strongest reasons.', { revisionId: rev.id });
+      const top = (cat: string) => base.reasons.filter((r) => r.category === cat).slice(0, 2);
+      const rev = addRevision(c, base, { reasons: [...top('people'), ...top('groups'), ...top('projects')] }, 'Top 2 per section');
+      say(c, 'Kept the 2 strongest items per section and dropped the ideas.', { revisionId: rev.id });
       touch(c);
       return clone(c);
     }

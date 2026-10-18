@@ -42,7 +42,11 @@ Top navigation bar: logo, *My desk*, *My cases*, *Action items* (with an open-it
 
 1. **Company card:** one-sentence description from her message, plus 3–4 fact chips.
    Then the **"Why Bern"** heading with institution dots.
-2. **Reason cards**, numbered. Each card has a one-line headline, one plain sentence
+2. **Categorized "Why Bern" elements**, in four sections: **People** (experts and
+   key contacts: initials avatar, name, role exactly as the source states it, why
+   they fit, source-page link; no emails or phone numbers), **Research groups**,
+   **Projects & studies**, and **Ideas to explore**. Empty sections are hidden.
+   Groups and projects share one running number. Each non-people card has a one-line headline, one plain sentence
    with citation chips `[n]`, and the Bern entries behind it (institution dot +
    name). Badges appear only when relevant: *Your lead ✓* (her suggestion was
    confirmed, E29) and *Idea · to validate* (adjacent application, E10). Each card
@@ -86,7 +90,7 @@ Defined in `src/frontend/src/types/contract.ts`:
 | `ActionItem` | id, caseId, question, askRole (colleague role), status open / asked / done |
 | `SimilarCase` | caseId, companyLabel, score 0–100, shared[], status |
 | `BriefRevision` | `company` (summary, facts[]), `reasons[]`, `similarCases[]`, `openQuestions[]`, `trace`, `coverage`, `changeNote`, `changedReasonIds`, optional `emptyMessage` |
-| `Reason` | headline, `line` (`CitedText`), `entries[]` (name, institution, evidenceIds), `kind` direct/idea, `fromLead`, selection |
+| `Reason` | `category` people / groups / projects / ideas, headline (a person's name for people), `line` (`CitedText`), `entries[]` (name, optional `role`, institution, evidenceIds), `kind` direct/idea, `fromLead`, selection |
 | `Evidence` | one entry extracted from one URL: short `label`, literal `excerpt` + `highlight`, url, title, institution, dates, one-line `relevance`, citation number `n` |
 | `SearchTrace` | `inputs` (her phrases), `terms` (ontology terms), `links` input→term and term→evidence id, with weights |
 | `DialogueTurn` | chat turn, optional `followUp` with choices |
@@ -103,7 +107,10 @@ backend, implement `NavigatorApi` over HTTP and swap it in `api/index.ts`.
 `src/frontend/src/mocks/`. Company names are synthetic. Evidence excerpts were
 captured on 18 Oct 2026 via a web-fetch tool from the pilot pages in
 [PILOT_SCOPE.md](../challenge/PILOT_SCOPE.md); check them against the live pages
-before presenting them as exact quotes. No person names are used. The Sankey
+before presenting them as exact quotes. People (Lia Bally, Stavroula
+Mougiakakou, and the DCB professors Witthauer, Koch, Garcia) are named only as
+their source pages state them: the Bally Lab team page, the ARTORG AIHN page, and
+the DCB professorships release of 10 Apr 2026 (German, via pressetext). The Sankey
 input→term mappings are hand-written for the demo, not model output.
 
 | Case | Shows |

@@ -55,13 +55,24 @@ export interface CitedText {
 export interface ReasonEntry {
   id: string;
   name: string;
+  /** Role or function exactly as the source states it (people only). */
+  role?: string;
   institution: Institution;
   evidenceIds: string[];
 }
 
+/** How "Why Bern" elements are grouped in the UI. */
+export type ReasonCategory = 'people' | 'groups' | 'projects' | 'ideas';
+
 /** One clear way in which Bern is good for this company. */
 export interface Reason {
   id: string;
+  /**
+   * people: an expert (headline = name, entries[0] = the person);
+   * groups: labs, units, centres; projects: projects and studies;
+   * ideas: possible adjacent applications.
+   */
+  category: ReasonCategory;
   headline: string;
   line: CitedText;
   entries: ReasonEntry[];

@@ -38,7 +38,44 @@ const PROMPT_A =
 
 const reasonsA: Reason[] = [
   {
+    id: 'pA-witthauer',
+    category: 'people',
+    headline: 'Prof. Dr. Lilian Witthauer',
+    line: { text: 'Holds DCB’s sensor-technology professorship, the core of a glucose-sensor company.', evidenceIds: ['ev-dcb-profs-a'] },
+    entries: [{ id: 'eA-witt', name: 'Prof. Dr. Lilian Witthauer', role: 'DCB professorship · Sensortechnologie', institution: 'DCB', evidenceIds: ['ev-dcb-profs-a'] }],
+    kind: 'direct',
+    selection: 'none',
+  },
+  {
+    id: 'pA-koch',
+    category: 'people',
+    headline: 'Prof. Dr. Lisa Koch',
+    line: { text: 'Holds DCB’s data-science and machine-learning professorship, relevant to the sensor algorithms.', evidenceIds: ['ev-dcb-profs-a'] },
+    entries: [{ id: 'eA-koch', name: 'Prof. Dr. Lisa Koch', role: 'DCB professorship · Data Science und Machine Learning', institution: 'DCB', evidenceIds: ['ev-dcb-profs-a'] }],
+    kind: 'direct',
+    selection: 'none',
+  },
+  {
+    id: 'pA-bally',
+    category: 'people',
+    headline: 'Dr. med. Dr. phil. Lia Bally',
+    line: { text: 'Leads the lab that evaluates digital biomarkers.', evidenceIds: ['ev-bally-team', 'ev-bally-biomarkers'] },
+    entries: [{ id: 'eA-lbally', name: 'Dr. med. Dr. phil. Lia Bally', role: 'Group Leader, Bally Lab (DBMR)', institution: 'UniBE', evidenceIds: ['ev-bally-team'] }],
+    kind: 'direct',
+    selection: 'none',
+  },
+  {
+    id: 'pA-mougiakakou',
+    category: 'people',
+    headline: 'Prof. Dr. Stavroula Mougiakakou',
+    line: { text: 'Contact for ARTORG’s AI-in-health group working on personalised diabetes management.', evidenceIds: ['ev-aihn-contact'] },
+    entries: [{ id: 'eA-moug', name: 'Prof. Dr. Stavroula Mougiakakou', role: 'Contact, AI in Health and Nutrition (ARTORG)', institution: 'ARTORG', evidenceIds: ['ev-aihn-contact'] }],
+    kind: 'direct',
+    selection: 'none',
+  },
+  {
     id: 'rA-needlefree',
+    category: 'projects',
     headline: 'Needle-free glucose monitoring is already researched here',
     line: { text: 'DCB runs a pilot study on painless, needle-free monitoring.', evidenceIds: ['ev-dcb-spn005'] },
     entries: [{ id: 'eA-spn', name: 'SPN-005 pilot study', institution: 'DCB', evidenceIds: ['ev-dcb-spn005'] }],
@@ -47,6 +84,7 @@ const reasonsA: Reason[] = [
   },
   {
     id: 'rA-biomarkers',
+    category: 'groups',
     headline: 'Experts who validate digital biomarkers',
     line: { text: 'Bally Lab develops and evaluates new digital biomarkers.', evidenceIds: ['ev-bally-biomarkers'] },
     entries: [{ id: 'eA-bally', name: 'Bally Lab', institution: 'UniBE', evidenceIds: ['ev-bally-biomarkers', 'ev-bally-aid'] }],
@@ -55,6 +93,7 @@ const reasonsA: Reason[] = [
   },
   {
     id: 'rA-ai',
+    category: 'groups',
     headline: 'AI that turns readings into personalised care',
     line: { text: 'ARTORG builds AI for adaptive, personalised diabetes care.', evidenceIds: ['ev-adaptive-ai'] },
     entries: [{ id: 'eA-adm', name: 'Adaptive Diabetes Management', institution: 'ARTORG', evidenceIds: ['ev-adaptive-ai', 'ev-adaptive-proactive'] }],
@@ -63,6 +102,7 @@ const reasonsA: Reason[] = [
   },
   {
     id: 'rA-women',
+    category: 'projects',
     headline: 'Research on diabetes in women',
     line: { text: 'DCB studied how the menstrual cycle relates to insulin needs.', evidenceIds: ['ev-dcb-menstrual'] },
     entries: [{ id: 'eA-cycle', name: 'Menstrual Cycle Study', institution: 'DCB', evidenceIds: ['ev-dcb-menstrual'] }],
@@ -72,6 +112,7 @@ const reasonsA: Reason[] = [
   },
   {
     id: 'rA-trial',
+    category: 'projects',
     headline: 'Clinical-trial experience with diabetes tools',
     line: { text: 'ARTORG’s GoCARB nutrition tool was validated in a clinical trial.', evidenceIds: ['ev-gocarb-trial'] },
     entries: [{ id: 'eA-gocarb', name: 'GoCARB', institution: 'ARTORG', evidenceIds: ['ev-gocarb-trial', 'ev-gocarb-project'] }],
@@ -80,6 +121,7 @@ const reasonsA: Reason[] = [
   },
   {
     id: 'rA-metabolite',
+    category: 'ideas',
     headline: 'Future idea: sensing several metabolites at once',
     line: { text: 'Early-stage DCB chemistry for continuous multi-metabolite measurement.', evidenceIds: ['ev-dcb-porphyrin'] },
     entries: [{ id: 'eA-porph', name: 'Illuminating Personalized Medicine', institution: 'DCB', evidenceIds: ['ev-dcb-porphyrin'] }],
@@ -122,6 +164,9 @@ const traceA: SearchTrace = {
     { source: 't-validation', target: 'ev-gocarb-trial', value: 1 },
     { source: 't-validation', target: 'ev-bally-aid', value: 1 },
     { source: 't-cycle', target: 'ev-dcb-menstrual', value: 1 },
+    { source: 't-cgm', target: 'ev-dcb-profs-a', value: 1 },
+    { source: 't-personal', target: 'ev-aihn-contact', value: 1 },
+    { source: 't-biomarker', target: 'ev-bally-team', value: 1 },
   ],
 };
 
@@ -143,7 +188,7 @@ const revA1: BriefRevision = {
     { caseId: 'case-d3', companyLabel: 'Diabeto App', score: 44, shared: ['Diabetes', 'Algorithms'], status: 'on_hold' },
   ],
   trace: traceA,
-  coverage: coverage('ok', ['No named contacts on the retrieved pages.']),
+  coverage: coverage('ok', ['Contact details: public profile pages only.']),
 };
 
 const reasonsA2 = reasonsA.filter((r) => r.id !== 'rA-trial');
@@ -173,7 +218,7 @@ const caseA: CaseDetail = {
   currentRevisionId: 'revA-2',
   turns: [
     { id: 'tA-1', role: 'operator', text: PROMPT_A, createdAt: '2026-10-18T14:00:00Z' },
-    { id: 'tA-2', role: 'agent', text: 'Found 6 reasons across UniBE, ARTORG and DCB. Your menstrual-cycle lead checks out.', createdAt: '2026-10-18T14:05:00Z', revisionId: 'revA-1' },
+    { id: 'tA-2', role: 'agent', text: 'Found 4 people and 6 groups/projects across UniBE, ARTORG and DCB. Your menstrual-cycle lead checks out.', createdAt: '2026-10-18T14:05:00Z', revisionId: 'revA-1' },
     { id: 'tA-3', role: 'operator', text: 'Drop the nutrition stuff, they don’t care about meals.', createdAt: '2026-10-18T14:11:00Z' },
     { id: 'tA-4', role: 'agent', text: 'Removed the nutrition reason.', createdAt: '2026-10-18T14:12:00Z', revisionId: 'revA-2' },
   ],
@@ -187,7 +232,26 @@ const PROMPT_B =
 
 const reasonsB: Reason[] = [
   {
+    id: 'pB-garcia',
+    category: 'people',
+    headline: 'Prof. Dr. José Garcia',
+    line: { text: 'Holds DCB’s professorship for automated insulin therapy, exactly Pumpline’s next step.', evidenceIds: ['ev-dcb-profs-b'] },
+    entries: [{ id: 'eB-garcia', name: 'Prof. Dr. José Garcia', role: 'DCB professorship · automatisierte Insulintherapie', institution: 'DCB', evidenceIds: ['ev-dcb-profs-b'] }],
+    kind: 'direct',
+    selection: 'none',
+  },
+  {
+    id: 'pB-bally',
+    category: 'people',
+    headline: 'Dr. med. Dr. phil. Lia Bally',
+    line: { text: 'Leads the lab working on closed-loop insulin delivery in hospitals.', evidenceIds: ['ev-bally-team', 'ev-bally-aid'] },
+    entries: [{ id: 'eB-lbally', name: 'Dr. med. Dr. phil. Lia Bally', role: 'Group Leader, Bally Lab (DBMR)', institution: 'UniBE', evidenceIds: ['ev-bally-team'] }],
+    kind: 'direct',
+    selection: 'none',
+  },
+  {
     id: 'rB-closedloop',
+    category: 'groups',
     headline: 'Closed-loop insulin delivery research',
     line: { text: 'Bally Lab works on closed-loop automated insulin delivery.', evidenceIds: ['ev-bally-aid'] },
     entries: [{ id: 'eB-bally', name: 'Bally Lab', institution: 'UniBE', evidenceIds: ['ev-bally-aid'] }],
@@ -196,6 +260,7 @@ const reasonsB: Reason[] = [
   },
   {
     id: 'rB-study',
+    category: 'projects',
     headline: 'An active automated-insulin-delivery study',
     line: { text: 'DCB studies therapies used alongside automated insulin delivery.', evidenceIds: ['ev-dcb-aidjunct'] },
     entries: [{ id: 'eB-junct', name: 'AID-JUNCT study', institution: 'DCB', evidenceIds: ['ev-dcb-aidjunct'] }],
@@ -204,6 +269,7 @@ const reasonsB: Reason[] = [
   },
   {
     id: 'rB-ai',
+    category: 'ideas',
     headline: 'AI for personalised insulin decisions',
     line: { text: 'ARTORG builds AI for adaptive, personalised diabetes care.', evidenceIds: ['ev-adaptive-ai'] },
     entries: [{ id: 'eB-adm', name: 'Adaptive Diabetes Management', institution: 'ARTORG', evidenceIds: ['ev-adaptive-ai'] }],
@@ -214,6 +280,7 @@ const reasonsB: Reason[] = [
 
 export const NETWORK_REASON: Reason = {
   id: 'rB-network',
+    category: 'groups',
   headline: 'A 61-researcher diabetes-technology network',
   line: { text: '61 researchers work across the four DCB professorships.', evidenceIds: ['ev-dcb-network'] },
   entries: [{ id: 'eB-net', name: 'DCB research professorships', institution: 'DCB', evidenceIds: ['ev-dcb-network'] }],
@@ -244,6 +311,8 @@ export const TRACE_B: SearchTrace = {
     { source: 't-adjunct', target: 'ev-dcb-aidjunct', value: 1 },
     { source: 't-personal', target: 'ev-adaptive-ai', value: 1 },
     { source: 't-network', target: 'ev-dcb-network', value: 1 },
+    { source: 't-aid', target: 'ev-dcb-profs-b', value: 1 },
+    { source: 't-aid', target: 'ev-bally-team', value: 1 },
   ],
 };
 
