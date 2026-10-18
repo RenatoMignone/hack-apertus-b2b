@@ -1,28 +1,29 @@
 # Project documentation
 
-**18 October 2026 · Database layer implemented; full application/model integration pending.**
+**18 October 2026 · U9 team module routing and provider handoff; live application integration pending.**
 Bern Economic Development Agency — Research & Expertise Navigator.
 Current pilot: Bern diabetes technology; the engine must support other domains
 through versioned profiles and rebuildable retrieval indexes.
 
 ## Start here
 
-1. **[Visual architecture and pipeline](architecture.html)** — main reference;
-   eight stacked diagrams from typed input through evidence preparation to report,
-   plus domain changes, deployment and data ownership. Open locally; no external assets.
-2. [Architecture contract](plans/ARCHITECTURE.md) — components/locations, text-only
-   intake, domain profiles, evidence pack, target architecture and dependencies.
-3. [Output structure](plans/OUTPUT_REPORT_STRUCTURE.md) — agreed brief sections.
-4. Implementation detail: [ingestion/contracts](plans/INGESTION_PLAN.md), then
-   [case operations](plans/OPERATIONS_PLAN.md). These are plans, not working code.
-5. **[Data-layer build router](data/DATA_LAYER.md)** — PostgreSQL + pgvector,
-   physical schemas, retrieval, cases/checkpoints, Langfuse and build gates.
-   Run it with the [deployment and team guide](data/DEPLOYMENT.md).
-6. **[Source structure](plans/SOURCE_STRUCTURE.md)** — frontend/backend split,
-   component ownership and folder guidance; [HTTP handoff](plans/FRONTEND_BACKEND_API.md)
-   for frontend integration. Python data-layer dependencies are pinned; the HTTP server/UI remain pending.
-7. **[Report-processing boundaries](plans/REPORT_PROCESSING_BOUNDARIES.md)** —
-   retrieved data → `ReportEvidencePack` and pack → output; detailed mapping pending.
+1. **[Agent/module handoffs](plans/MODULE_HANDOFFS.md)** — choose a feature row,
+   read its focused docs and code, and respect the write boundary. Frontend is
+   separately owned; backend agents leave `src/frontend/` unchanged.
+2. **[Execution graph](plans/EXECUTION_GRAPH.md)** and
+   [processing contract](plans/REPORT_PROCESSING_BOUNDARIES.md) — agreed end-to-end
+   stages, inputs/outputs, evidence gates, chat revisions, reason review and PDF.
+3. [Architecture](plans/ARCHITECTURE.md) and [interactive visual](architecture.html)
+   — shared components/deployment; [source structure](plans/SOURCE_STRUCTURE.md)
+   for module dependencies and [API handoff](plans/FRONTEND_BACKEND_API.md) for HTTP.
+4. [Data router](data/DATA_LAYER.md) and [deployment](data/DEPLOYMENT.md) — existing
+   PostgreSQL/pgvector persistence, retrieval, cases, checkpoints and tracing.
+5. **[Inference settings](data/INFERENCE_CONFIGURATION.md)** — supplied Keera
+   endpoint/model IDs; [embedding recommendation](data/EMBEDDING_DEPLOYMENT.md).
+   Root [.env.example](../.env.example) contains placeholders, not a working key.
+6. **[Active open questions](project/OPEN_QUESTIONS.md)** — integration decisions,
+   prerequisites and recommended defaults; [history](project/DECISIONS_AND_OPEN_QUESTIONS.md)
+   records provenance rather than another competing current backlog.
 
 ## Focused references
 
@@ -60,12 +61,19 @@ through versioned profiles and rebuildable retrieval indexes.
 
 **B1/N1:** supplied challenge/Notion baseline. **M1/M2:** local submission
 README/report template. **T01–T05:** supplied transcripts, not audio-verified;
-speakers' names/authority unverified. **U1–U7:** user instructions recorded in
+speakers' names/authority unverified. **U1–U9:** user instructions recorded in
 sources. **P1:** dated historical preparation. Label requirements, stakeholder
 clarifications, user decisions, proposals, measured results and unknowns.
 
 Keep source snapshots, original transcripts/material and timestamped evidence
 intact. Logical payloads remain in ingestion section 7; physical schema/search,
-case persistence and tracing belong to the focused data specs. Model/tokenizer
-sources and revisions are deferred. Evaluation/source history retain audit detail.
+case persistence and tracing belong to the focused data specs. Keera endpoint/model aliases and the EmbeddingGemma 2 reference are supplied;
+authenticated behavior, immutable revisions and hardware still need validation. Evaluation/source history retain audit detail.
 Update the visual and its owning focused document together when architecture changes.
+
+## U8 implementation boundary
+
+The agreed [case pipeline](plans/REPORT_PROCESSING_BOUNDARIES.md) defines interpretation, parallel DB/web research,
+supported frozen packs, reason-card review and PDF-first export. This change
+implements contracts and persistence only; frontend remains on mocks. Live models,
+search/scraping, HTTP, LangGraph execution and rendering are future integrations.

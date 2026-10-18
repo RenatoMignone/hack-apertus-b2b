@@ -160,15 +160,29 @@ class CaseRepository:
             return dict(result)
 
     def _validate_pack(self, connection, pack_id):
-        from backend.data.database import require_scope
-        rows = connection.execute(select(tables.spans.c.scope_id).select_from(tables.pack_items.outerjoin(tables.spans))
-            .where(tables.pack_items.c.pack_id == pack_id)).scalars().all()
-        if not rows or any(scope_id is None for scope_id in rows):
+        from backend.data.repositories.evidence import eligible_evidence
+        pack = connection.execute(select(tables.packs).where(tables.packs.c.pack_id == pack_id)).mappings().one()
+        run = connection.execute(select(tables.runs).where(tables.runs.c.run_id == pack["run_id"])).mappings().one()
+        evidence_ids = list(connection.execute(select(tables.pack_items.c.evidence_id).where(
+            tables.pack_items.c.pack_id == pack_id)).scalars())
+        if pack["payload"].get("schema_version") == 2:
+            from backend.contracts.pipeline import ReportEvidencePack
+            parsed = ReportEvidencePack.model_validate(pack["payload"])
+            expected_evidence = {key for claim in parsed.claims for key in claim.evidence_ids}
+            actual_claims = set(connection.execute(select(tables.pack_claims.c.claim_id).where(
+                tables.pack_claims.c.pack_id == pack_id)).scalars())
+            pins = {name: str(run[name]) for name in ("run_id", "input_id", "snapshot_id")}
+            digest = configuration_hash({"payload": pack["payload"], "pins": pins,
+                "configuration": run["configuration"], "manifest_id": str(pack["manifest_id"]) if pack["manifest_id"] else None,
+                "evidence": sorted(map(str, evidence_ids))})
+            if (set(evidence_ids) != expected_evidence or actual_claims != {claim.claim_id for claim in parsed.claims}
+                    or digest != pack["pack_hash"]):
+                raise PermissionError("frozen pack membership or hash changed")
+        elif not evidence_ids:
             raise PermissionError("pack evidence is unavailable")
-        for scope_id in rows:
-            require_scope(connection, scope_id)
+        eligible_evidence(connection, run, evidence_ids, pack["manifest_id"])
 
-    def review(self, access, result_id, *, expected_hash, decision):
+    def review(self, access, result_id, *, expected_hash, decision, expected_selection_hash=None):
         if decision not in {"accepted", "rejected"}:
             raise ValueError("review decision must be accepted or rejected")
         with transaction(self.engine, access) as connection:
@@ -177,13 +191,21 @@ class CaseRepository:
             self._validate_pack(connection, result["pack_id"])
             if case["current_result_id"] != result_id or result["result_hash"] != expected_hash:
                 raise ValueError("review must target the current exact result hash")
+            from backend.data.repositories.drafts import selection_hash
+            if result["payload"].get("schema_version") != 2:
+                raise ValueError("legacy results need a validated v2 reason revision before review")
+            selections = selection_hash(connection, result_id, require_complete=decision == "accepted")
+            if decision == "accepted" and expected_selection_hash != selections:
+                raise ValueError("approval requires the exact current selection hash")
             review_id = uuid4()
             connection.execute(insert(tables.reviews).values(review_id=review_id, result_id=result_id,
-                reviewer_id=access.principal_id, result_hash=expected_hash, decision=decision))
+                reviewer_id=access.principal_id, result_hash=expected_hash, selection_hash=selections, decision=decision))
             return review_id
 
-    def record_export(self, access, result_id, review_id, reference, *, artifacts, template_version, renderer_version):
+    def record_export(self, access, result_id, review_id, reference, *, artifacts, template_version, renderer_version, format="pdf"):
         from backend.data.repositories.corpus import save_artifact
+        if format != "pdf" or reference.mime != "application/pdf":
+            raise ValueError("only PDF export is supported; rendering is a future adapter")
         artifacts.read(reference)
         with transaction(self.engine, access) as connection:
             result = connection.execute(select(tables.results).where(tables.results.c.result_id == result_id)).mappings().one()
@@ -193,10 +215,12 @@ class CaseRepository:
             if (case["current_result_id"] != result_id or review["result_id"] != result_id or
                     review["decision"] != "accepted" or review["result_hash"] != result["result_hash"]):
                 raise ValueError("export requires the current reviewed result")
-            selections = list(connection.execute(select(tables.selections.c.match_id).where(
-                tables.selections.c.result_id == result_id, tables.selections.c.selected)).scalars())
+            from backend.data.repositories.drafts import selection_hash
+            selections = selection_hash(connection, result_id, require_complete=True)
+            if review["selection_hash"] != selections or result["payload"].get("schema_version") != 2:
+                raise ValueError("reviewed selections changed or result is legacy")
             export_id = uuid4()
             connection.execute(insert(tables.exports).values(export_id=export_id, result_id=result_id, review_id=review_id,
                 artifact_id=save_artifact(connection, reference), template_version=template_version,
-                renderer_version=renderer_version, selection_hash=configuration_hash({"selected": sorted(str(value) for value in selections)})))
+                renderer_version=renderer_version, selection_hash=selections, format=format))
             return export_id

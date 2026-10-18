@@ -42,9 +42,21 @@ def test_four_developer_roles_concurrent_and_rls(database, corpus):
         with ThreadPoolExecutor(max_workers=4) as pool:
             results = list(pool.map(search, range(4)))
         assert all(len(result.hits) == 4 for result in results)
-        case_id, _ = CaseRepository(engines[0]).create(accesses[0], "Permitted public need")
+        case_id, _input_id = CaseRepository(engines[0]).create(accesses[0], "Permitted public need")
         with transaction(engines[1], accesses[1]) as connection:
             assert not connection.execute(select(tables.cases).where(tables.cases.c.case_id == case_id)).first()
+        from backend.data.repositories.evidence import EvidenceRepository
+        from backend.tests.test_pipeline_contracts import interpretation
+        run_id, _ = CaseRepository(engines[0]).start_run(accesses[0], case_id,
+            _input_id,
+            UUID(fixture["snapshot_id"]), {})
+        EvidenceRepository(engines[0]).interpret(accesses[0], run_id, interpretation())
+        with transaction(engines[1], accesses[1]) as connection:
+            assert not connection.execute(select(tables.interpretations).where(tables.interpretations.c.run_id == run_id)).first()
+        with pytest.raises(DBAPIError):
+            with transaction(engines[1], accesses[1]) as connection:
+                connection.execute(insert(tables.web_research).values(research_id=uuid4(), run_id=run_id,
+                    query="foreign case", mode="connected"))
         with pytest.raises(PermissionError):
             with transaction(engines[0], accesses[1]):
                 pass

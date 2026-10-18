@@ -1,6 +1,6 @@
 # Case persistence, checkpoints and output lineage
 
-**18 October 2026 · Implementation specification, not a running case store.**
+**18 October 2026 · Case persistence implemented; live workflow/model integration pending.**
 Read [data layer](DATA_LAYER.md), [schema](RELATIONAL_SCHEMA.md), and
 [Phase 2](../plans/OPERATIONS_PLAN.md) for workflow semantics. PostgreSQL owns
 business records; the LangGraph PostgreSQL saver owns resumable graph state.
@@ -96,3 +96,10 @@ No historical dataset currently exists. Unknown outcomes remain unknown.
 - Revoke supporting evidence and block dependent reads even for an old snapshot.
 
 These are acceptance cases for future implementation, not completed tests.
+
+## U8 case pipeline extension
+
+[Case pipeline storage](CASE_PIPELINE_STORAGE.md) owns the new tables, manifest
+eligibility, supported-claim assessments and reason-level selection/review hashes.
+Legacy match selections remain historical. New accepted reviews/exports require
+the v2 reason workflow; rejection is editorial and does not retract a claim.

@@ -1,12 +1,16 @@
 # Evidence preparation
 
-Own future retrieved-record assessment and assembly/freezing of ReportEvidencePack.
-Inputs: versioned intent/company context, retrieved hits, literal support and pinned
-run/snapshot/manifest/config references. Output: a frozen supported pack with gaps
-and limitations, or an explicit blocked/partial outcome. A ranked hit is not a fact.
+The [processing contract](../../../docs/plans/REPORT_PROCESSING_BOUNDARIES.md)
+defines retrieval → assessed claims → frozen ReportEvidencePack. Storage is
+implemented in `data/repositories/evidence.py`: interpretations, exact claim
+assessments, case manifests, pack freezing and authorized citation reads.
+[Pack content](../../../docs/plans/ARCHITECTURE.md#evidence-pack-the-report-generation-gate)
+remains authoritative. A ranked hit is not a fact; live model extraction and
+semantic validators are subsequent adapters, not implemented by persistence.
 
-Read [processing Boundary A](../../../docs/plans/REPORT_PROCESSING_BOUNDARIES.md#boundary-a-retrieval--reportevidencepack)
-and [pack authority](../../../docs/plans/ARCHITECTURE.md#evidence-pack-the-report-generation-gate).
-Deduplication, expansion, validation, linking, completeness and intermediate DTOs
-still require mapping. No detailed pipeline/pack builder is implemented here.
-Report writing belongs in reports; durable storage uses data ports.
+## Parallel feature routing
+
+[Module handoffs](../../../docs/plans/MODULE_HANDOFFS.md) lists this module's
+focused read path, outputs and acceptance checks. [Active questions](../../../docs/project/OPEN_QUESTIONS.md)
+own unresolved inputs. Implement scoped behavior against agreed contracts and
+fixtures; coordinate shared schema/config changes. Leave `src/frontend/` untouched.

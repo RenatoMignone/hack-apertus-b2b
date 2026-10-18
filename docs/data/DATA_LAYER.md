@@ -3,8 +3,9 @@
 **18 October 2026 · Data-layer implementation added; model/product integration pending.** Authority: U6/D09 in
 [decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md). PostgreSQL + pgvector
 replace the earlier Weaviate/SQLite design. LangGraph orchestrates the workflow;
-self-hosted Langfuse records execution. Exact model sources, tokenizer packages,
-revisions, endpoints and deployment resources are deliberately deferred.
+self-hosted Langfuse records execution. U9 supplies Keera endpoint/model aliases
+and the EmbeddingGemma 2 artifact reference. Authenticated behavior, immutable
+revisions, runtime packages and hardware benchmarks remain open.
 
 ## Read by implementation task
 
@@ -86,6 +87,20 @@ through every handoff, including when producing multiple search queries.
 
 Medical pilot, three institutional families, public-only input and independent
 deployment constraints remain in [architecture](../plans/ARCHITECTURE.md) and
-[evidence policy](DATA_AND_PROVENANCE.md). U7 adds a directory-only
-[source scaffold](../plans/SOURCE_STRUCTURE.md); future agents implement code
-under `src/` after an implementation task authorizes it.
+[evidence policy](DATA_AND_PROVENANCE.md). The original U7 scaffold now contains
+implemented Python data modules and the separately owned React frontend. Use
+[module handoffs](../plans/MODULE_HANDOFFS.md) for scoped backend feature work.
+
+## U8 implementation boundary
+
+The agreed [case pipeline](../plans/REPORT_PROCESSING_BOUNDARIES.md) defines interpretation, parallel DB/web research,
+supported frozen packs, reason-card review and PDF-first export. This change
+implements contracts and persistence only; frontend remains on mocks. Live models,
+search/scraping, HTTP, LangGraph execution and rendering are future integrations.
+
+## Feature handoff and provider settings
+
+Use [module handoffs](../plans/MODULE_HANDOFFS.md) for independently scoped work,
+[inference configuration](INFERENCE_CONFIGURATION.md) for Keera and
+[embedding deployment](EMBEDDING_DEPLOYMENT.md) for local/hosted comparison.
+[Active questions](../project/OPEN_QUESTIONS.md) supersede historical unknown lists.

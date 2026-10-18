@@ -212,3 +212,29 @@ References: [Docker WSL2](https://docs.docker.com/desktop/features/wsl/),
 [port publishing](https://docs.docker.com/engine/network/port-publishing/),
 [Windows OpenSSH](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse),
 [Langfuse deployment](https://langfuse.com/self-hosting/deployment/docker-compose).
+
+## U8 schema update and validation
+
+Use the existing maintainer migration command to advance to `0004_case_pipeline`
+when deploying this change. Existing records and legacy match selections remain;
+legacy results require a validated v2 draft before new approval/export. No shared
+team-host database was migrated as part of this change.
+
+The isolated validation uses a disposable PostgreSQL 17 + pgvector container and
+`NAVIGATOR_TEST_ADMIN_DSN`, then `PYTHONPATH=src python -m pytest src/backend/tests -q`.
+Initialize the `navigator_app` NOLOGIN role as in the deployment bootstrap before
+running role tests. Model/scraper/PDF calls are not live: assertions and bytes in
+fixtures are explicitly synthetic. Tests cover fresh install, upgrade from 0003,
+RLS isolation, manifest/citation access, revision and selection invalidation,
+revocation and PDF artifact registration. This does not test PDF rendering.
+
+## U9 model connection handoff
+
+Root [.env.example](../../.env.example), the backend/tunnel example and deployment
+example contain the supplied public Keera base URL, default model and a key
+placeholder. Host initialization still generates infrastructure settings; fill
+its initially empty model values privately from the examples afterward.
+See [inference configuration](INFERENCE_CONFIGURATION.md) for the four aliases
+and smoke checks. No key was supplied or inference tested; current data settings
+do not yet construct model clients. Hosted Keera is connected-only. Local
+[embedding deployment](EMBEDDING_DEPLOYMENT.md) is recommended pending host tests.

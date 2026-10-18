@@ -1,11 +1,13 @@
-# Server configuration and domain profiles
+# Server settings and domain profiles
 
-Reserved for future validated server settings and versioned `profiles/` content.
-Preserve template LLM_NAME, LLM_BASE_URL, LLM_API_KEY; real credentials stay outside
-the repository and frontend. Endpoints/model sources/revisions remain unresolved.
+`settings.py` currently reads database/checkpoint/artifact settings. Root
+[.env.example](../../../.env.example) and the backend example contain public Keera
+settings and a team-key placeholder. LLM and proposed `EMBEDDING_*`/deployment keys
+are handoff configuration, not yet consumed by `Settings` or a live adapter.
 
-Read [model/build configuration](../../../docs/data/BUILD_AND_OPERATIONS.md) and
-[domain-profile boundaries](../../../docs/plans/ARCHITECTURE.md#data-independent-core-and-configurable-domain-profile).
-Domain sources/taxonomy/ranking settings belong in profiles, not workflow code.
-Existing documented source configuration is not copied into a competing registry.
-Profile files and environment examples will be added with actual implementation.
+Read [provider settings](../../../docs/data/INFERENCE_CONFIGURATION.md),
+[model/build configuration](../../../docs/data/BUILD_AND_OPERATIONS.md) and
+[profiles](../../../docs/plans/ARCHITECTURE.md#data-independent-core-and-configurable-domain-profile).
+Pin model/taxonomy/profile versions; do not copy source registries or secrets
+into graph nodes. The config integrator coordinates new parsed keys and bootstrap
+wiring; each feature documents what it requires. All credentials stay backend-only.

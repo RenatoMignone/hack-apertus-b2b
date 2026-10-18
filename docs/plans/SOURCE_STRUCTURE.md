@@ -3,7 +3,8 @@
 **18 October 2026 · Scaffold followed by authorized database implementation.**
 The backend data layer now uses Python 3.12, SQLAlchemy Core, psycopg, Alembic
 and Pydantic, with Docker Compose and an administrative CLI. See
-[deployment](../data/DEPLOYMENT.md). HTTP framework and frontend remain undecided.
+[deployment](../data/DEPLOYMENT.md). The React/Vite frontend is implemented on mocks and separately owned. HTTP
+framework remains open. Start feature work with [module handoffs](MODULE_HANDOFFS.md).
 Keep the submission template: application work stays under root `src/`.
 
 ## Directory map
@@ -11,11 +12,11 @@ Keep the submission template: application work stays under root `src/`.
 ```text
 src/
   README.md
-  frontend/                 Browser client; internal layout deliberately deferred
+  frontend/                 React browser client on mocks
   backend/
     api/                    HTTP transport validation, routes and response mapping
     application/            Use cases, access checks and transaction coordination
-    contracts/              Future typed contracts, ports and schema exports
+    contracts/              Implemented DTOs/projection helpers; additional agreed ports
     workflows/              LangGraph graph composition and resumable stages
     data/
       repositories/         Canonical PostgreSQL records and transactions
@@ -24,7 +25,7 @@ src/
       artifacts/            Controlled artifact storage adapters
     models/
       reasoning/            Apertus adapter
-      embeddings/           Embedding adapter; exact source deferred
+      embeddings/           EmbeddingGemma 2 adapter; revision/runtime pending
       reranking/            Reranker adapter
     ingestion/              Reserved acquisition/normalization integration
     evidence/               Retrieved evidence → frozen ReportEvidencePack
@@ -40,7 +41,8 @@ src/
 Every component directory has a local README or an empty `.gitkeep`. Subfolders
 are ownership boundaries, not separate deployed services. Module/file names and
 package conventions come with the implementation language. Do not create empty
-source files or pretend these are importable packages. Frontend internals are absent.
+source files or pretend placeholders are implemented features. Python data packages
+and the React frontend exist; backend tasks do not edit `src/frontend/`.
 
 ## Communication and dependency rules
 
@@ -60,7 +62,8 @@ frontend --HTTP--> api --> application --> workflows
 config supplies validated settings; observability receives masked events.
 ```
 
-`contracts/` will own typed payloads and narrow ports at implementation time.
+`contracts/` owns implemented typed payloads and narrow ports; add missing service
+ports explicitly before consumer integration.
 Specification authority remains [ingestion plan §7](INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2)
 for shared evidence records, [architecture](ARCHITECTURE.md#evidence-pack-the-report-generation-gate)
 for pack contents, and focused data specs for storage/lineage. Reuse contracts;
@@ -75,7 +78,7 @@ expose a smaller eligible view without changing its identity.
 | `contracts` | Shared DTOs, validation definitions and narrow service/repository/model/storage ports | No framework, database, UI or model-client dependencies |
 | `data` | PostgreSQL repositories, artifacts and hybrid retrieval | Contracts; retrieval uses injected embedding/reranking ports, never HTTP routes or graphs |
 | `models` | Reasoning, embedding and reranking adapter behavior | Validated model configs; no routing, case ownership or publication policy |
-| `ingestion` | Future acquisition/normalization integration | Publication contracts; scraper behavior/library explicitly undecided in this task |
+| `ingestion` | Future acquisition/normalization integration | Publication contracts; Crawl4AI selected for future case-time fetching; bulk ingestion separate |
 | `evidence` | Assessment and frozen pack boundary | Retrieval/record/model ports; does not generate the final report |
 | `reports` | Drafting, claim/citation checks and rendering from a pack | Model/artifact ports; cannot silently search or mutate its pack |
 | `observability` | Masked traces and diagnostic correlation | Local Langfuse; no authority over facts or run completion |
@@ -100,9 +103,8 @@ outside application SQL migrations.
 - Future executable placeholders fail explicitly; unresolved models/processing
   must never fabricate data or silently return success.
 
-First agree the [HTTP handoff](FRONTEND_BACKEND_API.md) and caller/access integration.
-Then map the two [processing boundaries](REPORT_PROCESSING_BOUNDARIES.md), choose
-backend/tooling/adapters and implement a vertical slice using the
-[data-layer build gates](../data/BUILD_AND_OPERATIONS.md). Existing high-level plans
-are not a completed stage-by-stage processing design. No dependency installation
-or scraper selection is part of this scaffold.
+U8 defines the [processing stages](REPORT_PROCESSING_BOUNDARIES.md) and extends
+contracts/data persistence; the React client remains on mocks. HTTP, live tools,
+models, orchestration and rendering are subsequent integrations. Agentic work must
+use LangGraph/LangChain. Keep fixtures explicitly synthetic and production adapters
+unavailable until configured; do not return fake success.

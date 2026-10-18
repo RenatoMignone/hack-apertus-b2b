@@ -53,4 +53,8 @@ This covers the written challenge’s required fields. A numerical matching scor
 
 The stakeholder emphasized **short explanations, useful scientific connections, source links and human selection**. She explicitly wanted more than bare links, accepted honest no-match results, and described an outgoing teaser of **five to ten pages maximum**. Historical-case scoring and economic-impact modelling were not established priorities. [Workshop findings E09–E16](../recordings/RECORDING_INSIGHTS.md).
 
-**For the first version:** deliver sections 1–7 as a concise, reviewable brief, with expertise matching taking most of the space. Then offer a company-facing PDF or PowerPoint assembled from the items she selects.
+**U8 current delivery order:** expose a concise cited draft for reason-card review,
+then export a PDF containing kept reasons, supporting company context, sources
+and material caveats. Sections 1–7 are content categories, not seven mandatory
+pages or extra unreviewed assertions. All reasons must be reviewed and at least
+one kept. PowerPoint remains a later output using the supplied template.

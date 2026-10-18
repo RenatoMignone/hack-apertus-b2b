@@ -2,8 +2,8 @@
 
 **18 October 2026 · Draft integration contract, not a running API.** U7 selects
 HTTP separation. Routes/projections below are a proposed v1 handoff; agree and
-export a machine-readable schema when implementation starts. No HTTP framework,
-authentication provider, frontend framework or port is selected.
+export a machine-readable schema when implementation starts. The frontend is React/Vite on mocks. HTTP framework, authentication provider and
+backend port remain unselected. U8 implements contracts/persistence only.
 
 ## Integration boundary
 
@@ -108,3 +108,42 @@ Before implementation, agree OpenAPI/JSON projections, caller/session integratio
 size limits, pagination and retry windows. Future contract fixtures must cover
 success, clarification, partial/no-match, stale revisions, access denial and
 export-not-ready. This scaffold includes no schema file, mock server or routes.
+
+## U8 integration mapping (future HTTP work)
+
+`createCase(prompt)` maps to case/input creation, then `runCase` starts research
+and automatic pack → draft chaining. Poll durable run state to drive existing
+`RunStage`: interpreting, searching, validating, drafting, done. Clarification
+is `waiting_for_input`, not an error or completed run.
+
+Add documented routes: `GET /cases` (authorized summaries), `PATCH /cases/{id}`
+(business status/current revision), `POST /cases/{id}/messages` (chat edit and base
+revision), `PUT /cases/{id}/reports/{revision}/reasons/{key}/selection` (kept,
+rejected, none plus expected result hash), and action-item list/update routes.
+Evidence projections add `origin` (corpus/web), `reviewStatus` (curated/unreviewed);
+new source trust stays separate from claim support and editorial selection.
+The backend uses UUIDs internally; the HTTP adapter serializes them as opaque
+strings matching the frontend contract. Existing `exportDeck` will become a
+format-aware report request; PDF first, PPTX later.
+
+Review submits exact result hash and selection hash; all reasons reviewed and at
+least one kept. Selections changing after review invalidate new exports. Cited
+lines map reason → claim IDs → evidence IDs, retaining literal quotes/highlights.
+The HTTP adapter must translate backend business statuses (`ready_for_review`)
+to the existing frontend status (`in_review`), independently from run status.
+No endpoints or client wiring are implemented by the data-layer work.
+
+## Separate frontend ownership (U9)
+
+The frontend belongs to another teammate. Backend/documentation agents must not
+edit `src/frontend/`, even to extend a TypeScript type. The current `Evidence`
+interface has no `origin`/`reviewStatus`; those are **proposed API additions** for
+source badges. Backend projection helpers can expose them, but the frontend
+owner must implement their display. Likewise, the current mock export checks
+only for at least one kept card; the stricter all-reviewed gate is backend design
+and a pending frontend integration change. Do not claim the mock is already wired.
+
+Before integration, agree these deltas with the frontend owner: source flags;
+company metadata projection; exact result/selection hashes on review/export;
+PDF-aware export naming; asynchronous polling/clarification/errors. Keep existing
+`NavigatorApi` behavior working via its future adapter, not ad hoc frontend edits.

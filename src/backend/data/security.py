@@ -1,7 +1,7 @@
 from sqlalchemy import text
 
 
-def install_security(connection):
+def install_security(connection, exclude=()):
     connection.execute(text("""
         CREATE FUNCTION ops.can_access(target uuid, writing boolean DEFAULT false)
         RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER
@@ -177,6 +177,8 @@ def install_security(connection):
     rules.update({f"cases.{name}": expression for name, expression in case_links.items()})
     for target in metadata.tables.values():
         fullname = target.fullname
+        if fullname in exclude:
+            continue
         expression = rules.get(fullname)
         if expression is None and "scope_id" in target.c:
             expression = "ops.can_access(scope_id)"

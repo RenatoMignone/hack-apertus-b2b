@@ -52,7 +52,7 @@ def test_competing_publishers_cannot_silently_replace_each_other(database, corpu
         assert sorted(pool.map(publish, snapshots)) == ["conflict", "published"]
 
 
-def test_revocation_blocks_old_result_and_invalidates_export(database, corpus):
+def test_revocation_blocks_legacy_result_and_prevents_new_approval(database, corpus):
     fixture, artifacts = corpus
     access = context(fixture)
     repository, case_id, _, run_id, _ = make_run(database, fixture)
@@ -60,14 +60,11 @@ def test_revocation_blocks_old_result_and_invalidates_export(database, corpus):
     pack = repository.freeze_pack(access, run_id, {"synthetic": True}, hit.evidence_ids)
     result = repository.record_result(access, case_id, pack, {"text": "Synthetic output"}, expected_revision=0)
     result_hash = repository.read_result(access, result)["result_hash"]
-    review = repository.review(access, result, expected_hash=result_hash, decision="accepted")
-    reference = artifacts.put(b"synthetic export", "text/plain")
-    export = repository.record_export(access, result, review, reference, artifacts=artifacts, template_version="fixture", renderer_version="fixture")
+    with pytest.raises(ValueError, match="legacy"):
+        repository.review(access, result, expected_hash=result_hash, decision="accepted")
     revoke_scope(database, UUID(fixture["scope_id"]))
     with pytest.raises(PermissionError):
         repository.read_result(access, result)
-    with database.connect() as connection:
-        assert connection.execute(select(tables.exports.c.status).where(tables.exports.c.export_id == export)).scalar_one() == "revoked"
 
 
 def test_supported_claims_and_new_embedding_templates_keep_original_chunks(database, corpus):

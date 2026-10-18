@@ -1,14 +1,15 @@
 # Phase 1 — Ingestion, taxonomy and memory
 
-**18 October 2026 · Implementation plan; nothing built or measured.**
+**18 October 2026 · Collection/build design; PostgreSQL persistence implemented, live acquisition/model adapters pending.**
 Start with the [stacked visual diagrams](../architecture.html) and
 [architecture/deployment contract](ARCHITECTURE.md). This plan owns the shared
 records and memory interfaces. [Phase 2](OPERATIONS_PLAN.md) consumes them.
 
 Selected stack: PostgreSQL + pgvector, LangGraph PostgreSQL checkpoints and
 self-hosted Langfuse; Apertus v1.5 8B / optional 70B, EmbeddingGemma 2 candidate
-and BGE reranking. Exact model/tokenizer sources, revisions, endpoints, hardware
-and taxonomy remain deferred. [Data-layer specs](../data/DATA_LAYER.md) own physical
+and BGE reranking. U9 supplies Keera aliases/base URL and the EmbeddingGemma 2
+reference; exact revisions/runtime packages, measured hardware and actual reviewed
+taxonomy remain open. [Data-layer specs](../data/DATA_LAYER.md) own physical
 implementation; this plan owns logical contracts. Code belongs in `src/`.
 
 ## 1. Pipeline and boundaries
@@ -419,3 +420,11 @@ indexes, taxonomy/profile, UI and rendering assets without remote fallbacks.
 Await the user's endpoint/hardware handoff, reviewed taxonomy and partner gold
 examples. Historical-case data remains independently absent. Record actual
 choices in [decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
+
+## U8 runtime contracts
+
+Existing source/read contracts above remain valid. New case processing DTOs
+are implemented in `src/backend/contracts/pipeline.py`; frontend projections
+are in `contracts/frontend.py`. [Case processing](REPORT_PROCESSING_BOUNDARIES.md)
+owns interpretation/assessment/pack/draft stages. [Web research](../data/WEB_RESEARCH.md)
+selects Crawl4AI for future case-time fetches; this does not settle bulk ingestion.

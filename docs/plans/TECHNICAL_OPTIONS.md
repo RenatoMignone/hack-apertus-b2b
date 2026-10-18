@@ -9,14 +9,14 @@ points, not measured superiority or verified hosting capabilities.
 
 | Responsibility | Initial choice | Validation still needed |
 | --- | --- | --- |
-| Interpretation, extraction, reasoning, writing | Apertus v1.5 8B; bounded optional 70B fallback | Actual served model/protocol, structured output handling, resources, quality/cost and licensing |
-| Original-text embeddings | EmbeddingGemma 2 candidate, provisional 768-dimensional output | Source/revision/tokenizer/encoding settings deferred; resolve before ingestion and evaluate pilot retrieval |
+| Interpretation, extraction, reasoning, writing | Apertus v1.5 8B; bounded optional 70B fallback | Keera alias/base supplied; verify authenticated schema/tool behavior, served revision, quality/cost |
+| Original-text embeddings | `google/embeddinggemma-2`, proposed text-only local, native 768d | Reference verified; pin revision/runtime/encoding before ingestion and evaluate pilot retrieval |
 | Lexical + vector retrieval | PostgreSQL full-text search + pgvector cosine, fused with RRF | Full-text ranking is not BM25; validate language configs, access/snapshot filters and exact baseline before optional HNSW |
 | Passage reranking | BGE-reranker-v2-m3 | Pair-token budget, ranking quality and latency; scores are not calibrated probabilities |
 | Workflow and resumable dialogue | LangGraph with PostgreSQL checkpointer in separate database | Revision/thread isolation, idempotent recovery across application/checkpoint commits and bounded retries |
 | Raw/evidence/claim storage | Artifact volume + PostgreSQL canonical records/jobs/cases | Reference integrity, atomic publication pointer, access-aware retention and restore |
 | Tracking/evaluation observations | Self-hosted Langfuse | Local web/worker, PostgreSQL, ClickHouse, Redis/Valkey and S3-compatible storage; masked payloads and non-blocking failure |
-| Interface/export | Framework/library not selected; supplied editable PowerPoint template | Rendered report/slide QA, editability, citations, local assets and licensing |
+| Interface/export | React frontend on mocks; HTTP/PDF renderer not selected; editable PowerPoint later | Rendered report/slide QA, editability, citations, local assets and licensing |
 
 Detailed records, payloads, indexing and initial budgets live in
 [INGESTION_PLAN.md](INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2).
@@ -24,7 +24,8 @@ Case intake/research/revisions/export live in [OPERATIONS_PLAN.md](OPERATIONS_PL
 Physical ownership is in the [data-layer router](../data/DATA_LAYER.md), with
 focused schema/retrieval/case/tracing/build specs. Avoid a second schema, taxonomy
 or search API. U6/D09 supersedes Weaviate, SQLite and BGE-M3 as active defaults;
-the exact model sources/tokenizer packages/revisions remain deferred.
+Keera served aliases/base URL and the EmbeddingGemma 2 artifact reference are now
+known; immutable revisions, tokenizers/runtimes and limits still need validation.
 
 ## Retrieval approach and alternatives
 
@@ -61,3 +62,18 @@ All development/deployment stays outside cantonal ICT/internal networks.
 
 Record results and choices in [decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
 No application implementation is authorized by this documentation update.
+
+## U8 selected runtime processing
+
+Use bounded LangGraph stages and LangChain adapters for all agentic execution.
+Primary Apertus 8B handles interpretation, batched extraction/assessment and draft
+synthesis; optional 70B fallback has identical checks. Large context length does
+not demonstrate one-call pack reliability. Exact model artifacts remain deferred.
+Self-hosted Crawl4AI is the selected future fetch adapter;
+[comparison and primary sources](../data/WEB_RESEARCH.md). PDF first, PPTX later.
+Only contracts and persistence are implemented in this phase.
+
+U9: [Keera settings](../data/INFERENCE_CONFIGURATION.md) own provider details;
+[embedding deployment](../data/EMBEDDING_DEPLOYMENT.md) compares local, HF Providers,
+dedicated endpoints and Spaces. Local text-only is recommended, not benchmarked.
+The team-reported $10/user credit cannot be assumed eligible for all HF services.

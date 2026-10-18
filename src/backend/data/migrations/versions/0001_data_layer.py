@@ -1,7 +1,7 @@
 from alembic import op
 from sqlalchemy import text
 
-from backend.data.schema import metadata
+from backend.data.schema import metadata, PIPELINE_TABLES
 from backend.data.security import install_security
 
 
@@ -16,8 +16,8 @@ def upgrade():
     connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
     for schema in ("corpus", "taxonomy", "retrieval", "cases", "ops"):
         connection.execute(text(f"CREATE SCHEMA {schema}"))
-    metadata.create_all(connection)
-    install_security(connection)
+    metadata.create_all(connection, tables=[t for t in metadata.sorted_tables if t.fullname not in PIPELINE_TABLES])
+    install_security(connection, exclude=PIPELINE_TABLES)
 
 
 def downgrade():

@@ -11,5 +11,15 @@ Specification owners:
 - [Data specs](../../../docs/data/DATA_LAYER.md): physical storage, retrieval and lineage.
 - [HTTP handoff](../../../docs/plans/FRONTEND_BACKEND_API.md): proposed transport projections.
 
-Do not invent a competing evidence schema. Exact pack/intermediate DTOs and
-report-processing contracts still require the planned mapping work.
+Do not invent a competing evidence schema. See `pipeline.py` and the agreed processing contract.
+
+## U8 persistence implementation
+
+`pipeline.py` owns typed interpretation, fetched source, assessment, pack, draft reason and export contracts. Pack assembly and stage design are now specified; live adapters remain pending.
+
+## Parallel feature routing
+
+[Module handoffs](../../../docs/plans/MODULE_HANDOFFS.md) lists this module's
+focused read path, outputs and acceptance checks. [Active questions](../../../docs/project/OPEN_QUESTIONS.md)
+own unresolved inputs. Implement scoped behavior against agreed contracts and
+fixtures; coordinate shared schema/config changes. Leave `src/frontend/` untouched.

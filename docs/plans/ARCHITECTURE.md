@@ -9,14 +9,14 @@ processing contracts and operational details.
 
 **U6/D09 update:** PostgreSQL + pgvector replace Weaviate/SQLite; LangGraph
 uses PostgreSQL checkpoints and Langfuse provides local tracing. EmbeddingGemma 2
-replaces BGE-M3 as the initial embedding candidate. Exact model/tokenizer sources,
-revisions and deployment resources are deferred. [Data-layer router](../data/DATA_LAYER.md)
+replaces BGE-M3 as the initial embedding candidate. U9 supplies Keera model aliases/endpoint and verifies the EmbeddingGemma 2
+reference; immutable revisions, tokenizer/runtime versions and resources remain open. [Data-layer router](../data/DATA_LAYER.md)
 owns physical specs; logical payloads remain in ingestion section 7.
 
 **U7/D11 source scaffold:** [source structure](SOURCE_STRUCTURE.md) maps components
 to `src/frontend/` and `src/backend/`, with HTTP separation documented in the
-[frontend handoff](FRONTEND_BACKEND_API.md). Only directories/READMEs/placeholders
-exist. Backend/framework, frontend internals and scraper implementation remain open.
+[frontend handoff](FRONTEND_BACKEND_API.md). Python persistence is implemented and the React frontend runs on mocks. HTTP and model integrations remain open;
+Crawl4AI is selected for future case-time fetching (U8); ingestion implementation is separate.
 
 ## Input and output boundary
 
@@ -54,7 +54,7 @@ gaps/next steps; sources/coverage; optional economic contribution and prior case
 | Calculator + export worker | Validated formulas, chart datasets, report rendering, editable slides | Runtime boundary with packaged template, logo, fonts and renderer |
 
 Logical components may share a host/process. Hardware, serving endpoints and
-frontend/export libraries remain unknown; do not read this table as a deployed topology.
+React/Vite is implemented on mocks; HTTP/export libraries remain open; do not read this table as a deployed topology.
 Preserve `LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY`; credentials stay server-side.
 
 ## Data-independent core and configurable domain profile
@@ -94,10 +94,10 @@ subject to access/retention rules. Rebuilding an index is distinct from fine-tun
 
 ## Evidence pack: the report-generation gate
 
-The table below defines content and invariants. The detailed transformations
-retrieved records → `ReportEvidencePack` and pack → final output still require
-separate mapping; [processing boundaries](REPORT_PROCESSING_BOUNDARIES.md) records
-owners and remaining design work. A high-level stage is not a selected algorithm.
+The table below defines content and invariants. [Case processing](REPORT_PROCESSING_BOUNDARIES.md)
+now defines interpretation, parallel research, batched evidence assessment, pack
+assembly, drafting, reason review and export. Persistence is implemented; model,
+HTTP, orchestration and rendering adapters remain subsequent work.
 
 | Record | Minimum contents | Report use |
 | --- | --- | --- |
@@ -123,11 +123,16 @@ inferred concept labels cannot hide otherwise relevant evidence. The owning
 
 The report writer receives this frozen pack, then its draft undergoes another
 claim/citation check and operator review. Render charts from prepared datasets;
-render editable PowerPoint from the reviewed revision and supplied template.
+render PDF first from reviewed reason selections; editable PowerPoint with the
+supplied template follows later. Keep/reject is editorial, separate from support.
 
 ## Target architecture (mandatory)
 
-**Proposed primary target: b) air-gapped case runtime on independent infrastructure
+**Deployment supports connected and offline modes.** Connected mode runs bounded
+public web research parallel to DB retrieval; offline disables external tools and
+reports coverage limitations. Both stay outside cantonal ICT.
+
+**Proposed offline target: b) air-gapped case runtime on independent infrastructure
 outside cantonal ICT.** No external network connection at runtime. Build and
 collection happen separately while connected; transfer only permitted, checked
 artifacts. All inference, embeddings, reranking, storage, tracing, UI assets,
@@ -178,3 +183,13 @@ publication, migrations, recovery and implementation gates.
 Owners: [ingestion/contracts](INGESTION_PLAN.md), [case operations](OPERATIONS_PLAN.md),
 [data-layer implementation](../data/DATA_LAYER.md), [evaluation](../challenge/EVALUATION.md),
 [decisions](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
+
+## Team feature and model handoff (U9)
+
+[Module handoffs](MODULE_HANDOFFS.md) route feature agents to focused owners and
+contracts. Frontend ownership is separate: backend agents read but do not edit it.
+Connected Apertus calls use [Keera](../data/INFERENCE_CONFIGURATION.md); offline
+requires a separate packaged local inference service. Local text-only
+[EmbeddingGemma 2](../data/EMBEDDING_DEPLOYMENT.md) is recommended, with hosting
+and performance still to validate. [Open questions](../project/OPEN_QUESTIONS.md)
+is the sole active unresolved-design register.

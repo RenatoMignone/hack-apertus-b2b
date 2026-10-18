@@ -213,6 +213,40 @@ outbox = table("ops", "outbox", "event_id", value("namespace"), uid("run_id", "c
                value("attempts", Integer, default=text("0")), value("next_retry", DateTime(timezone=True), default=text("now()")),
                UniqueConstraint("idempotency_key"))
 
+# U8: case processing persistence. Kept separate from the legacy match selections.
+interpretations = table("cases", "interpretations", "interpretation_id",
+    uid("run_id", "cases.runs.run_id"), payload(), UniqueConstraint("run_id"))
+web_research = table("cases", "web_research", "research_id", uid("run_id", "cases.runs.run_id"),
+    value("query"), value("mode"), state("pending"), payload("diagnostics"),
+    CheckConstraint("mode IN ('connected','offline')"),
+    CheckConstraint("status IN ('pending','completed','unavailable','failed')"))
+web_sources = table("cases", "web_sources", "discovery_id", uid("research_id", "cases.web_research.research_id"),
+    value("canonical_url"), uid("document_version_id", "corpus.document_versions.document_version_id", nullable=True),
+    uid("duplicate_version_id", "corpus.document_versions.document_version_id", nullable=True), payload(),
+    CheckConstraint("num_nonnulls(document_version_id,duplicate_version_id)=1"),
+    UniqueConstraint("research_id", "canonical_url"))
+assessments = table("cases", "claim_assessments", "assessment_id", uid("run_id", "cases.runs.run_id"),
+    uid("claim_id", "corpus.claims.claim_id"), value("status"), payload(),
+    UniqueConstraint("run_id", "claim_id"), CheckConstraint("status IN ('supported','unsupported','contradicted')"))
+reasons = table("cases", "draft_reasons", "reason_row_id", uid("result_id", "cases.result_revisions.result_id"),
+    value("reason_key"), value("support_hash"), payload(), UniqueConstraint("result_id", "reason_key"))
+reason_claims = Table("reason_claims", metadata,
+    uid("reason_row_id", "cases.draft_reasons.reason_row_id", primary_key=True),
+    uid("claim_id", "corpus.claims.claim_id", primary_key=True), schema="cases")
+reason_selections = Table("reason_selections", metadata,
+    uid("reason_row_id", "cases.draft_reasons.reason_row_id", primary_key=True),
+    value("selection"), uid("reviewer_id", "ops.principals.principal_id"),
+    value("updated_at", DateTime(timezone=True), default=text("now()")),
+    CheckConstraint("selection IN ('none','kept','rejected')"), schema="cases")
+action_items = table("cases", "action_items", "action_id", uid("case_id", "cases.cases.case_id"),
+    value("question"), value("ask_role"), state("open"), CheckConstraint("status IN ('open','asked','done')"))
+reviews.append_column(value("selection_hash", nullable=True))
+exports.append_column(value("format", default=text("'legacy'")))
+PIPELINE_TABLES = {"cases." + name for name in (
+    "interpretations", "web_research", "web_sources", "claim_assessments", "draft_reasons",
+    "reason_claims", "reason_selections", "action_items")}
+
+
 for current_table in list(metadata.tables.values()):
     for current_column in current_table.columns:
         if current_column.foreign_keys and not current_column.primary_key:

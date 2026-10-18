@@ -121,3 +121,12 @@ Search results include source/evidence/entity IDs, original text/locators, dates
 component scores, ranking version, snapshot/build, coverage and limitations.
 The model cannot know that an unindexed expert does not exist. Measure corpus
 coverage separately from retrieval quality, with the [evaluation protocol](../challenge/EVALUATION.md).
+
+## U8 connected branch
+
+Case-time [web research](WEB_RESEARCH.md) runs beside hybrid DB retrieval only
+when connected. Merge canonical URLs with the whole pinned corpus and preserve
+corpus versions. New case-local evidence requires literal checks and explicit
+claim assessments before pack assembly; it is flagged even when supported.
+The taxonomy's short activity label never replaces full intent in either search
+branch. Existing independent lexical/vector fusion and budgets remain active.

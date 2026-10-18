@@ -113,8 +113,9 @@ a fresh schedule verification. Confirm live changes with organizers. T01
 08:21–08:52 separately describes two finalist teams per track and three awards.
 
 P1 also records an organizer statement that CSCS inference keys would be provided
-after team formation. No actual endpoint, credentials, quotas or current access
-has been supplied here. No local model-download requirement is inferred.
+after team formation. U9 now supplies the Keera endpoint and model aliases below;
+credentials, quotas and authenticated access remain unverified. No model weights
+have been downloaded as part of documentation work.
 
 ## Delivery checklist for later implementation work
 
@@ -133,3 +134,12 @@ has been supplied here. No local model-download requirement is inferred.
 - [ ] Submit through the team's official flow and retain confirmation.
 
 These boxes are intentionally open; documentation is not submission completion.
+
+## Current inference handoff (U9, 18 October 2026)
+
+The user now supplies CSCS inference through Keera at
+`https://gateway.keera.ch/api/v1`, with Apertus 8B/70B and separate thinking aliases.
+See [inference configuration](../data/INFERENCE_CONFIGURATION.md) for exact names,
+team-key contact and protocol verification status. This supersedes earlier
+“endpoint not supplied” statements; key access/quotas remain unverified. Hosted
+inference is connected-only and does not imply local weights are already packaged.

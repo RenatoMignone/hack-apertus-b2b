@@ -33,6 +33,7 @@ Do not merge conflicting instructions silently. For example, conversational
 | U5 | User's visual architecture, manual input and domain-independence request, 18 Oct 2026 | Typed permitted keywords/context/operator knowledge; private PDFs outside app; future attachment extension; unchanged report sections; stacked HTML reference; concise docs and explicit deployment/dependency accounting | Documentation authorization; future confidential ingestion requires revised permission/handling; deployment target remains untested |
 | U6 | User's data-layer discussion/refinement and request for build specs plus AGENTS update, 18 Oct 2026 | PostgreSQL + pgvector instead of Weaviate/SQLite; LangGraph persistence; self-hosted Langfuse; named model roles/candidates, taxonomy-assisted hybrid retrieval, versioned cases/evidence; exact model/tokenizer sources deliberately deferred | Authorizes focused technical documentation, not application implementation, provisioning or measured performance claims; D09/D10 supersede older storage choices |
 | U7 | User's pasted team discussion 00:01–02:19 and accompanying source-structure instructions, 18 Oct 2026 | Separate frontend/backend communicating through HTTP; modular single-purpose backend components with local docs; directory-only scaffold and `.gitkeep` for empty folders; retrieval → ReportEvidencePack before report output | Explicitly no source code files or frontend implementation now; framework/scraper and detailed processing on both sides of the pack remain undecided. Draft API route/projection details are proposals, not user-selected exact schemas |
+| U9 | User's frontend ownership, parallel-feature docs and provider/embedding handoff, 18 Oct 2026 | Frontend changes restored; Keera base URL/four aliases/tool restrictions; env placeholder; report all remaining questions; compare local/HF EmbeddingGemma 2 | Team key not supplied; $10/user credits are user-reported, eligibility unverified; local embedding remains recommendation |
 | B1 | [Challenge text captured locally](../challenge/CHALLENGE_BRIEF.md), supplied by user | Objective, sources, models, expected fields, metrics, ethics and infrastructure boundaries | Linked Notion page not independently retrieved; capture is based on pasted text |
 | N1 | [Complete Notion page text supplied by user](../sources/NOTION_CHALLENGE_2026-10-18.md), 18 Oct 2026 | Confirms B1; domain Research & Innovation; exact supporting filenames; template/logo use only for this challenge | User-supplied page capture, not independent live verification; no attachment bytes/download URLs or workbook/branding inspection |
 | M1 | Root [README.md](../../README.md), local template at baseline commit `e1a8246` | Required layout, environment names, deliverables, report/video limits, six 0–5 jury dimensions | Contains unfilled project/team/challenge placeholders; remote template ancestry/visibility not checked |
@@ -142,3 +143,38 @@ or timestamp, verification method, affected requirement/question and whether it
 supersedes an older statement. Update the focused doc and the decision/question
 log together. Store only material appropriate for the repository; link restricted
 sources without copying private messages, credentials or confidential plans.
+
+## U8 / D16 — final pipeline and data alignment, 18 October 2026
+
+User approved the implementation plan after choosing: docs/data only; new-source
+flag-and-allow; reason-card review; clarification only when blocking; connected
+and offline modes; PDF first with PowerPoint later. This supersedes older
+“mapping/scraper undecided” statements for case-time research. Self-hosted
+Crawl4AI is selected; exact model artifacts, search provider and HTTP/auth
+integration remain future inputs. See [processing](../plans/REPORT_PROCESSING_BOUNDARIES.md),
+[web research and dated primary sources](../data/WEB_RESEARCH.md), and
+[storage additions](../data/CASE_PIPELINE_STORAGE.md). No live execution or
+performance result is established by this decision. No commit/push is authorized.
+
+## U9 provider/embedding research, 18 October 2026
+
+- User supplies `https://gateway.keera.ch/api/v1` and gateway aliases; Keera
+  `/api/v1/models` returned 401 without authorization. `/docs` and `/openapi.json`
+  serve control-panel HTML; `/api/v1/openapi.json` returned 404. No authenticated
+  request, model-output claim, or private credential was obtained.
+- [CSCS API](https://docs.cscs.ch/services/inference/api/) documents bearer-auth
+  chat/model conventions and no-tool thinking variants. Direct CSCS names/keys
+  differ from the supplied Keera mapping; do not substitute them automatically.
+- [Google model card](https://huggingface.co/google/embeddinggemma-2) and
+  [developer guide](https://developers.googleblog.com/embeddinggemma-2-the-developer-guide/)
+  establish the distinct EmbeddingGemma 2 artifact and configurable text-only use.
+- [HF pricing](https://huggingface.co/docs/inference-endpoints/support/pricing),
+  [credit rules](https://huggingface.co/docs/inference-providers/pricing) and
+  [autoscaling](https://huggingface.co/docs/inference-endpoints/guides/autoscaling)
+  support the deployment comparison; prices are dated examples, not team quotes
+  or evidence that this team's credits cover dedicated hosting.
+
+See [provider settings](../data/INFERENCE_CONFIGURATION.md),
+[embedding comparison](../data/EMBEDDING_DEPLOYMENT.md),
+[module routing](../plans/MODULE_HANDOFFS.md) and
+[active unresolved items](OPEN_QUESTIONS.md).

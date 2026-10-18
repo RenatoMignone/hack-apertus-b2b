@@ -1,90 +1,103 @@
-# Retrieved evidence, ReportEvidencePack and final output
+# End-to-end case and report processing
 
-**18 October 2026 · Boundary agreement; detailed processing remains unmapped.**
-U7 reserves further design for both transformations. Existing plans describe
-intended capabilities, not a completed algorithm or working path. This document
-allocates ownership without selecting a scraper, prompts, models' exact sources,
-intermediate schemas or report-generation library.
+**18 October 2026 · U8/D16: agreed design; contracts/persistence implementation in this change.**
+The frontend remains a mock client. HTTP, live models/search/scraping, LangGraph
+execution and PDF rendering are subsequent integrations, not working features.
+This document owns the processing stages; [architecture](ARCHITECTURE.md) owns
+pack content, [physical schema](../data/RELATIONAL_SCHEMA.md) owns storage.
 
-```text
-Acquisition / scraper (deferred)
-  → normalized, source-located records → published snapshot
-  → query-time retrieval (data/retrieval)
-  → retrieved EvidenceHit / EntityHit and provenance
-  → evidence preparation (evidence)                 [mapping still needed]
-  → frozen ReportEvidencePack
-  → report generation + checks + review (reports)   [mapping still needed]
-  → reviewed report revision → rendering → final artifacts
-```
+## Execution and ownership
 
-Source acquisition and query-time retrieval are distinct. Hits, URLs, a reranked
-answer or a checkpoint are not a report evidence pack. Workflows coordinate
-handoffs; HTTP exposes authorized progress and resource views to the frontend.
+1. **Intake:** persist the permitted message as an immutable input revision.
+   Confidential one-pagers/business plans remain outside the application.
+2. **Interpretation:** Apertus reads the full intent and reviewed, versioned
+   taxonomy. Return `CaseInterpretation`: company name (nullable), one-sentence
+   summary, primary/additional fields, 2–3-word activity label, Bern intents,
+   needs, concepts/search terms, constraints, operator leads and ambiguities.
+   Preserve original wording, priorities and negations; the activity label is not
+   the retrieval query. Initial field codes: `medtech`, `biotechnology`,
+   `pharmaceuticals`, `digital_health`, `healthcare_services`, `other`, `unknown`.
+   These extensible labels do not imply corpus coverage beyond the pilot.
+3. **Clarification:** missing capability/intent or material ambiguity pauses the
+   dependent workflow for a targeted answer. Missing company name or optional
+   context does not block. Validation errors concern malformed input; an unknown
+   fact is not a technical error. Store input-span attribution separately from
+   public factual support; operator leads are unverified until researched.
+4. **Research:** independent PostgreSQL full-text + pgvector branches, RRF and
+   reranking; reliable explicit metadata constraints apply to both. In connected
+   mode run bounded public web discovery/fetch in parallel; offline disables it.
+   See [web research](../data/WEB_RESEARCH.md) for source flags/deduplication.
+5. **Evidence preparation:** expand support around relevant entities/passages;
+   extract atomic claims in bounded evidence batches, then assess semantic
+   support, need-to-capability fit, contradictions and gaps. Code checks IDs,
+   membership, exact Unicode slices and hashes. Reranking is not validation.
+   At most three research rounds and one structured-output repair per task;
+   deadline/token/tool budgets belong to the pinned run configuration. Exhausted
+   budgets yield explicit gaps/partial output. Never invent a missing field.
+6. **Pack:** code assembles and freezes `ReportEvidencePack` from validated claims,
+   matches, attributed input, arguments/gaps and literal support. Its evidence is
+   the union of a pinned published snapshot and an immutable case-local manifest.
+   No-match/partial packs may have no public claims, with an explicit limitation.
+   A model cannot assign authoritative source metadata or quotation offsets.
+7. **Draft:** Apertus receives only the frozen pack and writing instructions.
+   Produce concise `Why Bern?` reasons, direct/adjacent labels, entries and claim
+   references. Draft persistence requires a supported assessment of its exact content hash.
+   Code checks citation membership and literal support; semantic
+   assessment confirms wording is entailed. Missing support routes to evidence
+   preparation/new pack, never silent browsing by the writer.
+8. **Review:** publish an immutable draft revision. The operator keeps/rejects
+   each reason card. Rejected means editorially excluded, not factually false.
+   `none` means unreviewed. Factual assessments and editorial decisions are
+   separate records. Unsupported statements cannot become facts by approval.
+9. **Export:** all cards reviewed and at least one kept; freeze an accepted review
+   of the exact result hash and selection hash. PDF first, editable PowerPoint
+   later with challenge-only assets. Include kept claims, sources and material
+   caveats. A future renderer uses no model or retrieval to add facts.
 
-## Boundary A: retrieval → ReportEvidencePack
+## Model boundaries and contracts
 
-**Owning code location:** `src/backend/evidence/`. Inputs: full versioned user
-intent, company context, retrieved records, supporting evidence references and
-pinned run/snapshot/model/profile identities. Retrieval payloads follow
-[ingestion §7](INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2)
-and [retrieval](../data/RETRIEVAL_SPEC.md). Reranking is relevance, not factual approval.
+Use focused stages: interpretation/query planning; batched claim extraction;
+claim/fit assessment; draft synthesis. Neither one enormous call nor one call per
+field is the default. Code assembles identifiers, dates, provenance, manifests and
+hashes. Validate Pydantic outputs and bound repairs; grammar-constrained output
+is endpoint dependent, not assumed. Apertus 8B is primary; a configured 70B
+fallback remains optional and subject to the same evidence checks. U9 supplies [Keera model aliases/base URL](../data/INFERENCE_CONFIGURATION.md)
+and the [EmbeddingGemma 2 reference](../data/EMBEDDING_DEPLOYMENT.md); exact revisions,
+compatible runtimes and authenticated limits remain open. Embeddings/reranking use their
+own compatible models/tokenizers.
 
-`ReportEvidencePack` is the set of source elements, facts and supported derivations
-needed to build the report. Content authority remains
-[architecture: evidence pack](ARCHITECTURE.md#evidence-pack-the-report-generation-gate),
-with persistence in [case state](../data/CASE_STATE_AND_LINEAGE.md). It includes:
+LangGraph coordinates every future agentic branch, join, tool budget, revision
+and interruption; LangChain provides model/structured-output/tool adapters.
+Apertus tool-selection calls use non-thinking mode: the current model card says
+thinking mode cannot be combined with tool calling. Benchmark on representative
+cases before claiming a model can reliably fill the pack.
 
-- Current permitted intent, attributed company input, supported company facts
-  and explicit unknowns.
-- Needs and supported people/unit/capability/project/service matches, keeping
-  direct and adjacent interpretations distinct.
-- Literal evidence and claim references, public URLs/input locators, source dates,
-  coverage/failures; original material sufficient to verify derived statements.
-- Labeled argument derivations, constraints, contradictions, gaps and actions.
-  Optional numerical/scenario/historical material only when eligible.
-- Run/input/snapshot/case-manifest/profile/configuration IDs, validation state,
-  manifest/hash and explicit partial/no-match limitations.
+`SupportedClaim` contains text, evidence IDs, direct/adjacent kind and a supported
+assessment. `DraftReason` links a headline/line and entries to claim IDs.
+`ReportEvidencePack` contains attributed intent, supported claims, matches,
+argument candidates, gaps/actions, coverage and pinned configuration references.
+References must resolve to accessible evidence in its snapshot/manifest. Keeping
+raw structured fields does not establish semantic truth: validators are adapters
+still to implement; persistence records their explicit assessments.
 
-Store durable references plus eligible literal support per the owning contracts.
-The pack is not a duplicate corpus or unconstrained prompt dump. Freeze before
-writing; changed support creates a new pack revision. Revocation overrides access.
+## Chat and revisions
 
-**Still to map:** intermediate DTOs, identity/deduplication rules, evidence
-expansion, factual/semantic validation stages, need-to-capability links,
-contradiction resolution/review thresholds, completeness rules, optional
-calculations, token budgets and exact conditions for asking/searching again.
-[Phase 2 preparation](OPERATIONS_PLAN.md#3-prepare-the-case-evidence) informs this
-design; its high-level table is not implemented processing.
+- Wording only: reuse the pack; revalidate draft wording and create a result revision.
+- New focus/facts: new input/query plan, retrieval and pack; old artifacts remain historical.
+- Identity/objective changes: reinterpret and invalidate dependent outputs.
+- Preserve a card selection only when its content **and support** hash is unchanged.
+  Changed/new cards become `none`. An unchanged card ID alone is insufficient.
+- Review/export binds exact revision/hash and selection set; subsequent selections
+  invalidate the old approval for new exports. Stale answers/results cannot win.
 
-## Boundary B: ReportEvidencePack → final output
+## Frontend and future HTTP projection
 
-**Owning code location:** `src/backend/reports/`, separated into generation,
-validation and rendering. Inputs: frozen eligible pack, output settings,
-permitted writing instructions and reviewed selections for export. Report
-sections remain [output structure](OUTPUT_REPORT_STRUCTURE.md).
-
-The intended boundary is pack → structured revision → claim/citation checks →
-human review → rendered report/slide artifacts. Drafts are not approved exports.
-The writer cannot silently retrieve facts, promote hypotheses to evidence or
-overwrite its pack. Missing support becomes a gap/escalation back to evidence
-preparation with a new revision when needed.
-
-**Still to map:** section-level DTOs, content planning, prompts/tasks, deterministic
-versus model checks, repair/retry rules, citation placement, operator review,
-selection/edit invalidation, report job/run lineage, renderer/library choice,
-slide-template mapping and artifact checks. No detailed generation graph or
-renderer has been selected by this scaffold.
-
-## Future handoff acceptance criteria
-
-| Handoff | Invariant |
-| --- | --- |
-| Retrieval → evidence preparation | IDs, locators, literal support, permissions, revisions and uncertainty survive |
-| Evidence preparation → pack | Facts resolve to support; input/hypotheses stay labeled; intent/exclusions and gaps survive |
-| Pack → report | Hash/versions pinned; factual assertions resolve to accepted support; no new unsourced facts |
-| Report → review/export | Exact revision, selections and review bound; citations/caveats survive rendering |
-| Edit/restart/cancel | Existing [case recovery/invalidation](../data/CASE_STATE_AND_LINEAGE.md) applies; stale outputs cannot replace current work |
-
-These are future acceptance criteria, not completed tests. Settle Boundary A and
-Boundary B separately with worked examples/schema proposals before implementation.
-Scraper choice and acquisition behavior remain a separate deferred workstream.
+Keep the existing `BriefRevision`, `Reason`, `ReasonEntry`, `Evidence`, `Coverage`
+and `SearchTrace` projections. Each reason has underlying atomic claim links;
+`CitedText.evidenceIds` is their deduplicated support. Evidence shows a literal
+excerpt/highlight, original URL, title, fetch/publication dates, source origin and
+review status. New-source badges are a later UI change. Sankey links reflect
+actual recorded input → concept → evidence decisions, not a generated story.
+Case statuses describe the business lifecycle; run stages describe execution.
+Similar-case scores remain unavailable without an authorized dataset/method.
+The [HTTP handoff](FRONTEND_BACKEND_API.md) defines future endpoints, not a server.

@@ -77,7 +77,11 @@ shorter*, contact/availability questions (it answers that pages don't say), and
 ### Export
 
 Uses only the ✓ kept reasons. The mock downloads a Markdown outline with sources;
-PowerPoint rendering with the partner template is backend work.
+PDF is now the first real export target; PowerPoint with the partner template follows later.
+U8 requires every reason reviewed and at least one kept for export; the existing
+mock only checks for a kept reason, so that behavior still needs UI integration.
+New-source badges will read explicit origin/review status. Keep/reject is editorial,
+not a factual assessment. No HTTP wiring or renderer is implemented in U8.
 
 ## Data contract
 
@@ -125,3 +129,11 @@ input→term mappings are hand-written for the demo, not model output.
 - The Sankey can crowd labels when there are many terms; long entry names are truncated with a tooltip.
 - No persistence: the mock store resets on reload.
 - The pitch-only field map / "add field" showcase is not built.
+
+## Team ownership (U9)
+
+This is a consumer handoff document. A separate teammate owns `src/frontend/`;
+backend agents must not edit it. Source badges, strict review gates, HTTP wiring
+and PDF export remain proposed UI changes in the
+[API handoff](FRONTEND_BACKEND_API.md#separate-frontend-ownership-u9). The current
+TypeScript `Evidence` lacks source origin/review fields; no UI badge is implemented.

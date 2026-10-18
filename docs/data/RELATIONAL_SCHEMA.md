@@ -118,3 +118,10 @@ Keep LangGraph/Langfuse framework tables in their separate databases with their
 own migrations. Application rows record opaque checkpoint/trace correlations,
 not foreign keys into framework internals. Source permission revocation overrides
 immutable history: prevent reads and retire dependent packs/exports as required.
+
+## U8 case pipeline extension
+
+[Case pipeline storage](CASE_PIPELINE_STORAGE.md) owns the new tables, manifest
+eligibility, supported-claim assessments and reason-level selection/review hashes.
+Legacy match selections remain historical. New accepted reviews/exports require
+the v2 reason workflow; rejection is editorial and does not retract a claim.

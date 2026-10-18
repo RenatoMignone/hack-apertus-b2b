@@ -1,17 +1,19 @@
 # Data layer build, models and operational gates
 
-**18 October 2026 · Data-layer implementation available; model handoff pending.**
-Read [data layer router](DATA_LAYER.md) and [deployment](DEPLOYMENT.md). The user deliberately defers exact model
-sources/tokenizer packages/revisions/endpoints. Do not fetch weights, provision
-services or fill these gaps with guessed model URLs as part of this docs task.
+**18 October 2026 · U9 provider handoff; live model adapters still pending.**
+Read [data router](DATA_LAYER.md), [inference configuration](INFERENCE_CONFIGURATION.md)
+and [embedding deployment](EMBEDDING_DEPLOYMENT.md). Keera endpoint/model aliases
+and `google/embeddinggemma-2` are known. Keys, immutable revisions, supported
+runtime packages, service limits and measured performance remain unresolved.
+Do not download weights/provision endpoints as part of documentation work.
 
 ## Model roles and required interfaces
 
 | Logical role | Intended model | Input → output | Resolution still needed |
 | --- | --- | --- | --- |
-| `reasoning_primary` | Apertus v1.5 8B | Permitted request or bounded source passages → structured interpretation, enrichment, support assessment or grounded prose | Artifact/served ID, tokenizer/chat template, endpoint and resource limits |
-| `reasoning_fallback` | Apertus v1.5 70B, optional and bounded | Difficult permitted task → same validated output contract | Availability, routing criteria, resources, quality/cost |
-| `embedding` | EmbeddingGemma 2, initial candidate replacing BGE-M3 | Original document chunks or contextual queries → finite dense vectors | Source/revision, role templates, tokenizer/limits, normalization; provisional full dimension 768 |
+| `reasoning_primary` | Keera `apertus-v1-5-8b` | Permitted request or bounded source passages → structured interpretation, enrichment, support assessment or grounded prose | Authenticated gateway behavior, served revision, tokenizer/chat template and resource limits |
+| `reasoning_fallback` | Keera `apertus-v1-5-70b`, optional and bounded | Difficult permitted task → same validated output contract | Availability, routing criteria, resources, quality/cost |
+| `embedding` | `google/embeddinggemma-2`, proposed local text-only | Original document chunks or contextual queries → finite dense vectors | Immutable revision/runtime and local benchmark; encoding defaults in embedding deployment; native dimension 768 |
 | `reranking` | BGE-reranker-v2-m3, initial candidate | Contextual request + original passage → relevance score | Source/revision, tokenizer/pair limit, score handling and latency |
 
 Named candidates are not measured winners. Preserve the ability to replace an
@@ -47,17 +49,22 @@ mode and local Langfuse endpoint/keys remain server-side configuration. Suggeste
 names are `DATABASE_URL`, `LANGGRAPH_DATABASE_URL`, `ARTIFACT_ROOT`,
 `DOMAIN_PROFILE_PATH`, `LANGFUSE_BASE_URL`, `LANGFUSE_PUBLIC_KEY`,
 `LANGFUSE_SECRET_KEY`; final naming must agree with the implemented adapters.
-No credentials or real deployment endpoints belong in committed examples.
+Public provider endpoints/model aliases belong in committed examples; real keys and
+private deployment credentials do not. Root `.env.example` and the backend/deploy
+examples agree on Keera. Current `Settings` consumes storage fields only; the LLM
+and proposed embedding/deployment keys await their scoped adapters.
 
 The selected [source structure](../plans/SOURCE_STRUCTURE.md) now places backend
 components under `src/backend/` and the independent HTTP client under
-`src/frontend/`. See local folder READMEs for ownership. This is a directory-only
-scaffold; scraper behavior, backend tooling and detailed evidence/report
-transformations remain undecided. Components are logical boundaries, not
+`src/frontend/`. See local folder READMEs for ownership. Python persistence/contracts and the React mock frontend exist. Stage design is
+agreed in [processing](../plans/REPORT_PROCESSING_BOUNDARIES.md); live tools/models,
+HTTP orchestration and rendering are pending. Crawl4AI is selected for case-time
+fetching; bulk ingestion is separate. Components are logical boundaries, not
 mandatory separate services.
 Use parameterized SQL and validated DTOs; retrieval tools accept structured
 queries, not arbitrary model-generated SQL. Direct SQL repositories are sufficient;
-ORM/migration tooling and exact package versions are implementation choices.
+SQLAlchemy Core, psycopg and Alembic are implemented; package pins are in the
+backend lock file. Missing service ports and provider packages are feature work.
 
 ## Build order and acceptance gates
 

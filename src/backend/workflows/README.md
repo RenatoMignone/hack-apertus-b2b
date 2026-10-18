@@ -10,4 +10,8 @@ Read [operations](../../../docs/plans/OPERATIONS_PLAN.md),
 [case persistence](../../../docs/data/CASE_STATE_AND_LINEAGE.md) and
 [processing boundaries](../../../docs/plans/REPORT_PROCESSING_BOUNDARIES.md).
 Canonical stage records live in application PostgreSQL; checkpoints resume work.
-Graph nodes for evidence preparation and report generation remain to be mapped.
+The agreed graph/stage behavior is in the processing contract; executable nodes,
+state schema and service ports still need implementation. [Module handoffs](../../../docs/plans/MODULE_HANDOFFS.md)
+separates graph work from models, tools, evidence/report services and HTTP.
+Use LangGraph/LangChain for all agentic behavior; no SQL or framework HTTP objects
+in nodes. Fixtures at service boundaries allow independent feature development.

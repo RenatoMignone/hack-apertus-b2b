@@ -1,6 +1,6 @@
 # Phase 2 — Case research, matching and presentation
 
-**18 October 2026 · Implementation proposal; nothing built or measured.**
+**18 October 2026 · U8 agreed workflow; contracts/persistence implemented, live execution pending.**
 Start with the [visual pipeline](../architecture.html). The
 [architecture contract](ARCHITECTURE.md) owns component placement, domain profiles,
 evidence-pack requirements and deployment. [Phase 1](INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2)
@@ -14,7 +14,7 @@ what she knows and suggested research directions**. No PDF or automatic email
 intake now. Her suggestions are leads, not established public facts.
 
 Support conversational corrections, targeted agent questions, inspectable
-matches, the agreed report and reviewed editable PowerPoint. The
+matches, a cited draft and PDF-first report; editable PowerPoint follows later. The
 [output structure](OUTPUT_REPORT_STRUCTURE.md) remains unchanged. Historical
 comparisons and numerical economics require eligible data; neither is invented.
 
@@ -27,7 +27,8 @@ Public linked research PDFs remain eligible for Phase 1 collection.
 Selected stack: LangGraph with PostgreSQL checkpoints, Phase 1 PostgreSQL
 full-text + pgvector retrieval with RRF fusion, EmbeddingGemma 2 candidate,
 BGE reranking, Apertus v1.5 8B and optional bounded 70B fallback; local Langfuse
-observes execution. Exact model/tokenizer sources and revisions are deferred.
+observes execution. [Keera aliases/base URL](../data/INFERENCE_CONFIGURATION.md) are supplied; exact
+revisions, compatible runtime/tokenizer packages and limits remain open.
 The engine is domain-independent; pilot concepts, sources, geography, validation
 and ranking settings come from a versioned profile. Current pilot remains Bern
 diabetes technology across UniBE, ARTORG and DCB, English-first with DE/FR/IT
@@ -131,13 +132,20 @@ source failures, partial coverage, unavailable fields and outside-pilot requests
 
 ## 5. Report, review and export
 
+U8: review is per reason card, not per database match. Every card must be kept or
+rejected and at least one kept before accepted review/export. Rejected means
+editorially omitted, not false. New web sources stay flagged and case-scoped.
+Rephrase reuses the pack; focus/new-fact/identity edits rerun affected research.
+The exact content/support hash controls selection carry; changed cards reset.
+
+
 1. Compose the [agreed sections](OUTPUT_REPORT_STRUCTURE.md) from the frozen pack.
    Every new factual assertion must be supported; otherwise return to research.
 2. Validate draft claims/citations and all numerical/chart lineage. Retain
    original-language support for derived English descriptions.
 3. Let the operator inspect sources, correct interpretation and select/reject
    findings. Keep uncertainties even when a finding is selected.
-4. Generate report artifacts and editable PowerPoint from the reviewed revision.
+4. Generate PDF from the exact reviewed revision/selections; editable PowerPoint is later work.
    Render charts deterministically from prepared datasets. Keep source references
    on slides, with detailed notes/appendix and snapshot dates.
 5. Render slides; check readability, overflow, tables, links, citation completeness
@@ -177,7 +185,7 @@ application use cases, contracts, workflows, data/model adapters, evidence and
 reports under `src/backend/`, with an independent `src/frontend/`. Read the
 [HTTP handoff](FRONTEND_BACKEND_API.md) before integrating UI/server. Only folder
 guidance/placeholders exist. Detailed [evidence/report processing](REPORT_PROCESSING_BOUNDARIES.md)
-remains to be mapped; scraper choice/behavior is deferred in this scaffold task.
+is defined in [case processing](REPORT_PROCESSING_BOUNDARIES.md). Crawl4AI is selected for future case-time fetching; live adapters remain unimplemented.
 These modules need not be separate services. LangGraph owns
 bounded state/checkpoints, not the corpus. Keep credentials server-side,
 authorization/access-aware caches and cancellation/retries. Disable external
@@ -206,7 +214,9 @@ case isolation and export traceability; record latency/cost where measurable.
 The two phases integrate when one permitted case pins a snapshot, returns
 supported matches or honest limitations and exports reviewed claims with lineage.
 
-Deployment, endpoints/hardware, taxonomy contents, search provider and export
-library remain unverified; historical cases and gold examples are absent.
+Keera connection details are supplied; authenticated limits, actual model/embedding
+hardware, taxonomy contents, search provider and export library remain open.
+Historical cases and gold examples are absent. The
+[active register](../project/OPEN_QUESTIONS.md) owns unresolved items.
 See [architecture/dependencies](ARCHITECTURE.md#target-architecture-mandatory) and
 [decision backlog](../project/DECISIONS_AND_OPEN_QUESTIONS.md).
