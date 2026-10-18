@@ -56,8 +56,10 @@ Public aliases/endpoints may be committed; real keys/credentials may not.
 [Source structure](../plans/SOURCE_STRUCTURE.md) maps the integrated FastAPI,
 worker, evidence/report/model adapters and independent HTTP frontend. Ingestion
 has explicit collect/registry/build/publication entry points; case-time web is
-optional controlled HTTP plus Crawl4AI conversion with separately provisioned
-Brave discovery. See [integration](../team/INTEGRATION.md) and [live setup](LIVE_SETUP.md).
+optional controlled HTTP plus isolated Crawl4AI conversion and keyless
+private SearXNG discovery; browser/Brave API remain explicit alternatives.
+See [web provisioning](WEB_RESEARCH.md), [integration](../team/INTEGRATION.md)
+and [live setup](LIVE_SETUP.md).
 Components are logical boundaries, not mandatory separate services.
 Use parameterized SQL and validated DTOs; retrieval tools accept structured
 queries, not arbitrary model-generated SQL. Direct SQL repositories are sufficient;
@@ -141,3 +143,26 @@ Framework interfaces were checked during this session on 18 October 2026:
 Exact software compatibility, licensed model artifacts, hardware, taxonomy
 contents, partner gold labels and final tracing/retention settings remain to be
 resolved. Model-source selection is intentionally a later task, not a docs blocker.
+
+## Interpretation taxonomy prompt — 19 October 2026
+
+Do not serialize raw database taxonomy rows into Apertus calls. The interpretation
+adapter projects them into a compact vocabulary keyed by short concept codes,
+with explicit label/edge column legends. Validate selected codes, then map them
+back to canonical IDs in code. All concepts, aliases, ambiguities, semantic notes
+and relationship directions remain; stored taxonomy/provenance is unchanged.
+
+The current 132-concept runtime taxonomy shrank from **107,282 to 24,255 JSON
+characters**, retaining 132 labels and 230 edges. Its former raw representation
+exceeded the 80,000-character model-task limit before the first inference request;
+that is an input-size budget error, not an expired research deadline. Keep the
+input guard in place. For substantially larger vocabularies, evaluate bounded
+semantic/lexical candidate retrieval or hierarchical classification separately;
+never let a keyword shortlist discard the operator's original intent.
+
+Live recheck of the failed case interpretation passed against configured Apertus
+70B in 27.64 seconds, selecting four canonical concepts and requesting four
+clarifications. The private probe changed no case/run records. The model-facing
+activity label is a bounded word array, joined to the unchanged public string
+contract; one schema repair succeeded. This verifies interpretation only, not
+the subsequent retrieval, report or PDF for that case.

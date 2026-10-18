@@ -1,5 +1,9 @@
 # Backend runtime acceptance — Renato
 
+**Current status:** this is a historical acceptance record. See the [19 October
+checklist](RUNTIME_CHECKLIST.md) for 224 isolated tests, working live access, keyless
+web research and the remaining real-provider case-to-PDF acceptance.
+
 18 October 2026. **Partial acceptance; live operation remains blocked.** Tested
 integrated main `091b87fa90be23a7dd84c7e6e9692febb3787537` on branch
 `codex/backend-runtime-acceptance`. This report records this run, not historical

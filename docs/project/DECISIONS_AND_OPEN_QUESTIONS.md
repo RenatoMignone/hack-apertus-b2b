@@ -398,3 +398,32 @@ Host-local checks and sandbox tests do not establish either developer’s peer S
 or a real provider-backed case. Renato can lead live acceptance if his terminal
 has access; no live test success is inferred. Pilot publication remains the
 corpus owner’s gate, independent of Elia’s unresolved route.
+
+## D24 — Keyless browser discovery and isolated crawler (18 October 2026)
+
+Provenance: user requests local-browser search without an API key and confirms
+Crawl4AI should remain part of the tool pipeline. Select Playwright/Chromium with
+DuckDuckGo HTML URL discovery, behind the existing discover/fetch ports and
+LangChain tools/LangGraph research node. Chrome can be configured explicitly.
+Brave API remains opt-in; neither provider is a hidden fallback. Browser pages
+cannot execute commands or supply factual evidence from search snippets.
+
+Keep robots-aware, public-IP-pinned acquisition and the existing case-local source
+rules. Crawl4AI 0.9.5 requires xxhash<4, incompatible with locked LangGraph's
+xxhash==4.0.1: provision an isolated conversion interpreter with its own lock.
+Use sanitized acquired HTML and bounded JSON subprocess I/O, never backend
+credentials or arbitrary page-controlled commands. [Web setup](../data/WEB_RESEARCH.md)
+owns installation, configuration, verification and honest blocking behavior.
+
+## D25 — Replace challenged HTML search with private SearXNG (18 October 2026)
+
+Provenance: user asks to research and fix keyless search after the browser provider
+hits challenges. A bounded local comparison found relevant results through private
+SearXNG's DuckDuckGo/Yahoo engines and verified actual discovery → controlled
+fetch → isolated Crawl4AI. Select this as the default, leaving browser and Brave API
+as explicit alternatives. Do not describe SearXNG as an independent index or promise
+unblockable search. Retain partial-engine diagnostics and explicit total failure;
+keep DB retrieval and case-local source provenance. No frontend/schema changes.
+[Evaluation](../data/WEB_SEARCH_EVALUATION.md) records experiments, alternatives,
+observed limitations and primary references; [setup](../data/WEB_RESEARCH.md) owns
+the private service/configuration. This supersedes D24's browser default.

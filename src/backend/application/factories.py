@@ -60,8 +60,19 @@ def backbone(*, settings, engine, artifacts):
 
 def web(*, settings, engine, artifacts):
     from backend.ingestion.web import BraveDiscovery, create_web_tools
-    return create_web_tools(discovery=BraveDiscovery(settings.brave_api_key) if settings.brave_api_key else None,
-        user_agent=settings.web_user_agent or None, allowed_hosts=settings.web_allowed_hosts)
+    discovery = None
+    if settings.web_discovery_provider == "searxng" and settings.web_search_url:
+        from backend.ingestion.searxng_discovery import SearXNGDiscovery
+        discovery = SearXNGDiscovery(settings.web_search_url, engines=settings.web_search_engines)
+    elif settings.web_discovery_provider == "browser" and settings.web_user_agent:
+        from backend.ingestion.browser_discovery import BrowserDiscovery
+        discovery = BrowserDiscovery(user_agent=settings.web_user_agent,
+            executable_path=settings.web_browser_executable, timeout=settings.web_browser_timeout_seconds)
+    elif settings.web_discovery_provider == "brave" and settings.brave_api_key:
+        discovery = BraveDiscovery(settings.brave_api_key)
+    return create_web_tools(discovery=discovery,
+        user_agent=settings.web_user_agent or None, allowed_hosts=settings.web_allowed_hosts,
+        crawler_python=settings.web_crawl4ai_python)
 
 
 def pdf(*, settings, engine, artifacts):

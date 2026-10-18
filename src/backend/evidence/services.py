@@ -73,23 +73,32 @@ class ApertusReasoningServices:
             return CaseInterpretation(company_summary="No permitted company context supplied.",
                 activity_label="Unknown activity", blocking_questions=[
                     "What capability are you seeking in Bern, and for what objective?"])
-        allowed = {str(c.get("concept_id", c.get("id"))) for c in taxonomy_context.get("concepts", [])}
-        def check(value):
+        from backend.evidence.taxonomy_context import interpretation_taxonomy
+        model_taxonomy, canonical_concepts = interpretation_taxonomy(taxonomy_context)
+        allowed = set(canonical_concepts)
+        from backend.evidence.interpretation_response import InterpretationResponse, interpretation_value
+        def check(response):
+            value = interpretation_value(response)
             if not set(value.concepts) <= allowed:
                 raise ValueError()
+            value.concepts[:] = list(dict.fromkeys(canonical_concepts[key] for key in value.concepts))
             # Do not discard operator negation even when the model misses it.
             for line in message.splitlines():
                 if any(word in line.casefold().split() for word in ("not", "exclude", "without", "avoid")):
                     if line.strip() not in value.constraints:
                         value.constraints.append(line.strip())
-        return await self.tasks.run("interpret", "Interpret the complete operator request against "
+            return value
+        response = await self.tasks.run("interpret", "Interpret the complete operator request against "
             "the supplied reviewed taxonomy. concepts contains only supplied concept IDs; use [] "
             "for unknown/unmapped terms. Preserve intent, exclusions, priorities, uncertainty, "
             "operator leads and original scientific/search wording. company_summary is attributed "
-            "operator context, not independently verified public facts. activity_label is 1–3 words. "
+            "operator context, not independently verified public facts. activity_label must be at most "
+            "THREE words supplied as an ARRAY, one word per item (e.g. [glucose, sensors]). Put longer "
+            "technical descriptions in needs or company_summary. "
             "Missing needs, missing Bern objective or material ambiguity requires a targeted "
             "blocking_question. Missing company name alone does not block. Do not invent company facts.",
-            {"message": message, "taxonomy": taxonomy_context}, CaseInterpretation, context, check=check)
+            {"message": message, "taxonomy": model_taxonomy}, InterpretationResponse, context, check=check)
+        return check(response)
 
     async def extract(self, interpretation: CaseInterpretation, research: ResearchBundle,
                       context: RunContext) -> ExtractionBatch:

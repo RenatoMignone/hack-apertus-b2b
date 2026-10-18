@@ -22,7 +22,14 @@ addresses, not the host SSH tunnel addresses in the developer env example.
 Compose sets `RUNTIME_PDF_LOGO_PATH=/app/assets/Logo_SF_BE_EN.png` explicitly so a
 repo-relative path in the env file cannot override it. For direct Docker commands,
 use that container path too. Install/package optional local-model/web extras for the actual target
-platform and mount verified configurations/assets explicitly. The core Dockerfile
+platform and mount verified configurations/assets explicitly. Keyless web additionally
+uses the independent `search.compose.yaml` SearXNG sidecar and a separate Crawl4AI
+interpreter inside the worker deployment; host paths are not automatically available
+inside a container. Playwright/browser assets are only for the optional `browser`
+provider. A containerized worker needs the search service's private Docker network
+and `WEB_SEARCH_URL=http://searxng:8080`, not host loopback. Follow
+[web provisioning](../../../docs/data/WEB_RESEARCH.md), keeping crawler/backend locks
+separate. The core Dockerfile
 does not include model weights or certify an operational offline deployment.
 
 ```bash

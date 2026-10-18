@@ -21,7 +21,7 @@ owned by a separate teammate and remains untouched by backend work.
 
 D18 finalizes schema contract v1 at `0005_finalize_schema`: [exact fields](../data/SCHEMA_REFERENCE.md)
 and [corpus/retrieval handoff](../data/INGESTION_RETRIEVAL_HANDOFF.md). D20 advances
-head through 0006/0007; current head is `0007_frontend_lifecycle`. Database shape
+head through 0006/0007; current head is `0008_live_corpus`. Database shape
 is implemented; O04/O13/O14 concern model configuration, corpus
 population and taxonomy contents, not alternative database designs.
 
@@ -43,11 +43,11 @@ records the evidence; real corpus retrieval quality remains unmeasured.
 | O05 / Q15 | Actual HF endpoint billing, credit eligibility, region, quotas and data handling | Hosted use explicitly selected; confirm with endpoint owner. No assumption of Swiss residency, pooled credits or offline operation | Embeddings/operations |
 | O06 / Q15 | Reranker artifact/revision, tokenizer/pair limit, hardware and measured latency | Validate BGE-reranker-v2-m3 candidate independently of embedding/model services | Reranking |
 | O07 / Q17 | Deploy and supervise the implemented API/worker on the actual host | FastAPI/CLI/LangGraph are integrated; assign process owner and verify restart behavior on target infrastructure | API/operations |
-| O08 / Q17 | Transfer prepared per-user bundles, confirm peer access and pilot-profile grants | Owner reports host-local app/saver/S3 checks passed; peer SSH and published profile access remain unverified. Confirm server key-only/forwarding policy and direct checkpoint credential trust boundary; 0007 is deployed | API/security/deployment |
+| O08 / Q17 | Transfer prepared per-user bundles, confirm peer access and pilot-profile grants | Eric reports shared 0008 and verified live bindings; Renato has peer checkpoint/S3/HF checks. Confirm combined live case-to-PDF, server forwarding policy and direct checkpoint credential trust boundary; publication is optional in live mode | API/security/deployment |
 | O09 / Q17 | Validate integrated HTTP frontend against the populated shared environment | OpenAPI, safe errors, pagination, polling and real client are implemented; local synthetic browser smoke passed | API/frontend/deployment |
 | O10 / Q18 | Evaluate prompt/task quality and resource budgets on representative corpus cases | Ports, graph and bounded settings are implemented; benchmark passage/context sizes, retry costs and evidence coverage before tuning defaults | Workflows/models/evaluation |
 | O11 / Q18 | Representative quality and thresholds for implemented extraction/support/draft tasks | Fixed prompts, bounded repair and independent semantic assessment exist; evaluate omissions, contradictions and exact wording on reviewed real cases | Evidence/validation; synthetic labels alone do not establish accuracy |
-| O12 / Q14 | Provision optional Brave discovery key and agree allowed public-query scope | Brave adapter is implemented separately from Crawl4AI conversion; smallest public capability queries, explicit unavailable result when unconfigured | Research/tools |
+| O12 / Q14 | Monitor private SearXNG upstream availability and provision worker crawler assets | SearXNG DuckDuckGo/Yahoo passed live pilot queries; browser HTML challenged. Crawl4AI stays isolated. CAPTCHA/blocks are unavailable; public capability queries only; [setup](../data/WEB_RESEARCH.md) | Research/tools |
 | O13 / Q01,Q14 | Corpus acquisition completeness, page/PDF formats, chunking, access/refresh rules | Inventory plus three source families; validated snapshots; record exclusions and freshness; bulk ingestion remains separate | Ingestion/data |
 | O14 / Q18 | Published reviewed taxonomy/profile pins and corpus assignments | MeSH category/subcategory + document subject support is implemented; import/review actual contents, preserve broader/related distinctions and unknowns; other domains use profiles | Taxonomy/interpretation |
 | O15 / Q08 | Partner acceptance of implemented PDF layout and larger real reports | Deterministic renderer, company introduction, kept-only citations, fonts/logo and visual fixtures verified; PPTX remains later | Reports/evaluation |

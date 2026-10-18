@@ -1,0 +1,3 @@
+# Dedicated conversion worker environment; never install into the backend venv.
+# Crawl4AI xxhash<4 conflicts with the current locked LangGraph xxhash==4.0.1.
+crawl4ai==0.9.5

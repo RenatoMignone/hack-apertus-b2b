@@ -1,5 +1,10 @@
 # Current development status
 
+**19 October peer update:** see the [current backend checklist](../team/RUNTIME_CHECKLIST.md).
+Renato's live binding, readiness and production bootstrap pass; 224 isolated
+backend tests pass. Real Apertus interpretation/repair and keyless research tools
+are verified separately; full real-provider case-to-PDF remains pending.
+
 Live ingestion runtime (18 October, explicitly authorized by Eric): backend source
 head is `0008_live_corpus`. `RUNTIME_CORPUS_MODE=live` creates case-owned captures
 of ready authorized chunks, so cases no longer require completed publication.

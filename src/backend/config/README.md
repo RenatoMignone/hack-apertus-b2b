@@ -21,8 +21,19 @@ legacy model-name/dimension hints alone cannot configure an index. See the
 [integration handoff](../../../docs/team/INTEGRATION.md).
 
 `application.factories:{reasoning,backbone,web,pdf}` implements the shared loader
-signature. Optional web needs explicit `BRAVE_API_KEY`, `WEB_USER_AGENT` and an
-enabled factory; `WEB_ALLOWED_HOSTS` optionally narrows public targets. Offline
+signature. Optional web uses a private SearXNG JSON service by default with
+`WEB_DISCOVERY_PROVIDER=searxng`, `WEB_SEARCH_URL`, explicit `WEB_SEARCH_ENGINES`,
+`WEB_USER_AGENT` and an enabled factory. No third-party API key or browser is
+required for this default. The independent local sidecar uses a locally generated
+`SEARXNG_SECRET` for its own cryptography, not a search subscription.
+Optional provider `browser` uses Playwright;
+`WEB_BROWSER_EXECUTABLE` optionally selects an absolute installed Chrome path;
+otherwise provision Playwright Chromium. `WEB_CRAWL4AI_PYTHON` points to the
+dedicated crawler venv, isolated because Crawl4AI and LangGraph currently require
+incompatible xxhash versions. Install the separate web/crawler locks following
+[web setup](../../../docs/data/WEB_RESEARCH.md). Explicit provider `brave` instead
+requires `BRAVE_API_KEY`; there is no automatic provider fallback.
+`WEB_ALLOWED_HOSTS` optionally narrows fetched sources, not the search service. Offline
 uses only loopback/`apertus`/`llm` endpoints and disables web. `RUNTIME_PDF_LOGO_PATH`
 is explicit in the container; local examples assume commands run at repo root.
 
@@ -32,3 +43,8 @@ Read [provider settings](../../../docs/data/INFERENCE_CONFIGURATION.md),
 Pin model/taxonomy/profile versions; do not copy source registries or secrets
 into graph nodes. The config integrator coordinates new parsed keys and bootstrap
 wiring; each feature documents what it requires. All credentials stay backend-only.
+
+`RUNTIME_CORPUS_MODE=live` retains Eric's per-case ready-evidence capture;
+`published` retains the reviewed-release path. Both need the accessible domain
+profile and matching encoder configuration. `RUNTIME_LIVE_TAXONOMY_ID` is only
+needed when the profile lacks a taxonomy pin. See [live runtime](../../../docs/data/LIVE_CORPUS_RUNTIME.md).

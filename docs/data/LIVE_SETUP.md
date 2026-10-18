@@ -1,6 +1,6 @@
 # First live run: your Mac and Eric's host
 
-18 October 2026 · Runbook for the integrated application. No commands in this
+19 October 2026 · Runbook for the integrated application. No commands in this
 file have been executed on the shared host by this documentation audit.
 [Current status](../project/STATUS.md) separates implementation from rollout.
 
@@ -14,10 +14,10 @@ is complete; do not repeat it. Sections 1–2 remain recovery/inspection guidanc
 
 ## 1. Confirm what actually exists (read-only)
 
-Eric reports shared head **0007** with backup/preservation checks. He is now
-ingesting base sources; ask for the **published** profile/snapshot/config pins
-when ready. A one-source build is not full pilot publication. The migration
-prompt is completed history; do not rerun it without an actual new requirement.
+Eric reports shared head **0008_live_corpus** and verified per-user runtime
+bindings. [Live corpus mode](LIVE_CORPUS_RUNTIME.md) starts cases while ingestion
+continues; no completed publication is required. Ready chunks and matching vectors
+are captured immutably for each run. Published mode remains available for releases.
 
 With your existing developer `.env`, activated backend environment and SSH tunnel,
 this optional check reads only database identity/revision, without printing passwords:
@@ -50,39 +50,11 @@ This check does not verify corpus coverage, model availability or object access.
 
 ## 2. Upgrade only if behind (Eric or his delegated operator)
 
-The required application revision in this checkout is **`0007_frontend_lifecycle`**.
-If already there, do not repeat the rollout. If behind:
-
-1. Coordinate a window with Eric; pause ingestion, all API/worker processes and
-   other writers. Take a consistent database + artifact backup; retain restore
-   instructions. [Deployment/recovery](DEPLOYMENT.md#backup-and-restore) describes
-   the supplied host-side cold backup for its Compose topology.
-2. Update the host checkout/environment to integrated main. Use a private
-   maintainer environment whose **`DATABASE_URL` is the migration owner**
-   (`navigator_migrator` in the supplied host setup), never your ordinary app DSN.
-3. On the host, from repo root with its virtualenv active:
-
-   ```text
-   navigator --env-file src/backend/deploy/.env db-migrate
-   navigator --env-file src/backend/deploy/.env validate-config
-   ```
-
-4. Confirm revision 0007, storage configuration and one preserved record/citation,
-   then proceed with corpus/runtime setup. `validate-config` checks schema and
-   storage configuration construction; it is not a model or S3 connectivity test.
-
-`db-migrate` upgrades **all unapplied migrations to head**, including 0005 when
-starting at 0004. It uses `DATABASE_URL`; setting `ADMIN_DATABASE_URL` alone does
-not select its connection. 0005 archives populated retired structures, 0006 adds
-restricted scope/RLS support, and 0007 persists UI flags/action answers. Published
-corpus/index data is a separate operation, not created by a schema migration.
-Do not edit old migrations, change `alembic_version` by hand or use destructive downgrades.
-
-**Can you do it?** Yes, if Eric delegates the migration role and backup/maintenance
-window. Your SSH key/developer DB credentials do not by themselves provide that
-role. Prefer Eric running these two host commands rather than distributing his
-private infrastructure env. Ordinary application processes keep developer/app
-credentials after the upgrade. This documentation audit does not execute a shared migration.
+The required revision is **`0008_live_corpus`**, already applied by Eric. Do not
+repeat it from a developer checkout. If another host is behind, its authorized
+maintainer must follow [live migration instructions](LIVE_CORPUS_RUNTIME.md#maintainer-deployment)
+and [backup/recovery](DEPLOYMENT.md#backup-and-restore). Application startup never
+migrates. Keep migration-owner credentials out of API/worker environments.
 
 ## 3. Get the corpus/model handoff
 
@@ -91,16 +63,15 @@ The corpus owner must supply these real, mutually compatible items:
 | Item | Runtime use |
 | --- | --- |
 | DB principal ID, namespace, application-role DSN and public scope grants | Server-side identity/access; shared profile must be visible in this namespace |
-| Published profile UUID, snapshot/build IDs, taxonomy version and config hash | `RUNTIME_PROFILE_ID` selects the profile; new runs pin its published snapshot |
+| Profile UUID, reviewed taxonomy and matching embedding config | `RUNTIME_PROFILE_ID` selects the profile; `RUNTIME_CORPUS_MODE=live` creates a ready-evidence capture, while `published` uses the active release |
 | Verified shared `ModelConfiguration` JSON and selected encoder setup | HF endpoint/token + pinned tokenizer, or local assets; model, tokenizer, templates and dimension must match the index |
 | Artifact endpoint/bucket and backend application credentials | Reads source artifacts and writes reports; SSH forwarding does not grant object permissions |
 | Checkpoint database access and agreed worker location | `LANGGRAPH_DATABASE_URL`; use a plain psycopg `postgresql://...` DSN for the saver |
 | Coverage/failures and reviewed example query | Establish that sources/claims are usable, not merely that tables contain rows |
 
-A published snapshot is required; a partly filled DB or extracted text alone is
-insufficient. Use the implemented [ingestion CLI](../../src/backend/ingestion/README.md)
-and [publication contract](INGESTION_RETRIEVAL_HANDOFF.md) for explicit builds.
-Do not publish synthetic fixtures into the real pilot namespace.
+In live mode, ingestion may continue and coverage stays explicitly incomplete.
+A new run sees newly indexed data; existing runs and formatting edits retain their
+capture. Do not publish synthetic fixtures into the real namespace.
 
 ## 4. Configure and run the backend on your Mac
 
@@ -146,7 +117,10 @@ Do not publish synthetic fixtures into the real pilot namespace.
    navigator-runtime --env-file .env worker
    ```
 
-Start without optional web/reranker if not provisioned; web remains disabled when
+For private keyless SearXNG search plus isolated Crawl4AI, follow [web setup](WEB_RESEARCH.md)
+on the worker host. No search API key or browser is needed with provider `searxng`;
+the sidecar and crawler environment are separate from the core runtime. Authorized
+profile/corpus requirements remain; live mode does not require publication. Start without optional web/reranker if not provisioned; web remains disabled when
 `RUNTIME_WEB_FACTORY` is empty. Their absence must be visible, not replaced by
 invented evidence. Connected Keera requires `DEPLOYMENT_MODE=connected`.
 
@@ -168,7 +142,7 @@ These checks do not prove profile publication/scope access, checkpoint write
 permissions, object read/write permissions or model quality. Verify those at
 their acceptance steps. Existing shell variables override env-file values.
 
-### Local preparation checkpoint — 18 October 2026
+### Historical Mac preparation checkpoint — 18 October 2026
 
 The Mac repository `.venv` was refreshed from `requirements.hosted.lock` and the
 editable backend. Dependency consistency and CLI imports passed; **117 tests
@@ -176,9 +150,9 @@ passed, 58 integration tests deselected**. Local HF tokenizer/config validation
 passed without contacting providers. Private operator token/hash binding and
 developer DSN were prepared in ignored local files; no secret is recorded here.
 
-The supplied developer identity uses a **fixture namespace**. Confirm with Eric
-which namespace/principal and public-source grants should access the real pilot;
-do not relabel that identity or copy fixture profile IDs into pilot settings.
+At that earlier checkpoint the bundle used a fixture namespace. The new live
+binding supersedes it; preserve historical fixture identities rather than
+relabeling them. See the latest runtime access status for current peer checks.
 API/worker on this Mac is the proposed first placement; no worker was started.
 
 SSH to the user-confirmed account `elia@192.168.10.230` returned **No route to host**.
@@ -192,8 +166,8 @@ The original Mac preparation still needs these inputs:
 - Checkpoint DSN and confirmation that framework tables are provisioned; runtime
   read/write permissions must be agreed separately from setup ownership.
 - MinIO application credentials for the `navigator` bucket.
-- Published pilot profile/snapshot/build/taxonomy pins and compatible embedding
-  configuration, plus confirmation that the developer identity can access them.
+- Accessible profile/taxonomy and compatible embedding configuration, with
+  matching source access. Live captures do not need reviewed-release publication.
 
 Eric's application migration is already complete. This preparation did not
 change his host, ingest data, publish a snapshot or initialize checkpoint tables.
@@ -211,3 +185,14 @@ A capabilities response reports configuration, not a full provider health check.
 A synthetic browser smoke already passed; this live acceptance still needs real
 assets/corpus/providers. Later evaluate research quality and target-host restart.
 No shared tests, migration or model download happen automatically at startup.
+
+### Current integration checkpoint — 19 October 2026
+
+The private live binding is installed, existing credentials/operator token are
+preserved, and an actual owned-case capture of 13,705 ready chunks passed in a
+transaction that was rolled back. The combined backend passed 221 isolated tests.
+Eric applied the missing SELECT grant on `public.alembic_version`. All network
+readiness checks and actual production application bootstrap now pass; see
+[runtime access status](../team/RUNTIME_ACCESS_STATUS.md). No shared schema or
+grants were changed from this checkout. Restart both API and worker, then perform
+full real-provider case-to-PDF acceptance.

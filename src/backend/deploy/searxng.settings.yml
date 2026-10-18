@@ -1,0 +1,19 @@
+use_default_settings:
+  engines:
+    keep_only: [duckduckgo, yahoo]
+server:
+  # Set SEARXNG_SECRET privately; Compose requires it. Never expose this service.
+  secret_key: replace-with-private-SEARXNG_SECRET
+  limiter: false
+  public_instance: false
+  image_proxy: false
+search:
+  formats: [json]
+outgoing:
+  request_timeout: 5.0
+  max_request_timeout: 8.0
+engines:
+  - name: duckduckgo
+    disabled: false
+  - name: yahoo
+    disabled: false

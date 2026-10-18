@@ -26,3 +26,15 @@ questions, duplicate canonical IDs, mismatched assessment statements/support,
 unknown evidence and incompatible draft references. A supplies authorization,
 profile/snapshot/model pins and budgets. Semantic model decisions remain fallible;
 the synthetic tests and small live probe do not establish production quality.
+
+`taxonomy_context.py` prepares interpretation input without changing stored
+taxonomy or database retrieval. Model selections use short unique concept codes;
+code validates these and maps them to canonical IDs before persistence. Every
+concept, alias/ambiguity and directed broader/related relationship is retained.
+Labels and edges use explicit column legends; UUID repetition, row timestamps
+and repeated reviewer bookkeeping stay out of the prompt. It does not shortlist
+by keywords, truncate meaning or increase model input limits.
+
+`interpretation_response.py` asks the model for activity-label words as a bounded
+array, then joins them into the existing public string field. Excess/multiword
+items are rejected with field-specific repair diagnostics, never truncated.

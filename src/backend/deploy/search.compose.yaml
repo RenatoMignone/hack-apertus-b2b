@@ -1,0 +1,15 @@
+# Independent local discovery sidecar; no shared DB/ingestion dependencies.
+services:
+  searxng:
+    image: docker.io/searxng/searxng@sha256:8bdd9aa136b2dc3b9332cf24714fa34a375b8a1949a1201ec900c24d7378596e
+    ports:
+      - "127.0.0.1:${WEB_SEARCH_PORT:-18888}:8080"
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET:?Generate a private local secret first}
+      FORCE_OWNERSHIP: "false"
+      GRANIAN_WORKERS: "1"
+    volumes:
+      - ./searxng.settings.yml:/etc/searxng/settings.yml:ro
+    mem_limit: 512m
+    pids_limit: 128
+    restart: unless-stopped

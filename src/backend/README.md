@@ -17,9 +17,9 @@ navigator-runtime --env-file .env worker
 ```
 
 Copy root `.env.example` privately and fill identity/token bindings, application
-DSN, checkpoint DB, artifact access, published profile and verified embedding
+DSN, checkpoint DB, artifact access, domain profile and verified embedding
 configuration/assets. Startup never migrates, ingests a corpus or downloads weights.
-Eric completed the shared migration through `0007_frontend_lifecycle`;
+Eric completed the shared migration through `0008_live_corpus`;
 see [host status](../../docs/team/MIGRATION_STATUS.md). Set up the separate framework database explicitly.
 See [live setup](../../docs/data/LIVE_SETUP.md) and [deployment](../../docs/data/DEPLOYMENT.md).
 
@@ -33,6 +33,13 @@ Core/test dependencies are locked. Hosted embeddings use
 [HF setup](../../docs/data/HOSTED_EMBEDDINGS.md) documents endpoint/config/tokenizer
 requirements. Local models and connected web remain optional extras requiring
 target-platform packaging. Hosted services require connected mode.
+
+Keyless web research has an explicit [setup](../../docs/data/WEB_RESEARCH.md):
+our private SearXNG JSON sidecar (no search API key/browser), and Crawl4AI in a
+**separate** venv (`requirements.crawler.lock`). Playwright/Chrome is an optional
+diagnostic alternative. Do not
+install the crawler lock into this backend: its xxhash constraint conflicts with
+locked LangGraph. `WEB_CRAWL4AI_PYTHON` selects that worker interpreter.
 
 | Component | Local guidance |
 | --- | --- |
@@ -82,3 +89,8 @@ DTOs, owned directories and integration checks. Provider setup lives in
 credentials stay server-side. [Active questions](../../docs/project/OPEN_QUESTIONS.md)
 distinguish blocked live inputs from independent fixture work. Do not edit
 `src/frontend/`; request consumer changes through the HTTP contract.
+
+For development during ingestion use `RUNTIME_CORPUS_MODE=live`: each owned run
+captures ready authorized evidence; completed publication is optional. Follow
+[live corpus setup](../../docs/data/LIVE_CORPUS_RUNTIME.md). Keep the schema
+version check enabled; the runtime role needs SELECT on `public.alembic_version`.

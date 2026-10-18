@@ -37,7 +37,7 @@ class RunContext(Contract):
     deadline_at: datetime
     max_research_rounds: int = Field(default=3, ge=1, le=3)
     max_output_tokens: int = Field(default=4096, gt=0)
-    max_tool_calls: int = Field(default=6, ge=0)
+    max_tool_calls: int = Field(default=11, ge=0)
     request_id: str = Field(min_length=1, max_length=128)
 
     @model_validator(mode="after")

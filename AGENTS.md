@@ -43,14 +43,16 @@ never overwrite another agent's work or independently rename shared fields.
 
 - React/Vite defaults to authenticated HTTP, with explicit mock demo mode. Python
   contracts, FastAPI, durable LangGraph, A/B/C adapters, semantic task stages,
-  PDF rendering and PostgreSQL persistence through `0007_frontend_lifecycle` are
+  PDF rendering and PostgreSQL persistence through `0008_live_corpus` are
   implemented. Final schema fields are authoritative;
   read [data handoff](docs/data/INGESTION_RETRIEVAL_HANDOFF.md) before ingestion or
   retrieval work and use the generated [field reference](docs/data/SCHEMA_REFERENCE.md).
   Synthetic integration checks are not a quality/model benchmark.
 - Cross-lane execution is tested with synthetic model responses/embeddings and
-  real disposable PostgreSQL. Eric migrated the shared host to 0007 (see migration status). Real corpus/index
-  publication and a combined live provider-backed case remain prerequisites.
+  real disposable PostgreSQL. Eric reports shared head 0008 and narrow per-user runtime bindings.
+  [Live corpus mode](docs/data/LIVE_CORPUS_RUNTIME.md) captures ready authorized
+  evidence per case during ingestion; publication is optional for this development
+  mode. A combined live provider-backed case remains an acceptance step.
 - Connected inference: CSCS via Keera, `https://gateway.keera.ch/api/v1`, connected examples now select
   `apertus-v1-5-70b` explicitly (user configuration; no automatic fallback). Four supplied aliases and tool/thinking rules are in
   [inference configuration](docs/data/INFERENCE_CONFIGURATION.md). Authenticated synthetic Keera probes passed; broader quality, current key validity
@@ -63,6 +65,11 @@ never overwrite another agent's work or independently rename shared fields.
 - Pilot: Bern diabetes technology, covering UniBE, ARTORG and DCB as one ecosystem.
   Development host is shared Windows/WSL2/Docker with individual SSH tunnels;
   running end-to-end connected/offline deployments have not been established.
+- Optional public research now defaults to a private keyless SearXNG sidecar
+  (DuckDuckGo/Yahoo) and controlled Crawl4AI conversion in a separate venv. Follow
+  [web setup](docs/data/WEB_RESEARCH.md); never combine crawler/backend locks,
+  bypass CAPTCHA or treat search snippets as evidence. Browser/Brave API adapters
+  are explicit alternatives; SearXNG can still encounter upstream failures.
 
 ## Focused router
 

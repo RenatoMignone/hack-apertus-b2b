@@ -1,0 +1,6 @@
+# Supplemental keyless discovery; browser assets are provisioned separately.
+# Browser rendering requires no torch/model weights or search API key.
+# Crawl4AI dependencies belong ONLY in a separate venv: requirements.crawler.lock.
+-r requirements.lock
+playwright==1.64.0
+pyee==14.0.0

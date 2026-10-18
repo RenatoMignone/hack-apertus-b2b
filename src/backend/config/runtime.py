@@ -39,7 +39,7 @@ class RuntimeSettings:
     deadline_seconds: int = 600
     max_research_rounds: int = 3
     max_output_tokens: int = 4096
-    max_tool_calls: int = 6
+    max_tool_calls: int = 11
     max_request_bytes: int = 128_000
     worker_lease_seconds: int = 60
     template_version: str = "unconfigured"
@@ -61,6 +61,12 @@ class RuntimeSettings:
     web_user_agent: str = ""
     web_allowed_hosts: tuple[str, ...] = ()
     brave_api_key: str = field(default="", repr=False)
+    web_discovery_provider: str = "searxng"
+    web_search_url: str = ""
+    web_search_engines: tuple[str, ...] = ("duckduckgo", "yahoo")
+    web_browser_executable: str = ""
+    web_browser_timeout_seconds: int = 25
+    web_crawl4ai_python: str = ""
 
     def __post_init__(self):
         if self.corpus_mode not in {"live", "published"}:
@@ -77,6 +83,10 @@ class RuntimeSettings:
             raise ValueError("offline inference requires an explicit local model endpoint")
         if self.embedding_backend not in {"local", "hf"}:
             raise ValueError("EMBEDDING_BACKEND must be local or hf")
+        if self.web_discovery_provider not in {"searxng", "browser", "brave"}:
+            raise ValueError("WEB_DISCOVERY_PROVIDER must be searxng, browser or brave")
+        if not 1 <= self.web_browser_timeout_seconds <= 60:
+            raise ValueError("WEB_BROWSER_TIMEOUT_SECONDS must be 1–60")
         if self.mode == "offline" and self.embedding_backend == "hf":
             raise ValueError("hosted embeddings are forbidden offline")
         if "*" in self.cors_origins:
@@ -108,7 +118,7 @@ class RuntimeSettings:
             deadline_seconds=int(os.getenv("RUNTIME_DEADLINE_SECONDS", "600")),
             max_research_rounds=int(os.getenv("RUNTIME_RESEARCH_ROUNDS", "3")),
             max_output_tokens=int(os.getenv("RUNTIME_MAX_OUTPUT_TOKENS", "4096")),
-            max_tool_calls=int(os.getenv("RUNTIME_MAX_TOOL_CALLS", "6")),
+            max_tool_calls=int(os.getenv("RUNTIME_MAX_TOOL_CALLS", "11")),
             worker_lease_seconds=int(os.getenv("RUNTIME_WORKER_LEASE_SECONDS", "60")),
             template_version=os.getenv("RUNTIME_TEMPLATE_VERSION", "unconfigured"),
             renderer_version=os.getenv("RUNTIME_RENDERER_VERSION", "unconfigured"),
@@ -126,4 +136,10 @@ class RuntimeSettings:
             reranker_model_path=os.getenv("RERANKER_MODEL_PATH", ""),
             model_device=os.getenv("MODEL_DEVICE", "cpu"), web_user_agent=os.getenv("WEB_USER_AGENT", ""),
             web_allowed_hosts=tuple(x.strip() for x in os.getenv("WEB_ALLOWED_HOSTS", "").split(",") if x.strip()),
-            brave_api_key=os.getenv("BRAVE_API_KEY", ""))
+            brave_api_key=os.getenv("BRAVE_API_KEY", ""),
+            web_discovery_provider=os.getenv("WEB_DISCOVERY_PROVIDER", "searxng"),
+            web_search_url=os.getenv("WEB_SEARCH_URL", ""),
+            web_search_engines=tuple(n.strip() for n in os.getenv("WEB_SEARCH_ENGINES", "duckduckgo,yahoo").split(",") if n.strip()),
+            web_browser_executable=os.getenv("WEB_BROWSER_EXECUTABLE", ""),
+            web_browser_timeout_seconds=int(os.getenv("WEB_BROWSER_TIMEOUT_SECONDS", "25")),
+            web_crawl4ai_python=os.getenv("WEB_CRAWL4AI_PYTHON", ""))

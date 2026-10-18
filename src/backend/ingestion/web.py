@@ -125,22 +125,19 @@ class SafeHTTP:
 
 
 class Crawl4AIFetcher:
-    def __init__(self, transport: SafeHTTP):
+    def __init__(self, transport: SafeHTTP, *, python_executable=""):
         self.transport = transport
+        self.python_executable = python_executable
         self.observations = OrderedDict()
 
     def fetch(self, url):
-        try:
-            from crawl4ai.markdown_generation_strategy import DefaultMarkdownGenerator
-        except ImportError as error:
-            raise ServiceUnavailable() from error
         observation = self.transport.fetch(url)
         document = normalize(observation.raw, observation.mime, fallback_title=observation.final_url)
         if observation.mime.split(";")[0] in {"text/html", "application/xhtml+xml"}:
             from html import escape
             cleaned = "<article>" + "".join("<p>" + escape(line) + "</p>" for line in document.body.splitlines()) + "</article>"
-            markdown = DefaultMarkdownGenerator().generate_markdown(cleaned_html=cleaned, base_url=observation.final_url)
-            body = markdown.raw_markdown.strip()
+            from backend.ingestion.crawl4ai_markdown import convert
+            body = convert(cleaned, observation.final_url, python_executable=self.python_executable)
         else:
             body = document.body
         source = FetchedSource(title=document.title, url=observation.requested_url, canonical_url=observation.final_url,
@@ -153,11 +150,12 @@ class Crawl4AIFetcher:
 
 
 class PublicWebTools:
-    def __init__(self, *, discovery=None, fetcher=None, max_pages=5):
+    def __init__(self, *, discovery=None, fetcher=None, max_pages=10):
         if not 1 <= max_pages <= 10:
             raise ValueError("web page budget must be between one and ten")
         self.discovery, self.fetcher, self.max_pages = discovery, fetcher, max_pages
         self.calls = OrderedDict()
+        self.discovery_limitations = OrderedDict()
 
     def _budget(self, context):
         if datetime.now(timezone.utc) >= context.deadline_at:
@@ -179,7 +177,17 @@ class PublicWebTools:
         self._budget(context)
         try:
             async with asyncio.timeout(max(0.001, (context.deadline_at - datetime.now(timezone.utc)).total_seconds())):
-                urls = await self.discovery.discover(query, limit=self.max_pages)
+                detailed = getattr(self.discovery, "discover_with_diagnostics", None)
+                if detailed:
+                    result = await detailed(query, limit=self.max_pages)
+                    urls = result.urls
+                    key = (context.access.principal_id, context.run_id, context.request_id)
+                    self.discovery_limitations[key] = result.limitations
+                    self.discovery_limitations.move_to_end(key)
+                    while len(self.discovery_limitations) > 1024:
+                        self.discovery_limitations.popitem(last=False)
+                else:
+                    urls = await self.discovery.discover(query, limit=self.max_pages)
             return list(dict.fromkeys(canonical_url(url) for url in urls))[:self.max_pages]
         except (TimeoutError, OSError) as error:
             raise ServiceUnavailable() from error
@@ -189,7 +197,8 @@ class PublicWebTools:
             return WebResearchResult(status="unavailable", limitations=["web_fetch_unavailable"])
         if len(urls) > self.max_pages:
             raise BudgetExceeded()
-        sources, limitations = [], []
+        key = (context.access.principal_id, context.run_id, context.request_id)
+        sources, limitations = [], list(self.discovery_limitations.get(key, []))
         for url in dict.fromkeys(urls):
             self._budget(context)
             try:
@@ -204,8 +213,9 @@ class PublicWebTools:
             sources=sources, limitations=list(dict.fromkeys(limitations)))
 
 
-def create_web_tools(*, discovery=None, user_agent=None, allowed_hosts=()):
-    fetcher = Crawl4AIFetcher(SafeHTTP(user_agent=user_agent, allowed_hosts=allowed_hosts)) if user_agent else None
+def create_web_tools(*, discovery=None, user_agent=None, allowed_hosts=(), crawler_python=""):
+    fetcher = Crawl4AIFetcher(SafeHTTP(user_agent=user_agent, allowed_hosts=allowed_hosts),
+        python_executable=crawler_python) if user_agent else None
     return PublicWebTools(discovery=discovery, fetcher=fetcher)
 
 

@@ -1,5 +1,6 @@
 """Deterministic wording for diagnostic codes at report/UI presentation boundaries."""
 LIMITATIONS = {
+    "web_search_partial_engines": "Some search engines were unavailable; available search results were used.",
     "scores_are_not_confidence": "Search relevance does not establish factual certainty.",
     "reranker_unavailable": "Results use the initial search ranking; additional relevance ranking was unavailable.",
     "graph_adjacency_is_not_expertise_or_availability": "An institutional connection does not establish expertise or willingness to collaborate.",

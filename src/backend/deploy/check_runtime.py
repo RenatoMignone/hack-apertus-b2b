@@ -40,7 +40,7 @@ def main():
         check("application DSN", lambda: required(os.getenv(binding.database_url_env)))
         if binding.namespace.startswith(("fixture", "test")):
             print("NOTE fixture/test identity: pilot namespace and grants need owner confirmation")
-    check("published profile configured", lambda: required(runtime.default_profile_id))
+    check("runtime profile configured", lambda: required(runtime.default_profile_id))
     check("checkpoint DSN configured", lambda: required(runtime.langgraph_database_url))
     check("reasoning endpoint/key configured (not contacted)",
           lambda: required(runtime.llm_base_url and runtime.llm_api_key))
@@ -101,7 +101,7 @@ def main():
             store.client.head_bucket(Bucket=store.bucket)
         check("S3 bucket reachable with configured credentials", storage)
         print("NOTE bucket HEAD does not verify source-object reads or report writes")
-    print("NOTE profile publication/scope visibility, model calls and full-case acceptance remain separate checks")
+    print("NOTE profile/capture access, model calls and full-case acceptance remain separate checks; live mode needs no publication")
     return int(bool(failures))
 
 

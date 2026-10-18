@@ -88,7 +88,7 @@ class ResearchNodes:
                                        lambda: discover.ainvoke({"query": query}))
             # URL selection is constrained before delegating redirect/network safety to C's fetcher.
             from backend.contracts.pipeline import canonical_url
-            urls = list(dict.fromkeys(canonical_url(url) for url in urls))[:min(5, context.max_tool_calls - used - 1)]
+            urls = list(dict.fromkeys(canonical_url(url) for url in urls))[:min(10, context.max_tool_calls - used - 1)]
             used += 1 + len(urls)  # C counts discovery and each fetched page independently.
             result = await execution.call(f"fetch.{state['round']}", {"urls": urls},
                                          lambda: fetch.ainvoke({"urls": urls}))

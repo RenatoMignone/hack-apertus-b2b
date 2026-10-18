@@ -25,3 +25,7 @@ limits, factories and tests. [Module handoffs](../../../docs/plans/MODULE_HANDOF
 separates graph work from models, tools, evidence/report services and HTTP.
 Use LangGraph/LangChain for all agentic behavior; no SQL or framework HTTP objects
 in nodes. Fixtures at service boundaries allow independent feature development.
+
+Default web budget: ten URLs per round, eleven operations per run (one search
+plus each attempted page). Follow-up searches share this budget. See [web limits
+and manual UI testing](../../../docs/data/WEB_RESEARCH.md#apertus-research-budget-and-manual-ui-testing).

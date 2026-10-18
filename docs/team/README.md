@@ -7,8 +7,9 @@ and [open questions](../project/OPEN_QUESTIONS.md).
 
 | Document | Use now |
 | --- | --- |
+| [Current backend checklist](RUNTIME_CHECKLIST.md) | Current 14-area readiness and remaining live/output gaps |
 | [INTEGRATION.md](INTEGRATION.md) | Current merged baseline, reviewed tips, fixes and dated verification |
-| [Runtime access status](RUNTIME_ACCESS_STATUS.md) | Owner-reported host checks; private bundle transfer, peer SSH and publication pending |
+| [Runtime access status](RUNTIME_ACCESS_STATUS.md) | Eric's live binding; Renato's case/capture, network readiness and production bootstrap pass after metadata grant |
 | [Backend acceptance](BACKEND_RUNTIME_ACCEPTANCE.md) | Renato’s partial sandbox run and explicit disposable-test guard |
 | [SERVICE_CONTRACTS.md](SERVICE_CONTRACTS.md) | In-process service boundaries; executable DTOs/ports are authoritative |
 | [Eric runtime access prompt](prompts/05_RUNTIME_ACCESS_HANDOFF.md) | Active access/credential and publication handoff; preserve ongoing ingestion |

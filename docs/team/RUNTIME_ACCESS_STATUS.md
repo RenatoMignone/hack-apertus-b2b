@@ -77,3 +77,44 @@ The endpoint/configuration/credentials remain unchanged. A complete real-provide
 case-to-PDF run remains an acceptance step after the peer-side API/worker starts;
 the complete execution path passed with synthetic providers in isolated tests.
 Published release pins remain pending and are optional for live development.
+
+## Renato peer integration — 19 October 2026
+
+Renato fetched `eafed67` and retained Eric's live ingestion, migration and runtime
+access implementation. Local SearXNG/Crawl4AI research and the ten-page default
+remain integrated. The private deployment binding was patched using the supported
+helper, preserving the existing operator token digest and all provider, database,
+checkpoint and storage credentials. No shared migration or grant change was run.
+
+Earlier peer checks independently passed checkpoint write/read with rollback,
+synthetic S3 integrity and HF query/document encoding (HTTP 200, two 768d unit
+vectors). Prior fixture-namespace and publication blockers are historical; live
+development uses the new principal and ready-evidence captures described above.
+Combined real-provider case-to-PDF acceptance remains separate from engineering tests.
+
+Peer integration verification: **221 backend tests passed** on disposable
+PostgreSQL 17/pgvector, including Eric's live/published capture/access cases and
+our keyless research adapters. One existing pytest asyncio-policy deprecation
+warning remains. Shared-host application identity and a real owned-case capture
+passed: **13,705 ready chunks**, correct profile and status `live`. The entire
+probe transaction was rolled back; no verification case/capture was retained.
+
+**Earlier startup blocker, now resolved:** the narrow runtime role cannot
+read `public.alembic_version` (SQLSTATE 42501). The API's schema check therefore
+fails before service composition, despite case/capture access working. An
+authorized maintainer must apply this read-only metadata grant on `navigator`:
+
+```sql
+GRANT SELECT ON TABLE public.alembic_version TO navigator_runtime;
+```
+
+This grants no migration, corpus-write or administrator capability. No shared
+grant was changed in this integration. Rerun readiness and restart API/worker
+after the owner applies it; do not bypass schema verification.
+
+Latest peer recheck after Eric applied the metadata grant: all network readiness
+checks pass, `public.alembic_version` reads `0008_live_corpus`, and the actual
+production `Registry.application` bootstrap succeeds with corpus mode `live`.
+No credentials, grants or schema were changed by this recheck. Restart existing
+API/worker processes to load the updated code and private binding; combined
+real-provider case-to-PDF acceptance remains to be run.

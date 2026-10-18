@@ -16,15 +16,32 @@ records the original lane results.
   migration head is `0007_frontend_lifecycle`.
 - `web.py`: robots-aware IP-pinned HTTP and Crawl4AI conversion without page JS.
   Discovery is explicitly configured; offline/unconfigured tools are unavailable.
+- `searxng_discovery.py`: default keyless search through our private SearXNG JSON
+  service, explicit engines, bounded replies, validated URL leads and partial-engine
+  diagnostics. No browser needed; upstream blocking is still possible.
+- `browser_discovery.py` / `browser_results.py`: optional DuckDuckGo HTML discovery
+  through isolated Playwright Chromium, fixed search origin and validated links.
+  Network acquisition reuses SafeHTTP; the rendering context is offline, with
+  page JS/subresources disabled. CAPTCHA/blocks/changed markup are unavailable.
+- `crawl4ai_markdown.py` / `crawl4ai_worker.py`: bounded conversion in a separate
+  crawler venv, without backend secrets or dependency conflicts. No arbitrary
+  commands, page scripts, LLM extraction or model downloads.
 - `evaluation.py`: unique-entity, reviewed, intent-balanced Recall@10.
 
 `python -m backend.ingestion --help` exposes collect, mesh-import, benchmark and
 build. DB commands check schema, never migrate. Hosted embeddings use
-`requirements.hosted.lock`; `local-models` / `web` extras remain optional.
+`requirements.hosted.lock`; `local-models` remains optional. Default keyless research
+uses the SearXNG sidecar and core HTTP client plus `requirements.crawler.lock` in
+a dedicated venv; never combine it with the backend lock. `requirements.web.lock`
+adds Playwright only for the optional browser adapter.
 `EMBEDDING_BACKEND=hf` selects the same encoder as runtime queries and makes
 `--model-path` unnecessary for benchmark/build. Supply the pinned tokenizer,
 private HF token and shared verified JSON from the [HF handoff](../../../docs/data/HOSTED_EMBEDDINGS.md).
 No confidential company-plan intake.
+
+Follow [web setup and the independent public probe](../../../docs/data/WEB_RESEARCH.md)
+to provision the browser/converter. Discovery returns URL leads; controlled fetch
+produces source text and provenance. A search snippet cannot become evidence.
 
 ## Build manifest
 
