@@ -21,7 +21,7 @@ Langfuse retain their own migration tools and framework-owned tables.
 
 ## U8 persistence implementation
 
-U8 adds interpretations, case web research, supported claim assessments, case manifests, typed packs, draft reasons, editorial selections and PDF export lineage. Current head is `0007_frontend_lifecycle` (including restricted case-scope/runtime
+U8 adds interpretations, case web research, supported claim assessments, case manifests, typed packs, draft reasons, editorial selections and PDF export lineage. Current source head is `0011_capture_performance` (including restricted case-scope/runtime
 RLS and independent UI flags/action notes). Use focused case repositories; populated retired workflow tables are owner-only history outside the application schema.
 
 ## Parallel feature routing
@@ -39,3 +39,9 @@ are generated from it with `PYTHONPATH=src python -m backend.data.schema_docs`
 (from repository root). Add `--check` for drift checking. Never import
 `migrations/baseline_schema.py` in runtime code: it freezes old migration behavior.
 No new code reads `legacy` or recreates removed match/selection/plan/hit/frontier tables.
+
+Live capture performance and the required maintainer-only rollout are documented
+in [capture performance](../../../docs/data/CAPTURE_PERFORMANCE.md). Shared 0010
+remains compatible; startup never applies the function migration. Snapshot
+authorization/context reads must use the small projection rather than fetching
+whole membership manifests.

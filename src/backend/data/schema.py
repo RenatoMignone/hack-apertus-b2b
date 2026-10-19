@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 from pgvector.sqlalchemy import Vector
 
 
-SCHEMA_REVISION = "0010_rich_outputs"
+SCHEMA_REVISION = "0011_capture_performance"
 
 metadata = MetaData(naming_convention={"ix": "ix_%(table_name)s_%(column_0_name)s",
                                       "uq": "uq_%(table_name)s_%(column_0_name)s",

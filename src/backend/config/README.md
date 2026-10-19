@@ -56,3 +56,8 @@ from embeddings. Changing reranker weights does not re-encode the corpus.
 does not filter vector eligibility. Optional flags `CASE_MEMORY_ENABLED` and
 `RUNTIME_RICH_OUTPUTS_ENABLED` default false until maintainer migrations/assets.
 `RUNTIME_PPTX_TEMPLATE_PATH` is an explicit deployment asset path.
+
+`RUNTIME_CAPTURE_TIMEOUT_SECONDS` (default 30, range 1–120) bounds the synchronous
+corpus-preparation SQL separately from the research deadline. Existing stricter
+statement timeouts are preserved and command failures roll back. See
+[capture performance](../../../docs/data/CAPTURE_PERFORMANCE.md).

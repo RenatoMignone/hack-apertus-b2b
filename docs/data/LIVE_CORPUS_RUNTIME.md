@@ -4,6 +4,14 @@
 waiting for a completed version or production publication. Publication remains an
 optional workflow for reviewed releases.
 
+## Capture performance update — 19 October 2026
+
+Source migration `0011_capture_performance` removes a measured quadratic
+newest-version sort while preserving exact ready membership and isolation.
+[Performance details](CAPTURE_PERFORMANCE.md) and the
+[maintainer rollout](../team/CAPTURE_PERFORMANCE_HANDOFF.md) distinguish local
+benchmarks from the still-pending shared-host activation.
+
 ## Runtime behavior
 
 Set `RUNTIME_CORPUS_MODE=live` in the private API and worker environment.

@@ -1,5 +1,10 @@
 # Current development status
 
+**Local performance patch — 19 October:** source 0011 removes the quadratic
+live-capture newest-version sort. A 120,004-chunk synthetic capture completed in
+7.206 s versus the old query exceeding 30 s; 273 tests passed. Shared migration
+is pending with Eric. [Measured scope and rollout](../data/CAPTURE_PERFORMANCE.md).
+
 19 October 2026 shared-host update: the confirmed application pause, validated
 backup and maintainer migration advanced `navigator` from 0008 to
 **0010_rich_outputs**. A repeated migration was a no-op; existing source, document,

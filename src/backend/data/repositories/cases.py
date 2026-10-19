@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from sqlalchemy import insert, select, text, update
 
+from backend.data.snapshot_projection import snapshot_metadata
 from backend.contracts.data import configuration_hash
 from backend.data import schema as tables
 from backend.data.database import transaction
@@ -32,10 +33,10 @@ class CaseRepository:
             case = self._case(connection, access, case_id)
             if case["current_input_id"] != input_id:
                 raise ValueError("stale input revision")
-            snapshot = connection.execute(select(tables.snapshots).where(tables.snapshots.c.snapshot_id == snapshot_id,
+            snapshot = connection.execute(select(*snapshot_metadata()).where(tables.snapshots.c.snapshot_id == snapshot_id,
                 tables.snapshots.c.namespace == access.namespace)).mappings().one()
             if not (snapshot["status"] == "published" or (snapshot["status"] == "live"
-                    and snapshot["manifest"].get("runtime_case_id") == str(case_id))):
+                    and snapshot["runtime_case_id"] == str(case_id))):
                 raise PermissionError("run requires a published corpus or its own live capture")
             run_id, thread_id = uuid4(), uuid4()
             pinned = {**configuration, "profile_id": str(snapshot["profile_id"]),

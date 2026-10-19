@@ -1,6 +1,6 @@
 # Exact application schema reference
 
-Generated from `src/backend/data/schema.py`; migration head **`0010_rich_outputs`**.
+Generated from `src/backend/data/schema.py`; migration head **`0011_capture_performance`**.
 Do not edit by hand. Regenerate with `PYTHONPATH=src python -m backend.data.schema_docs`.
 
 **65 application tables.** Read [schema decisions](RELATIONAL_SCHEMA.md) and

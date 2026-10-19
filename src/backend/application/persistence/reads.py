@@ -4,6 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 
+from backend.data.snapshot_projection import snapshot_metadata
 from backend.contracts.data import configuration_hash
 from backend.contracts.services import EvidenceRejected, RunContext
 from backend.data import schema as t
@@ -21,7 +22,7 @@ class Reads:
     def context(self, access, run_id):
         with self.session(access) as c:
             run = self.run(c, access, run_id)
-            pin = c.execute(select(t.snapshots, t.embedding_configs.c.config_hash).select_from(
+            pin = c.execute(select(*snapshot_metadata(), t.embedding_configs.c.config_hash).select_from(
                 t.snapshots.join(t.builds).join(t.embedding_configs)).where(
                 t.snapshots.c.snapshot_id == run["snapshot_id"])).mappings().one()
             cfg = run["configuration"]

@@ -25,14 +25,20 @@ class ConfiguredEmbedding:
             raise ServiceUnavailable()
         return self.configuration.config_hash
 
-    def embed_query(self, text):
+    def _encoder(self):
         if self.configuration is None:
             raise ServiceUnavailable()
         with self.lock:
             if self.loaded is None:
                 from backend.models.embeddings.configured import load_configured
                 self.loaded = load_configured(self.configuration, self.settings)
-        return self.loaded.embed_query(text)
+        return self.loaded
+
+    def embed_queries(self, texts):
+        return self._encoder().embed_queries(texts)
+
+    def embed_query(self, text):
+        return self._encoder().embed_query(text)
 
 
 class ConfiguredReranker:

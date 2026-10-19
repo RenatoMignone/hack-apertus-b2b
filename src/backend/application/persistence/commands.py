@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 
 from sqlalchemy import insert, select, text, update
 
+from backend.data.snapshot_projection import snapshot_metadata
 from backend.contracts.data import configuration_hash
 from backend.contracts.services import ServiceUnavailable, StaleRevision
 from backend.data import schema as t
@@ -41,7 +42,7 @@ class Commands:
             original = self.run(c, access, previous["run_id"])
             if previous["input_id"] != input_id or original["case_id"] != case_id:
                 raise StaleRevision()
-            snapshot = c.execute(select(t.snapshots).where(t.snapshots.c.snapshot_id == original["snapshot_id"])).mappings().one()
+            snapshot = c.execute(select(*snapshot_metadata()).where(t.snapshots.c.snapshot_id == original["snapshot_id"])).mappings().one()
         else:
             if self.settings.corpus_mode == "live":
                 from backend.data.repositories.live import capture_live_corpus

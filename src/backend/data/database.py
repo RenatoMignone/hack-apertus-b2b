@@ -49,7 +49,7 @@ def check_schema(engine, *, require_latest=False) -> None:
         actual = MigrationContext.configure(connection).get_current_revision()
     # Only explicitly additive optional releases may coexist with the proven
     # core baseline. Feature services separately require their own tables.
-    compatible = {'0008_live_corpus', '0009_case_memory', '0010_rich_outputs'}
+    compatible = {'0008_live_corpus', '0009_case_memory', '0010_rich_outputs', '0011_capture_performance'}
     if actual != expected and (require_latest or actual not in compatible or expected not in compatible):
         raise RuntimeError(f"schema revision {actual!r} is incompatible; maintainer must migrate to {expected}")
 

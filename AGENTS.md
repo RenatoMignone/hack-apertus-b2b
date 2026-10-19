@@ -41,6 +41,11 @@ never overwrite another agent's work or independently rename shared fields.
 
 ## Current implementation and model configuration
 
+- Source head `0011_capture_performance` optimizes live capture and retrieval;
+  shared head was last verified at 0010. Read the [performance specification](docs/data/CAPTURE_PERFORMANCE.md)
+  and [maintainer handoff](docs/team/CAPTURE_PERFORMANCE_HANDOFF.md) before rollout.
+  Never migrate the shared host implicitly or discard evidence checks for speed.
+
 - React/Vite defaults to authenticated HTTP, with explicit mock demo mode. Python
   contracts, FastAPI, durable LangGraph, A/B/C adapters, semantic task stages,
   PDF rendering and PostgreSQL persistence through `0008_live_corpus` are

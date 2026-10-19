@@ -7,6 +7,7 @@ from sqlalchemy import insert, or_, select, text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import DBAPIError, NoResultFound
 
+from backend.data.snapshot_projection import snapshot_metadata
 from backend.contracts.data import Span, configuration_hash, content_hash
 from backend.contracts.pipeline import SupportedClaim, canonical_url
 from backend.contracts.services import (BudgetExceeded, EvidenceRecord, EvidenceRejected, PersistedClaims,
@@ -40,11 +41,11 @@ class BackboneRepository:
             raise StaleRevision() from error
         if (run["case_id"], run["input_id"], run["snapshot_id"]) != (context.case_id, context.input_id, context.snapshot_id):
             raise EvidenceRejected()
-        pin = connection.execute(select(tables.snapshots, tables.embedding_configs.c.config_hash).select_from(
+        pin = connection.execute(select(*snapshot_metadata(), tables.embedding_configs.c.config_hash).select_from(
             tables.snapshots.join(tables.builds).join(tables.embedding_configs)).where(
                 tables.snapshots.c.snapshot_id == context.snapshot_id,
                 tables.snapshots.c.status.in_(["published", "live"]))).mappings().one()
-        if pin["status"] == "live" and pin["manifest"].get("runtime_case_id") != str(context.case_id):
+        if pin["status"] == "live" and pin["runtime_case_id"] != str(context.case_id):
             raise EvidenceRejected()
         if (pin["namespace"] != context.access.namespace or pin["profile_id"] != context.profile_id
                 or pin["taxonomy_version_id"] != context.taxonomy_version_id or pin["build_id"] != context.build_id

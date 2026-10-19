@@ -46,8 +46,11 @@ class LocalEmbedder:
             vectors.append([value / norm for value in vector])
         return vectors
 
+    def embed_queries(self, texts):
+        return self.encode_inputs([self.configuration.query_template.format(text=text, query=text) for text in texts])
+
     def embed_query(self, text):
-        return self.encode_inputs([self.configuration.query_template.format(text=text, query=text)])[0]
+        return self.embed_queries([text])[0]
 
     def embed_documents(self, texts):
         return self.encode_inputs(texts)

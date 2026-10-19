@@ -36,6 +36,7 @@ class RuntimeSettings:
     llm_api_key: str = field(default="", repr=False)
     langgraph_database_url: str = field(default="", repr=False)
     cors_origins: tuple[str, ...] = ()
+    capture_timeout_seconds: int = 30
     deadline_seconds: int = 600
     max_research_rounds: int = 3
     max_output_tokens: int = 4096
@@ -73,6 +74,8 @@ class RuntimeSettings:
     case_memory_min_score: float = 50
 
     def __post_init__(self):
+        if not 1 <= self.capture_timeout_seconds <= 120:
+            raise ValueError("RUNTIME_CAPTURE_TIMEOUT_SECONDS must be 1–120")
         if self.corpus_mode not in {"live", "published"}:
             raise ValueError("RUNTIME_CORPUS_MODE must be live or published")
         if not 0 <= self.case_memory_min_score <= 100:
@@ -121,6 +124,7 @@ class RuntimeSettings:
             llm_base_url=os.getenv("LLM_BASE_URL", "https://gateway.keera.ch/api/v1"),
             llm_api_key=os.getenv("LLM_API_KEY", ""), langgraph_database_url=os.getenv("LANGGRAPH_DATABASE_URL", ""),
             cors_origins=tuple(x.strip() for x in os.getenv("RUNTIME_CORS_ORIGINS", "").split(",") if x.strip()),
+            capture_timeout_seconds=int(os.getenv("RUNTIME_CAPTURE_TIMEOUT_SECONDS", "30")),
             deadline_seconds=int(os.getenv("RUNTIME_DEADLINE_SECONDS", "600")),
             max_research_rounds=int(os.getenv("RUNTIME_RESEARCH_ROUNDS", "3")),
             max_output_tokens=int(os.getenv("RUNTIME_MAX_OUTPUT_TOKENS", "4096")),

@@ -4,6 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import bindparam, select, text
 
+from backend.data.snapshot_projection import snapshot_metadata
 from backend.contracts.data import EvidenceHit, QueryPlan, SearchResult, validate_vector
 from backend.contracts.services import ServiceUnavailable
 from backend.data import schema as tables
@@ -77,7 +78,7 @@ class HybridSearch:
                       "all_documents": not plan.excluded_document_ids, "excluded": plan.excluded_document_ids or [UUID(int=0)],
                       "all_families": not plan.source_family_ids, "families": plan.source_family_ids or [UUID(int=0)]}
         with transaction(self.engine, access) as connection:
-            pin = connection.execute(select(tables.snapshots, tables.embedding_configs.c.config_hash,
+            pin = connection.execute(select(*snapshot_metadata(), tables.embedding_configs.c.config_hash,
                 tables.embedding_configs.c.dimension).select_from(tables.snapshots.join(tables.builds).join(
                     tables.embedding_configs)).where(tables.snapshots.c.snapshot_id == plan.snapshot_id,
                     tables.snapshots.c.namespace == access.namespace,
@@ -85,14 +86,21 @@ class HybridSearch:
             if pin["status"] == "live":
                 run = connection.execute(select(tables.runs.c.case_id).where(
                     tables.runs.c.run_id == plan.run_id, tables.runs.c.snapshot_id == plan.snapshot_id)).scalar_one_or_none()
-                if run is None or str(run) != pin["manifest"].get("runtime_case_id"):
+                if run is None or str(run) != pin["runtime_case_id"]:
                     raise PermissionError("live retrieval requires its owning case run")
             if (pin["profile_id"] != plan.profile_id or pin["taxonomy_version_id"] != plan.taxonomy_version_id
                     or pin["build_id"] != plan.build_id or pin["config_hash"] != plan.embedding_config_hash
                     or self.embedder.config_hash != pin["config_hash"]):
                 raise ValueError("query profile, taxonomy, snapshot, build or embedding space is incompatible")
         queries = list(dict.fromkeys([plan.original_request, *plan.variants]))
-        vectors = [validate_vector(self.embedder.embed_query(query), pin["dimension"]) for query in queries] if self.strategy != 'lexical' else [None]*len(queries)
+        if self.strategy == 'lexical':
+            vectors = [None] * len(queries)
+        else:
+            batch = getattr(self.embedder, 'embed_queries', None)
+            encoded = batch(queries) if callable(batch) else [self.embedder.embed_query(query) for query in queries]
+            if len(encoded) != len(queries):
+                raise ValueError('embedding batch must cover every query exactly')
+            vectors = [validate_vector(value, pin['dimension']) for value in encoded]
         lexical, vector, rows_by_id, query_matches = {}, {}, {}, {}
         with transaction(self.engine, access) as connection:
             for query, query_vector in zip(queries, vectors, strict=True):
@@ -113,17 +121,28 @@ class HybridSearch:
             lexical = dict(sorted(lexical.items(), key=lambda item: (item[1]["rank"], str(item[0])))[:30])
             vector = dict(sorted(vector.items(), key=lambda item: (item[1]["rank"], str(item[0])))[:30])
             fused = fuse(lexical, vector, limit=60)
+            candidate_ids = [chunk_id for chunk_id, _ in fused]
+            candidate_rows = {row['chunk_id']: row for row in connection.execute(
+                select(tables.chunks, tables.versions.c.document_id, tables.documents.c.canonical_url)
+                .select_from(tables.chunks.join(tables.versions).join(tables.documents))
+                .where(tables.chunks.c.chunk_id.in_(candidate_ids),
+                    text("ops.can_access(retrieval.chunks.scope_id)"))).mappings()}
+            evidence_by_chunk = {}
+            for row in connection.execute(select(tables.chunk_evidence)
+                    .where(tables.chunk_evidence.c.chunk_id.in_(candidate_ids))
+                    .order_by(tables.chunk_evidence.c.chunk_id, tables.chunk_evidence.c.evidence_id)).mappings():
+                evidence_by_chunk.setdefault(row['chunk_id'], []).append(row['evidence_id'])
             for chunk_id, score in fused:
-                row = connection.execute(select(tables.chunks, tables.versions.c.document_id, tables.documents.c.canonical_url)
-                    .select_from(tables.chunks.join(tables.versions).join(tables.documents)).where(tables.chunks.c.chunk_id == chunk_id,
-                    text("ops.can_access(retrieval.chunks.scope_id)"))).mappings().one()
+                if chunk_id not in candidate_rows:
+                    from sqlalchemy.exc import NoResultFound
+                    raise NoResultFound('ranked passage is no longer accessible')
+                row = candidate_rows[chunk_id]
                 if any(previous["document_version_id"] == row["document_version_id"] and
                        max(0, min(previous["char_end"], row["char_end"]) - max(previous["char_start"], row["char_start"])) /
                        min(previous["char_end"] - previous["char_start"], row["char_end"] - row["char_start"]) >= .8
                        for previous in rows_by_id.values()):
                     continue
-                evidence_ids = list(connection.execute(select(tables.chunk_evidence.c.evidence_id).where(
-                    tables.chunk_evidence.c.chunk_id == chunk_id)).scalars())
+                evidence_ids = evidence_by_chunk.get(chunk_id, [])
                 rows_by_id[chunk_id] = {**dict(row), "evidence_ids": evidence_ids, "fusion_score": score}
                 if len(rows_by_id) == 30:
                     break
@@ -156,9 +175,9 @@ class HybridSearch:
         if reranked is not None:
             hits.sort(key=lambda hit: (-hit.reranker_score, str(hit.chunk_id)))
         with transaction(self.engine, access) as connection:
-            for row in rows_by_id.values():
-                from backend.data.database import require_scope
-                require_scope(connection, row["scope_id"])
+            from backend.data.database import require_scope
+            for scope_id in {row["scope_id"] for row in rows_by_id.values()}:
+                require_scope(connection, scope_id)
         return SearchResult(hits=hits, limitations=["scores_are_not_confidence"]
             + (["live_corpus_incomplete_coverage"] if pin["status"] == "live" else [])
             + (["reranker_unavailable"] if (self.default_strategy or self.strategy == 'reranked') and reranked is None else []))
