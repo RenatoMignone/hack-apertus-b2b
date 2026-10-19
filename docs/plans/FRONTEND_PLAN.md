@@ -15,7 +15,7 @@ remain visible; failures never switch to mocks. Reload requires reconnection;
 durable jobs continue and polling resumes.
 
 `VITE_API_MODE=mock` explicitly enables seeded companies and browser-local demo
-state (v5). Demo evidence is illustrative; it is not a live research result.
+state (v7). Demo evidence is illustrative; it is not a live research result.
 
 ## Screens
 
@@ -76,3 +76,7 @@ Run transport and export-policy tests, typecheck and the locked build. Use the
 isolated synthetic browser smoke for integrated interaction checks; an authorized live capture or published
 profile plus real providers is required for live acceptance.
 [Status](../project/STATUS.md) owns deployment gates and current measured results.
+
+Demo mode seeds a hero case for the pitch: GlucoWave is not on the board at start and
+is created live from the *Glucose sensor* example, written in lay terms, then refined
+through a follow-up answer and an exclusion. Run sheet: [DEMO_SCRIPT.md](../project/DEMO_SCRIPT.md).

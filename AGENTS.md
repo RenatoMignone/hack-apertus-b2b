@@ -90,6 +90,7 @@ never overwrite another agent's work or independently rename shared fields.
 | Product/pilot/evaluation | [Requirements](docs/challenge/PRODUCT_REQUIREMENTS.md), [pilot](docs/challenge/PILOT_SCOPE.md), [evaluation](docs/challenge/EVALUATION.md) |
 | Challenge/workshop/source evidence | [Brief](docs/challenge/CHALLENGE_BRIEF.md), [recording findings](docs/recordings/RECORDING_INSIGHTS.md), [sources](docs/project/SOURCES.md) |
 | Unknowns, decisions or submission | [Active questions](docs/project/OPEN_QUESTIONS.md), [decision history](docs/project/DECISIONS_AND_OPEN_QUESTIONS.md), [event/submission](docs/project/EVENT_AND_SUBMISSION.md) |
+| Live demo, pitch video or walkthrough | [Demo script](docs/project/DEMO_SCRIPT.md), [walkthrough playbook](docs/project/DEMO_WALKTHROUGH_PLAYBOOK.md) |
 
 ## Invariants across features
 
