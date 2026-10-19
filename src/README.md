@@ -1,5 +1,10 @@
 # Application source
 
+**B to Bern (B2B), Team Stregoni.** For judge-facing installation and usage,
+follow the [quickstart](../docs/judges/QUICKSTART.md) and
+[product walkthrough](../docs/judges/DEMO.md). These distinguish the credential-free
+seeded UI, synthetic backend and provisioned live application.
+
 **Backend and HTTP frontend integrated; shared real-corpus rollout pending.**
 
 - [frontend/](frontend/README.md): React/Vite browser client over authenticated HTTP; explicit mock demo mode.
@@ -8,7 +13,7 @@
 Read the [source structure](../docs/plans/SOURCE_STRUCTURE.md),
 [frontend/backend handoff](../docs/plans/FRONTEND_BACKEND_API.md) and
 [processing boundaries](../docs/plans/REPORT_PROCESSING_BOUNDARIES.md).
-The root submission template remains unchanged. [Current status](../docs/project/STATUS.md)
+The root submission layout is preserved. [Current status](../docs/project/STATUS.md)
 and [live setup](../docs/data/LIVE_SETUP.md) distinguish tested synthetic integration
 from real corpus/model deployment. Run the data layer using the
 [deployment guide](../docs/data/DEPLOYMENT.md).

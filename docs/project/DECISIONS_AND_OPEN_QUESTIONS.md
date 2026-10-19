@@ -464,3 +464,19 @@ source quotes without entry metadata and read-only history. Honor server export
 formats; connected PPTX stays unavailable. Optional structured metadata is not
 inferred. The [audit](../team/FRONTEND_RUNTIME_AUDIT.md) records synthetic browser
 checks separately from actual-provider partial PDF acceptance.
+
+## D28 — B2B delivery identity and judge documentation (19 October 2026)
+
+Provenance: the user requested a latest-changes pull and repository preparation
+for judges under **B to Bern (B2B)**. The user then confirmed **Team Stregoni**:
+Renato Mignone, Elia Innocenti, Eric Ruiz Giménez and Mohamed Kechiche.
+Product/team identity is settled; submission account, ancestry and visibility
+remain O27 inputs. Preserve the root organizer layout and complete its README
+and technical-report sections with measured scope and explicit unknowns.
+
+The [judge guide](../judges/README.md) provides setup, walkthrough, architecture,
+verification and delivery acceptance. The user reports PostgreSQL currently
+runs on their computer. Stable external hosting is a recommendation for
+independent judge access, not a selected provider or authorization to migrate.
+No final report PDF, demo URL, sovereign deployment, release commit or submission
+is established by this documentation pass. Frontend source remains separately owned.
