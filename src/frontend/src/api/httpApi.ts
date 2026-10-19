@@ -36,6 +36,10 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
   pollInterval = 1200, maxPolls = 750,
 }: { baseUrl?: string; token: () => string; fetcher?: Fetch; pause?: (ms: number) => Promise<void>;
   pollInterval?: number; maxPolls?: number }): HttpNavigatorApi {
+  type PendingExport = {reviewKey:string; exportKey:string; reviewId?:string; url?:string};
+  const pendingExports = new Map<string, PendingExport>();
+  const exporting = new Map<string, Promise<{filename:string; blob:Blob}>>();
+  let exportCredential = token();
   const listeners = new Set<() => void>();
   let lastOpened: string | undefined;
   const base = baseUrl.replace(/\/$/, '');
@@ -47,12 +51,12 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     return result;
   };
 
-  async function request<T>(url: string, method = 'GET', body?: unknown, blob = false, signal?: AbortSignal): Promise<T> {
+  async function request<T>(url: string, method = 'GET', body?: unknown, blob = false, signal?: AbortSignal, idempotencyKey?: string): Promise<T> {
     // Server-returned paths stay on the configured API origin, including downloads.
     if (!url.startsWith('/api/v1/') || url.includes('://') || url.includes('\\')) throw new Error('Invalid API path.');
     const credential = token();
     const headers: Record<string, string> = credential ? { Authorization: `Bearer ${credential}` } : {};
-    if (method !== 'GET') headers['Idempotency-Key'] = crypto.randomUUID();
+    if (method !== 'GET') headers['Idempotency-Key'] = idempotencyKey ?? crypto.randomUUID();
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     // Retry transport failures once with the SAME idempotency key; never retry a conflict.
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -117,10 +121,10 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     } finally { signal.removeEventListener('abort', abort); }
     signal.throwIfAborted();
   }
-  async function observe<T>(url: string, signal?: AbortSignal, caseId?: string): Promise<T> {
+  async function observe<T>(url: string, signal?: AbortSignal, caseId?: string, blob = false): Promise<T> {
     for (let attempt = 0; ; attempt++) {
       try {
-        const value = await request<T>(url, 'GET', undefined, false, signal);
+        const value = await request<T>(url, 'GET', undefined, blob, signal);
         if (caseId) publishObservation(caseId, 'connected');
         return value;
       }
@@ -258,9 +262,8 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
       ...('outcome' in flags ? { outcome: flags.outcome ?? null } : {}),
     }),
     async exportDeck(caseId, expected, format = 'pdf') {
-      const supported = (await requireCase(caseId)).exportFormats ?? ['pdf'];
-      if (!supported.includes(format)) throw new Error('This export format is unavailable on the server.');
       const detail = await requireCase(caseId), result = current(detail);
+      if (!(detail.exportFormats ?? ['pdf']).includes(format)) throw new Error('This export format is unavailable on the server.');
       if (!expected || expected.resultId !== result.id || expected.resultHash !== result.resultHash) {
         throw new ApiError(409, 'stale_revision');
       }
@@ -268,24 +271,51 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
           || !result.reasons.some((r) => r.selection === 'kept')) {
         throw new Error('Review every reason and keep at least one before exporting.');
       }
-      const report = `${path(caseId)}/reports/${result.id}`;
-      const review = await request<{ review_id: string }>(`${report}/reviews`, 'POST', { decision: 'accepted',
-        expected_result_hash: result.resultHash, expected_selection_hash: detail.selectionHash });
-      const queued = await request<{ status_url: string }>(`${path(caseId)}/exports`, 'POST', {
-        result_id: result.id, review_id: review.review_id, expected_result_hash: result.resultHash,
-        expected_selection_hash: detail.selectionHash, format });
-      for (let n = 0; n < maxPolls; n++) {
-        const operation = await request<Operation>(queued.status_url);
-        if (operation.status === 'failed') throw new ApiError(409, operation.error_code ?? 'service_unavailable');
-        if (operation.status === 'committed' && operation.download_url) {
-          const blob = await request<Blob>(operation.download_url, 'GET', undefined, true);
-          const mime = format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-          if (!blob.type.startsWith(mime)) throw new Error('The server returned an unexpected export format.');
-          return { filename: `bern-report-${result.id}.${format}`, blob };
+      // Memory only, scoped to authenticated session and the exact reviewed content.
+      if (exportCredential !== token()) { pendingExports.clear(); exporting.clear(); exportCredential = token(); }
+      const key = JSON.stringify([caseId, result.id, result.resultHash, detail.selectionHash, format]);
+      const existing = exporting.get(key);
+      if (existing) return existing;
+      const pending = pendingExports.get(key) ?? {reviewKey:crypto.randomUUID(), exportKey:crypto.randomUUID()};
+      pendingExports.set(key, pending);
+      const task = (async () => {
+        try {
+          if (!pending.reviewId) {
+            const review = await request<{review_id:string}>(`${path(caseId)}/reports/${result.id}/reviews`, 'POST', {
+              decision:'accepted', expected_result_hash:result.resultHash, expected_selection_hash:detail.selectionHash,
+            }, false, undefined, pending.reviewKey);
+            pending.reviewId = review.review_id;
+          }
+          if (!pending.url) {
+            const queued = await request<{status_url:string}>(`${path(caseId)}/exports`, 'POST', {
+              result_id:result.id, review_id:pending.reviewId, expected_result_hash:result.resultHash,
+              expected_selection_hash:detail.selectionHash, format,
+            }, false, undefined, pending.exportKey);
+            pending.url = queued.status_url;
+          }
+          for (let n = 0; n < maxPolls; n++) {
+            const operation = await observe<Operation>(pending.url, undefined, caseId);
+            if (operation.status === 'failed') {
+              pendingExports.delete(key);
+              throw new ApiError(409, operation.error_code ?? 'service_unavailable');
+            }
+            if (operation.status === 'committed' && operation.download_url) {
+              const blob = await observe<Blob>(operation.download_url, undefined, caseId, true);
+              const mime = format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+              if (!blob.type.startsWith(mime)) throw new Error('The server returned an unexpected export format.');
+              pendingExports.delete(key);
+              return {filename:`bern-report-${result.id}.${format}`, blob};
+            }
+            await pause(pollInterval);
+          }
+          throw new Error('Report rendering is still pending. Retry export to reconnect to the accepted operation.');
+        } catch (error) {
+          if (error instanceof ApiError && [404,409,422].includes(error.status)) pendingExports.delete(key);
+          throw error;
         }
-        await pause(pollInterval);
-      }
-      throw new Error('Report rendering is still pending. Try exporting again shortly.');
+      })().finally(() => { exporting.delete(key); });
+      exporting.set(key, task);
+      return task;
     },
     async listActionItems() { return request<ActionItem[]>('/api/v1/action-items'); },
     async setActionStatus(id, status, answer) {

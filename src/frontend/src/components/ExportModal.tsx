@@ -1,5 +1,5 @@
 import { Dialog, IconButton } from '@radix-ui/themes';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FileText, Presentation, X } from 'lucide-react';
 import type { BriefRevision, CaseDetail } from '../types/contract';
 import { buildExportModel, download, fileSlug, kept as keptOf } from '../export/model';
@@ -17,6 +17,8 @@ type Format = 'pdf' | 'pptx';
  * export uses the server's exact-revision approval and authenticated download.
  */
 export default function ExportModal({ detail, revision, onClose, onConflict }: { detail: CaseDetail; revision: BriefRevision; onClose: () => void; onConflict: (error: unknown) => Promise<void> }) {
+  const alive = useRef(true), pending = useRef(false);
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
   const [busy, setBusy] = useState<Format | null>(null);
   const toast = useToast();
   const kept = keptOf(revision);
@@ -25,13 +27,16 @@ export default function ExportModal({ detail, revision, onClose, onConflict }: {
   const pdfAvailable = apiMode === 'mock' || formats.includes('pdf');
 
   const run = async (format: Format) => {
-    setBusy(format);
+    if (pending.current) return;
+    pending.current = true; setBusy(format);
     try {
       assertExportAllowed(revision, apiMode, format, formats.filter((f): f is Format => f === 'pdf' || f === 'pptx'));
+      if (!alive.current) return;
       if (apiMode === 'http') {
         const { filename, blob } = await api.exportDeck(detail.case.id, {
           resultId: revision.id, resultHash: revision.resultHash!,
         }, format);
+        if (!alive.current) return;
         download(blob, filename);
         toast(`Downloaded ${filename}`);
         onClose();
@@ -50,10 +55,11 @@ export default function ExportModal({ detail, revision, onClose, onConflict }: {
       }
       onClose();
     } catch (e) {
+      if (!alive.current) return;
       if (apiMode === 'http') { reportApiError(e); await onConflict(e); }
       else toast('Export failed. Please try again.');
     } finally {
-      setBusy(null);
+      pending.current = false; if (alive.current) setBusy(null);
     }
   };
 

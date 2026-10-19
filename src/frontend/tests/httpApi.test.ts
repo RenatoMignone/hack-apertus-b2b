@@ -247,3 +247,41 @@ test('reconnect after the run finishes returns its result without starting resea
   await api.runCase('case',()=>{});
   assert.equal(calls.filter(c => c.method !== 'GET').length,0);
 });
+
+test('export reconnect retains accepted operation after polling retries are exhausted', async () => {
+  let disconnected = true;
+  const {api,calls} = harness(url => {
+    if (url.endsWith('/reviews')) return {review_id:'review'};
+    if (url.endsWith('/exports')) return {status_url:'/api/v1/operations/op'};
+    if (url.endsWith('/operations/op')) {
+      if (disconnected) return Response.json({error:{code:'service_unavailable'}},{status:503});
+      return {status:'committed',download_url:'/api/v1/cases/case/exports/pdf/download'};
+    }
+    if (url.endsWith('/download')) return new Response('%PDF-test',{headers:{'Content-Type':'application/pdf'}});
+    return detail();
+  });
+  await assert.rejects(api.exportDeck('case',expected));
+  disconnected = false;
+  await api.exportDeck('case',expected);
+  assert.equal(calls.filter(c => c.method === 'POST' && c.url.endsWith('/exports')).length,1);
+  assert.equal(calls.filter(c => c.method === 'POST' && c.url.endsWith('/reviews')).length,1);
+});
+
+test('uncertain export submission reuses its key across an explicit reconnect', async () => {
+  let offline = true;
+  const {api,calls} = harness(url => {
+    if (url.endsWith('/reviews')) return {review_id:'review'};
+    if (url.endsWith('/exports')) {
+      if (offline) throw new TypeError('response lost');
+      return {status_url:'/api/v1/operations/op'};
+    }
+    if (url.endsWith('/operations/op')) return {status:'committed',download_url:'/api/v1/cases/case/exports/pdf/download'};
+    if (url.endsWith('/download')) return new Response('%PDF-test',{headers:{'Content-Type':'application/pdf'}});
+    return detail();
+  });
+  await assert.rejects(api.exportDeck('case',expected));
+  offline = false;
+  await api.exportDeck('case',expected);
+  const keys = calls.filter(c => c.url.endsWith('/exports')).map(c => c.headers.get('Idempotency-Key'));
+  assert.equal(keys.length,3); assert.equal(new Set(keys).size,1);
+});
