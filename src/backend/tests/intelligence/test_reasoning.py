@@ -8,7 +8,7 @@ from backend.contracts.pipeline import ClaimAssessment, ReportEvidencePack
 from backend.contracts.services import (BudgetExceeded, EvidenceAssessment, EvidenceRejected,
     InvalidModelOutput, PersistedClaims, ResearchBundle)
 from backend.evidence import create_reasoning_services
-from backend.models.reasoning.fixtures import FixtureChatModel
+from backend.models.reasoning.fixtures import FixtureChatModel, draft_findings
 
 
 def run(awaitable):
@@ -155,7 +155,7 @@ def test_pack_only_drafting_and_exact_hash_assessment(context, interpretation, c
     draft = pdf_input.draft.model_copy(deep=True)
     draft = draft.model_copy(update={"reasons": draft.reasons[:1]})
     service, model = services(draft.model_dump(mode="json"),
-        {"status": "supported", "explanation": "The exact cited wording is entailed."})
+        draft_findings(draft.model_dump(mode="json"), pack.gaps))
     result = run(service.draft(pack, "Shorter", context))
     checked = run(service.assess_draft(result, pack, context))
     assert checked.draft_hash == configuration_hash(result.model_dump(mode="json"))
@@ -209,7 +209,7 @@ def test_draft_overclaim_can_fail_semantic_assessment(context,interpretation,cla
     pack=ReportEvidencePack(interpretation=interpretation,claims=[claim],outcome="complete")
     draft=pdf_input.draft.model_copy(update={"reasons":[pdf_input.draft.reasons[0].model_copy(
         update={"text":"This technology guarantees clinical success."})]})
-    service,_=services({"status":"unsupported","explanation":"Clinical success is not supported."})
+    service,_=services(draft_findings(draft.model_dump(mode="json"), status="unsupported"))
     assert run(service.assess_draft(draft,pack,context)).status=="unsupported"
 
 
@@ -247,3 +247,35 @@ def test_blocking_questions_prevent_extraction_or_pack(context,interpretation):
     with pytest.raises(EvidenceRejected):
         run(service.propose_pack(blocked,PersistedClaims(),EvidenceAssessment(),ResearchBundle(),context))
     assert not model.calls
+
+
+@pytest.mark.parametrize('fault', ['omitted_reason', 'changed_text', 'foreign_claim', 'omitted_caveat'])
+def test_draft_findings_require_exact_complete_coverage(context, interpretation, claim, pdf_input, fault):
+    from copy import deepcopy
+    pack = ReportEvidencePack(interpretation=interpretation, claims=[claim], outcome='partial', gaps=['Unknown availability'])
+    draft = pdf_input.draft
+    bad = draft_findings(draft.model_dump(mode='json'), pack.gaps)
+    if fault == 'omitted_reason':
+        bad['reasons'].pop()
+    elif fault == 'changed_text':
+        bad['reasons'][0]['text'] = 'Different wording'
+    elif fault == 'foreign_claim':
+        bad['reasons'][0]['claim_ids'] = []
+    else:
+        bad['caveats'] = []
+    service, model = services(bad, deepcopy(bad))
+    with pytest.raises(InvalidModelOutput):
+        run(service.assess_draft(draft, pack, context))
+    assert len(model.calls) == 2
+
+
+def test_draft_failure_cannot_be_overridden_by_positive_explanation(context, interpretation, claim, pdf_input):
+    pack = ReportEvidencePack(interpretation=interpretation, claims=[claim], outcome='partial', gaps=['Unknown availability'])
+    findings = draft_findings(pdf_input.draft.model_dump(mode='json'), pack.gaps)
+    findings['reasons'][0].update(status='unsupported', explanation='Everything is supported.')
+    service, _ = services(findings)
+    assert run(service.assess_draft(pdf_input.draft, pack, context)).status == 'unsupported'
+    findings['reasons'][0]['status'] = 'supported'
+    findings['caveats'][0]['preserved'] = False
+    service, _ = services(findings)
+    assert run(service.assess_draft(pdf_input.draft, pack, context)).status == 'unsupported'

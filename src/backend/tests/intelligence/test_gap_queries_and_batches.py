@@ -84,7 +84,7 @@ def test_writer_and_assessor_use_claims_and_caveats_without_bulk_provenance(cont
         gaps=['Availability is unknown.'],coverage={'large_source_manifest':'x'*90000})
     draft=pdf_input.draft.model_copy(update={'reasons':pdf_input.draft.reasons[:1]})
     model=FixtureChatModel(responses=[draft.model_dump(mode='json'),
-        {'status':'supported','explanation':'Fixture wording is supported.'}])
+        __import__('backend.models.reasoning.fixtures', fromlist=['draft_findings']).draft_findings(draft.model_dump(mode='json'), pack.gaps)])
     service=create_reasoning_services(model=model)
     result=asyncio.run(service.draft(pack,'Concise source facts only',context))
     checked=asyncio.run(service.assess_draft(result,pack,context,evidence=[evidence]))

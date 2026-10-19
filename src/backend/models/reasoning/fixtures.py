@@ -29,3 +29,12 @@ class FixtureChatModel(BaseChatModel):
         message = value if isinstance(value, AIMessage) else AIMessage(
             content=value if isinstance(value, str) else json.dumps(value, default=str))
         return ChatResult(generations=[ChatGeneration(message=message)])
+
+
+def draft_findings(draft, gaps=(), *, status="supported"):
+    """Explicit scripted assessment; never used by production reasoning."""
+    return {"reasons": [{"reason_id": r["id"], "headline": r["headline"],
+        "text": r["text"], "claim_ids": r["claim_ids"], "status": status,
+        "explanation": "Scripted synthetic verdict."} for r in draft["reasons"]],
+        "caveats": [{"gap": gap, "preserved": True, "explanation": "Scripted caveat check."}
+                    for gap in dict.fromkeys(gaps)]}
