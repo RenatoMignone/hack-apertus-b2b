@@ -1,5 +1,6 @@
 """Tolerant display-label input; factual/public interpretation stays strict."""
 from copy import deepcopy
+from typing import Literal
 
 from pydantic import Field, create_model
 
@@ -18,6 +19,13 @@ fields["research_questions"][1].description = (
 # Do not inherit public validators before translating the private wire shape.
 InterpretationResponse = create_model("InterpretationResponse",
     __config__=CaseInterpretation.model_config, **fields)
+
+
+def interpretation_schema(codes):
+    """Expose pinned domain codes in the private schema, not only prose."""
+    code = Literal[tuple(codes)]
+    return create_model("DomainInterpretationResponse", __base__=InterpretationResponse,
+        primary_field=(code, "unknown"), additional_fields=(list[code], Field(default_factory=list)))
 
 
 def interpretation_value(value) -> CaseInterpretation:

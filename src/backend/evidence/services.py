@@ -83,7 +83,7 @@ class ApertusReasoningServices:
         domain = DomainVocabulary.from_taxonomy(taxonomy_context)
         model_taxonomy["domain"] = domain.model_dump(mode="json")
         allowed = set(canonical_concepts)
-        from backend.evidence.interpretation_response import InterpretationResponse, interpretation_value
+        from backend.evidence.interpretation_response import interpretation_schema, interpretation_value
         def check(response):
             value = interpretation_value(response)
             if not {value.primary_field, *value.additional_fields} <= set(domain.fields):
@@ -125,9 +125,11 @@ class ApertusReasoningServices:
             "For example, 'find biosensing groups and testing facilities in Bern' has clear "
             "intent: ambiguities=[], blocking_questions=[]; unknown experts/facilities are "
             "research_questions. Do NOT ask the user to name the very groups they ask you to find. "
+            "A Clarification section contains the operator's later answers: use them to resolve "
+            "earlier missing intent. Do not repeat an ambiguity already answered there. "
             "Use only supplied domain.fields codes for primary/additional fields; unknown is valid. "
             "Do not invent company facts.",
-            {"message": message, "taxonomy": model_taxonomy}, InterpretationResponse, context, check=check)
+            {"message": message, "taxonomy": model_taxonomy}, interpretation_schema(domain.fields), context, check=check)
         return check(response)
 
     async def extract(self, interpretation: CaseInterpretation, research: ResearchBundle,
@@ -212,6 +214,10 @@ class ApertusReasoningServices:
             "overclaiming or mere topic overlap. Ranking, valid JSON, quote existence and source "
             "review status do not prove truth. Check role, capability, geography, clinical claims "
             "and implied collaboration carefully. Do not certify source trust or rewrite statements. "
+            "Supported means entailed by the supplied canonical passage, not independently verified "
+            "in the outside world. An explicit fictional/test label does not negate entailment within "
+            "that passage; retain that qualification and never present fictional capabilities as real. "
+            "Do not require patents, trials or product details for a narrower stated capability. "
             "Explain support/contradiction and limitations concisely.",
             {"claims": [c.model_dump(mode="json") for c in eligible],
              "evidence": [e.model_dump(mode="json") for e in available.values()]},
