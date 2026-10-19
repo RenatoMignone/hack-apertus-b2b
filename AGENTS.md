@@ -59,7 +59,7 @@ Proposed primary target is an air-gapped independent runtime; not yet tested.
 | Add Langfuse tracing or deploy the data services | [Observability](docs/data/OBSERVABILITY.md), [build/operations](docs/data/BUILD_AND_OPERATIONS.md) |
 | Choose architecture, retrieval or Apertus integration | [Technical options](docs/plans/TECHNICAL_OPTIONS.md), [decisions and questions](docs/project/DECISIONS_AND_OPEN_QUESTIONS.md) |
 | Evaluate quality, grounding or sovereign operation | [Evaluation](docs/challenge/EVALUATION.md), [data and provenance](docs/data/DATA_AND_PROVENANCE.md) |
-| Prepare report, pitch, video or delivery | Root [README.md](README.md), [technical_report.md](technical_report.md), [event and submission](docs/project/EVENT_AND_SUBMISSION.md) |
+| Prepare report, pitch, video or delivery | Root [README.md](README.md), [technical_report.md](technical_report.md), [event and submission](docs/project/EVENT_AND_SUBMISSION.md), [demo script](docs/project/DEMO_SCRIPT.md), [demo walkthrough playbook](docs/project/DEMO_WALKTHROUGH_PLAYBOOK.md) |
 | Resolve uncertainty or update context | [Sources](docs/project/SOURCES.md), [decisions and questions](docs/project/DECISIONS_AND_OPEN_QUESTIONS.md) |
 
 ## Constraints to carry into every task

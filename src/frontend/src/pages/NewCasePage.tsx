@@ -1,14 +1,14 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowUp, Lock } from 'lucide-react';
 import { api } from '../api';
+import { HERO_PROMPT } from '../mocks/cases';
 import { useTitle } from '../components/ui';
 
+// The first example is the demo's hero case: written in everyday words, so the
+// "How I searched" Sankey shows the bridge to scientific terms.
 const EXAMPLES: { label: string; text: string }[] = [
-  {
-    label: 'Glucose sensor',
-    text: 'GlucoWave builds a needle-free wearable glucose sensor and needs partners for clinical studies and algorithms. Most early users are women; I think DCB studied diabetes and the menstrual cycle.',
-  },
+  { label: 'Glucose sensor', text: HERO_PROMPT },
   {
     label: 'Insulin pump',
     text: 'European insulin pump maker wants to add closed-loop automated insulin delivery and is looking at Bern for R&D.',
@@ -20,7 +20,14 @@ export default function NewCasePage() {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState<string | null>(null);
+  const box = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
+  // Back to the text box after an example, so Ctrl + Enter submits it.
+  const fill = (value: string) => {
+    setText(value);
+    setPending(null);
+    box.current?.focus();
+  };
   useTitle('New case');
 
   const submit = async () => {
@@ -37,6 +44,7 @@ export default function NewCasePage() {
 
         <div className="mt-8 rounded-2xl border border-line bg-white p-3 shadow-sm focus-within:border-ink/40">
           <textarea
+            ref={box}
             autoFocus
             aria-label="Company description"
             value={text}
@@ -68,7 +76,7 @@ export default function NewCasePage() {
           {EXAMPLES.map((e) => (
             <button
               key={e.label}
-              onClick={() => (text.trim() && text !== e.text ? setPending(e.text) : setText(e.text))}
+              onClick={() => (text.trim() && text !== e.text ? setPending(e.text) : fill(e.text))}
               className="rounded-full border border-line bg-white px-3 py-1 text-sm text-muted hover:border-ink/30 hover:text-ink"
             >
               {e.label}
@@ -78,7 +86,7 @@ export default function NewCasePage() {
         {pending && (
           <div className="mt-3 flex items-center justify-center gap-2 text-sm">
             <span className="text-muted">Replace your text with the example?</span>
-            <button onClick={() => (setText(pending), setPending(null))} className="font-medium text-brand hover:underline">Replace</button>
+            <button onClick={() => fill(pending)} className="font-medium text-brand hover:underline">Replace</button>
             <button onClick={() => setPending(null)} className="text-muted hover:text-ink">Keep mine</button>
           </div>
         )}

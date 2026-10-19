@@ -1,6 +1,6 @@
 import type { NavigatorApi } from './index';
 import type { BriefRevision, CaseDetail, DialogueTurn, Reason, RunStage, Selection } from '../types/contract';
-import { emptyRevision, NETWORK_REASON, pruneTrace, reasonEvidence, SEED_CASES, TRACE_B } from '../mocks/cases';
+import { emptyRevision, HERO_FOLLOW_UP, HERO_REVISION, NETWORK_REASON, pruneTrace, reasonEvidence, SEED_CASES, withNetworkTrace } from '../mocks/cases';
 import { EVIDENCE } from '../mocks/evidence';
 
 // In-memory mock backend with scripted agent behaviour. Unknown instructions are
@@ -10,7 +10,7 @@ const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 
 // Demo state survives reloads via localStorage (per browser only). Evidence is
 // static and re-attached on load rather than stored.
-const KEY = 'bern-navigator-demo-v5';
+const KEY = 'bern-navigator-demo-v7';
 type Saved = { cases: Omit<CaseDetail, 'evidence'>[] };
 
 function loadSaved(): Saved | null {
@@ -96,7 +96,8 @@ const NUTRITION = /nutrition|meal|carb|food|diet|gocarb/i;
 function seededFor(prompt: string): { rev: BriefRevision; topic: 'glucose' | 'insulin' | 'none'; health: boolean } {
   const p = prompt.toLowerCase();
   const first = (id: string) => clone(SEED_CASES.find((c) => c.case.id === id)!.revisions[0]);
-  if (/glucose|sensor|cgm|wearable|monitor|menstrual|women/.test(p)) return { rev: first('case-glucowave'), topic: 'glucose', health: true };
+  // Lay terms ("blood sugar", "patch") route like the scientific ones, as the real search should.
+  if (/glucose|blood.?sugar|sugar level|sensor|patch|cgm|wearable|monitor|menstrual|women/.test(p)) return { rev: clone(HERO_REVISION), topic: 'glucose', health: true };
   if (/insulin|pump|closed.?loop|\baid\b/.test(p)) return { rev: first('case-pumpline'), topic: 'insulin', health: true };
   const health = /diabet|medic|health|clinic|patient|bio|pharma|med ?tech|hospital/.test(p);
   return {
@@ -109,6 +110,9 @@ function seededFor(prompt: string): { rev: BriefRevision; topic: 'glucose' | 'in
 }
 
 function companyFrom(prompt: string) {
+  // "GlucoWave makes …" → "GlucoWave"; otherwise the first words of the message.
+  const named = prompt.match(/^\s*([A-Z][\w&'’-]*(?:\s[A-Z][\w&'’-]*){0,2})\s(?:makes|builds|develops|is|wants|needs|sells|produces)\b/);
+  if (named) return named[1];
   const words = prompt.split(/[,.(\n]/)[0].trim().split(/\s+/);
   return (words.length > 3 ? words.slice(0, 3).join(' ') + '…' : words.join(' ')) || 'New case';
 }
@@ -156,9 +160,15 @@ export const mockApi: NavigatorApi = {
     c.currentRevisionId = rev.id;
     c.case.status = rev.reasons.length ? 'in_review' : 'researching';
     if (topic === 'insulin') {
-      say(c, 'First draft ready. One question:', {
+      say(c, 'First draft ready. One question: R&D partner or clinical validation?', {
         revisionId: rev.id,
         followUp: { id: uid('f'), question: 'R&D partner or clinical validation?', choices: ['R&D partner', 'Clinical validation', 'Both'] },
+      });
+    } else if (topic === 'glucose') {
+      const people = rev.reasons.filter((r) => r.category === 'people').length;
+      say(c, `First draft: ${people} people and ${rev.reasons.length - people} groups, projects and services across UniBE, ARTORG and DCB. Your menstrual-cycle lead checks out. One question: ${HERO_FOLLOW_UP.question}`, {
+        revisionId: rev.id,
+        followUp: { id: uid('f'), ...HERO_FOLLOW_UP },
       });
     } else if (rev.reasons.length) {
       const people = rev.reasons.filter((r) => r.category === 'people').length;
@@ -187,8 +197,10 @@ export const mockApi: NavigatorApi = {
       // Nutrition has synonyms in the seed; other topics match on their first significant word.
       const topic = exclude[1].replace(/[.!?]$/, '').trim();
       const word = NUTRITION.test(topic) ? null : topic.split(/\s+/).find((w) => w.length > 3) ?? topic;
+      // Match what an item is about, not the units it sits in: ARTORG's "AI in Health
+      // and Nutrition" group must survive "drop nutrition".
       const matches = (r: Reason) => {
-        const blob = (JSON.stringify(r) + r.entries.map((e) => e.evidenceIds.join(' ')).join(' ')).toLowerCase();
+        const blob = [r.headline, r.line.text, ...r.entries.flatMap((e) => [e.name, ...(e.expertise ?? []), ...e.evidenceIds])].join(' ').toLowerCase();
         return word ? blob.includes(word.toLowerCase()) : NUTRITION.test(blob);
       };
       const reasons = base.reasons.filter((r) => !matches(r));
@@ -248,7 +260,7 @@ export const mockApi: NavigatorApi = {
     const base = current(c);
     if (!base) return clone(c);
     await stages(onStage);
-    const clinical = /clinical|both/i.test(answer);
+    const clinical = /clinical|study|both/i.test(answer);
     const reasons = clinical ? [clone(NETWORK_REASON), ...base.reasons] : base.reasons;
     const rev = addRevision(
       c,
@@ -256,13 +268,14 @@ export const mockApi: NavigatorApi = {
       {
         reasons,
         changedReasonIds: clinical ? [NETWORK_REASON.id] : [],
-        openQuestions: base.openQuestions.filter((q) => !/R&D partner or clinical/i.test(q)),
-        trace: pruneTrace(TRACE_B, reasonEvidence(reasons)),
-        coverage: { ...base.coverage, resultKind: 'ok', limitations: [] },
+        // The answered question is no longer open.
+        openQuestions: base.openQuestions.filter((q) => q !== turn?.followUp?.question),
+        trace: clinical ? withNetworkTrace(base.trace) : base.trace,
+        coverage: { ...base.coverage, resultKind: 'ok', limitations: base.coverage.limitations.filter((l) => !/waiting for your answer/i.test(l)) },
       },
       answer,
     );
-    say(c, clinical ? 'Added DCB’s research network for clinical studies.' : 'Kept the R&D-focused groups.', { revisionId: rev.id });
+    say(c, clinical ? 'Added DCB’s 61-researcher network for clinical studies.' : 'Kept the R&D-focused groups.', { revisionId: rev.id });
     c.case.status = 'in_review';
     touch(c);
     return clone(c);

@@ -157,7 +157,7 @@ input→term mappings are hand-written for the demo, not model output.
 
 | Case | Shows |
 | --- | --- |
-| GlucoWave | 6 reasons → v2 without nutrition; menstrual-cycle lead confirmed by DCB |
+| GlucoWave (hero, not on the board at start) | Created live from the *Glucose sensor* example, written in lay terms ("blood-sugar patch"). First draft across all three institutions and all five sections → follow-up *Study partner, R&D site, or both?* (v2 adds the DCB network) → "Drop the nutrition study" (v3) → keep → export. Script: [DEMO_SCRIPT.md](../project/DEMO_SCRIPT.md) |
 | Pumpline Medical | Follow-up question; answering adds a reason (v2) |
 | Grain trader | Out of scope |
 | Six smaller cases | Board variety (incl. outcomes and on hold); each opens to a short brief built only from the evidence above (Alpine Bioprint is a no-match) |
