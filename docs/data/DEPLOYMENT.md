@@ -46,7 +46,7 @@ tables remain owner-only legacy; runtime never queries them.
 compatible assets and accepted access; supply the unchanged PPTX template path.
 Source 0011/0012 improve capture/membership paths; see [performance](CAPTURE_PERFORMANCE.md).
 0013 batches equivalent read authorization sets; its shared-host rollout is applied.
-See the [restricted-role retrieval receipt and operator restart](LIVE_RETRIEVAL_PERFORMANCE.md).
+See the restricted-role retrieval receipt and operator restart.
 Checkpoint tables use the framework's explicit `navigator-runtime ... checkpoints-setup`
 with authorized setup access; do not rerun setup from an ordinary worker account.
 
@@ -87,4 +87,4 @@ settings, restart API/worker/frontend, run readiness then an actual case/review/
 export. Test controlled restart/resume and backup restore separately. Hosted
 Keera/HF and web are connected dependencies. Offline requires local models/assets,
 disabled external egress and demonstrated cold-start/report completion.
-[Delivery status](../project/STATUS.md) records outstanding acceptance.
+Delivery status records outstanding acceptance.

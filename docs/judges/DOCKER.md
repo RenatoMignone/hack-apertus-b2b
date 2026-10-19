@@ -109,8 +109,8 @@ python -m pip install -r src/backend/requirements.hosted.lock
 Provision the pinned tokenizer and verified configuration from
 [hosted embedding setup](../data/HOSTED_EMBEDDINGS.md). The encoder configuration
 must match the indexed vectors. Startup never downloads these assets or builds
-the corpus. Corpus preparation follows the
-[ingestion handoff](../data/ingestion/INGESTION_SPEC.md).
+the corpus. Corpus preparation is a separate, controlled release step; this judge setup
+does not populate or modify the corpus.
 A public, redistributable ready-to-use corpus bundle has not been packaged here.
 
 ## 4. Run API/worker on the host

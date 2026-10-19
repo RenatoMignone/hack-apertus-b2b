@@ -19,8 +19,8 @@ brief. The diabetes-technology pilot spans UniBE, ARTORG and Diabetes Center Ber
 | Storage | S3-compatible artifacts; separate PostgreSQL checkpoints; optional self-hosted Langfuse traces |
 
 The [execution graph](EXECUTION_GRAPH.md) shows control flow. API and worker are
-separate processes; backend modules communicate through [typed ports](SERVICE_CONTRACTS.md).
-The browser uses [HTTP](FRONTEND_BACKEND_API.md), never DB or provider credentials.
+separate processes; backend modules communicate through typed ports.
+The browser uses HTTP, never DB or provider credentials.
 
 ## Input and output boundary
 
@@ -64,7 +64,7 @@ embedding configuration and relevant model/prompt versions.
 
 Live mode captures immutable ready evidence per case while ingestion continues.
 Published mode uses a reviewed active release. Neither mode grants access to
-otherwise hidden sources. See [live captures](../data/LIVE_CORPUS_RUNTIME.md).
+otherwise hidden sources. See live captures.
 
 ## RAG rebuild rules
 

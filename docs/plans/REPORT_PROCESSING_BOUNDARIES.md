@@ -46,5 +46,5 @@ manual plans also creates a new input/review cycle. Chat cannot execute arbitrar
 commands or update shared knowledge.
 
 Exact payloads are in `contracts/pipeline.py` and `contracts/services.py`.
-[Operations](OPERATIONS_PLAN.md) owns deadlines/recovery;
-[case lineage](../data/CASE_STATE_AND_LINEAGE.md) owns persisted hashes and versions.
+Operations owns deadlines/recovery;
+case lineage owns persisted hashes and versions.

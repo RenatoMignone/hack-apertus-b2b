@@ -26,6 +26,6 @@ services. Its original retrieval measurements are separated from newer pipeline
 and performance acceptance.
 
 The [submission package](DELIVERY.md) records final artifact/access requirements;
-[current status](../project/STATUS.md) distinguishes implemented features from
+current status distinguishes implemented features from
 host migration, real-corpus quality and deployment acceptance. Connected provider
 operation does not demonstrate the selected offline target.

@@ -28,6 +28,6 @@ human-controlled output. These mechanisms reduce risk; their existence is not a
 measured accuracy claim.
 
 See the [execution graph](../plans/EXECUTION_GRAPH.md),
-[technical architecture](../plans/ARCHITECTURE.md), [module map](../plans/MODULE_HANDOFFS.md)
+[technical architecture](../plans/ARCHITECTURE.md)
 and [verification](VERIFICATION.md). The technical report selects an independent
 air-gapped target; current connected development has not demonstrated that target.

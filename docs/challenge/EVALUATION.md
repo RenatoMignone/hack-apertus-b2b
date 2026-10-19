@@ -13,7 +13,7 @@ definition, not an organizer-supplied aggregation clarification.
 
 The numerical targets come from [B1 §4](CHALLENGE_BRIEF.md); the recordings supply
 no labeled evaluation dataset and suggest constructing a pilot or synthetic
-examples. [E20](../recordings/RECORDING_INSIGHTS.md#e20--evaluation-needs-to-be-constructed)
+examples.
 
 ## Official targets versus proposed measurements
 
@@ -147,11 +147,11 @@ Additional user design gates, not new organizer metrics:
 [Architecture/dependency inventory](../plans/ARCHITECTURE.md#target-architecture-mandatory).
 Synthetic integration verifies manual intake, revised inputs and pack → reviewed
 PDF lineage. Broader second-domain, full deletion/retention and disconnected
-cold-start checks are not established. See [verification scope](../project/STATUS.md).
+cold-start checks are not established. See the [verification guide](../judges/VERIFICATION.md).
 
 ## Data-layer implementation checks
 
-The [data-layer specs](../data/DATA_LAYER.md) add concrete acceptance cases:
+The implementation should add concrete data-layer acceptance cases:
 
 - Compare PostgreSQL lexical-only, dense-only, RRF fusion and reranked retrieval
   on the same frozen snapshot/gold suite; report relevance and factual support

@@ -80,7 +80,7 @@ SHA-256: `A2F5E50FF7B986FE6A5A2F38654BF5459142EA9285E844E12AA9392F20F7A262`.
 the English Bern Economic Development Agency wordmark and red graphic.
 Use the supplied original, preserving proportions and legibility. Do not redraw,
 stretch or infer additional branding rules. N1 explicitly restricts this logo and the PowerPoint template to use for this
-challenge; see [the supplied source snapshot](../sources/NOTION_CHALLENGE_2026-10-18.md).
+challenge; see the supplied source snapshot.
 Do not reuse them for unrelated projects or assume broader redistribution rights.
 
 SHA-256: `FDE725FE9D25F858003DA6256F89F6420CE23C4BEB3B6C230764507EC87BDFB9`.

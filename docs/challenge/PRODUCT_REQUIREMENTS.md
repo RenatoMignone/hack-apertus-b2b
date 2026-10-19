@@ -2,8 +2,7 @@
 
 The operator is Bern economic-development staff translating a company's plans
 into a concise, inspectable opportunity brief for company decision-makers.
-The [supplied challenge](CHALLENGE_BRIEF.md) and [workshop evidence](../recordings/RECORDING_INSIGHTS.md)
-define needs; [architecture](../plans/ARCHITECTURE.md) defines the implementation.
+The [supplied challenge](CHALLENGE_BRIEF.md) defines needs; [architecture](../plans/ARCHITECTURE.md) defines the implementation.
 
 ## Core workflow
 

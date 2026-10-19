@@ -1,12 +1,7 @@
 # Research & Expertise Navigator — supplied challenge brief
 
-**Supplied requirements, not an implementation-status page. Sources B1 and N1:** initial challenge text and the complete Notion page text
-pasted by the user on 18 October 2026. N1 confirms the initial requirements and
-adds the supporting filenames and challenge-only branding restriction; see the
-[dated source snapshot](../sources/NOTION_CHALLENGE_2026-10-18.md). This is a
-structured capture, not independent live-page verification. Workshop
-clarifications are separate in
-[RECORDING_INSIGHTS.md](../recordings/RECORDING_INSIGHTS.md).
+These requirements summarize the challenge text supplied on 18 October 2026,
+including the supporting materials and challenge-only branding restriction.
 
 **Partner:** Bern Economic Development Agency.
 
@@ -55,7 +50,7 @@ The Notion page names these supporting materials [N1]:
 **Use the PowerPoint template and logo only for this challenge.** This explicit
 restriction is not a general reuse/license grant. The presentation template is
 separate from the required repository/technical-report template and does not
-establish a mandatory automatic teaser-export feature. The [provided-material inventory](../provided_material/README.md) records the
+establish a mandatory automatic teaser-export feature. The [provided-material inventory](../provided-material/README.md) records the
 later file delivery and inspection; workbook discovery rows still require live
 access/relevance checks before collection.
 

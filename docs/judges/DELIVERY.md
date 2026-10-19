@@ -1,7 +1,7 @@
 # Submission package
 
-**B to Bern (B2B), Team Stregoni.** Implementation and verification are recorded in
-[status](../project/STATUS.md).
+**B to Bern (B2B), Team Stregoni.** Verification is recorded in
+[verification](VERIFICATION.md).
 
 | Item | Requirement / location |
 | --- | --- |

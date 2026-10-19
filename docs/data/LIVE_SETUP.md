@@ -38,7 +38,7 @@ Shared servers require an operator bearer token whose SHA-256 digest is bound to
 the intended principal. The browser holds the raw token in memory. For private
 local testing, `RUNTIME_LOCAL_ACCESS=true` accepts loopback requests using exactly
 one existing binding; it does not remove DB authorization or create credentials.
-Keep it false for shared deployment. See [HTTP](../plans/FRONTEND_BACKEND_API.md).
+Keep it false for shared deployment. See HTTP.
 
 If infrastructure is reached through SSH, keep the authorized tunnel running:
 
