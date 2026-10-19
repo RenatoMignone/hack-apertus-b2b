@@ -207,7 +207,14 @@ class StructuredTasks:
                  max_input_chars: int = 80000):
         self.model, self.receipt, self.max_input_chars = model, receipt, max_input_chars
 
-    async def _invoke(self, messages, context, task, **kwargs):
+    def _record(self, value):
+        if self.receipt:
+            try:
+                self.receipt(value)
+            except Exception:
+                pass  # Diagnostics must never block a case.
+
+    async def _invoke(self, messages, context, task, *, attempt=1, **kwargs):
         remaining(context)
         started = time.monotonic()
         try:
@@ -217,18 +224,23 @@ class StructuredTasks:
                     result = await self.model.ainvoke(messages, context=context, config={"callbacks": []}, **kwargs)
         except InvalidModelOutput as error:
             error.model_task = task
+            self._record({"kind": "model_call", "task": task, "run_id": str(context.run_id), "attempt": attempt,
+                "status": error.code, "elapsed_seconds": time.monotonic() - started})
             raise
         except TimeoutError:
+            self._record({"kind": "model_call", "task": task, "run_id": str(context.run_id), "attempt": attempt,
+                "status": "budget_exceeded", "elapsed_seconds": time.monotonic() - started})
             raise BudgetExceeded() from None
+        except (ServiceUnavailable, BudgetExceeded) as error:
+            self._record({"kind": "model_call", "task": task, "run_id": str(context.run_id), "attempt": attempt,
+                "status": error.code, "elapsed_seconds": time.monotonic() - started})
+            raise
         event("model.usage", run_id=context.run_id, task=task,
               **{k: v for k, v in result.response_metadata.get("usage", {}).items() if k in {"prompt_tokens", "completion_tokens"}})
-        if self.receipt:
-            try:
-                self.receipt({"task": task, "elapsed_seconds": time.monotonic() - started,
-                              "model": result.response_metadata.get("model_name"),
-                              "usage": result.response_metadata.get("usage", {})})
-            except Exception:
-                pass  # Diagnostics must never block a case.
+        self._record({"kind": "model_call", "task": task, "run_id": str(context.run_id), "attempt": attempt,
+                      "status": "received", "elapsed_seconds": time.monotonic() - started,
+                      "model": result.response_metadata.get("model_name"),
+                      "usage": result.response_metadata.get("usage", {})})
         return result
 
     async def run(self, task: str, instruction: str, payload: dict, schema: type[BaseModel],
@@ -244,11 +256,13 @@ class StructuredTasks:
                   "\nSCHEMA:\n" + json.dumps(schema.model_json_schema(), separators=(",", ":")))
         messages = [SystemMessage(content=system), HumanMessage(content=content)]
         for attempt in range(2):
-            result = await self._invoke(messages, context, task)
+            result = await self._invoke(messages, context, task, attempt=attempt+1)
             try:
                 value = schema.model_validate_json(result.content)
                 if check:
                     check(value)
+                self._record({"kind": "validation", "task": task, "run_id": str(context.run_id), "attempt": attempt+1,
+                              "status": "valid"})
                 return value
             except (ValidationError, ValueError, KeyError, TypeError) as error:
                 event("model.validation_failed", run_id=context.run_id, task=task,
@@ -264,6 +278,8 @@ class StructuredTasks:
                 for issue in issues:
                     event("model.validation_issue", run_id=context.run_id, task=task,
                           attempt=attempt+1, validation_field=issue["field"], validation_type=issue["type"])
+                self._record({"kind": "validation", "task": task, "run_id": str(context.run_id), "attempt": attempt+1,
+                    "status": "repair_exhausted" if attempt else "repair_required", "issues": issues})
                 if attempt:
                     failure = InvalidModelOutput()
                     failure.model_task = task

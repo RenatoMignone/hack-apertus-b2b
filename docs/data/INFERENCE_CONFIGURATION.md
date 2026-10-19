@@ -31,8 +31,8 @@ the compatible convention; actual gateway behavior must be tested separately.
 
 ## Structured tasks and tool execution
 
-`models/reasoning/transport.py` handles requests and safe failure mapping.
-`tasks.py` serializes compact context/schema, validates typed output and permits
+`models/reasoning/client.py` handles requests and safe failure mapping. Its
+`StructuredTasks` serializes compact context/schema, validates typed output and permits
 bounded repair. Services perform interpretation, gap queries, extraction,
 assessment, pack proposal, writing and wording assessment. Valid JSON does not
 prove source support. LangGraph owns tool execution and branching through
@@ -60,3 +60,17 @@ that is not a literal quote is omitted from those annotations rather than failin
 a clear request. The full original request and its constraints remain available;
 this does not create public facts or relax claim/taxonomy validation. Safe
 `model.validation_issue` events identify schema fields/types on actual failures.
+
+The private interpretation schema enumerates the pinned profile's domain codes;
+unmapped activities use `other`/`unknown` without restricting retrieval. Repair
+identifies missing blocking questions and distinguishes later clarification from
+historical uncertainty. Explicit general capabilities remain extractable even
+when optional methods/product details are missing; fit is assessed separately.
+
+Draft semantic assessment returns an exact finding per reason and a numbered
+preservation finding per pack gap. Code validates complete coverage and derives
+the verdict; an unsupported finding or lost caveat rejects the draft regardless
+of reassuring explanatory prose. Public HTTP/assessment fields are unchanged.
+Optional private receipts record model calls, repair attempts, timing and token
+counts without prompts or provider bodies. See the isolated acceptance command in
+[quickstart](../judges/QUICKSTART.md).

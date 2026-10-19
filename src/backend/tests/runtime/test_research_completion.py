@@ -49,7 +49,10 @@ async def test_gap_research_keeps_earlier_claims_and_freezes_only_final_pack(har
     assert plans[0].original_request == plans[1].original_request
     with h.store.engine.connect() as c:
         packs = c.execute(select(t.packs).where(t.packs.c.run_id==UUID(created['run_id']))).mappings().all()
-    assert len(packs)==1 and len(packs[0]['payload']['claims'])==2
+    assert len(packs)==1 and len(packs[0]['payload']['claims'])==1
+    assert h.reasoning.calls['extract'] == 1 and h.reasoning.calls['assess'] == 1
+    assert 'Need testing infrastructure details' in packs[0]['payload']['gaps']
+    assert any('no new source passages' in gap for gap in packs[0]['payload']['gaps'])
 
 
 @pytest.mark.integration

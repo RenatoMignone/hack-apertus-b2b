@@ -152,3 +152,15 @@ def test_malformed_provider_metadata_has_safe_failure(context):
     data=response();data["usage"]="not-a-usage-object"
     with pytest.raises(InvalidModelOutput):
         invoke(client(lambda req:httpx.Response(200,json=data)),context)
+
+
+def test_private_receipts_count_repairs_without_recording_model_content(context, interpretation):
+    from backend.evidence import create_reasoning_services
+    from backend.models.reasoning.fixtures import FixtureChatModel
+    rows = []
+    model = FixtureChatModel(responses=['PRIVATE INVALID RESPONSE', interpretation.model_dump(mode='json')])
+    service = create_reasoning_services(model=model, receipt=rows.append)
+    asyncio.run(service.interpret('Find sensors in Bern', {}, context))
+    assert [r['attempt'] for r in rows if r['kind'] == 'model_call'] == [1, 2]
+    assert [r['status'] for r in rows if r['kind'] == 'validation'] == ['repair_required', 'valid']
+    assert 'PRIVATE INVALID RESPONSE' not in json.dumps(rows)

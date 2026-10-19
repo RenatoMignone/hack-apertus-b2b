@@ -36,5 +36,5 @@ def draft_findings(draft, gaps=(), *, status="supported"):
     return {"reasons": [{"reason_id": r["id"], "headline": r["headline"],
         "text": r["text"], "claim_ids": r["claim_ids"], "status": status,
         "explanation": "Scripted synthetic verdict."} for r in draft["reasons"]],
-        "caveats": [{"gap": gap, "preserved": True, "explanation": "Scripted caveat check."}
-                    for gap in dict.fromkeys(gaps)]}
+        "caveats": [{"gap_index": i, "preserved": True, "explanation": "Scripted caveat check."}
+                    for i, gap in enumerate(gaps)]}

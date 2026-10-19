@@ -2,7 +2,7 @@
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, create_model
 
 from backend.contracts.data import configuration_hash
 from backend.contracts.pipeline import DraftAssessment
@@ -22,7 +22,7 @@ class ReasonFinding(BaseModel):
 
 class CaveatFinding(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    gap: str
+    gap_index: int = Field(ge=0)
     preserved: bool
     explanation: str = Field(min_length=1)
 
@@ -44,9 +44,9 @@ def check_findings(verdict, draft, pack):
         if (finding.headline != reason.headline or finding.text != reason.text
                 or finding.claim_ids != reason.claim_ids):
             raise ValueError("reason findings must copy exact headline, text and claim_ids from the draft")
-    gaps = set(pack.gaps)
-    if len(verdict.caveats) != len(gaps) or {c.gap for c in verdict.caveats} != gaps:
-        raise ValueError("caveats must assess every exact pack gap once, without omissions or duplicates")
+    if (len(verdict.caveats) != len(pack.gaps)
+            or {c.gap_index for c in verdict.caveats} != set(range(len(pack.gaps)))):
+        raise ValueError("caveats must assess every supplied gap_index once, without omissions or duplicates")
 
 
 def validate_draft_references(draft, pack):
@@ -88,6 +88,9 @@ async def assess_draft(tasks, draft, pack, context, *, evidence=()):
     support = [record for record in evidence if record.evidence_id in used]
     if evidence and {record.evidence_id for record in support} != used:
         raise EvidenceRejected()
+    schema = create_model("CompleteDraftVerdict", __base__=DraftVerdict,
+        reasons=(list[ReasonFinding], Field(min_length=len(draft.reasons), max_length=len(draft.reasons))),
+        caveats=(list[CaveatFinding], Field(min_length=len(pack.gaps), max_length=len(pack.gaps))))
     verdict = await tasks.run("assess_draft", "Independently assess the EXACT draft wording against "
         "the frozen pack's supported claims, with citation membership already checked. Check ALL "
         "headlines, reason text, entry names/institutions and implications. Unsupported new facts, "
@@ -103,14 +106,15 @@ async def assess_draft(tasks, draft, pack, context, *, evidence=()):
         "be documented identities, never invented names for a capability or unnamed team. "
         "Return one reasons finding for EVERY reason, copying its reason_id (draft id), exact "
         "headline, text and ordered claim_ids. Each status assesses the entire reason including "
-        "all entries, affiliations and implications. Return one caveats finding for EVERY exact "
-        "pack gap, indicating whether its material limitation survives in the draft, including "
+        "all entries, affiliations and implications. Return one caveats finding for EVERY supplied "
+        "gap_index in caveat_checks, indicating whether its material limitation survives in the draft, including "
         "open_questions. An explicitly unsupported statement must have status unsupported even "
         "when other statements are supported. Do not return an overall verdict; code derives it. "
         "Do not rewrite the draft or invent its hash.",
         {"draft": draft.model_dump(mode="json"), "pack": pack.model_dump(mode="json", exclude={"coverage"}),
-         "evidence": [record.model_dump(mode="json") for record in support]},
-        DraftVerdict, context, check=lambda value: check_findings(value, draft, pack))
+         "evidence": [record.model_dump(mode="json") for record in support],
+         "caveat_checks": [{"gap_index": i, "gap": gap} for i, gap in enumerate(pack.gaps)]},
+        schema, context, check=lambda value: check_findings(value, draft, pack))
     return DraftAssessment(draft_hash=digest, validator="apertus-draft-semantic-v2",
         status="unsupported" if any(r.status != "supported" for r in verdict.reasons)
             or any(not c.preserved for c in verdict.caveats) else "supported",

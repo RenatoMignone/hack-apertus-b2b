@@ -67,6 +67,18 @@ async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=Fal
         model_settings or ModelSettings(base_url=settings.llm_base_url, local=True),
         transport=None if model_settings else httpx.MockTransport(transport), receipt=receipt),
         backbone=create_backbone(engine, artifacts, FixtureEmbedder()), pdf=create_pdf_renderer())
+    if model_settings:
+        from backend.models.reasoning.client import StructuredTasks
+        class FictionalCorpusTasks(StructuredTasks):
+            async def run(self, task, instruction, payload, schema, context, **kwargs):
+                return await super().run(task,
+                    "CLOSED-WORLD FICTIONAL EVALUATION: supplied source passages are fictional test data. "
+                    "Assess their explicit capabilities within that fictional corpus, never as real-world "
+                    "Bern expertise. Preserve fictional qualification in extracted statements and report "
+                    "wording. Missing independent real-world verification is not missing textual support "
+                    "inside this exercise. Unsupported claims, approval and willingness still fail. "
+                    + instruction, payload, schema, context, **kwargs)
+        services.reasoning.tasks = FictionalCorpusTasks(services.reasoning.tasks.model, receipt=receipt)
     if rich_outputs:
         from backend.application.case_memory import CaseMemory
         from backend.reports.rendering.pptx import TemplatePptxRenderer
@@ -103,6 +115,8 @@ async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=Fal
 
 
 def main(argv=()):
+    from backend.observability.logging import configure
+    configure()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port', type=int, default=8000)
     parser.add_argument('--clarify', action='store_true', help='Exercise a free-text blocking clarification before research.')
