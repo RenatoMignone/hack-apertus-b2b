@@ -7,6 +7,7 @@ import ChatPanel from '../components/ChatPanel';
 import EvidenceDrawer from '../components/EvidenceDrawer';
 import ExportModal from '../components/ExportModal';
 import Results from '../components/Results';
+import CaseDataControls from '../components/CaseDataControls';
 import RunStepper from '../components/RunStepper';
 import { useToast } from '../components/Toast';
 import { Button, CaseFlags, Skeleton, StatusSelect, useTitle } from '../components/ui';
@@ -326,6 +327,8 @@ export default function CaseWorkspace() {
       <div className="relative flex min-h-0 flex-1">
         <div className="min-w-0 flex-1 overflow-y-auto" id="case-scroll">
           <div className="mx-auto max-w-3xl px-6 pb-16 pt-4">
+            <CaseDataControls key={`${detail.case.id}:${detail.inputId}`} detail={detail}
+              busy={running || selecting || awaitingAnswers || historical} onBusy={setRunning} onChange={setDetail} onStage={setStage} />
             {revision && <JumpBar revision={revision} />}
             {!revision && running && (
               <div className="mx-auto mt-10 max-w-xs rounded-2xl border border-line bg-white p-6">

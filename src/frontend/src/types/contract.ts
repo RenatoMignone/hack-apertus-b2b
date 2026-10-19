@@ -34,6 +34,7 @@ export interface Evidence {
   url: string;
   title: string;
   institution: Institution;
+  institutionLabel?: string;
   fetchedAt: string;
   sourceDate?: string;
   /** Literal passage from the page. */
@@ -58,6 +59,7 @@ export interface ReasonEntry {
   /** Role or function exactly as the source states it (people only). */
   role?: string;
   institution: Institution;
+  institutionLabel?: string;
   /** Organisational hierarchy, top-down, e.g. ["University of Bern", "DBMR", "Bally Lab"]. */
   unitPath?: string[];
   /** Fields of expertise stated by the sources (short tags). */
@@ -106,6 +108,9 @@ export interface SearchTrace {
  * of success (see case_similarity_score in OPERATIONS_PLAN.md).
  */
 export interface SimilarCase {
+  method?: string;
+  indexedAt?: string;
+  differences?: string[];
   caseId: string;
   companyLabel: string;
   score: number;
@@ -162,7 +167,18 @@ export interface DialogueTurn {
   followUp?: FollowUpQuestion;
 }
 
+export interface BusinessContext {
+  planned_jobs?: number | null;
+  investment_amount?: string | null;
+  investment_currency?: string | null;
+  timeline?: string | null;
+}
+
 export interface CaseDetail {
+  memory?: { available: boolean; eligible: boolean };
+  businessContextAvailable?: boolean;
+  businessContext?: BusinessContext;
+  exportFormats?: ('pdf' | 'pptx')[];
   case: CaseSummary;
   revisions: BriefRevision[];
   currentRevisionId?: string;

@@ -41,3 +41,7 @@ assignment for changes and preserve other contributors' work.
 focused read path, outputs and acceptance checks. [Active questions](../../../docs/project/OPEN_QUESTIONS.md)
 own unresolved inputs. Implement scoped behavior against agreed contracts and
 fixtures; coordinate shared schema/config changes. Leave `src/frontend/` untouched.
+
+`persistence/business.py` binds manual plans to immutable inputs. Optional case
+memory and rich outputs require their explicit feature flags and schema tables;
+0008 core remains supported. See [rich outputs](../../../docs/data/RICH_OUTPUTS.md).

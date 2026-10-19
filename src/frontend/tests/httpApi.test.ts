@@ -150,3 +150,51 @@ test('formatting is explicit and unanswered clarification cannot become a new fo
   await assert.rejects(waiting.api.sendMessage('case', 'My answer', () => {}), /Answer the clarification/);
   assert.equal(waiting.calls.filter((call) => call.method === 'POST').length, 0);
 });
+
+test('case history requires current reviewed hash and explicit attestations', async () => {
+  const { api, calls } = harness((url) => url.endsWith('/reviews') ? {review_id:'review'} :
+    {...detail(), memory:{available:true,eligible:false}});
+  await api.setCaseMemory!('case', true, expected);
+  const command = calls.find((c) => c.url.endsWith('/memory'))!.body;
+  assert.deepEqual(command, {eligible:true,expected_revision:3,expected_result_hash:hash,
+    synthetic:false,permitted_context_confirmed:true});
+  await api.setCaseMemory!('case', false);
+  assert.equal(calls.filter((c) => c.url.endsWith('/reviews')).length, 1);
+  const denied = harness(() => ({...detail(false),memory:{available:true,eligible:false}}));
+  await assert.rejects(denied.api.setCaseMemory!('case',true,expected));
+  assert.equal(denied.calls.filter((c) => c.method !== 'GET').length,0);
+});
+
+test('manual business update sends exact operator values and polls replacement run', async () => {
+  const { api, calls } = harness((url, method) => method === 'PUT' ? {status_url:'/api/v1/cases/case/runs/new'} :
+    url.endsWith('/runs/new') ? {status:'succeeded',stage:'done'} : {...detail(),businessContextAvailable:true});
+  const values = {planned_jobs:5,investment_amount:'100.00',investment_currency:'CHF',timeline:'2027, tentative'};
+  await api.setBusinessContext!('case',values,()=>{},3);
+  assert.deepEqual(calls.find((c) => c.method === 'PUT')!.body,
+    {expected_revision:3,values,permitted_context_confirmed:true});
+});
+
+test('advertised PPTX uses authenticated exact review and PPTX download', async () => {
+  const mime = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+  const { api, calls } = harness((url) => {
+    if (url.endsWith('/reviews')) return {review_id:'review'};
+    if (url.endsWith('/exports')) return {status_url:'/api/v1/operations/op'};
+    if (url.endsWith('/operations/op')) return {status:'committed',download_url:'/api/v1/cases/case/exports/pptx/download'};
+    if (url.endsWith('/download')) return new Response('synthetic ZIP', {headers:{'Content-Type':mime}});
+    return {...detail(),exportFormats:['pdf','pptx']};
+  });
+  const result = await api.exportDeck('case',expected,'pptx');
+  assert.equal(result.filename,'bern-report-result.pptx');
+  assert.equal(result.blob.type,mime);
+  assert.equal(calls.find((c) => c.url.endsWith('/exports'))!.body.format,'pptx');
+  const disabled = harness(() => detail());
+  await assert.rejects(disabled.api.exportDeck('case',expected,'pptx'));
+  assert.equal(disabled.calls.filter((c) => c.method !== 'GET').length,0);
+});
+
+
+test('manual plans cannot overwrite an unseen input revision', async () => {
+  const {api,calls} = harness(() => ({...detail(),businessContextAvailable:true,revision:4}));
+  await assert.rejects(api.setBusinessContext!('case',{planned_jobs:5},()=>{},3),ApiError);
+  assert.equal(calls.filter((c) => c.method !== 'GET').length,0);
+});

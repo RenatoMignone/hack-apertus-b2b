@@ -96,6 +96,7 @@ class Commands:
             old_result = case["current_result_id"]
             change = self.repositories(c)[0].edit(access, case_id, expected_revision=body["expected_revision"],
                 instruction=body["text"], kind=body["kind"])
+            self.copy_business_context(c, access, case_id, case["current_input_id"], change["input_id"])
             if body["kind"] == "formatting" and not change["reusable_pack_id"]:
                 raise StaleRevision()
             profile = body.get("profile_id") or self.settings.default_profile_id

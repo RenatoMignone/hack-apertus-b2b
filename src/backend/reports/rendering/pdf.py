@@ -97,6 +97,10 @@ class ReportLabPdfRenderer:
                 if values:
                     story.append(para(label, heading))
                     story.extend(para("- " + value) for value in values)
+        if report.business_context and report.business_context.lines():
+            story.append(para('Company plans', heading))
+            story.append(para('Manually entered operator plans; not actual economic impact', small))
+            story.extend(para(line) for line in report.business_context.lines())
         nums = {e.evidence_id: i + 1 for i, e in enumerate(evidence)}
         for index, reason in enumerate(kept, 1):
             story.append(para(f"{index}. {reason.headline}", heading))

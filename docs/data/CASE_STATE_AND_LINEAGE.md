@@ -88,10 +88,12 @@ completed evidence and prevents late responses from replacing a newer revision.
 | New corpus snapshot | Existing run stays pinned | New run uses new snapshot; never silently refresh a completed answer |
 | Source permission revoked | Only still-authorized material | Block dependent evidence reads; retire/invalidate affected exports and caches |
 
-Reviewed case records can later enter an eligible historical-case dataset through
-the same staging/validation/publication interfaces. Do not publish cases, learn
+Reviewed case records can explicitly enter [own-case memory](CASE_MEMORY.md);
+agency-wide publication remains a separate future authorization/data operation. Do not publish cases, learn
 from user corrections, update taxonomy or embed generated reports automatically.
-No historical dataset currently exists. Unknown outcomes remain unknown.
+No agency-wide historical dataset is supplied. Unknown outcomes remain unknown.
+Manual business plans bind to input revisions and frozen pack/review hashes;
+see [rich outputs](RICH_OUTPUTS.md).
 
 ## Required integration checks
 

@@ -4,8 +4,8 @@
 Additive [integration changes](../team/INTEGRATION.md) advance head to
 `0007_frontend_lifecycle`: 0006 adds restricted case-scope provisioning/private
 runtime RLS, and 0007 adds independent case hold/outcome fields and action notes.
-Optional [own-case memory](CASE_MEMORY.md) adds head `0009_case_memory`; shared
-0008 remains supported while disabled. Historical migrations stay frozen; the shared host has not been migrated here.
+Optional [own-case memory](CASE_MEMORY.md) adds 0009; [manual plans and PPTX](RICH_OUTPUTS.md)
+advance source head to `0010_rich_outputs`. Shared 0008 remains supported while disabled. Historical migrations stay frozen; the shared host has not been migrated here.
 One `navigator` database retains `corpus`, `taxonomy`, `retrieval`, `cases`, `ops`.
 LangGraph and Langfuse retain their own databases/stores. No three application
 DBs or cross-database foreign keys are introduced.
@@ -21,7 +21,7 @@ DBs or cross-database foreign keys are introduced.
 | `cases.reason_selections` | One current editorial selection per reason row; kept/rejected/none; reviewer/time |
 | `cases.action_items` | Action ID → case; question, ask role, open/asked/done and optional answer note |
 | `cases.reviews` | Exact result and immutable selection hash; approval is not truth validation |
-| `cases.exports` | Existing export lineage plus format; PDF first, PPTX later |
+| `cases.exports` | Existing export lineage plus format; reviewed PDF or provisioned PPTX |
 
 Reuse existing entities/claims for organizations, institutes, companies, people,
 units, projects, facilities and services. Relations are supported predicates, not

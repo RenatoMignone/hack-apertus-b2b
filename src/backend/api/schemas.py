@@ -13,6 +13,15 @@ class Input(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
 
+from backend.contracts.business import BusinessContext
+
+
+class BusinessUpdate(Input):
+    expected_revision: int = Field(ge=0)
+    values: BusinessContext
+    permitted_context_confirmed: Literal[True]
+
+
 class CreateCase(Input):
     prompt: str = Field(min_length=1, max_length=50_000)
     profile_id: UUID | None = None
@@ -67,7 +76,7 @@ class Export(Input):
     review_id: UUID
     expected_result_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     expected_selection_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
-    format: Literal["pdf"] = "pdf"
+    format: Literal["pdf", "pptx"] = "pdf"
 
 
 class PatchCase(Input):
@@ -184,6 +193,9 @@ class Turn(BaseModel):
 
 
 class CaseDetail(BaseModel):
+    businessContextAvailable: bool = False
+    businessContext: dict = Field(default_factory=dict)
+    exportFormats: list[str] = Field(default_factory=lambda: ["pdf"])
     case: CaseSummary
     revisions: list[BriefRevision]
     currentRevisionId: str | None = None

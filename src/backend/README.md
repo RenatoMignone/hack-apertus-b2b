@@ -97,3 +97,7 @@ version check enabled; the runtime role needs SELECT on `public.alembic_version`
 
 Optional CPU reranking has a separate locked install and explicit asset provisioning:
 [reranker setup](../../docs/data/RERANKING.md). Source downloads never happen at startup.
+
+Optional own-case memory (0009) and manual plans/PPTX (0010) require maintainer
+activation. Both flags default false; the 0008 core remains supported. See
+[activation](../../docs/team/OPTIONAL_FEATURE_ACTIVATION.md).

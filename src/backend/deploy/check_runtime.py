@@ -65,6 +65,8 @@ def main():
             required(configuration.adapter_version == runtime_identity())
             verify_assets(runtime.reranker_model_path, configuration)
         check("reranker configuration/runtime/local asset integrity (not contacted)", reranker)
+    if runtime.rich_outputs_enabled:
+        check('PPTX template exists', lambda: required(Path(runtime.pptx_template_path).is_file()))
     check("PDF logo exists", lambda: required(Path(runtime.pdf_logo_path).is_file()))
 
     def artifacts():
@@ -80,15 +82,17 @@ def main():
 
         for binding in runtime.bindings:
             def database():
-                from alembic.script import ScriptDirectory
-                from backend.data.database import migration_config
+                from backend.data.database import check_schema
                 engine = engine_for(os.environ[binding.database_url_env])
                 try:
+                    check_schema(engine)
                     with engine.connect() as connection:
                         connection.execute(text("SET TRANSACTION READ ONLY"))
                         connection.execute(text("SET LOCAL statement_timeout = '5s'"))
-                        revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
-                        required(revision == ScriptDirectory.from_config(migration_config()).get_current_head())
+                        for enabled, table in ((runtime.case_memory_enabled, 'cases.memory_profiles'),
+                                (runtime.rich_outputs_enabled, 'cases.business_contexts')):
+                            if enabled:
+                                required(connection.execute(text('SELECT to_regclass(:table) IS NOT NULL'), {'table':table}).scalar_one())
                         required(connection.execute(text("SELECT 1 FROM ops.principals WHERE "
                             "principal_id=:id AND namespace=:ns AND database_role=session_user AND active"),
                             {"id": binding.principal_id, "ns": binding.namespace}).scalar())

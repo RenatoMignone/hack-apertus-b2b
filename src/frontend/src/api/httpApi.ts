@@ -177,13 +177,42 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
         { selection, expected_result_hash: result.resultHash });
       emit(); return requireCase(caseId);
     },
+    async setCaseMemory(caseId, eligible, expected) {
+      const detail = await requireCase(caseId);
+      if (!detail.memory?.available) throw new Error('Case comparison is unavailable.');
+      let resultHash: string | undefined;
+      if (eligible) {
+        const result = current(detail);
+        if (!expected || result.id !== expected.resultId || result.resultHash !== expected.resultHash) throw new ApiError(409, 'stale_revision');
+        if (!detail.selectionHash || !result.reasons.some((r) => r.selection === 'kept') || result.reasons.some((r) => r.selection === 'none')) {
+          throw new Error('Review every item and keep at least one before adding this case to your history.');
+        }
+        await request(`${path(caseId)}/reports/${result.id}/reviews`, 'POST', { decision: 'accepted',
+          expected_result_hash: result.resultHash, expected_selection_hash: detail.selectionHash });
+        resultHash = result.resultHash;
+      }
+      await request(`${path(caseId)}/memory`, 'POST', { eligible, expected_revision: detail.revision,
+        ...(eligible ? { expected_result_hash: resultHash, synthetic: false, permitted_context_confirmed: true } : {}) });
+      emit(); return requireCase(caseId);
+    },
+    async setBusinessContext(caseId, values, onStage, expectedRevision) {
+      const detail = await requireCase(caseId);
+      if (!detail.businessContextAvailable) throw new Error('Manual business fields are unavailable.');
+      if (expectedRevision === undefined || detail.revision !== expectedRevision) throw new ApiError(409, 'stale_revision');
+      const queued = await request<Accepted>(`${path(caseId)}/business-context`, 'PUT', {
+        expected_revision: detail.revision, values, permitted_context_confirmed: true });
+      if (!queued.status_url) throw new Error('The server did not return a research run.');
+      return poll(caseId, queued.status_url, onStage);
+    },
     setStatus: (caseId, status) => patch(caseId, { status }),
     setCurrentRevision: (caseId, revisionId) => patch(caseId, { current_revision_id: revisionId }),
     setCaseFlags: (caseId, flags) => patch(caseId, {
       ...('onHold' in flags ? { on_hold: flags.onHold ?? false } : {}),
       ...('outcome' in flags ? { outcome: flags.outcome ?? null } : {}),
     }),
-    async exportDeck(caseId, expected) {
+    async exportDeck(caseId, expected, format = 'pdf') {
+      const supported = (await requireCase(caseId)).exportFormats ?? ['pdf'];
+      if (!supported.includes(format)) throw new Error('This export format is unavailable on the server.');
       const detail = await requireCase(caseId), result = current(detail);
       if (!expected || expected.resultId !== result.id || expected.resultHash !== result.resultHash) {
         throw new ApiError(409, 'stale_revision');
@@ -197,18 +226,19 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
         expected_result_hash: result.resultHash, expected_selection_hash: detail.selectionHash });
       const queued = await request<{ status_url: string }>(`${path(caseId)}/exports`, 'POST', {
         result_id: result.id, review_id: review.review_id, expected_result_hash: result.resultHash,
-        expected_selection_hash: detail.selectionHash, format: 'pdf' });
+        expected_selection_hash: detail.selectionHash, format });
       for (let n = 0; n < maxPolls; n++) {
         const operation = await request<Operation>(queued.status_url);
         if (operation.status === 'failed') throw new ApiError(409, operation.error_code ?? 'service_unavailable');
         if (operation.status === 'committed' && operation.download_url) {
           const blob = await request<Blob>(operation.download_url, 'GET', undefined, true);
-          if (!blob.type.startsWith('application/pdf')) throw new Error('The server did not return a PDF.');
-          return { filename: `bern-report-${result.id}.pdf`, blob };
+          const mime = format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+          if (!blob.type.startsWith(mime)) throw new Error('The server returned an unexpected export format.');
+          return { filename: `bern-report-${result.id}.${format}`, blob };
         }
         await pause(pollInterval);
       }
-      throw new Error('PDF rendering is still pending. Try exporting again shortly.');
+      throw new Error('Report rendering is still pending. Try exporting again shortly.');
     },
     async listActionItems() { return request<ActionItem[]>('/api/v1/action-items'); },
     async setActionStatus(id, status, answer) {

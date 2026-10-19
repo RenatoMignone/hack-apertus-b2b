@@ -67,6 +67,8 @@ class RuntimeSettings:
     web_browser_executable: str = ""
     web_browser_timeout_seconds: int = 25
     web_crawl4ai_python: str = ""
+    rich_outputs_enabled: bool = False
+    pptx_template_path: str = ""
     case_memory_enabled: bool = False
     case_memory_min_score: float = 50
 
@@ -147,5 +149,7 @@ class RuntimeSettings:
             web_browser_executable=os.getenv("WEB_BROWSER_EXECUTABLE", ""),
             web_browser_timeout_seconds=int(os.getenv("WEB_BROWSER_TIMEOUT_SECONDS", "25")),
             web_crawl4ai_python=os.getenv("WEB_CRAWL4AI_PYTHON", ""),
+            rich_outputs_enabled=os.getenv("RUNTIME_RICH_OUTPUTS_ENABLED", "false").lower() == "true",
+            pptx_template_path=os.getenv("RUNTIME_PPTX_TEMPLATE_PATH", ""),
             case_memory_enabled=os.getenv('CASE_MEMORY_ENABLED', '').lower() in {'1', 'true', 'yes'},
             case_memory_min_score=float(os.getenv('CASE_MEMORY_MIN_SCORE', '50')))

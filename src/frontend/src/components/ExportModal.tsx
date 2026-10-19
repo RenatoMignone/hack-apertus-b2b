@@ -20,16 +20,17 @@ export default function ExportModal({ detail, revision, onClose }: { detail: Cas
   const toast = useToast();
   const kept = keptOf(revision);
   const unreviewed = revision.reasons.filter((r) => r.selection === 'none').length;
-  const pdfAvailable = apiMode === 'mock' || serverFormats().includes('pdf');
+  const formats = detail.exportFormats ?? serverFormats();
+  const pdfAvailable = apiMode === 'mock' || formats.includes('pdf');
 
   const run = async (format: Format) => {
     setBusy(format);
     try {
-      assertExportAllowed(revision, apiMode, format);
+      assertExportAllowed(revision, apiMode, format, formats.filter((f): f is Format => f === 'pdf' || f === 'pptx'));
       if (apiMode === 'http') {
         const { filename, blob } = await api.exportDeck(detail.case.id, {
           resultId: revision.id, resultHash: revision.resultHash!,
-        });
+        }, format);
         download(blob, filename);
         toast(`Downloaded ${filename}`);
         onClose();
@@ -99,7 +100,7 @@ export default function ExportModal({ detail, revision, onClose }: { detail: Cas
           {unreviewed > 0 && <p className="text-sm text-muted">Review all {unreviewed} remaining item(s) before exporting.</p>}
           {!pdfAvailable && <p className="text-sm text-muted">PDF export is unavailable on the connected server.</p>}
           {option('pdf', FileText, 'PDF brief', 'Short company-facing brief with the agency logo and a source appendix.')}
-          {apiMode === 'mock' && option('pptx', Presentation, 'PowerPoint (agency template)', 'Editable demo slides in the agency design, ready to adjust.')}
+          {(apiMode === 'mock' || formats.includes('pptx')) && option('pptx', Presentation, 'PowerPoint (agency template)', apiMode === 'mock' ? 'Editable demo slides.' : 'Reviewed content and source passages in editable agency slides.')}
         </div>
       </div>
     </div>

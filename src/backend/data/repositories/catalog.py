@@ -49,4 +49,6 @@ class CatalogRepository:
             return sorted(scored.values(), key=lambda item: (-item["relevance_score"], str(item["entity_id"])))[:10]
 
     def search_cases(self, access, **kwargs):
+        # Agency-wide published library only; private own-case memory is implemented
+        # by application.case_memory and never widens these catalog permissions.
         return {"status": "unavailable", "hits": [], "reason": "no reviewed historical-case dataset is published"}

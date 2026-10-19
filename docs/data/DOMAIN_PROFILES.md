@@ -27,8 +27,8 @@ this feature. Default pilot configuration remains backward compatible.
 
 Current HTTP badges remain UniBE/ARTORG/DCB/Other for frontend compatibility;
 unknown institutions project to Other with the exact `institutionLabel` retained.
-The frontend owner can adopt that optional label and a neutral badge. PDF/PPTX
-render source-supported names directly. No frontend files changed.
+The frontend now displays that optional label with its existing neutral badge.
+PDF/PPTX render source-supported names directly.
 
 Verification: a materials/manufacturing profile passes actual structured service
 validation with synthetic model output; unsupplied field codes are rejected.

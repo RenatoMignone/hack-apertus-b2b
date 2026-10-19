@@ -151,13 +151,19 @@ class Worker:
             await self.db("validate_evidence", access, prepared["run_id"], evidence)
             report = PdfInput(result_id=result_id, review_id=UUID(command["review_id"]),
                 result_hash=prepared["result_hash"], selection_hash=prepared["selection_hash"], draft=draft,
-                interpretation=pack.interpretation, claims=claims,
+                interpretation=pack.interpretation, business_context=pack.coverage.get("operator_business_context") or None, claims=claims,
                 kept_reason_keys=prepared["kept"], evidence=evidence, limitations=pack.gaps,
                 template_version=self.store.settings.template_version)
-            data = await self.services.pdf.render(report)
-        if not isinstance(data, bytes) or not data.startswith(b"%PDF-") or len(data) > 20_000_000:
+            format = command.get('format', 'pdf')
+            renderer = self.services.pptx if format == 'pptx' else self.services.pdf
+            if renderer is None:
+                raise ServiceUnavailable()
+            data = await renderer.render(report)
+        from backend.reports.rendering.pptx import MIME as PPTX_MIME
+        signature = b'PK\x03\x04' if format == 'pptx' else b'%PDF-'
+        if not isinstance(data, bytes) or not data.startswith(signature) or len(data) > 20_000_000:
             raise EvidenceRejected()
-        reference = await asyncio.to_thread(self.store.artifacts.put, data, "application/pdf")
+        reference = await asyncio.to_thread(self.store.artifacts.put, data, PPTX_MIME if format == "pptx" else "application/pdf")
         await asyncio.to_thread(self.store.artifacts.read, reference)
         export_id = await self.db("register_export", access, job, reference, data)
         return {"export_id": str(export_id), "download_url": f"/api/v1/cases/{case_id}/exports/{export_id}/download"}

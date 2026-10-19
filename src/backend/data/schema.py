@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 from pgvector.sqlalchemy import Vector
 
 
-SCHEMA_REVISION = "0009_case_memory"
+SCHEMA_REVISION = "0010_rich_outputs"
 
 metadata = MetaData(naming_convention={"ix": "ix_%(table_name)s_%(column_0_name)s",
                                       "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -174,6 +174,9 @@ active_snapshots = Table("active_snapshots", metadata, uid("profile_id", "taxono
                          uid("snapshot_id", "corpus.snapshots.snapshot_id"), schema="corpus")
 inputs = table("cases", "input_revisions", "input_id", uid("case_id", "cases.cases.case_id"),
                uid("parent_id", "cases.input_revisions.input_id", nullable=True), value("message"))
+business_contexts = table('cases', 'business_contexts', 'context_id',
+    uid('case_id', 'cases.cases.case_id'), uid('input_id', 'cases.input_revisions.input_id'),
+    uid('entered_by', 'ops.principals.principal_id'), payload(), UniqueConstraint('input_id'))
 runs = table("cases", "runs", "run_id", uid("case_id", "cases.cases.case_id"), uid("input_id", "cases.input_revisions.input_id"),
              uid("snapshot_id", "corpus.snapshots.snapshot_id"), uid("thread_id"), state(), payload("configuration"),
              value("trace_id", nullable=True), value("last_successful_stage", nullable=True), value("failure_reason", nullable=True),

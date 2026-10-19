@@ -40,6 +40,10 @@ class RuntimeApplication:
             for revision in projected['revisions']:
                 revision['similarCases'] = []
             projected['memory'] = {'available': False, 'eligible': False}
+        projected['businessContext'] = await self.execute('business_context', access, case_id)
+        rich = await self.execute('rich_outputs_available')
+        projected['businessContextAvailable'] = rich
+        projected['exportFormats'] = await self.export_formats()
         current = data["case"]["current_result_id"]
         if current:
             projected["selectionHash"] = await self.execute("selection_state", access, case_id, current)
@@ -47,6 +51,16 @@ class RuntimeApplication:
         if run_id:
             projected["currentRun"] = await self.execute("run_view", access, case_id, run_id)
         return projected
+
+    async def export_formats(self):
+        from backend.application.adapters import Unavailable
+        settings = self.store.settings
+        if settings.template_version in {'', 'unconfigured'} or settings.renderer_version in {'', 'unconfigured'}:
+            return []
+        formats = [] if isinstance(self.services.pdf, Unavailable) else ['pdf']
+        if self.services.pptx and self.services.pptx.available() and await self.execute('rich_outputs_available'):
+            formats.append('pptx')
+        return formats
 
     async def list_cases(self, access, *, limit=50, offset=0):
         data = await self.execute("case_rows", access, limit=limit, offset=offset)

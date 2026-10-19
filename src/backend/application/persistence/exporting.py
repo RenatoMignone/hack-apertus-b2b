@@ -43,6 +43,9 @@ class Exporting:
         if self.settings.template_version in {"", "unconfigured"} or self.settings.renderer_version in {"", "unconfigured"}:
             from backend.contracts.services import ServiceUnavailable
             raise ServiceUnavailable()
+        if body.get('format', 'pdf') == 'pptx' and not self.rich_outputs_available():
+            from backend.contracts.services import ServiceUnavailable
+            raise ServiceUnavailable()
         # Initial check is repeated inside the command transaction and before/after rendering.
         def callback(c):
             data = self.export_input_bound(c, access, case_id, result_id, body)
@@ -63,7 +66,7 @@ class Exporting:
         with self.session(access) as c:
             self.export_input_bound(c, access, case_id, result_id, body)
             old = c.execute(select(t.exports.c.export_id).where(t.exports.c.result_id == result_id,
-                t.exports.c.review_id == UUID(body["review_id"]), t.exports.c.status == "ready",
+                t.exports.c.review_id == UUID(body["review_id"]), t.exports.c.format == body.get("format", "pdf"), t.exports.c.status == "ready",
                 t.exports.c.selection_hash == body["expected_selection_hash"],
                 t.exports.c.template_version == self.settings.template_version,
                 t.exports.c.renderer_version == self.settings.renderer_version)).scalar_one_or_none()
@@ -72,7 +75,7 @@ class Exporting:
             # The already written/read bytes are local here; no object/network operation under SQL locks.
             return self.repositories(c)[0].record_export(access, result_id, UUID(body["review_id"]), reference,
                 artifacts=VerifiedBytes(reference, data), template_version=self.settings.template_version,
-                renderer_version=self.settings.renderer_version)
+                renderer_version=self.settings.renderer_version, format=body.get("format", "pdf"))
 
     def download(self, access, case_id, export_id):
         with self.session(access) as c:

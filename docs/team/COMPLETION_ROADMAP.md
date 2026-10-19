@@ -12,7 +12,7 @@ comes first; agency-wide sharing is deferred. Confidential documents remain out.
 | 3 | Own-case similarity | Complete backend; optional migration/activation pending |
 | 4 | Domain-independent configuration | Complete backend; profile onboarding documented |
 | 5 | Local DB/web and actual checkpoint restart tests | Complete isolated acceptance; real deployment acceptance remains |
-| 6 | Reviewed PPTX and richer attributed case/output fields | Queued |
+| 6 | Reviewed PPTX and richer attributed case/output fields | Complete backend/frontend; optional host activation pending |
 
 ## Checkpoint 1
 
@@ -60,3 +60,23 @@ corpus/taxonomy/index provisioning remains an explicit owner operation.
 PostgreSQL checkpoints and a separate resumed process, plus combined controlled
 public-PDF fetching/DB deduplication and case-local provenance. Synthetic providers
 and disposable DB only; deployment-host and live upstream checks remain distinct.
+
+## Checkpoint 6
+
+[Manual plans and reviewed PPTX](../data/RICH_OUTPUTS.md) bind operator-entered
+figures to immutable input/pack/review revisions. The user subsequently authorized
+frontend edits: history opt-in/out, generic institution labels, manual fields and
+server PPTX are now connected. Earlier handoffs described their prior ownership
+boundary. Synthetic browser plan-save/new revision/review/PPTX completed. A
+seven-slide fixture rendered in LibreOffice with the supplied logo/style intact.
+
+Source head is 0010; shared services remain at their previously verified head.
+Both new feature flags default false. [Eric's complete activation prompt](OPTIONAL_FEATURE_ACTIVATION.md)
+owns the backup/migration/asset/flag/restart checks. Read-only readiness passed
+again without changing his host. Real-provider combined DB/web quality, reviewed
+recall labels, similarity calibration and demonstrated target deployment remain.
+
+Final verification: **267 backend tests passed** with disposable PostgreSQL;
+**20 frontend transport/policy tests passed**, and the frontend production build
+passed. Focused final capability/history/manual-output checks also passed.
+Provider quality, human labels and shared feature activation are not implied.

@@ -1,9 +1,9 @@
 # Exact application schema reference
 
-Generated from `src/backend/data/schema.py`; migration head **`0009_case_memory`**.
+Generated from `src/backend/data/schema.py`; migration head **`0010_rich_outputs`**.
 Do not edit by hand. Regenerate with `PYTHONPATH=src python -m backend.data.schema_docs`.
 
-**64 application tables.** Read [schema decisions](RELATIONAL_SCHEMA.md) and
+**65 application tables.** Read [schema decisions](RELATIONAL_SCHEMA.md) and
 [ingestion/retrieval handoff](INGESTION_RETRIEVAL_HANDOFF.md) for meanings and write order.
 Only these tables are supported for new queries. `alembic_version` is migration-owned;
 optional `legacy` history is maintainer-only. Framework tables live outside this database.
@@ -613,6 +613,24 @@ Primary key: `answer_id`.
 - Unique: `question_id`.
 - Index: `question_id`.
 - Index: `turn_id`.
+
+### `cases.business_contexts`
+
+| Column | Type | Required | Default | References |
+| --- | --- | --- | --- | --- |
+| `context_id` | `UUID` | yes | `—` | — |
+| `created_at` | `TIMESTAMP WITH TIME ZONE` | yes | `now()` | — |
+| `case_id` | `UUID` | yes | `—` | cases.cases.case_id |
+| `input_id` | `UUID` | yes | `—` | cases.input_revisions.input_id |
+| `entered_by` | `UUID` | yes | `—` | ops.principals.principal_id |
+| `payload` | `JSONB` | yes | `'{}'::jsonb` | — |
+
+Primary key: `context_id`.
+
+- Unique: `input_id`.
+- Index: `case_id`.
+- Index: `entered_by`.
+- Index: `input_id`.
 
 ### `cases.case_evidence_items`
 

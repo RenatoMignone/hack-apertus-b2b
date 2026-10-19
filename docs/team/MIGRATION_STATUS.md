@@ -132,3 +132,11 @@ The LF checkout rule and host rewrite instructions are now in
 host-side verification before retiring the private override. The shared hosted
 encoder is implemented and protocol/parity tested: [HF handoff](../data/HOSTED_EMBEDDINGS.md).
 The recorded migration results above retain their original scope.
+
+## Optional release prepared — 19 October 2026
+
+Source now includes 0009_case_memory and 0010_rich_outputs. These were tested on
+disposable PostgreSQL only; this task did not migrate the shared host. Current
+runtime explicitly accepts 0008 core while both optional flags are false. Eric's
+[activation prompt](OPTIONAL_FEATURE_ACTIVATION.md) owns backup/migration and
+per-host feature enablement. The earlier host measurements above remain dated.

@@ -3,7 +3,12 @@
 19 October 2026. The backend research completion and frontend integration audit
 are integrated into main. See the [backend acceptance](../team/BACKEND_RESEARCH_COMPLETION.md),
 [frontend audit](../team/FRONTEND_RUNTIME_AUDIT.md) and
-[current checklist](../team/RUNTIME_CHECKLIST.md). Earlier handoffs are dated
+[current checklist](../team/RUNTIME_CHECKLIST.md). The [ordered completion roadmap](../team/COMPLETION_ROADMAP.md) adds retrieval
+evaluation, curation tools, own-case memory, domain profiles, process recovery,
+manual plans and reviewed PPTX, with connected frontend controls. Optional source
+head is `0010_rich_outputs`; shared host last verified at 0008.
+[Eric must activate the optional features](../team/OPTIONAL_FEATURE_ACTIVATION.md);
+flags remain false until migration/assets are ready. Earlier handoffs are dated
 measurements, not the current backlog.
 
 | Area | Implemented / measured | Still needed |
@@ -14,7 +19,7 @@ measurements, not the current backlog.
 | Research | Independent lexical/vector + RRF, bounded novel gap queries, retained evidence/claims and exact source-context expansion | Combined real DB/web deduplication/provenance acceptance |
 | Reranking | Pinned multilingual CPU model, integrity manifest, exact windows; actual 30-hit retrieval probe passed | Human-reviewed RRF/reranker quality and controlled latency comparison; other-host packaging |
 | Search lineage | Actual query → canonical evidence paths stored in pack; browser diagram/text fallback verified synthetically | Real-corpus UI review; no invented ontology mappings |
-| Frontend | HTTP default, free-text clarification, draft retry, explicit rewrite mode, read-only history, source quotes, exact review/export gates | Evidence-backed optional hierarchy/expertise fields and connected PPTX |
+| Frontend | HTTP, clarification/retry/rewrite/history, source quotes, exact PDF/PPTX review/export, optional manual plans and own-case opt-in | Optional feature activation; richer evidence-backed hierarchy/expertise metadata |
 | Access | Elia’s pinned key-only SSH, DB binding/schema, checkpoints, separate MinIO credentials and source-artifact hash pass | Server SSH policy and direct checkpoint row-isolation review |
 | Operations / target | Local API/worker, readiness and actual reviewed PDF pass; automated recovery tests | Controlled target-host restart/resume, supervision, retention/restore and demonstrated required deployment target |
 
@@ -46,7 +51,7 @@ Checkpoint logins still share rows; separate usernames do not establish isolatio
    Renato repeats the fictional Helvetic case with his configured web services.
 2. Review named experts/facilities, direct versus adjacent relevance, exact source
    support and combined DB/web deduplication. Improve coverage without inventing data.
-3. Demonstrate controlled worker restart/resume against PostgreSQL checkpoints.
+3. Repeat the verified disposable subprocess crash/resume on the selected deployment host.
 4. Build reviewed evaluation cases; measure recall, factual support, reranking
    relevance and latency. Synthetic engineering checks are not gold labels.
 5. Choose and demonstrate the required target architecture. Connected Keera/HF
@@ -54,3 +59,18 @@ Checkpoint logins still share rows; separate usernames do not establish isolatio
 
 Keep docs/team for current integration evidence and historical ownership records.
 Start fresh feature branches from updated main; do not reset completed lanes.
+
+## Optional completion release
+
+Own-case comparison uses explicitly eligible reviewed non-synthetic cases only;
+no automatic agency library, pitch learning or success probabilities. Domain
+vocabularies come from pinned profile configuration. Curation is dry-run-first,
+with immutable reviewed claim successors and audit provenance. Candidate evaluation
+labels remain unreviewed, so no Recall@10/quality score is claimed. Manual plans
+are operator inputs, not model estimates or economic impact. New features are
+covered by isolated tests/browser verification; no shared corpus/migration changed.
+
+Final verification: **267 backend tests passed** with disposable PostgreSQL;
+**20 frontend transport/policy tests passed**, and the frontend production build
+passed. Focused final capability/history/manual-output checks also passed.
+Provider quality, human labels and shared feature activation are not implied.

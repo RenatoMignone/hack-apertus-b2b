@@ -207,8 +207,9 @@ class CaseRepository:
 
     def record_export(self, access, result_id, review_id, reference, *, artifacts, template_version, renderer_version, format="pdf"):
         from backend.data.repositories.corpus import save_artifact
-        if format != "pdf" or reference.mime != "application/pdf":
-            raise ValueError("only PDF export is supported; rendering is a future adapter")
+        from backend.reports.rendering.pptx import MIME as PPTX_MIME
+        if format not in {'pdf', 'pptx'} or reference.mime != {'pdf':'application/pdf', 'pptx':PPTX_MIME}[format]:
+            raise ValueError('export format and MIME must agree')
         artifacts.read(reference)
         with transaction(self.engine, access) as connection:
             result = connection.execute(select(tables.results).where(tables.results.c.result_id == result_id)).mappings().one()

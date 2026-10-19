@@ -1,5 +1,6 @@
 """Pure projections onto the existing React contract; transport wiring is separate."""
 from backend.contracts.pipeline import DraftReason, FetchedSource
+from backend.contracts.business import BusinessContext
 
 
 def reason_view(reason: DraftReason, claims: dict, selection="none") -> dict:
@@ -58,10 +59,12 @@ def case_view(data, evidence):
                 "person": "people", "project": "projects", "facility": "infrastructure",
                 "service": "infrastructure"}.get(primary, "groups")
             reasons.append(view)
+        business = BusinessContext.model_validate(pack.coverage.get('operator_business_context', {}))
         revisions.append({"id": str(row["result_id"]), "version": version,
             "parentId": str(row["parent_id"]) if row["parent_id"] else None, "createdAt": row["created_at"].isoformat(),
             "changeNote": draft.change_note, "changedReasonIds": [r["id"] for r in reasons],
-            "company": {"summary": pack.interpretation.company_summary, "facts": []},
+            "company": {"summary": pack.interpretation.company_summary, "facts":
+                (["Operator-entered plans; not independently verified", *business.lines()] if business.lines() else [])},
             "reasons": reasons, "openQuestions": public_limitations(draft.open_questions),
             "similarCases": pack.coverage.get('similar_cases', []),
             "trace": pack.coverage.get("search_trace", draft.trace),

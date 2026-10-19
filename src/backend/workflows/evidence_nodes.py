@@ -123,7 +123,10 @@ class PipelineNodes(ResearchNodes):
         canonical = [EvidenceRecord.model_validate(record) for record in state["claim_evidence"]
                      if UUID(record["evidence_id"]) in used]
         trace = search_trace(execution.context.input_id, state.get("search_observations", []), research.evidence, canonical)
-        pack = pack.model_copy(update={"coverage": {**pack.coverage, "search_trace": trace}})
+        business = await asyncio.to_thread(self.store.business_context, execution.context.access,
+            execution.context.case_id, execution.context.input_id)
+        pack = pack.model_copy(update={"coverage": {**pack.coverage, "search_trace": trace,
+            "operator_business_context": business}})
         saved = await asyncio.to_thread(self.store.save_pack, execution.context.access, execution.context.run_id, pack, assessment)
         return {**saved, "pack": pack.model_dump(mode="json")}
 

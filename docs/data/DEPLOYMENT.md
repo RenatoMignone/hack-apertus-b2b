@@ -1,7 +1,8 @@
 # Data services, shared access and recovery
 
 Application/API, worker, adapters, PDF and HTTP frontend are integrated.
-Application head is **`0008_live_corpus`**. Start at the
+Source head is **`0010_rich_outputs`**; shared host last verified at 0008.
+Optional features stay disabled until [maintainer activation](../team/OPTIONAL_FEATURE_ACTIVATION.md). Start at the
 [first live run checklist](LIVE_SETUP.md) for existing deployments and Mac-to-host
 setup. A new data stack follows the commands below; do not reinitialize Eric's
 existing secrets/volumes. The earlier [migration](../team/MIGRATION_STATUS.md) reached 0007;
@@ -228,7 +229,7 @@ References: [Docker WSL2](https://docs.docker.com/desktop/features/wsl/),
 
 ## Schema upgrades and measured history
 
-Always target the current Alembic head, now `0008_live_corpus`; the
+For a maintainer-authorized upgrade target current Alembic head, now `0010_rich_outputs`; the
 [runbook](LIVE_SETUP.md#2-upgrade-only-if-behind-eric-or-his-delegated-operator)
 explains migration credentials and sequencing. Migration 0005 archives populated
 retired structures; 0006 adds restricted case-scope/runtime access; 0007 adds UI

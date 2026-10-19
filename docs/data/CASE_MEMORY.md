@@ -16,10 +16,13 @@ accepted review must bind that result and selection hash. This is a trusted
 operator declaration; it cannot establish source truth or detect fictional text.
 Disabling requires `eligible:false` and the current `expected_revision`.
 
+The HTTP frontend provides explicit permitted/non-synthetic opt-in after all-card
+review, plus opt-out; fictional/demo cases must remain excluded.
+
 Case detail exposes `memory:{available,eligible}`. Frozen report revisions expose
 `similarCases` with case/memory/input/result IDs, index date, score, method,
 shared literal needs, current-case needs absent from that profile, and any known
-outcome at indexing. A later input revision makes the old profile ineligible;
+outcome/status observed during matching (then frozen with the report). A later input revision makes the old profile ineligible;
 opt-out hides references on subsequent authorized reads. Previously downloaded
 artifacts are not recalled. Reindex explicitly after new review/configuration.
 
@@ -45,4 +48,6 @@ does not prevent a supported core report.
 
 Verification: disposable PostgreSQL migration/schema, reviewed opt-in, vector reuse,
 owner rejection, frozen matching, revocation and existing PDF pipeline tests.
-No shared migration, indexing or grant was performed.
+No shared migration, indexing or grant was performed. The old catalog
+`search_cases` port remains reserved for an agency-wide published dataset; the
+own-case service is a separate private opt-in feature.

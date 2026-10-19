@@ -181,4 +181,4 @@ class ExportRequest(Contract):
     review_id: UUID
     expected_result_hash: str
     expected_selection_hash: str
-    format: Literal["pdf"] = "pdf"
+    format: Literal["pdf", "pptx"] = "pdf"

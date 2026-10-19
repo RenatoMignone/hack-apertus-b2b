@@ -51,3 +51,8 @@ needed when the profile lacks a taxonomy pin. See [live runtime](../../../docs/d
 
 [Local reranker setup](../../../docs/data/RERANKING.md) pins assets/runtime separately
 from embeddings. Changing reranker weights does not re-encode the corpus.
+
+`domain.py` validates a pinned profile’s `configuration.domain` vocabulary; it
+does not filter vector eligibility. Optional flags `CASE_MEMORY_ENABLED` and
+`RUNTIME_RICH_OUTPUTS_ENABLED` default false until maintainer migrations/assets.
+`RUNTIME_PPTX_TEMPLATE_PATH` is an explicit deployment asset path.

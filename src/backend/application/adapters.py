@@ -22,9 +22,9 @@ def load_factory(spec, *, settings, engine, artifacts):
 
 
 class Services:
-    def __init__(self, *, reasoning, backbone, web=None, pdf=None, memory=None):
+    def __init__(self, *, reasoning, backbone, web=None, pdf=None, memory=None, pptx=None):
         self.reasoning, self.backbone, self.web, self.pdf = reasoning, backbone, web, pdf or Unavailable()
-        self.memory = memory
+        self.memory, self.pptx = memory, pptx
 
     @classmethod
     def configured(cls, settings, engine, artifacts):
@@ -35,6 +35,9 @@ class Services:
             pdf=adapter(settings.pdf_factory))
         from backend.application.factories import connect_observations
         connect_observations(services.backbone, services.web)
+        if settings.rich_outputs_enabled:
+            from backend.reports.rendering.pptx import TemplatePptxRenderer
+            services.pptx = TemplatePptxRenderer(settings.pptx_template_path or None)
         if settings.case_memory_enabled:
             from backend.application.case_memory import CaseMemory
             from backend.application.factories import ConfiguredEmbedding

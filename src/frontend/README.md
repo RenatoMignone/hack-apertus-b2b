@@ -21,7 +21,7 @@ reconnecting; server jobs continue independently and active run polling resumes.
 Do not put tokens, model keys or database credentials in `VITE_*` or git.
 
 `NavigatorApi` is implemented by `api/httpApi.ts`: real run polling, durable
-clarifications, exact report/selection hashes, authenticated PDF download,
+clarifications, exact report/selection hashes, authenticated PDF/PPTX download when provisioned,
 persisted hold/outcome flags and action notes. Chat explicitly selects new focus/research or rewriting the existing report.
 Blocking clarification supports free text and server choices; it resumes the same
 run. Failed drafting retries the existing frozen pack instead of retrieving again. Source badges
@@ -30,11 +30,17 @@ distinguish new web research; absent lineage is explicitly unavailable.
 For the original seeded demo only, set `VITE_API_MODE=mock` in an ignored
 `.env.local` and restart Vite. Its browser PDF/PowerPoint exports and localStorage are demo-only. The board is
 home; the standalone desk/action screens were removed. All cards must be reviewed
-and at least one kept for export. HTTP mode retains server-authorized PDF;
-connected PowerPoint is pending backend support. Hierarchy/expertise/missing-field displays are optional and are not yet fully
+and at least one kept for export. HTTP mode uses server-authorized exports;
+optional PPTX, manual company plans and own-case comparison require backend activation. Hierarchy/expertise/missing-field displays are optional and are not yet fully
 populated by the backend. Facilities/services use their actual entity categories.
 History browsing is read-only; selection/export applies only to the current report.
 No-match results retain their caveats. The connection checks API compatibility and
-server export formats; connected PowerPoint stays unavailable.
+server export formats; unavailable features stay hidden.
 An HTTP failure never switches to mocks. The connection token and live case
 content are never saved by the frontend to localStorage.
+
+Manual plans use explicit operator confirmation and start a new input/review cycle.
+Case comparison requires a real permitted case and exact reviewed report; no demo
+case is automatically indexed. Institution labels outside the pilot use a neutral
+badge. See [rich outputs](../../docs/data/RICH_OUTPUTS.md) and
+[own-case memory](../../docs/data/CASE_MEMORY.md).

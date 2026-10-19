@@ -1,6 +1,6 @@
 # Final application schema
 
-**18 October 2026 · Contract v1 finalized at 0005; source head `0008_live_corpus`.**
+**18 October 2026 · Contract v1 finalized at 0005; source head `0010_rich_outputs`; shared host last verified at 0008.**
 This is the schema for the agreed case → research → evidence pack → draft →
 reason review → PDF pipeline. The executable table definitions are
 [`schema.py`](../../src/backend/data/schema.py); the generated
@@ -18,6 +18,9 @@ capture ready public chunks while ingestion continues, without publication or an
 active pointer. `navigator_runtime` reads public scopes and writes owned case
 evidence/reports. See [live runtime](LIVE_CORPUS_RUNTIME.md); source head does not
 itself confirm deployment on a particular host.
+
+Optional [case memory](CASE_MEMORY.md) (0009) and [manual plans/PPTX](RICH_OUTPUTS.md)
+(0010) are disabled until maintainer activation. Core 0008 compatibility is explicit.
 
 ## Tables retained and why
 

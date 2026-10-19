@@ -13,9 +13,9 @@ router = APIRouter(prefix="/api/v1")
 @router.get("/capabilities")
 async def capabilities(request: Request, who: Actor = Depends(actor)):
     settings = request.app.state.registry.settings
+    formats = await who.application.export_formats()
     return {"schema_version": "1", "service_contract_version": "1", "deployment_mode": settings.mode,
-        "formats": ["pdf"] if (settings.pdf_factory and settings.template_version != "unconfigured"
-            and settings.renderer_version != "unconfigured") else [], "frontend_transport": "polling",
+        "formats": formats, "frontend_transport": "polling",
         "reasoning_configured": bool(settings.reasoning_factory), "backbone_configured": bool(settings.backbone_factory),
         "web_configured": settings.mode == "connected" and bool(settings.web_factory)}
 
@@ -83,6 +83,12 @@ async def create_report(case_id: UUID, body: s.ReportRequest, request: Request, 
     return await who.application.execute("report", who.access, key, case_id, body.model_dump(mode="json"), request.state.request_id)
 
 
+@router.put('/cases/{case_id}/business-context', status_code=202)
+async def business_context(case_id: UUID, body: s.BusinessUpdate, request: Request, who: Actor = Depends(actor), key=Depends(idempotency_key)):
+    return await who.application.execute('set_business_context', who.access, key, case_id,
+        body.model_dump(mode='json'), request.state.request_id)
+
+
 @router.post('/cases/{case_id}/memory')
 async def case_memory(case_id: UUID, body: s.MemoryRequest, who: Actor = Depends(actor), key=Depends(idempotency_key)):
     from backend.contracts.services import ServiceUnavailable
@@ -132,11 +138,14 @@ async def operation(operation_id: UUID, who: Actor = Depends(actor)):
     return await who.application.execute("operation", who.access, operation_id)
 
 
-@router.get("/cases/{case_id}/exports/{export_id}/download", responses={200: {"content": {"application/pdf": {"schema": {"type": "string", "format": "binary"}}}}})
+@router.get("/cases/{case_id}/exports/{export_id}/download", responses={200: {"content": {mime: {"schema": {"type": "string", "format": "binary"}} for mime in ("application/pdf", "application/vnd.openxmlformats-officedocument.presentationml.presentation")}}})
 async def download(case_id: UUID, export_id: UUID, who: Actor = Depends(actor)):
     data = await who.application.execute("download", who.access, case_id, export_id)
-    return Response(data, media_type="application/pdf", headers={
-        "Content-Disposition": f'attachment; filename="bern-report-{export_id}.pdf"', "Cache-Control": "no-store"})
+    record = await who.application.execute('export_view', who.access, case_id, export_id)
+    format = record['format']
+    from backend.reports.rendering.pptx import MIME as PPTX_MIME
+    return Response(data, media_type=PPTX_MIME if format == 'pptx' else 'application/pdf', headers={
+        "Content-Disposition": f'attachment; filename="bern-report-{export_id}.{format}"', "Cache-Control": "no-store"})
 
 
 @router.get("/action-items")

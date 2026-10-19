@@ -3,7 +3,7 @@ import asyncio
 from uuid import UUID, uuid4
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import cast, func, insert, select, text, update
+from sqlalchemy import cast, insert, select, text, update
 
 from backend.contracts.data import configuration_hash, validate_vector
 from backend.contracts.pipeline import CaseInterpretation
@@ -128,7 +128,7 @@ class CaseMemory:
             self.store.case(c, access, case_id)
             c.execute(text("SET LOCAL hnsw.iterative_scan='strict_order'"))
             distance = cast(t.case_memory.c.embedding, Vector(len(vector))).cosine_distance(vector)
-            rows = c.execute(select(t.case_memory, distance.label('distance')).join(t.cases,
+            rows = c.execute(select(t.case_memory, t.cases.c.status.label('case_status'), t.cases.c.outcome.label('case_outcome'), distance.label('distance')).join(t.cases,
                 t.cases.c.case_id == t.case_memory.c.case_id).where(t.case_memory.c.owner_id == access.principal_id,
                 t.case_memory.c.namespace == access.namespace, t.case_memory.c.enabled,
                 t.case_memory.c.case_id != case_id, t.case_memory.c.input_id == t.cases.c.current_input_id,
@@ -142,12 +142,12 @@ class CaseMemory:
                 old = row['payload']['features']
                 shared = [need for need in old['needs'] if need.casefold() in {n.casefold() for n in features['needs']}]
                 differences = [need for need in features['needs'] if need.casefold() not in {n.casefold() for n in old['needs']}]
-                status = {'ready_for_review': 'in_review', 'draft': 'researching'}.get(row['payload']['status'], row['payload']['status'])
+                status = {'ready_for_review': 'in_review', 'draft': 'researching', 'closed_visit': 'closed', 'closed_no_interest': 'closed', 'on_hold': 'researching'}.get(row['case_status'], row['case_status'])
                 result.append({'memoryId': str(row['memory_id']), 'caseId': str(row['case_id']),
                     'companyLabel': row['payload']['companyLabel'], 'score': score,
                     'method': 'symmetric-needs-cosine-v1', 'shared': shared, 'differences': differences[:5],
                     'status': status if status in {'in_review', 'researching', 'pitch_sent', 'closed'} else 'researching',
-                    **({'outcome': row['payload']['outcome']} if row['payload']['outcome'] else {}), 'inputId': str(row['input_id']),
+                    **({'outcome': row['case_outcome']} if row['case_outcome'] else {}), 'inputId': str(row['input_id']),
                     'resultId': str(row['result_id']), 'indexedAt': row['created_at'].isoformat()})
                 if len(result) == limit:
                     break

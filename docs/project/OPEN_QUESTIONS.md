@@ -16,12 +16,12 @@ for agentic behavior; local Langfuse; text-only permitted intake; independent
 lexical/vector branches + RRF/reranking; case-local flagged web sources allowed
 after support checks; controlled HTTP/Crawl4AI conversion; frozen evidence pack before
 draft; reason-card editorial keep/reject; clarification only when blocking;
-connected and offline modes; PDF first and PPTX later. React/Vite frontend is
-owned by a separate teammate and remains untouched by backend work.
+connected and offline modes; PDF and optional reviewed PPTX. React/Vite frontend is
+normally separately owned; this user-authorized completion also integrates its new backend controls.
 
 D18 finalizes schema contract v1 at `0005_finalize_schema`: [exact fields](../data/SCHEMA_REFERENCE.md)
 and [corpus/retrieval handoff](../data/INGESTION_RETRIEVAL_HANDOFF.md). D20 advances
-head through 0006/0007; current head is `0008_live_corpus`. Database shape
+head through 0006/0007; source head is `0010_rich_outputs`; shared host last verified at 0008. Database shape
 is implemented; O04/O13/O14 concern model configuration, corpus
 population and taxonomy contents, not alternative database designs.
 
@@ -50,8 +50,8 @@ records the evidence; real corpus retrieval quality remains unmeasured.
 | O12 / Q14 | Monitor private SearXNG upstream availability and provision worker crawler assets | SearXNG DuckDuckGo/Yahoo passed live pilot queries; browser HTML challenged. Crawl4AI stays isolated. CAPTCHA/blocks are unavailable; public capability queries only; [setup](../data/WEB_RESEARCH.md) | Research/tools |
 | O13 / Q01,Q14 | Corpus acquisition completeness, page/PDF formats, chunking, access/refresh rules | Inventory plus three source families; validated snapshots; record exclusions and freshness; bulk ingestion remains separate | Ingestion/data |
 | O14 / Q18 | Published reviewed taxonomy/profile pins and corpus assignments | MeSH category/subcategory + document subject support is implemented; import/review actual contents, preserve broader/related distinctions and unknowns; other domains use profiles | Taxonomy/interpretation |
-| O15 / Q08 | Partner acceptance of implemented PDF layout and larger real reports | Deterministic renderer, company introduction, kept-only citations, fonts/logo and visual fixtures verified; PPTX remains later | Reports/evaluation |
-| O16 / Q18 | Structured result metadata, real combined DB/web UI inspection and connected PPTX | HTTP, source badges, review/hash gates and PDF remain; board replaces desk/actions screens. Demo PDF/PPTX exist; backend PPTX and evidence-backed optional hierarchy/expertise fields remain. Explicit rewrite mode, free-text clarification and read-only history are implemented. Query/evidence links now derive from actual retrieval and exact mirror identities; unrecorded ontology mappings remain absent | Frontend/API |
+| O15 / Q08 | Partner acceptance of implemented PDF layout and larger real reports | Deterministic renderer, company introduction, kept-only citations, fonts/logo and visual fixtures verified; optional reviewed PPTX is implemented; host activation and partner acceptance remain | Reports/evaluation |
+| O16 / Q18 | Structured result metadata, real combined DB/web UI inspection and connected PPTX | HTTP, source badges, review/hash gates and PDF remain; board replaces desk/actions screens. Backend PPTX/manual plans/own-case controls are implemented; optional host activation and evidence-backed hierarchy/expertise fields remain. Explicit rewrite mode, free-text clarification and read-only history are implemented. Query/evidence links now derive from actual retrieval and exact mirror identities; unrecorded ontology mappings remain absent | Frontend/API |
 | O17 / Q06,Q16 | Runtime placement, Windows normal bootstrap verification and offline packaging | Migration complete: [host result](../team/MIGRATION_STATUS.md). Apply [LF fix](../data/WINDOWS_SHELL_FIX.md). Hosted HF/Keera require connected mode; offline needs local assets | Operations |
 | O18 / Q16 | Trace/backup/artifact/checkpoint retention, gateway data handling/locality, restore policy and resource monitoring | Local masked tracing and nonblocking outages; select concrete durations/capacity with host owner; respect revocation | Operations/observability |
 | O19 / Q03,Q04 | Gold queries, expected experts/units, approved examples and measured quality | Obtain partner examples; evaluate intent-balanced Recall@10 ≥ .80 and claim support/coverage; synthetic fixtures are not a benchmark | Evaluation |
@@ -61,7 +61,7 @@ records the evidence; real corpus retrieval quality remains unmeasured.
 
 | ID / old question | Unresolved input | Treatment until resolved |
 | --- | --- | --- |
-| O21 / Q03 | Authorized historical case dataset, similarity method and outcome evidence | `search_cases` remains unavailable and frontend mock scores illustrative; no cross-owner access or success prediction |
+| O21 / Q03 | Authorized historical case dataset, similarity method and outcome evidence | Own-case opt-in similarity is implemented, requires 0009 activation and human calibration; agency-wide catalog search remains unavailable. No cross-owner access or success prediction |
 | O22 | Eligible numeric investment/jobs/timeline data and economic formulas | Omit optional economics rather than infer numbers; formulas/scenario methods need independent support |
 | O23 / Q07 | DE/FR/IT beyond English baseline | Preserve source language; evaluate query/answer translations before claiming multilingual quality |
 | O24 / Q09 | Additional Bern organizations/people/companies and confirmed locality | Add evidence-backed entities within selected scope; membership is not proof of local presence |

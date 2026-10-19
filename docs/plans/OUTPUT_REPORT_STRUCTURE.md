@@ -25,7 +25,7 @@ The immediate pitch audience is primarily the company’s CEO/C-level decision-m
 | **6. Gaps and next steps** | Missing company information, weak evidence, questions to clarify, and potential introductions for the agency to pursue. Expert availability remains unconfirmed. | Core |
 | **7. Sources and coverage** | Direct supporting links, source dates where available, institutions searched and coverage limitations. Put citations beside claims as well. | Core |
 | **8. Economic contribution** | Supplied investment, planned jobs, timing and potential local activities. Show assumptions separately from company commitments. | Optional |
-| **9. Comparable company cases** | Relevant prior cases, similarities, differences and documented outcomes—**only if an authorized, usable case dataset becomes available**. | Future extension |
+| **9. Comparable company cases** | Relevant prior cases, similarities, differences and documented outcomes—**only if an authorized, usable case dataset becomes available**. | Optional own-case v1; agency-wide dataset later |
 
 ### What each match should contain
 
@@ -57,4 +57,6 @@ The stakeholder emphasized **short explanations, useful scientific connections, 
 then export a PDF containing kept reasons, supporting company context, sources
 and material caveats. Sections 1–7 are content categories, not seven mandatory
 pages or extra unreviewed assertions. All reasons must be reviewed and at least
-one kept. PowerPoint remains a later output using the supplied template.
+one kept. Optional reviewed PowerPoint now uses the supplied template; see [rich outputs](../data/RICH_OUTPUTS.md).
+Manual plans are attributed context; no economic forecast is inferred. Own-case
+similarity is available in draft view after explicit eligibility, not in PDF/PPTX.

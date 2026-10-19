@@ -52,11 +52,16 @@ async def test_reviewed_opt_in_matches_and_revocation(harness):
         calls = encoder.calls
         assert (await client.post(url+'/memory', headers={'Idempotency-Key': 'reindex'}, json=body)).status_code == 200
         assert encoder.calls == calls  # stored vector reused, not re-embedded
+        lifecycle = await client.patch(url, headers={'Idempotency-Key': 'closed-outcome'}, json={
+            'expected_revision': detail['revision'], 'status':'closed', 'outcome':'visit'})
+        assert lifecycle.status_code == 200, lifecycle.text
+        detail = (await client.get(url)).json()
         url2, detail2, _ = await reviewed(client, h, 'second')
         match = detail2['revisions'][0]['similarCases'][0]
         assert match['caseId'] == detail['case']['id'] and match['score'] == 100
         assert match['method'] == 'symmetric-needs-cosine-v1'
         assert match['shared'] == ['sensor research']
+        assert match['status'] == 'closed' and match['outcome'] == 'visit'
         foreign = h.access.model_copy(update={'principal_id': uuid4()})
         with pytest.raises(PermissionError):
             h.services.memory._search(foreign, UUID(detail2['case']['id']), {}, [1., .1, .1], 5)

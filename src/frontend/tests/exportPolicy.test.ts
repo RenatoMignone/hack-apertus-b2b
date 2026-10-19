@@ -26,3 +26,8 @@ test('reviewed demo selections support local PDF and PowerPoint', () => {
     assert.doesNotThrow(() => assertExportAllowed(revision(['kept', 'rejected']), 'mock', format));
   }
 });
+
+test('reviewed HTTP PPTX requires an advertised server format', () => {
+  assert.doesNotThrow(() => assertExportAllowed(revision(['kept'], 'hash'), 'http', 'pptx', ['pdf', 'pptx']));
+  assert.throws(() => assertExportAllowed(revision(['kept', 'none'], 'hash'), 'http', 'pptx', ['pdf', 'pptx']));
+});

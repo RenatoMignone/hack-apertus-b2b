@@ -143,3 +143,19 @@ optional `institutionLabel` for the exact supported institution outside the pilo
 Render that label with a neutral badge when institution=Other. See
 [domain configuration](../data/DOMAIN_PROFILES.md). Backend fields are generic;
 existing frontend files remain unchanged.
+
+## Implemented rich feature controls — user-authorized integration, 19 October
+
+The frontend now implements the memory opt-in/out controls above, exact reviewed
+hash checks, generic `institutionLabel`, manually confirmed business plans and
+server-reviewed PPTX. Earlier frontend-owner handoff notes described the state at
+the preceding checkpoints; these additions are now connected. No mock fallback.
+
+`PUT /cases/{id}/business-context` takes expected_revision, confirmation and a
+full replacement `values` object; returns a run/status_url. Saving creates a new
+input/report review cycle. Values and limits: [rich outputs](../data/RICH_OUTPUTS.md).
+Case detail adds `businessContextAvailable`, `businessContext`, `memory` and
+`exportFormats`; absent/unavailable features stay hidden. The transport refuses
+manual updates from an unseen revision. Current report company facts include
+explicitly attributed frozen plans, not model-extracted business data. Export
+uses format-specific MIME/filename and the same exact review gates as PDF.

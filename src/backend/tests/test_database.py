@@ -44,7 +44,7 @@ def test_migration_is_repeatable_and_schema_is_checked(database):
     check_schema(database)
     with database.connect() as connection:
         assert connection.execute(text("SELECT extversion FROM pg_extension WHERE extname='vector'")).scalar_one()
-        assert len(tables.metadata.tables) == 63
+        assert len(tables.metadata.tables) == 65
 
 
 def test_hybrid_multilingual_and_semantic_branch(database, corpus):

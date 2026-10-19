@@ -27,7 +27,9 @@ Missing library/logo/font is unavailable. The packaged logo must remain accessib
 or A must inject `logo_path` when deploying an installed wheel.
 
 Actual one-page and two-page multilingual fixtures were rendered and visually
-inspected. PPTX and charts/economic calculations remain later work.
+inspected. Optional deterministic template PPTX and manual company plans are now
+implemented; see [rich outputs](../../../docs/data/RICH_OUTPUTS.md). Economic
+impact calculations and charts requiring validated underlying data remain deferred.
 See [integration](../../../docs/team/INTEGRATION.md) for current wiring/dependencies
 and [original handoff](../../../docs/team/intelligence/HANDOFF.md) for provenance
 and model comparison limitations.

@@ -7,6 +7,8 @@ COPY src/backend/requirements.lock /tmp/requirements.lock
 RUN pip install --no-cache-dir -r /tmp/requirements.lock
 COPY src/backend /app/src/backend
 COPY docs/provided_material/Logo_SF_BE_EN.png /app/assets/Logo_SF_BE_EN.png
+COPY docs/provided_material/powerpoint_template.pptx /app/assets/powerpoint_template.pptx
+ENV RUNTIME_PPTX_TEMPLATE_PATH=/app/assets/powerpoint_template.pptx
 ENV RUNTIME_PDF_LOGO_PATH=/app/assets/Logo_SF_BE_EN.png
 RUN pip install --no-cache-dir --no-deps /app/src/backend \
     && useradd --create-home --uid 10001 navigator \

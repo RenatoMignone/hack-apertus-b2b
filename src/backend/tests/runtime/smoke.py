@@ -38,13 +38,14 @@ from backend.tests.runtime.test_integrated_lanes import synthetic_transport
 from backend.tests.run import require_test_admin_dsn
 
 
-async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=False):
+async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=False, rich_outputs=False):
     token = "synthetic-browser-smoke"
     binding = IdentityBinding(token_sha256=hashlib.sha256(token.encode()).hexdigest(),
         principal_id=principal, namespace=fixture["namespace"])
     settings = RuntimeSettings(mode="offline", llm_base_url="http://llm:8080/v1", bindings=(binding,),
         default_profile_id=UUID(fixture["profile_id"]), cors_origins=("http://127.0.0.1:5173", "http://localhost:5173",
             "http://127.0.0.1:5174", "http://localhost:5174"),
+        rich_outputs_enabled=rich_outputs, case_memory_enabled=rich_outputs,
         template_version="challenge-v1", renderer_version="reportlab-v1",
         pdf_factory="backend.application.factories:pdf")
     store = RuntimeStore(engine, settings, artifacts)
@@ -61,6 +62,11 @@ async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=Fal
     services = Services(reasoning=create_reasoning_services(ModelSettings(base_url=settings.llm_base_url, local=True),
         transport=httpx.MockTransport(transport)),
         backbone=create_backbone(engine, artifacts, FixtureEmbedder()), pdf=create_pdf_renderer())
+    if rich_outputs:
+        from backend.application.case_memory import CaseMemory
+        from backend.reports.rendering.pptx import TemplatePptxRenderer
+        services.memory = CaseMemory(store, FixtureEmbedder())
+        services.pptx = TemplatePptxRenderer()
     application = RuntimeApplication(store, services)
     saver = InMemorySaver()
     @asynccontextmanager
@@ -93,6 +99,7 @@ def main(argv=()):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port', type=int, default=8000)
     parser.add_argument('--clarify', action='store_true', help='Exercise a free-text blocking clarification before research.')
+    parser.add_argument('--rich-outputs', action='store_true', help='Exercise optional plans/PPTX controls; keep fictional cases out of comparison history.')
     args = parser.parse_args(argv)
     admin_dsn = require_test_admin_dsn()
     name, role = "navigator_browser_" + uuid4().hex, "browser_" + uuid4().hex[:12]
@@ -111,7 +118,7 @@ def main(argv=()):
             grant_scope(database, principal, UUID(fixture["scope_id"]))
             application_engine = engine_for(database.url.set(username=role, password=password).render_as_string(hide_password=False))
             try:
-                asyncio.run(serve(application_engine, artifacts, fixture, principal, port=args.port, clarify=args.clarify))
+                asyncio.run(serve(application_engine, artifacts, fixture, principal, port=args.port, clarify=args.clarify, rich_outputs=args.rich_outputs))
             except KeyboardInterrupt:
                 pass
     finally:
