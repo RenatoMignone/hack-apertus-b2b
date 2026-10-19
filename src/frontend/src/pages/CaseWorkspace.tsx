@@ -1,3 +1,4 @@
+import { canReusePack, failureMessage } from '../api/recovery';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, Download, MessageSquare } from 'lucide-react';
@@ -317,8 +318,8 @@ export default function CaseWorkspace() {
       </div>
 
       {(error || detail.currentRun?.status === 'failed') && <div role="alert" className="border-b border-line bg-white px-6 py-3 text-sm text-brand">
-        {error || 'Research stopped before a report could be published.'}
-        {!running && <button className="ml-3 underline" onClick={retry}>{detail.currentRun?.pack_id ? 'Retry report from existing evidence' : 'Retry / resume research'}</button>}
+        {error || failureMessage(detail.currentRun?.error_code)}
+        {!running && <button className="ml-3 underline" onClick={retry}>{canReusePack(detail) ? 'Retry report from existing evidence' : 'Retry / resume research'}</button>}
       </div>}
       {awaitingAnswers && <div role="status" className="border-b border-line bg-white px-6 py-3 text-sm">
         Research needs your answer. <button className="text-brand underline" onClick={() => setChatOpen(true)}>Open clarification questions</button>

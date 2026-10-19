@@ -2,7 +2,7 @@
 
 Current executable definitions are [`data/schema.py`](../../src/backend/data/schema.py).
 The generated [field reference](SCHEMA_REFERENCE.md) owns exact columns, constraints,
-foreign keys and indexes. Source migration head is `0012_membership_lookup`;
+foreign keys and indexes. Source migration head is `0013_retrieval_scope_sets`;
 installed-host rollout is verified independently. Forward migrations and reference
 updates accompany schema changes. One application PostgreSQL database uses five
 schemas; framework checkpoints/tracing have separate databases and migrations.
@@ -112,6 +112,8 @@ profiles. `cases.business_contexts` (0010) stores immutable attributed manual pl
 exports support reviewed PDF/PPTX. See [memory](CASE_MEMORY.md) and
 [rich outputs](RICH_OUTPUTS.md). Migration 0008 supplies case-owned live captures;
 0011/0012 optimize capture and membership policies without replacing that model.
+0013 batches equivalent read-scope/chunk authorization sets; write policies and
+case ownership remain unchanged. See the [live retrieval measurement and rollout](LIVE_RETRIEVAL_PERFORMANCE.md).
 
 The retired query-plan/retrieval-hit/match/selection/frontier tables are not runtime
 interfaces. Populated historical records remain owner-only under `legacy` on

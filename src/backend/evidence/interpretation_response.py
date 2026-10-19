@@ -1,5 +1,6 @@
 """Tolerant display-label input; factual/public interpretation stays strict."""
 from copy import deepcopy
+from typing import Literal
 
 from pydantic import Field, create_model
 
@@ -20,6 +21,13 @@ InterpretationResponse = create_model("InterpretationResponse",
     __config__=CaseInterpretation.model_config, **fields)
 
 
+def interpretation_schema(codes):
+    """Expose pinned domain codes in the private schema, not only prose."""
+    code = Literal[tuple(codes)]
+    return create_model("DomainInterpretationResponse", __base__=InterpretationResponse,
+        primary_field=(code, "unknown"), additional_fields=(list[code], Field(default_factory=list)))
+
+
 def interpretation_value(value) -> CaseInterpretation:
     body = value.model_dump()
     label = body["activity_label"]
@@ -33,4 +41,11 @@ def interpretation_value(value) -> CaseInterpretation:
         body["search_terms"] = list(dict.fromkeys([*body["search_terms"], label]))
         label = "Research request"
     body["activity_label"] = label
+    if (not body["needs"] or not body["bern_intents"] or body["ambiguities"]) and not body["blocking_questions"]:
+        raise ValueError(
+            "blocking_questions: add a targeted question for each material ambiguity in USER intent, "
+            "or the missing capability/Bern objective. Preserve unresolved ambiguities; do not invent "
+            "answers. Example: unspecified device capability -> 'Which technical capability do you "
+            "need in Bern?' Unknown researchers or facility availability belong in research_questions "
+            "and do not block a clear capability/objective request.")
     return CaseInterpretation.model_validate(body)

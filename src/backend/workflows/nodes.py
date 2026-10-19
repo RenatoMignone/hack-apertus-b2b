@@ -162,4 +162,23 @@ class ResearchNodes:
             entities = {str(e.get("entity_id", e.get("id"))): e for e in [*old.existing_entities, *result.existing_entities]}
             result = result.model_copy(update={"hits": list(hits.values()), "existing_entities": list(entities.values())})
         await asyncio.to_thread(self.store.validate_evidence, execution.context.access, execution.context.run_id, result.evidence)
-        return {"research": result.model_dump(mode="json"), "search_observations": observations}
+        update = {"research": result.model_dump(mode="json"), "search_observations": observations,
+                  "reuse_prepared_evidence": False}
+        if state.get("research") and state.get("pack"):
+            from backend.contracts.data import configuration_hash
+            from backend.contracts.pipeline import ReportEvidencePack
+            def signature(bundle):
+                return configuration_hash({
+                    "evidence": sorted((e.model_dump(mode="json") for e in bundle.evidence),
+                                       key=lambda e: e["evidence_id"]),
+                    "entities": sorted(bundle.existing_entities, key=lambda e: configuration_hash(e))})
+            if signature(ResearchBundle.model_validate(state["research"])) == signature(result):
+                pack = ReportEvidencePack.model_validate(state["pack"])
+                limitation = "Follow-up research returned no new source passages; existing evidence and unresolved gaps were retained."
+                pack = pack.model_copy(update={"gaps": list(dict.fromkeys([
+                    *pack.gaps, *result.limitations, limitation])),
+                    "outcome": "partial" if pack.claims else "no_match"})
+                update.update(pack=pack.model_dump(mode="json"), reuse_prepared_evidence=True)
+                from backend.observability.logging import event
+                event("research.unchanged_evidence", run_id=execution.context.run_id)
+        return update

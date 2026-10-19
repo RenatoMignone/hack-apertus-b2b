@@ -79,7 +79,8 @@ def synthetic_transport(request):
         result = {"reasons": [{"id": "sensor", "headline": "Synthetic glucose research",
             "text": claim["text"], "claim_ids": [claim["claim_id"]]}]}
     elif task == "assess_draft":
-        result = {"status": "supported", "explanation": "Synthetic transport fixture verdict."}
+        from backend.models.reasoning.fixtures import draft_findings
+        result = draft_findings(data["draft"], data["pack"]["gaps"])
     else:
         raise AssertionError(task)
     return httpx.Response(200, json={"choices": [{"message": {"role": "assistant", "content": json.dumps(result)}}]})

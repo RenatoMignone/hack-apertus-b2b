@@ -123,6 +123,14 @@ class HybridSearch:
             parameters['search_hash'] = connection.execute(select(tables.builds.c.search_config_hash).where(
                 tables.builds.c.build_id == plan.build_id)).scalar_one()
             from backend.data.retrieval.branches import run_branch
+            from backend.data.retrieval.prepared import prepare
+            # Pin and authorize membership once for both branches. Its actual
+            # statistics avoid unseen live captures being planned as one row.
+            _, preparation_failure = run_branch(connection, 'eligibility', lambda: prepare(
+                connection, ELIGIBLE, parameters, vectors=self.strategy != 'lexical'),
+                allow_partial=self.default_strategy, run_id=plan.run_id, query_count=len(queries))
+            if preparation_failure:
+                raise ServiceUnavailable()
             lexical_rows, vector_rows = [], []
             operations = []
             if self.strategy != 'dense':

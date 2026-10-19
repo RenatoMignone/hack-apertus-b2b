@@ -28,7 +28,7 @@ Image digests are locked in `deploy/images.lock.json`.
 
 ## Migration and optional activation
 
-Current source head: **`0012_membership_lookup`**. Inspect the installed host's
+Current source head: **`0013_retrieval_scope_sets`**. Inspect the installed host's
 `alembic_version`; do not infer rollout from source. The authorized maintainer
 backs up, coordinates writers and applies forward migrations:
 
@@ -45,6 +45,8 @@ tables remain owner-only legacy; runtime never queries them.
 `CASE_MEMORY_ENABLED` / `RUNTIME_RICH_OUTPUTS_ENABLED` only with migrated tables,
 compatible assets and accepted access; supply the unchanged PPTX template path.
 Source 0011/0012 improve capture/membership paths; see [performance](CAPTURE_PERFORMANCE.md).
+0013 batches equivalent read authorization sets; its shared-host rollout is applied.
+See the [restricted-role retrieval receipt and operator restart](LIVE_RETRIEVAL_PERFORMANCE.md).
 Checkpoint tables use the framework's explicit `navigator-runtime ... checkpoints-setup`
 with authorized setup access; do not rerun setup from an ordinary worker account.
 

@@ -1,3 +1,4 @@
+import { canReusePack, failureMessage } from './recovery.ts';
 import { nextPollDelay, publishProgress } from './progress.ts';
 import type { NavigatorApi } from './index';
 import type { ActionItem, BriefRevision, CaseDetail, CaseRun, CaseSummary, RunStage } from '../types/contract';
@@ -13,22 +14,13 @@ interface HttpNavigatorApi extends NavigatorApi {
 type Fetch = typeof fetch;
 type Accepted = { case_id: string; input_id: string; run_id?: string; status_url?: string };
 type Operation = { status: string; download_url?: string; error_code?: string };
-const messages: Record<string, string> = {
-  authentication_required: 'Your access token was rejected. Disconnect and reconnect with a valid token.',
-  service_unavailable: 'A required backend service is unavailable. Check the worker and server configuration.',
-  storage_unavailable: 'The database or artifact store is unavailable.',
-  stale_revision: 'This case changed. Reload it before trying again.',
-  conflict: 'The case changed or this action is not allowed in its current state. Reload and try again.',
-  invalid_model_output: 'The model could not produce a valid result. You can retry the research.',
-  evidence_rejected: 'The evidence or draft failed validation. No unsupported report was published.',
-  budget_exceeded: 'The research budget expired. You can start a new run.',
-};
+
 
 export class ApiError extends Error {
   status: number;
   code: string;
   constructor(status: number, code: string) {
-    super(messages[code] ?? 'The request could not be completed. Please try again.');
+    super(failureMessage(code));
     this.status = status;
     this.code = code;
   }
@@ -154,9 +146,9 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
       if (run && ['queued', 'running', 'waiting_for_input'].includes(run.status)) {
         return poll(caseId, `${path(caseId)}/runs/${run.run_id}`, onStage, signal);
       }
-      if (run?.status === 'failed' && run.pack_id && run.input_id === detail.inputId) {
+      if (canReusePack(detail)) {
         const started = await request<Accepted>(`${path(caseId)}/reports`, 'POST', {
-          pack_id: run.pack_id, expected_revision: detail.revision,
+          pack_id: run!.pack_id, expected_revision: detail.revision,
           instruction: 'Create a concise cited draft from the existing evidence pack. Preserve caveats and avoid unsupported implications.',
         });
         if (!started.status_url) throw new Error('The server did not return a report run.');

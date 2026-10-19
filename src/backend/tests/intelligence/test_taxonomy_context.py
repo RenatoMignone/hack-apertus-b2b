@@ -121,3 +121,10 @@ async def test_profile_rejects_unsupplied_company_field(context, interpretation)
     model = FixtureChatModel(responses=[response, response])
     with pytest.raises(InvalidModelOutput):
         await create_reasoning_services(model=model).interpret('Find research in Bern', {}, context)
+
+
+def test_interpretation_wire_schema_uses_pinned_domain_codes():
+    from backend.evidence.interpretation_response import interpretation_schema
+    schema = interpretation_schema(['unknown', 'other', 'space']).model_json_schema()
+    assert schema['properties']['primary_field']['enum'] == ['unknown', 'other', 'space']
+    assert schema['properties']['additional_fields']['items']['enum'] == ['unknown', 'other', 'space']
