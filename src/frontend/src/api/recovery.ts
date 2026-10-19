@@ -19,3 +19,10 @@ export function canReusePack(detail: Pick<CaseDetail, 'currentRun' | 'inputId'>)
   const run = detail.currentRun;
   return run?.status === 'failed' && !!run.pack_id && run.input_id === detail.inputId;
 }
+
+/** A failed run may also use HTTP 409; only revision/state conflicts refresh editing context. */
+export function isStateConflict(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const value = error as {status?: number; code?: string};
+  return value.status === 409 && ['stale_revision', 'conflict'].includes(value.code ?? '');
+}

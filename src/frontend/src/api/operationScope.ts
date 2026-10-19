@@ -7,6 +7,7 @@ export class OperationScope {
   reset(identity: string) {
     if (identity !== this.identity) { this.stop(); this.identity = identity; }
   }
+  capture() { const generation = this.generation; return () => generation === this.generation; }
   stop() { this.generation++; this.controller?.abort(); this.controller = undefined; }
   begin() {
     this.stop();

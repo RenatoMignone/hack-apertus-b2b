@@ -3,9 +3,9 @@ import { api } from '../api';
 import type { BusinessContext, CaseDetail, RunStage } from '../types/contract';
 
 /** Explicit operator input; never populate business figures from model text. */
-export default function CaseDataControls({ detail, busy, onBusy, onChange, onStage }: {
+export default function CaseDataControls({ detail, busy, onBusy, onChange, onStage, onConflict }: {
   detail: CaseDetail; busy: boolean; onBusy: (busy: boolean) => void;
-  onChange: (detail: CaseDetail) => void; onStage: (stage: RunStage) => void;
+  onChange: (detail: CaseDetail) => void; onConflict: (error: unknown) => Promise<void>; onStage: (stage: RunStage) => void;
 }) {
   const alive = useRef(true);
   const pending = useRef(false);
@@ -25,7 +25,7 @@ export default function CaseDataControls({ detail, busy, onBusy, onChange, onSta
     if (pending.current) return;
     pending.current = true; setError(''); onBusy(true);
     try { const value = await task(); if (alive.current) onChange(value); }
-    catch (e) { if (alive.current) setError(e instanceof Error ? e.message : 'The update failed.'); }
+    catch (e) { if (alive.current) { setError(e instanceof Error ? e.message : 'The update failed.'); await onConflict(e); } }
     finally { pending.current = false; if (alive.current) onBusy(false); }
   };
   if (!detail.memory?.available && !detail.businessContextAvailable) return null;

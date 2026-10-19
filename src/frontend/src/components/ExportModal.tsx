@@ -16,7 +16,7 @@ type Format = 'pdf' | 'pptx';
  * as an editable demo PowerPoint built from the partner template. Connected PDF
  * export uses the server's exact-revision approval and authenticated download.
  */
-export default function ExportModal({ detail, revision, onClose }: { detail: CaseDetail; revision: BriefRevision; onClose: () => void }) {
+export default function ExportModal({ detail, revision, onClose, onConflict }: { detail: CaseDetail; revision: BriefRevision; onClose: () => void; onConflict: (error: unknown) => Promise<void> }) {
   const [busy, setBusy] = useState<Format | null>(null);
   const toast = useToast();
   const kept = keptOf(revision);
@@ -50,7 +50,7 @@ export default function ExportModal({ detail, revision, onClose }: { detail: Cas
       }
       onClose();
     } catch (e) {
-      if (apiMode === 'http') reportApiError(e);
+      if (apiMode === 'http') { reportApiError(e); await onConflict(e); }
       else toast('Export failed. Please try again.');
     } finally {
       setBusy(null);

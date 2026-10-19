@@ -59,7 +59,7 @@ export default function ChatPanel({
   running: boolean;
   stage: RunStage;
   suggestions: Suggestion[];
-  onSend: (text: string, kind: 'focus' | 'formatting') => void;
+  onSend: (text: string, kind: 'focus' | 'formatting') => Promise<boolean>;
   onAnswer: (turnId: string, answer: string) => void;
   onClose: () => void;
   awaitingAnswers?: boolean;
@@ -84,10 +84,14 @@ export default function ChatPanel({
     el.style.height = Math.min(el.scrollHeight, 180) + 'px';
   }, [text]);
 
-  const send = (t = text) => {
-    if (!t.trim() || running || awaitingAnswers) return;
-    onSend(t.trim(), canRewrite ? kind : 'focus');
-    setText('');
+  const sending = useRef(false);
+  const send = async (t = text) => {
+    if (!t.trim() || running || awaitingAnswers || sending.current) return;
+    sending.current = true;
+    try {
+      const accepted = await onSend(t.trim(), canRewrite ? kind : 'focus');
+      if (accepted) setText(current => current === t ? '' : current);
+    } finally { sending.current = false; }
   };
 
   return (
