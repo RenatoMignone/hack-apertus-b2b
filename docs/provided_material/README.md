@@ -1,5 +1,8 @@
 # Partner-provided material
 
+This directory is the canonical location for the three original partner files.
+Application configuration, ingestion and container packaging reference these paths.
+
 **Received and inspected:** 18 October 2026, following the user's message that
 the partner material is now in `docs/`. Preserve the three original files.
 Inspection was read-only: workbook and presentation XML, plus logo image viewing.

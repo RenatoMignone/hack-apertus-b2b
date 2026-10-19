@@ -136,7 +136,7 @@ The maintainer supplies:
 Use root [.env.example](../../.env.example) as the settings inventory. Follow
 [HF setup](../data/HOSTED_EMBEDDINGS.md),
 [inference setup](../data/INFERENCE_CONFIGURATION.md) and
-[live provisioning](../data/LIVE_SETUP.md). Source head is 0012; confirm the installed host revision with its maintainer
+[live provisioning](../data/LIVE_SETUP.md). Source head is `0013_retrieval_scope_sets`; confirm the installed host revision with its maintainer
 using the [deployment guide](../data/DEPLOYMENT.md). Do not migrate the shared host
 during a judge walkthrough.
 

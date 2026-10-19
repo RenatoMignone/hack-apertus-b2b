@@ -22,14 +22,19 @@ now complete with identical authorized membership and exact dense ranking. The
 complete RRF adapter returned 30 hits in 6.81 s using cached real embeddings, without
 reranking. See the [measured receipt, plans and restart commands](../data/LIVE_RETRIEVAL_PERFORMANCE.md).
 
-The integrated runtime baseline `88f5b75` passed **284 backend tests** against
-disposable PostgreSQL/pgvector and **24 frontend tests**, TypeScript and production
-build. A separately recorded live run used Keera 70B, HF encoding, local reranking,
-authorized corpus, PostgreSQL checkpoints and MinIO: five partial-report cards,
-26 caveats, one kept ARTORG capability and a 66,979-byte PDF. Web research was not
-configured in that live acceptance. Later UI/documentation integration needs its
-own recorded checks; earlier test counts are not automatically attributed to it.
-See [verification](../judges/VERIFICATION.md).
+Combined recovery/retrieval integration passed **310 backend tests**, **39 frontend
+transport/helper tests** and **18 React interaction tests**, TypeScript and build.
+Actual-Apertus isolated cases passed match, clarification/resume and no-match,
+with assessed drafts, review/PDF and stale-download rejection. Browser fault
+injection verified connection, authentication, revision and export recovery.
+See [pipeline](PIPELINE_RELIABILITY.md) and [recovery](FRONTEND_RECOVERY.md) receipts.
+
+A separate earlier live-corpus case produced five partial cards, 26 caveats, one
+kept ARTORG capability and a reviewed PDF using Keera, HF, local reranking,
+PostgreSQL checkpoints and MinIO; web was not configured. The
+[retrieval PoC](../proof-of-concept/README.md) preserves the earlier real-source
+experiment and its revised standalone PDF. [Verification](../judges/VERIFICATION.md)
+separates the scope and conditions of each result.
 
 ## Remaining acceptance and delivery
 
@@ -46,54 +51,19 @@ See [verification](../judges/VERIFICATION.md).
 - Produce final report PDF, accessible video/demo handoff and release/submission
   confirmation; use the [delivery checklist](../judges/DELIVERY.md).
 
-No fixed source count, current provider availability or completed migration is
-inferred from configuration. Readiness is a configuration/access check, not proof
-of all permissions, corpus completeness or report quality.
+## Runtime behavior
 
-## Earlier runtime corrections and verification
+Interpretation uses pinned domain codes and bounded clarification repair. Draft
+assessment covers every reason and caveat before code derives acceptance.
+Unchanged follow-up evidence reuses prepared work; unchanged evidence after a
+failed draft stops repeated generation. Wording edits retain evidence; focus
+changes research again.
 
-297 disposable-backend tests pass, including real SQL timeout/savepoint recovery;
-the last frontend verification passed 24 tests/build. The original long
-HelioSense request passed live interpretation after excluding nonliteral optional
-lead annotations. Registration now bounds large source span sets before the
-100-record reader, with explicit omissions; it passed that stage on live data.
-Search variants share authorized branch projections, literal validation is batched,
-metadata reuse is request-local, and extraction runs two independent batches at
-once. No scope/support checks are waived. Shared revision 0012 was read-only verified.
+Default search preserves a surviving branch with an explicit limitation if the
+other branch times out. Both branches timing out fails; evaluation strategies
+never silently degrade. Shared SQL optimization and rollout are measured in the
+linked performance receipt.
 
-Default runtime search now preserves a surviving authorized branch when the other
-hits its SQL statement timeout, carrying an explicit coverage limitation into the
-pack. Both timing out still fails, and explicit evaluation strategies never degrade.
-This bounds the failure impact; it does not establish faster shared-host SQL.
-
-The developer-created acceptance cases were cancelled to free the queue for manual
-testing; a fresh latest-code case through report/review/PDF is not yet certified.
-Restart API/worker/frontend after source updates and test a new case. UI hot-reload
-invalidation during the My desk merge was observed and its mixed helper export
-removed; it was separate from durable backend execution.
-
-## Isolated pipeline reliability acceptance
-
-The reliability pass passed **304 disposable-backend tests**, **26 frontend tests**,
-TypeScript and production build. Continuous actual-Apertus 70B runs with fictional
-sources, synthetic embeddings and local PostgreSQL checkpoints passed match,
-clarification/resume and no-match scenarios. Match and clarification each produced
-two assessed reasons and a reviewed PDF; wording revisions invalidated old downloads.
-This establishes isolated orchestration/model integration, not shared-host retrieval
-performance or real expertise quality. See the [receipt](PIPELINE_RELIABILITY.md).
-
-Interpretation now uses pinned domain codes in its private schema and targeted
-clarification repair. Draft assessment requires complete reason/caveat findings;
-code derives its verdict. Follow-up research with identical passages/entity context
-reuses assessed work with unresolved gaps; unchanged evidence after a draft failure
-stops rather than regenerating repeatedly. Restart API/worker after updating.
-
-
-## Frontend recovery branch acceptance
-
-`codex/frontend-backend-recovery` is integrated into `main`. Combined verification
-with the latest retrieval fixes passed 39 transport/helper tests, 18 React interaction
-tests, TypeScript/build and 310 disposable-backend tests. Browser fault injection verified reconnect/conflict/export recovery; a fresh
-actual-Apertus fictional HTTP case passed review/export and stale-download rejection.
-No shared database or public HTTP contract changed. See the
-[recovery receipt](FRONTEND_RECOVERY.md) for scope, limits and reproduction.
+Frontend reconnect observes existing work, stale revisions reload without replaying
+writes, and export retries reuse an accepted operation within the session. Safe
+request IDs support diagnosis. Restart API/worker after pulling runtime updates.

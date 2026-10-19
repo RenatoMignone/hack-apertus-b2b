@@ -16,11 +16,10 @@ Built for the Bern Economic Development Agency challenge at Hack Apertus.
 [Architecture](docs/plans/ARCHITECTURE.md) · [Technical report](technical_report.md) ·
 [Documentation](docs/README.md)
 
-**Frontend-independent demonstration:** the
-[retrieval proof of concept](docs/proof-of-concept/README.md) includes a standalone
-PDF and real-corpus rank/source records for the fictional HelioSense case. Four
-queries returned source-backed researcher mentions; accepted structured profiles
-were not returned, so this is not an expert-recall benchmark.
+**Standalone evidence:** the [retrieval proof of concept](docs/proof-of-concept/README.md)
+contains a three-page PDF and real-source rankings for fictional HelioSense.
+It records retrieval and traceability; newer pipeline and performance checks are
+linked separately.
 
 ## Why B2B
 
@@ -74,13 +73,13 @@ the shared database, migrate it, install dependencies or download model assets.
 
 ## Verification
 
-An integrated baseline passed **284 isolated backend tests and 24 frontend tests**,
-with TypeScript and production build. A recorded real-provider run produced a
-partial report and reviewed PDF. These checks establish a narrow working path;
-they do not establish the challenge's 80% Recall@10 target, broad source coverage
-or an air-gapped deployment. Source and verified shared-host schema are 0012;
-real-corpus performance and fresh report acceptance remain separate. See [verification](docs/judges/VERIFICATION.md) and
-[current delivery status](docs/project/STATUS.md).
+Combined verification passed **310 backend tests and 57 frontend tests**, TypeScript
+and production build. Actual-Apertus isolated cases passed clarification, assessed
+reports, review and PDF export; a separate real-provider run produced a partial
+report on the live corpus. Shared schema `0013` retrieval measurements are recorded.
+Reviewed expert Recall@10, a fresh complete case on the optimized live corpus and
+target deployment acceptance remain. See [verification](docs/judges/VERIFICATION.md)
+and [current status](docs/project/STATUS.md).
 
 ## 🎯 The Challenge
 
