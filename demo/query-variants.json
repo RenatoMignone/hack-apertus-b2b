@@ -1,0 +1,22 @@
+{
+  "fixture": "navigator-demo-helio-sense-v1",
+  "synthetic": true,
+  "purpose": "Separate case inputs for qualitative terminology robustness checks; not gold labels.",
+  "variants": [
+    {
+      "id": "glucose-sensors",
+      "intent_group": "continuous-glucose-monitoring-capabilities",
+      "prompt": "Which UniBE, ARTORG or Diabetes Center Berne groups or researchers have documented expertise relevant to glucose sensors or continuous glucose monitoring for an exploratory wearable medtech R&D project? Show exact sources and distinguish direct from adjacent matches."
+    },
+    {
+      "id": "cgm",
+      "intent_group": "continuous-glucose-monitoring-capabilities",
+      "prompt": "For a fictional wearable medtech R&D scenario, find source-backed Bern expertise relevant to CGM (continuous glucose monitoring). Include people, units, projects and services only where the UniBE, ARTORG or Diabetes Center Berne pages support them; explain missing fields."
+    },
+    {
+      "id": "biosensing-lay-terms",
+      "intent_group": "continuous-glucose-monitoring-capabilities",
+      "prompt": "A fictional startup wants a wearable that measures blood sugar continuously. Who or what in the UniBE, ARTORG and Diabetes Center Berne ecosystem has documented work on biosensing, wearable measurements, diabetes technology or related device evaluation? Link every factual match to its source and label adjacent work clearly."
+    }
+  ]
+}

@@ -13,6 +13,11 @@ when supported; missing contacts and roles are never guessed.
 
 ## Choose your review path
 
+If the frontend is unavailable, open the
+[standalone retrieval proof of concept](../proof-of-concept/README.md). It records
+actual demo-query retrieval, source quotations, timings and limitations without
+requiring the UI or live connectivity to inspect the PDF.
+
 1. **Try the product:** [quickstart](QUICKSTART.md), then [walkthrough](DEMO.md).
    For Compose-based data services and optional containers, use [Docker setup](DOCKER.md).
    The seeded UI needs no credentials and is explicitly scripted. The guide also
