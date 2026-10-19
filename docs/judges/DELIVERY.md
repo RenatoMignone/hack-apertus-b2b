@@ -4,6 +4,9 @@
 **Team:** Renato Mignone, Elia Innocenti, Eric Ruiz Giménez, Mohamed Kechiche.
 Prepared 19 October 2026. This is release preparation, not a submission receipt.
 
+See the [submission audit](SUBMISSION_AUDIT.md) for the inspected gaps and
+[Docker setup](DOCKER.md) for the actual Compose deployment boundary.
+
 ## Prepared in this documentation pass
 
 - [x] Product/team overview in the root README, keeping organizer sections.

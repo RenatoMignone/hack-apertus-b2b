@@ -14,6 +14,7 @@ when supported; missing contacts and roles are never guessed.
 ## Choose your review path
 
 1. **Try the product:** [quickstart](QUICKSTART.md), then [walkthrough](DEMO.md).
+   For Compose-based data services and optional containers, use [Docker setup](DOCKER.md).
    The seeded UI needs no credentials and is explicitly scripted. The guide also
    covers the synthetic backend and provisioned live research.
 2. **Understand the implementation:** [architecture](ARCHITECTURE.md), then the
@@ -40,6 +41,9 @@ report/PDF evidence is recorded; it is not a production or sovereign-deployment
 certification. [Delivery checklist](DELIVERY.md) tracks release pins, video, PDF
 and final acceptance. Internal handoffs are dated engineering records; start
 here for the judge-facing route and consult linked receipts for precise scope.
+
+The [submission audit](SUBMISSION_AUDIT.md) lists missing artifacts, release
+integration, deployment prerequisites and remaining validation work.
 
 Some screens and internal identifiers still use “Bern Navigator” or
 “Research & Expertise Navigator”; these refer to B2B. The name does not rename

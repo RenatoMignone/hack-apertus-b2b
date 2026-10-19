@@ -4,6 +4,9 @@ Run from the repository root unless a block changes directory. Choose a route:
 seeded UI without credentials; real local application with fixture providers;
 or live research using provisioned services. No route silently falls back.
 
+For a new Docker Compose data stack, follow [Docker setup](DOCKER.md). It also
+describes the optional API/worker containers and their remaining asset requirements.
+
 ## 1. Seeded UI demo: no services or credentials
 
 Requires **Node 22.18+**, npm and an initial network connection to install packages.
