@@ -61,7 +61,7 @@ without coordination.
 The first validates local settings/assets. The second adds read-only DB identity/
 schema, checkpoint reads and bucket HEAD. Neither performs model calls, checkpoint
 writes, authorized object read/write, migrations or full research acceptance.
-Application startup checks schema without migrating. The source head is 0012;
+Application startup checks schema without migrating. The source head is 0013;
 the maintainer verifies/updates the actual host through [deployment](DEPLOYMENT.md).
 
 ## Four service commands
@@ -72,7 +72,7 @@ the maintainer verifies/updates the actual host through [deployment](DEPLOYMENT.
 | `make server` | Start/reuse API on 127.0.0.1:8000 and follow logs |
 | `make worker` | Start/reuse durable worker and follow logs |
 | `make frontend` | Start/reuse Vite HTTP client on 127.0.0.1:5173 and follow logs |
-| `make all` | Start all four in background; print URLs/log paths |
+| `make all` | Check infrastructure, then start search → API → worker → frontend with readiness gates |
 | `make destroy` | Stop Make-managed app process groups and local search project |
 | `make help` | Usage and prerequisites |
 
@@ -82,6 +82,14 @@ the maintainer verifies/updates the actual host through [deployment](DEPLOYMENT.
 app target stops that service; Ctrl+C on Docker ends log-following only. Destroy
 preserves logs, volumes, SSH and shared infrastructure, and never kills unrelated
 or manually started processes. Stop manual services before reusing their ports.
+
+`make all` first runs bounded read-only infrastructure checks (DB identity/schema,
+checkpoint reads and storage bucket access). A missing tunnel stops startup with
+an actionable error in `.local/dev-services/readiness.log`. It then waits for
+search HTTP readiness, API capabilities, worker `runtime.ready`, frontend HTTP
+and its API proxy, in that order. Existing tracked services are reused; a dead
+worker is restarted. On app startup failure, only newly started app processes
+are stopped. Readiness does not execute provider calls or prove research/export.
 
 Make starts the **search sidecar**, not the shared PostgreSQL/MinIO stack. It does
 not install dependencies, migrate, ingest or download models. Prepare

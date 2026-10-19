@@ -43,6 +43,7 @@ state.mkdir(parents=True, exist_ok=True, mode=0o700)
 os.chmod(state, 0o700)
 action = sys.argv[1]
 runtime = os.environ['DEV_RUNTIME']
+python = sys.executable
 commands = {
     'server': [runtime, '--env-file', str(env_file), 'serve', '--host', '127.0.0.1', '--port', '8000'],
     'worker': [runtime, '--env-file', str(env_file), 'worker'],
@@ -143,6 +144,61 @@ def start(name):
     print(name + ': started; log ' + str(log))
     return True
 
+def preflight():
+    print('preflight: checking DB/tunnel, identity, checkpoints and storage...', flush=True)
+    log = state / 'readiness.log'
+    with log.open('wb') as output:
+        os.chmod(log, 0o600)
+        try:
+            result = subprocess.run([python, '-m', 'backend.deploy.check_runtime',
+                '--env-file', str(env_file), '--network'], cwd=root,
+                stdout=output, stderr=subprocess.STDOUT, timeout=60)
+        except subprocess.TimeoutExpired:
+            raise RuntimeError('Infrastructure readiness timed out; check SSH forwarding and ' + str(log))
+    if result.returncode:
+        raise RuntimeError('Infrastructure unavailable; restore SSH/DB access first. See ' + str(log))
+    print('preflight: passed', flush=True)
+
+
+def wait_http(url, *, name, timeout=45, authenticated=False):
+    from urllib.request import build_opener, ProxyHandler
+    from urllib.error import HTTPError, URLError
+    opener = build_opener(ProxyHandler({}))
+    until = time.monotonic() + timeout
+    while time.monotonic() < until:
+        if name in commands and not tracked(name):
+            raise RuntimeError(name + ' exited; see ' + str(state / (name + '.log')))
+        try:
+            with opener.open(url, timeout=min(3, max(.1, until-time.monotonic()))) as response:
+                if response.status == 200:
+                    print(name + ': HTTP ready', flush=True)
+                    return
+        except HTTPError as error:
+            # Shared bearer mode requires browser login; never print/load its raw token.
+            if authenticated and error.code == 401:
+                print(name + ': HTTP ready (bearer authentication required)', flush=True)
+                return
+        except (URLError, TimeoutError, OSError):
+            pass
+        time.sleep(.25)
+    raise RuntimeError(name + ' readiness timed out; inspect its log')
+
+
+def wait_worker(offset, timeout=45):
+    until = time.monotonic() + timeout
+    log = state / 'worker.log'
+    while time.monotonic() < until:
+        if not tracked('worker'):
+            raise RuntimeError('worker exited; see ' + str(log))
+        with log.open() as stream:
+            stream.seek(offset)
+            if 'runtime.ready' in stream.read():
+                print('worker: runtime ready', flush=True)
+                return
+        time.sleep(.25)
+    raise RuntimeError('worker initialization timed out; see ' + str(log))
+
+
 def docker_up():
     if not env_file.is_file():
         raise RuntimeError('Missing private ENV_FILE: ' + str(env_file))
@@ -187,12 +243,25 @@ try:
                 raise RuntimeError('Prepare the backend .venv and private ENV_FILE first')
             if not (root / 'src/frontend/node_modules/.bin/vite').exists():
                 raise RuntimeError('Run npm ci in src/frontend first')
+            preflight()
             docker_up()
+            port_result = subprocess.check_output(compose + ['port', 'searxng', '8080'], cwd=root, text=True).strip()
+            wait_http('http://' + port_result + '/', name='docker')
             started = []
             try:
                 for name in ('server', 'worker', 'frontend'):
-                    if start(name):
+                    worker_log = state / 'worker.log'
+                    offset = worker_log.stat().st_size if worker_log.exists() else 0
+                    fresh = start(name)
+                    if fresh:
                         started.append(name)
+                    if name == 'server':
+                        wait_http('http://127.0.0.1:8000/api/v1/capabilities', name=name, authenticated=True)
+                    elif name == 'worker':
+                        wait_worker(offset if fresh else 0)
+                    else:
+                        wait_http('http://127.0.0.1:5173/', name=name)
+                        wait_http('http://127.0.0.1:5173/api/v1/capabilities', name=name, authenticated=True)
             except BaseException:
                 failed_name = name
                 for name in reversed(started):
@@ -202,7 +271,7 @@ try:
                     stop(failed_name)
                 raise
             print('Frontend: http://127.0.0.1:5173 | API: http://127.0.0.1:8000')
-            print('Background processes started; this does not certify DB/provider readiness.')
+            print('Services ready. Full research/model calls and export still require a case test.')
         elif action == 'docker':
             docker_up()
         else:
