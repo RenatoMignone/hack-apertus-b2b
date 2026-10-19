@@ -55,7 +55,7 @@ The Notion page names these supporting materials [N1]:
 **Use the PowerPoint template and logo only for this challenge.** This explicit
 restriction is not a general reuse/license grant. The presentation template is
 separate from the required repository/technical-report template and does not
-establish a mandatory automatic teaser-export feature. The [provided-material inventory](../provided_material/README.md) records the
+establish a mandatory automatic teaser-export feature. The [provided-material inventory](../provided-material/README.md) records the
 later file delivery and inspection; workbook discovery rows still require live
 access/relevance checks before collection.
 

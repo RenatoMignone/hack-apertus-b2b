@@ -2,7 +2,7 @@
 
 The pilot treats UniBE, ARTORG and Diabetes Center Berne public pages and public
 research PDFs as one ecosystem. The supplied workbook is a discovery inventory,
-not proof of complete acquisition. [Materials](../provided_material/README.md)
+not proof of complete acquisition. [Materials](../provided-material/README.md)
 records its actual rows and caveats.
 
 ## Source lifecycle

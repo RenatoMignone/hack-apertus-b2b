@@ -1,7 +1,7 @@
 <table align="center" width="800" bgcolor="#ffffff">
   <tr>
     <td align="center">
-      <img src="docs/provided_material/Logo_SF_BE_EN.png" alt="Bern Economic Development Agency" width="300">
+      <img src="docs/provided-material/Logo_SF_BE_EN.png" alt="Bern Economic Development Agency" width="300">
     </td>
   </tr>
 </table>

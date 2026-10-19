@@ -18,7 +18,7 @@ source-backed, human-reviewed Bern opportunity brief.
 | Optional capabilities | [Plans and PPTX](data/RICH_OUTPUTS.md) |
 | Reliability and quality | [Performance](data/CAPTURE_PERFORMANCE.md), [evaluation](challenge/EVALUATION.md) |
 | Demo and submission | [Walkthrough](judges/DEMO.md), [delivery checklist](judges/DELIVERY.md), [technical report](../technical_report.md) |
-| Original requirements and materials | [Challenge](challenge/CHALLENGE_BRIEF.md), [assets](provided_material/README.md) |
+| Original requirements and materials | [Challenge](challenge/CHALLENGE_BRIEF.md), [assets](provided-material/README.md) |
 
 Executable contracts and schema take precedence for exact fields. Supplied assets
 retain their original contents. Internal task prompts, recordings, source

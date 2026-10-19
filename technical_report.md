@@ -17,8 +17,8 @@ one ecosystem. Apertus v1.5 interprets needs, extracts and assesses evidence, an
 drafts cited reasons; code controls provenance and export eligibility.
 A real-provider partial report and reviewed PDF have been demonstrated. Actual-
 Apertus isolated cases also passed clarification, evidence assessment, review and
-export. Combined integration checks passed 310 backend and 57 frontend tests.
-Real-corpus retrieval and later SQL optimization have separate measured receipts.
+export. Real-corpus retrieval and later SQL optimization have separate measured
+receipts.
 Independent expert Recall@10 remains to be measured.
 
 ## 2. Architecture
@@ -27,7 +27,9 @@ React/Vite communicates with an authenticated FastAPI service. A separate durabl
 LangGraph worker executes interpretation, clarification, research, evidence
 preparation and drafting. PostgreSQL/pgvector stores authorized corpus evidence,
 case revisions and results; a separate PostgreSQL database holds framework
-checkpoints. S3-compatible storage holds source and export artifacts. Optional
+checkpoints, with checkpoint row-level isolation and target-host access policy
+remaining deployment-acceptance items. S3-compatible storage holds source and
+export artifacts. Optional
 masked local Langfuse traces diagnose execution and do not supply facts.
 
 Retrieval runs lexical and vector searches independently, fuses with reciprocal
@@ -46,23 +48,36 @@ Wording edits reuse the pack; new facts or focus create a new research revision.
 See the [judge architecture guide](docs/judges/ARCHITECTURE.md) and
 [execution graph](docs/plans/EXECUTION_GRAPH.md).
 
-### Target architecture (mandatory)
+### Target architectures (mandatory)
 
-**Selected design target: b) air-gapped case runtime on independent infrastructure,
-outside cantonal ICT. This target has not been demonstrated.** Connected build
-stages must prepare approved corpus snapshots, compatible indexes, Apertus weights
-and serving runtime, embedding/reranker assets, tokenizers, dependencies and report
-assets for transfer. Runtime must use local inference/encoding and disable web
-research and external egress. A cold start, completed case and export with external
-networking disabled remain acceptance requirements.
+The application is designed to run in all three requested deployment settings:
+
+- **On-premise:** all services can run on infrastructure administered by the
+  organisation, whether on a remote Swiss server, an internal company server,
+  or a controlled personal workstation/PC for development or small-scale use.
+- **Air-gapped:** connected build stages prepare approved corpus snapshots,
+  compatible indexes, Apertus weights and serving runtime, embedding/reranker
+  assets, tokenizers, dependencies and report assets for transfer. Runtime uses
+  local inference/encoding, disables web research and external egress, and
+  performs intake, retrieval, review and export locally.
+- **Sovereign Swiss cloud:** the same services can run on a Swiss-operated,
+  Swiss-jurisdiction cloud with Swiss data residency and provider-controlled
+  storage, backups, inference and monitoring.
+
+These are supported deployment designs, not completed certifications. A cold
+start, completed case and export with external networking disabled remain
+acceptance requirements for the air-gapped target; Swiss jurisdiction,
+residency, contractual controls and operations remain acceptance requirements
+for a sovereign-cloud deployment.
 
 The measured development path is **connected**: Keera reasoning, an HF embedding
 endpoint, independently hosted PostgreSQL/MinIO and local API/worker/frontend.
-The team currently hosts PostgreSQL on a member's computer. This does not
-establish Swiss data residency, sovereign Swiss-cloud operation or air-gap
-compliance. Build time requires package/model/image acquisition; connected runtime
-additionally requires provider credentials and network access. Offline runtime
-requires packaged assets and local services, with no hosted fallback.
+Current development uses PostgreSQL hosted on team-controlled infrastructure.
+This does not establish Swiss data residency, sovereign Swiss-cloud operation or
+air-gap compliance. Build time requires package/model/image acquisition;
+connected runtime additionally requires provider credentials and network access.
+Offline runtime requires packaged assets and local services, with no hosted
+fallback.
 
 ## 3. Use of Apertus
 
@@ -77,8 +92,7 @@ requires packaged assets and local services, with no hosted fallback.
 model is selected explicitly with no automatic fallback. Typed contracts and
 bounded repair constrain task responses; valid JSON alone is insufficient to
 accept a factual statement. LangGraph coordinates all agentic execution and
-LangChain supplies model/task adapters. Thinking aliases are separate and cannot
-be combined with tool calling. See the
+LangChain supplies model/task adapters. See the
 [evidence services](src/backend/evidence/README.md) and
 [model adapters](src/backend/models/README.md).
 
@@ -101,11 +115,12 @@ completeness is claimed here.
 Operators read confidential company documents outside the application and type
 only permitted context. Confidential uploads to any model are forbidden under
 the current boundary. Operator assertions remain attributed rather than treated
-as public evidence. Source copyright remains with institutions; Apache-2.0 code
-licensing does not relicense source pages, personal data, recordings or model
-weights. Partner branding is for this challenge only. Original materials and
-the explicitly publication-authorized transcript are preserved; no additional
-redistribution rights are assumed.
+as public evidence. Source copyright remains with institutions; Apache-2.0 code licensing does not
+relicense source pages, personal data, recordings or model weights. Partner
+branding is for this challenge only. Workshop recordings, transcripts and source
+snapshots are retained as internal provenance where permitted, but are excluded
+from the public submission unless their publication rights are separately
+confirmed.
 
 ## 5. Limitations
 
@@ -114,13 +129,33 @@ combined database/web quality and independently reviewed expert Recall@10 remain
 acceptance tasks. Source coverage, freshness, multilingual quality, representative
 latency/cost and load also need evaluation; English is the baseline.
 
+Apertus is central to interpretation, evidence assessment and drafting, so model
+quality directly affects the product. Context limits, reasoning errors,
+structured-output failures, multilingual quality, inference latency,
+memory/accelerator requirements, provider availability and model-version changes
+remain material risks. Bounded prompts, typed contracts, validation, evidence
+gates and human review reduce these risks but cannot remove the underlying model
+trade-offs.
+
 Source passages and model support checks make findings inspectable, while human
 review handles unsupported implications and practical follow-up. Current roles,
-availability and willingness to collaborate need confirmation. Optional outputs
-and case memory need validation on the intended deployment.
+availability and willingness to collaborate need confirmation. Users may download
+the reviewed report as PDF and, where enabled, as PPTX; both outputs remain
+dependent on the reviewed evidence and configured deployment.
+
+The retrieval PoC is evidence of source traceability and retrieval mechanics only.
+It does not establish complete corpus coverage, expert availability, semantic
+matching quality or end-to-end report quality. A reachable source URL or matching
+passage does not prove that every generated role, capability, relationship,
+availability statement or business implication is correct.
 
 The selected air-gapped runtime has not been demonstrated; current development is
 connected. Target-host restart/recovery and checkpoint access isolation remain.
+Representative cost and throughput are not yet measured. The main drivers are
+70B inference, embedding generation, optional reranking, corpus storage,
+crawling and concurrent workflow execution. Local sovereign operation may require
+substantial accelerator memory, while hosted operation introduces provider cost,
+quota and availability dependencies.
 See [verification](docs/judges/VERIFICATION.md), the
 [retrieval PoC](docs/proof-of-concept/README.md) and the
 [delivery checklist](docs/judges/DELIVERY.md).
@@ -153,13 +188,10 @@ data or download weights. A clean clone is not a pre-provisioned live installati
 
 The guide also supplies a synthetic API/worker route using disposable local
 PostgreSQL/pgvector and fixture providers. Backend checks use
-`python -m pytest src/backend/tests -m "not integration" -q`; the full suite
-requires an isolated `NAVIGATOR_TEST_ADMIN_DSN` and creates/drops test databases.
-Frontend checks are `npm test` and `npm run build`. Record the final commit,
-platform, pins, active flags, test counts and live-case outcome at release.
-Historical tests and live receipts used different environments; no single
-hardware/quality benchmark is claimed. Final release SHA and report PDF/page
-count remain pending.
+isolated disposable databases and fixture providers where applicable. Historical
+validation and live receipts used different environments; no single
+hardware/quality benchmark is claimed. Record the final commit, platform, pins,
+active flags and live-case outcome for any reproduced result.
 
 ## License
 
@@ -176,3 +208,4 @@ Repository code uses [Apache-2.0](LICENSE); third-party material keeps its right
 6. [Recorded live partial report and PDF](docs/judges/VERIFICATION.md).
 7. [Capture-performance evidence](docs/data/CAPTURE_PERFORMANCE.md).
 8. [Evaluation method](docs/challenge/EVALUATION.md).
+9. [Retrieval proof-of-concept PDF](docs/proof-of-concept/Stregoni_Retrieval_Proof_of_Concept.pdf).

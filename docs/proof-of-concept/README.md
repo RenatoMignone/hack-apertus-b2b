@@ -4,7 +4,7 @@
 passages from real Bern institutional sources, with inspectable quotations,
 rankings and source references.
 
-[Read the three-page PDF](../../output/pdf/Stregoni_Retrieval_Proof_of_Concept.pdf)
+[Read the three-page PDF](Stregoni_Retrieval_Proof_of_Concept.pdf)
 · [Inspect the original result record](retrieval-results.json)
 
 The experiment ran on **19 October 2026 at 09:22 UTC**. The PDF presentation was
