@@ -25,7 +25,7 @@ a three-page PDF, real-source quotations and full rank records without live
 services. Its original retrieval measurements are separated from newer pipeline
 and performance acceptance.
 
-The [delivery checklist](DELIVERY.md) records final artifact/access requirements;
+The [submission package](DELIVERY.md) records final artifact/access requirements;
 [current status](../project/STATUS.md) distinguishes implemented features from
 host migration, real-corpus quality and deployment acceptance. Connected provider
 operation does not demonstrate the selected offline target.

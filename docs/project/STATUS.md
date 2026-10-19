@@ -49,7 +49,7 @@ separates the scope and conditions of each result.
 - Package and demonstrate the selected offline target, or explicitly qualify the
   connected demonstration. Current development proves no air-gap or Swiss residency.
 - Produce final report PDF, accessible video/demo handoff and release/submission
-  confirmation; use the [delivery checklist](../judges/DELIVERY.md).
+  confirmation; use the [submission package](../judges/DELIVERY.md).
 
 ## Runtime behavior
 

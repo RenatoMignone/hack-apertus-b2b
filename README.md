@@ -155,7 +155,7 @@ Maintain [technical_report.md](technical_report.md) and export
 
 Provide an accessible video of at most two minutes and add its URL to the report's
 Demo field. Final artifacts/access are tracked in the
-[delivery checklist](docs/judges/DELIVERY.md); this README is not a submission receipt.
+[submission package](docs/judges/DELIVERY.md).
 
 ## ⚖️ Judging Criteria
 

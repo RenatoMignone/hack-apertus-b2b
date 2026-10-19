@@ -4,7 +4,7 @@
 - **Event:** Hack Apertus, on-site Liebefeld
 - **Team:** Stregoni — Renato Mignone, Elia Innocenti, Eric Ruiz Giménez, Mohamed Kechiche
 - **Demo:** Pending video URL; [reproducible walkthrough](docs/judges/DEMO.md)
-- **Status:** Delivery draft, 19 October 2026; integrated main, with final artifacts/acceptance tracked in the delivery checklist
+- **Status:** Delivery draft, 19 October 2026; integrated main, with final artifacts/acceptance tracked in the submission package
 
 ## 1. Summary
 
@@ -123,7 +123,7 @@ The selected air-gapped runtime has not been demonstrated; current development i
 connected. Target-host restart/recovery and checkpoint access isolation remain.
 See [verification](docs/judges/VERIFICATION.md), the
 [retrieval PoC](docs/proof-of-concept/README.md) and the
-[delivery checklist](docs/judges/DELIVERY.md).
+[submission package](docs/judges/DELIVERY.md).
 
 ## 6. Reproducibility
 

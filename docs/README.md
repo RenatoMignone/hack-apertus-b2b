@@ -19,7 +19,7 @@ source-backed, human-reviewed Bern opportunity brief.
 | Search and models | [Retrieval](data/RETRIEVAL_SPEC.md), [Apertus](data/INFERENCE_CONFIGURATION.md), [embeddings](data/HOSTED_EMBEDDINGS.md), [reranking](data/RERANKING.md), [web tools](data/WEB_RESEARCH.md) |
 | Optional capabilities | [Own-case memory](data/CASE_MEMORY.md), [plans and PPTX](data/RICH_OUTPUTS.md) |
 | Reliability and quality | [Performance](data/CAPTURE_PERFORMANCE.md), [observability](data/OBSERVABILITY.md), [evaluation](challenge/EVALUATION.md) |
-| Demo and submission | [Walkthrough](judges/DEMO.md), [delivery checklist](judges/DELIVERY.md), [technical report](../technical_report.md) |
+| Demo and submission | [Walkthrough](judges/DEMO.md), [submission package](judges/DELIVERY.md), [technical report](../technical_report.md) |
 | Original requirements and materials | [Challenge](challenge/CHALLENGE_BRIEF.md), [source provenance](project/SOURCES.md), [assets](provided_material/README.md), [transcripts](recordings/README.md) |
 
 Executable contracts and schema take precedence for exact fields. Source snapshots,

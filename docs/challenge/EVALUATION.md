@@ -78,7 +78,7 @@ automatically incorrect; audit them before revising a versioned expected set.
    tested, with sample size, protocol and limits. A small synthetic-query pilot
    is preliminary evidence, not proof of production-wide 80% recall.
 
-Suggested case record: case ID, intent, synthetic/public input provenance,
+Evaluation case fields: case ID, intent, synthetic/public input provenance,
 query/variant group, expected typed entity IDs, supporting URLs/passages,
 relevance labels, corpus/version, reviewer/date and unresolved judgments.
 Use real verified expertise even when the company/query is synthetic.
