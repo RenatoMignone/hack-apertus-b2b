@@ -28,3 +28,10 @@ build/
 .DS_Store
 .idea/
 .vscode/
+
+# Test and coverage artifacts
+.coverage
+htmlcov/
+coverage/
+playwright-report/
+test-results/

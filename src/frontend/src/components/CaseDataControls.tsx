@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api } from '../api';
 import type { BusinessContext, CaseDetail, RunStage } from '../types/contract';
 
 /** Explicit operator input; never populate business figures from model text. */
-export default function CaseDataControls({ detail, busy, onBusy, onChange, onStage }: {
+export default function CaseDataControls({ detail, busy, onBusy, onChange, onStage, onConflict }: {
   detail: CaseDetail; busy: boolean; onBusy: (busy: boolean) => void;
-  onChange: (detail: CaseDetail) => void; onStage: (stage: RunStage) => void;
+  onChange: (detail: CaseDetail) => void; onConflict: (error: unknown) => Promise<void>; onStage: (stage: RunStage) => void;
 }) {
+  const alive = useRef(true);
+  const pending = useRef(false);
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
   const [confirmed, setConfirmed] = useState(false);
   const [plansConfirmed, setPlansConfirmed] = useState(false);
   const [error, setError] = useState('');
@@ -19,9 +22,11 @@ export default function CaseDataControls({ detail, busy, onBusy, onChange, onSta
   const reviewed = !!result?.resultHash && result.reasons.some((r) => r.selection === 'kept')
     && result.reasons.every((r) => r.selection !== 'none');
   const perform = async (task: () => Promise<CaseDetail>) => {
-    setError(''); onBusy(true);
-    try { onChange(await task()); } catch (e) { setError(e instanceof Error ? e.message : 'The update failed.'); }
-    finally { onBusy(false); }
+    if (pending.current) return;
+    pending.current = true; setError(''); onBusy(true);
+    try { const value = await task(); if (alive.current) onChange(value); }
+    catch (e) { if (alive.current) { setError(e instanceof Error ? e.message : 'The update failed.'); await onConflict(e); } }
+    finally { pending.current = false; if (alive.current) onBusy(false); }
   };
   if (!detail.memory?.available && !detail.businessContextAvailable) return null;
   const savePlans = () => {
@@ -32,7 +37,7 @@ export default function CaseDataControls({ detail, busy, onBusy, onChange, onSta
     if (currency && !/^[A-Z]{3}$/.test(currency)) { setError('Enter an explicit three-letter currency code.'); return; }
     const values: BusinessContext = { planned_jobs: jobs ? Number(jobs) : null,
       investment_amount: amount || null, investment_currency: currency || null, timeline: timeline.trim() || null };
-    void perform(() => api.setBusinessContext!(detail.case.id, values, onStage, detail.revision));
+    void perform(() => api.setBusinessContext!(detail.case.id, values, (stage) => { if (alive.current) onStage(stage); }, detail.revision));
   };
   return <details className="my-4 rounded-xl border border-line bg-white p-4">
     <summary className="cursor-pointer text-sm font-medium">Company plans and case comparison</summary>

@@ -33,15 +33,17 @@ are recorded separately; zero profiles must not be described as a successful
 canonical-person search. The named demonstration examples were selected after
 retrieval and inspected by the assistant, not independently labeled as gold.
 
-`python -m backend.evaluation.render_proof_of_concept` renders the inspected receipt
-as a PDF, Markdown summary and public rank/source JSON. It asserts the recorded
-query/rank/source selection; changed rankings require fresh inspection. Pass
-`--font` / `--font-bold` with Unicode TTF files outside Windows. Full texts remain
-in the ignored receipt; only selected exact quotations are republished.
+`python -m backend.evaluation.render_proof_of_concept` renders the committed,
+sanitized `docs/proof-of-concept/retrieval-results.json` into the standalone PDF.
+It validates counts and selected rank/source/quote references, uses bundled Unicode
+fonts and writes only the PDF. It does not update the JSON/README, require private
+raw text or rerun source verification. Optional `--input`, `--output`, `--font` and
+`--font-bold` select explicit paths. New collector runs require a separately
+inspected public receipt; the historical rankings remain fixed.
 
 See [PoC outcome and reproduction](../../../docs/proof-of-concept/README.md).
-This static fallback is distinct from the application's exact-review-gated report
-export and from independent expert Recall@10 evaluation.
+The document demonstrates retrieval; application review/export and independent
+expert Recall@10 have separate acceptance records.
 
 ## Live SQL performance reproduction
 

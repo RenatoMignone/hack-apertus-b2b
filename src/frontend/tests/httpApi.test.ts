@@ -198,3 +198,119 @@ test('manual plans cannot overwrite an unseen input revision', async () => {
   await assert.rejects(api.setBusinessContext!('case',{planned_jobs:5},()=>{},3),ApiError);
   assert.equal(calls.filter((c) => c.method !== 'GET').length,0);
 });
+
+
+test('interrupted status observation resumes existing run without writes', async () => {
+  let reads = 0;
+  const { api, calls } = harness((url) => {
+    if (url.endsWith('/runs/run')) {
+      if (++reads <= 2) throw new TypeError('offline');
+      return { status: 'succeeded', stage: 'done' };
+    }
+    return detail();
+  });
+  await api.runCase('case', () => {});
+  assert.equal(reads, 3);
+  assert.equal(calls.filter(c => c.method !== 'GET').length, 0);
+});
+
+test('authentication stops observation immediately; unavailable reads have a bound', async () => {
+  for (const status of [401, 503]) {
+    let reads = 0;
+    const { api } = harness(url => {
+      if (url.endsWith('/runs/run')) { reads++; return Response.json({error:{code:'service_unavailable'}}, {status}); }
+      return detail();
+    });
+    await assert.rejects(api.runCase('case', () => {}), ApiError);
+    assert.equal(reads, status === 401 ? 1 : 4);
+  }
+});
+
+test('navigation aborts an in-flight status read without transport retry', async () => {
+  const controller = new AbortController(); let reads = 0;
+  const fetcher: typeof fetch = async (url, init) => {
+    if (!String(url).endsWith('/runs/run')) return Response.json(detail());
+    reads++;
+    return new Promise((_, reject) => {
+      init!.signal!.addEventListener('abort', () => reject(new DOMException('stopped','AbortError')), {once:true});
+      controller.abort();
+    });
+  };
+  const api = createHttpApi({token:()=>'',fetcher});
+  await assert.rejects(api.runCase('case',()=>{},controller.signal), {name:'AbortError'});
+  assert.equal(reads,1);
+});
+
+
+test('reconnect after the run finishes returns its result without starting research', async () => {
+  const {api,calls} = harness(() => ({...detail(),currentRun:{run_id:'run',input_id:'input',status:'succeeded'}}));
+  await api.runCase('case',()=>{});
+  assert.equal(calls.filter(c => c.method !== 'GET').length,0);
+});
+
+test('export reconnect retains accepted operation after polling retries are exhausted', async () => {
+  let disconnected = true;
+  const {api,calls} = harness(url => {
+    if (url.endsWith('/reviews')) return {review_id:'review'};
+    if (url.endsWith('/exports')) return {status_url:'/api/v1/operations/op'};
+    if (url.endsWith('/operations/op')) {
+      if (disconnected) return Response.json({error:{code:'service_unavailable'}},{status:503});
+      return {status:'committed',download_url:'/api/v1/cases/case/exports/pdf/download'};
+    }
+    if (url.endsWith('/download')) return new Response('%PDF-test',{headers:{'Content-Type':'application/pdf'}});
+    return detail();
+  });
+  await assert.rejects(api.exportDeck('case',expected));
+  disconnected = false;
+  await api.exportDeck('case',expected);
+  assert.equal(calls.filter(c => c.method === 'POST' && c.url.endsWith('/exports')).length,1);
+  assert.equal(calls.filter(c => c.method === 'POST' && c.url.endsWith('/reviews')).length,1);
+});
+
+test('uncertain export submission reuses its key across an explicit reconnect', async () => {
+  let offline = true;
+  const {api,calls} = harness(url => {
+    if (url.endsWith('/reviews')) return {review_id:'review'};
+    if (url.endsWith('/exports')) {
+      if (offline) throw new TypeError('response lost');
+      return {status_url:'/api/v1/operations/op'};
+    }
+    if (url.endsWith('/operations/op')) return {status:'committed',download_url:'/api/v1/cases/case/exports/pdf/download'};
+    if (url.endsWith('/download')) return new Response('%PDF-test',{headers:{'Content-Type':'application/pdf'}});
+    return detail();
+  });
+  await assert.rejects(api.exportDeck('case',expected));
+  offline = false;
+  await api.exportDeck('case',expected);
+  const keys = calls.filter(c => c.url.endsWith('/exports')).map(c => c.headers.get('Idempotency-Key'));
+  assert.equal(keys.length,3); assert.equal(new Set(keys).size,1);
+});
+
+test('safe error metadata is preserved but provider bodies are never surfaced', async () => {
+  const {api}=harness(()=>Response.json({request_id:'req_123',error:{code:'storage_unavailable',retryable:true,
+    message:'PRIVATE provider body',details:[{secret:'never surface'}]}},{status:503}));
+  await assert.rejects(api.getCase('case'),(error:unknown)=>{
+    assert.ok(error instanceof ApiError); assert.equal(error.requestId,'req_123');
+    assert.equal(error.retryable,true);assert.equal(error.status,503);assert.equal(error.code,'storage_unavailable');
+    assert.doesNotMatch(error.message,/PRIVATE|secret/);return true;
+  });
+  const unsafe=new ApiError(503,'unknown',{requestId:'token=secret\nprovider',retryable:'true'});
+  assert.equal(unsafe.requestId,undefined);assert.equal(unsafe.retryable,undefined);
+});
+
+test('explicit nonretryable status reads stop rather than concealing the failure',async()=>{
+  let reads=0;const {api}=harness(url=>url.endsWith('/runs/run')
+    ? (++reads,Response.json({error:{code:'service_unavailable',retryable:false}},{status:503})) : detail());
+  await assert.rejects(api.runCase('case',()=>{}));assert.equal(reads,1);
+});
+
+test('a new authenticated session never coalesces an older pending detail read',async()=>{
+  let token='first', release!:(r:Response)=>void, reads=0;
+  const api=createHttpApi({token:()=>token,fetcher:async()=>{
+    if(++reads===1)return new Promise(resolve=>{release=resolve;});
+    return Response.json(detail());
+  }});
+  const old=api.getCase('case');const rejected=assert.rejects(old,ApiError);
+  token='second';await api.getCase('case');release(Response.json(detail()));await rejected;
+  assert.equal(reads,2);
+});

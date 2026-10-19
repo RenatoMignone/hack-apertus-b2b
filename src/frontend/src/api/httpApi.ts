@@ -1,3 +1,5 @@
+import { rejectAccess } from './session.ts';
+import { publishObservation } from './observation.ts';
 import { canReusePack, failureMessage } from './recovery.ts';
 import { nextPollDelay, publishProgress } from './progress.ts';
 import type { NavigatorApi } from './index';
@@ -16,13 +18,22 @@ type Accepted = { case_id: string; input_id: string; run_id?: string; status_url
 type Operation = { status: string; download_url?: string; error_code?: string };
 
 
+export class ConnectionError extends Error {
+  constructor() { super("Connection interrupted. Submitted work may still be running. Reconnect to check its status."); }
+}
+
 export class ApiError extends Error {
   status: number;
   code: string;
-  constructor(status: number, code: string) {
-    super(failureMessage(code));
+  retryable?: boolean;
+  requestId?: string;
+  constructor(status: number, code: string, metadata: {retryable?: unknown; requestId?: unknown} = {}) {
+    const safeCode = typeof code === 'string' && /^[a-z][a-z0-9_]{0,79}$/.test(code) ? code : 'service_unavailable';
+    super(failureMessage(safeCode));
     this.status = status;
-    this.code = code;
+    this.code = safeCode;
+    this.retryable = typeof metadata.retryable === 'boolean' ? metadata.retryable : undefined;
+    this.requestId = typeof metadata.requestId === 'string' && /^[a-zA-Z0-9_-]{1,100}$/.test(metadata.requestId) ? metadata.requestId : undefined;
   }
 }
 
@@ -31,6 +42,10 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
   pollInterval = 1200, maxPolls = 750,
 }: { baseUrl?: string; token: () => string; fetcher?: Fetch; pause?: (ms: number) => Promise<void>;
   pollInterval?: number; maxPolls?: number }): HttpNavigatorApi {
+  type PendingExport = {reviewKey:string; exportKey:string; reviewId?:string; url?:string};
+  const pendingExports = new Map<string, PendingExport>();
+  const exporting = new Map<string, Promise<{filename:string; blob:Blob}>>();
+  let exportCredential = token();
   const listeners = new Set<() => void>();
   let lastOpened: string | undefined;
   const base = baseUrl.replace(/\/$/, '');
@@ -42,16 +57,19 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     return result;
   };
 
-  async function request<T>(url: string, method = 'GET', body?: unknown, blob = false): Promise<T> {
+  async function request<T>(url: string, method = 'GET', body?: unknown, blob = false, signal?: AbortSignal, idempotencyKey?: string): Promise<T> {
     // Server-returned paths stay on the configured API origin, including downloads.
     if (!url.startsWith('/api/v1/') || url.includes('://') || url.includes('\\')) throw new Error('Invalid API path.');
     const credential = token();
     const headers: Record<string, string> = credential ? { Authorization: `Bearer ${credential}` } : {};
-    if (method !== 'GET') headers['Idempotency-Key'] = crypto.randomUUID();
+    if (method !== 'GET') headers['Idempotency-Key'] = idempotencyKey ?? crypto.randomUUID();
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     // Retry transport failures once with the SAME idempotency key; never retry a conflict.
     for (let attempt = 0; attempt < 2; attempt++) {
+      signal?.throwIfAborted();
       const controller = new AbortController();
+      const abort = () => controller.abort();
+      signal?.addEventListener('abort', abort, { once: true });
       // Live-corpus capture can exceed a short read timeout. Mutations retain
       // their idempotency key if a lost response requires a transport retry.
       const timeout = setTimeout(() => controller.abort(), method === 'GET' ? 30000 : 120000);
@@ -59,24 +77,35 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
         const response = await fetcher(base + url, { method, headers, credentials: 'omit',
           redirect: 'error', cache: 'no-store', signal: controller.signal,
           body: body === undefined ? undefined : JSON.stringify(body) });
+        signal?.throwIfAborted();
+        if (credential !== token()) throw new ApiError(401, 'authentication_required');
         if (!response.ok) {
           const payload = await response.json().catch(() => ({}));
-          throw new ApiError(response.status, payload.error?.code ?? 'service_unavailable');
+          if (response.status === 401) rejectAccess();
+          throw new ApiError(response.status, payload.error?.code ?? 'service_unavailable', {
+            retryable:payload.error?.retryable, requestId:payload.request_id ?? response.headers.get('X-Request-ID'),
+          });
         }
-        return (blob ? await response.blob() : await response.json()) as T;
+        const value = (blob ? await response.blob() : await response.json()) as T;
+        signal?.throwIfAborted();
+        if (credential !== token()) throw new ApiError(401, 'authentication_required');
+        return value;
       } catch (error) {
+        signal?.throwIfAborted();
         if (error instanceof ApiError) throw error;
-        if (attempt) throw new Error('Cannot reach the backend. Check your connection and reload; submitted work may still be running.');
-        await pause(300);
-      } finally { clearTimeout(timeout); }
+        if (attempt) throw new ConnectionError();
+        await wait(300, signal);
+      } finally { clearTimeout(timeout); signal?.removeEventListener('abort', abort); }
     }
     throw new Error('Cannot reach the backend.');
   }
 
+  let detailCredential = token();
   const detailRequests = new Map<string, Promise<CaseDetail | null>>();
   async function loadCase(id: string): Promise<CaseDetail | null> {
     try {
       const detail = await request<CaseDetail>(path(id));
+      publishObservation(id, 'connected');
       lastOpened = id;
       return detail;
     } catch (error) {
@@ -85,9 +114,10 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     }
   }
   function getCase(id: string): Promise<CaseDetail | null> {
+    if (detailCredential !== token()) { detailRequests.clear(); detailCredential = token(); }
     const existing = detailRequests.get(id);
     if (existing) return existing;
-    const promise = loadCase(id).finally(() => { detailRequests.delete(id); });
+    const promise = loadCase(id).finally(() => { if (detailRequests.get(id) === promise) detailRequests.delete(id); });
     detailRequests.set(id, promise);
     return promise;
   }
@@ -96,11 +126,40 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     if (!detail || detail.revision === undefined || !detail.inputId) throw new Error('Case is unavailable.');
     return detail;
   }
+  async function wait(ms: number, signal?: AbortSignal) {
+    signal?.throwIfAborted();
+    if (!signal) return pause(ms);
+    let abort: () => void = () => {};
+    try {
+      await Promise.race([pause(ms), new Promise<never>((_, reject) => {
+        abort = () => reject(signal.reason ?? new DOMException('Observation stopped', 'AbortError'));
+        signal.addEventListener('abort', abort, { once: true });
+      })]);
+    } finally { signal.removeEventListener('abort', abort); }
+    signal.throwIfAborted();
+  }
+  async function observe<T>(url: string, signal?: AbortSignal, caseId?: string, blob = false): Promise<T> {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const value = await request<T>(url, 'GET', undefined, blob, signal);
+        if (caseId) publishObservation(caseId, 'connected');
+        return value;
+      }
+      catch (error) {
+        const transient = error instanceof ConnectionError || error instanceof ApiError && [502, 503, 504].includes(error.status) && error.retryable !== false;
+        if (signal?.aborted) throw error;
+        if (caseId) publishObservation(caseId, error instanceof ApiError && error.status === 401
+          ? 'authentication_required' : transient && attempt < 3 ? 'reconnecting' : 'disconnected');
+        if (!transient || attempt >= 3) throw error;
+        await wait(nextPollDelay(pollInterval, attempt), signal);
+      }
+    }
+  }
   async function poll(caseId: string, url: string, onStage: (stage: RunStage) => void, signal?: AbortSignal) {
     let last = "", unchanged = 0;
     for (let n = 0; n < maxPolls; n++) {
       signal?.throwIfAborted();
-      const run = await request<CaseRun>(url);
+      const run = await observe<CaseRun>(url, signal, caseId);
       signal?.throwIfAborted();
       publishProgress(caseId, run);
       const signature = JSON.stringify([run.status, run.stage, run.step, run.activity]);
@@ -115,7 +174,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
         emit();
         throw new ApiError(409, run.error_code ?? 'conflict');
       }
-      await pause(nextPollDelay(pollInterval, unchanged));
+      await wait(nextPollDelay(pollInterval, unchanged), signal);
     }
     throw new Error('Research is still running. Reopen this case to resume progress updates.');
   }
@@ -142,7 +201,9 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     },
     async runCase(caseId, onStage, signal) {
       const detail = await requireCase(caseId);
+      signal?.throwIfAborted();
       const run = detail.currentRun;
+      if (run?.status === 'succeeded') return detail;
       if (run && ['queued', 'running', 'waiting_for_input'].includes(run.status)) {
         return poll(caseId, `${path(caseId)}/runs/${run.run_id}`, onStage, signal);
       }
@@ -158,22 +219,24 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
       if (!started.status_url) throw new Error('The server did not return a run.');
       return poll(caseId, started.status_url, onStage, signal);
     },
-    async sendMessage(caseId, text, onStage, kind = 'focus') {
+    async sendMessage(caseId, text, onStage, kind = 'focus', signal) {
       const detail = await requireCase(caseId);
+      signal?.throwIfAborted();
       if (detail.currentRun?.status === 'waiting_for_input') throw new Error('Answer the clarification question before sending a new request.');
       const started = await request<Accepted>(`${path(caseId)}/messages`, 'POST', {
         text, kind, expected_revision: detail.revision });
       if (!started.status_url) throw new Error('The server did not return a run.');
-      return poll(caseId, started.status_url, onStage);
+      return poll(caseId, started.status_url, onStage, signal);
     },
-    async answerFollowUp(caseId, turnId, answer, onStage) {
+    async answerFollowUp(caseId, turnId, answer, onStage, signal) {
       const detail = await requireCase(caseId);
+      signal?.throwIfAborted();
       const question = detail.turns.find((turn) => turn.id === turnId)?.followUp;
       if (!detail.currentRun || !question) throw new Error('This clarification is no longer available.');
       const accepted = await request<Accepted>(`${path(caseId)}/runs/${detail.currentRun.run_id}/answers`, 'POST', {
         input_id: detail.inputId, question_id: question.id, answer });
       if (!accepted.status_url) throw new Error('The server did not return a run.');
-      return poll(caseId, accepted.status_url, onStage);
+      return poll(caseId, accepted.status_url, onStage, signal);
     },
     async setSelection(caseId, reasonId, selection, expected) {
       const detail = await requireCase(caseId), result = current(detail);
@@ -218,9 +281,8 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
       ...('outcome' in flags ? { outcome: flags.outcome ?? null } : {}),
     }),
     async exportDeck(caseId, expected, format = 'pdf') {
-      const supported = (await requireCase(caseId)).exportFormats ?? ['pdf'];
-      if (!supported.includes(format)) throw new Error('This export format is unavailable on the server.');
       const detail = await requireCase(caseId), result = current(detail);
+      if (!(detail.exportFormats ?? ['pdf']).includes(format)) throw new Error('This export format is unavailable on the server.');
       if (!expected || expected.resultId !== result.id || expected.resultHash !== result.resultHash) {
         throw new ApiError(409, 'stale_revision');
       }
@@ -228,24 +290,52 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
           || !result.reasons.some((r) => r.selection === 'kept')) {
         throw new Error('Review every reason and keep at least one before exporting.');
       }
-      const report = `${path(caseId)}/reports/${result.id}`;
-      const review = await request<{ review_id: string }>(`${report}/reviews`, 'POST', { decision: 'accepted',
-        expected_result_hash: result.resultHash, expected_selection_hash: detail.selectionHash });
-      const queued = await request<{ status_url: string }>(`${path(caseId)}/exports`, 'POST', {
-        result_id: result.id, review_id: review.review_id, expected_result_hash: result.resultHash,
-        expected_selection_hash: detail.selectionHash, format });
-      for (let n = 0; n < maxPolls; n++) {
-        const operation = await request<Operation>(queued.status_url);
-        if (operation.status === 'failed') throw new ApiError(409, operation.error_code ?? 'service_unavailable');
-        if (operation.status === 'committed' && operation.download_url) {
-          const blob = await request<Blob>(operation.download_url, 'GET', undefined, true);
-          const mime = format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-          if (!blob.type.startsWith(mime)) throw new Error('The server returned an unexpected export format.');
-          return { filename: `bern-report-${result.id}.${format}`, blob };
+      // Memory only, scoped to authenticated session and the exact reviewed content.
+      if (exportCredential !== token()) { pendingExports.clear(); exporting.clear(); exportCredential = token(); }
+      const key = JSON.stringify([caseId, result.id, result.resultHash, detail.selectionHash, format]);
+      const existing = exporting.get(key);
+      if (existing) return existing;
+      const pending = pendingExports.get(key) ?? {reviewKey:crypto.randomUUID(), exportKey:crypto.randomUUID()};
+      pendingExports.set(key, pending);
+      const dropPending = () => { if (pendingExports.get(key) === pending) pendingExports.delete(key); };
+      const task = (async () => {
+        try {
+          if (!pending.reviewId) {
+            const review = await request<{review_id:string}>(`${path(caseId)}/reports/${result.id}/reviews`, 'POST', {
+              decision:'accepted', expected_result_hash:result.resultHash, expected_selection_hash:detail.selectionHash,
+            }, false, undefined, pending.reviewKey);
+            pending.reviewId = review.review_id;
+          }
+          if (!pending.url) {
+            const queued = await request<{status_url:string}>(`${path(caseId)}/exports`, 'POST', {
+              result_id:result.id, review_id:pending.reviewId, expected_result_hash:result.resultHash,
+              expected_selection_hash:detail.selectionHash, format,
+            }, false, undefined, pending.exportKey);
+            pending.url = queued.status_url;
+          }
+          for (let n = 0; n < maxPolls; n++) {
+            const operation = await observe<Operation>(pending.url, undefined, `${caseId}:export`);
+            if (operation.status === 'failed') {
+              dropPending();
+              throw new ApiError(409, operation.error_code ?? 'service_unavailable');
+            }
+            if (operation.status === 'committed' && operation.download_url) {
+              const blob = await observe<Blob>(operation.download_url, undefined, `${caseId}:export`, true);
+              const mime = format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+              if (!blob.type.startsWith(mime)) throw new Error('The server returned an unexpected export format.');
+              dropPending();
+              return {filename:`bern-report-${result.id}.${format}`, blob};
+            }
+            await pause(pollInterval);
+          }
+          throw new Error('Report rendering is still pending. Retry export to reconnect to the accepted operation.');
+        } catch (error) {
+          if (error instanceof ApiError && [404,409,422].includes(error.status)) dropPending();
+          throw error;
         }
-        await pause(pollInterval);
-      }
-      throw new Error('Report rendering is still pending. Try exporting again shortly.');
+      })().finally(() => { if (exporting.get(key) === task) exporting.delete(key); });
+      exporting.set(key, task);
+      return task;
     },
     async listActionItems() { return request<ActionItem[]>('/api/v1/action-items'); },
     async setActionStatus(id, status, answer) {

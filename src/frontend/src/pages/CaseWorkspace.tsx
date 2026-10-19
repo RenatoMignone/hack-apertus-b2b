@@ -1,5 +1,9 @@
-import { canReusePack, failureMessage } from '../api/recovery';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { sessionVersion, subscribeSession } from '../api/session';
+import { ApiError } from '../api/httpApi';
+import { observationStatus, subscribeObservation } from '../api/observation';
+import { OperationScope } from '../api/operationScope';
+import { failureMessage, isStateConflict, recoveryAction } from '../api/recovery';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, Download, MessageSquare } from 'lucide-react';
 import { api, apiMode } from '../api';
@@ -122,6 +126,9 @@ export default function CaseWorkspace() {
   const [detail, setDetail] = useState<CaseDetail | null | undefined>(undefined);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState('');
+  const [chatDraft, setChatDraft] = useState('');
+  const [answerDrafts, setAnswerDrafts] = useState<Record<string,string>>({});
+  useEffect(() => { setChatDraft(''); setAnswerDrafts({}); }, [id]);
   const [stage, setStage] = useState<RunStage>('interpreting');
   const [drawer, setDrawer] = useState<string | null>(null);
   const [flash, setFlash] = useState<Set<string>>(new Set());
@@ -129,6 +136,11 @@ export default function CaseWorkspace() {
   const started = useRef(false);
   const [viewedRevisionId, setViewedRevisionId] = useState<string>();
   const [selecting, setSelecting] = useState(false);
+  const session = useSyncExternalStore(subscribeSession, sessionVersion);
+  const connection = useSyncExternalStore(subscribeObservation, () => observationStatus(id));
+  const scope = useRef(new OperationScope(id));
+  scope.current.reset(id);
+  const busy = useRef(false);
   const activeCase = useRef(id);
   activeCase.current = id;
   const [chatPref, setChatPref] = useState(readChatPref);
@@ -151,7 +163,8 @@ export default function CaseWorkspace() {
   };
 
   useEffect(() => {
-    let alive = true;
+    const ticket = scope.current.begin();
+    busy.current = false;
     started.current = false;
     setViewedRevisionId(undefined);
     setSelecting(false);
@@ -159,17 +172,31 @@ export default function CaseWorkspace() {
     setRunning(false); setError('');
     setDrawer(null);
     setDetail(undefined);
-    api.getCase(id).then((data) => { if (alive) setDetail(data); }).catch((reason) => {
-      if (alive) setError(reason instanceof Error ? reason.message : 'Cannot load this case.');
+    api.getCase(id).then((data) => { if (ticket.current()) setDetail(data); }).catch((reason) => {
+      if (ticket.current()) setError(reason instanceof Error ? reason.message : 'Cannot load this case.');
     });
-    return () => { alive = false; };
-  }, [id]);
+    return () => { scope.current.stop(); busy.current = false; };
+  }, [id, session]);
 
-  const failed = (reason: unknown) => {
+  const refreshConflict = async (reason: unknown, current = scope.current.capture()) => {
+    if (!isStateConflict(reason)) return;
+    try {
+      const value = await api.getCase(id);
+      if (current()) {
+        setDetail(value); setViewedRevisionId(undefined); setExportOpen(false);
+        setError('This case changed. The latest state is loaded. Review it before repeating your action. Your unsent text has been kept.');
+      }
+    } catch (error) { if (current()) reportApiError(error); }
+  };
+  const failed = (reason: unknown, current = scope.current.capture()) => {
     if (activeCase.current !== id || (reason instanceof DOMException && reason.name === "AbortError")) return;
+    busy.current = false;
     setRunning(false);
     setError(reason instanceof Error ? reason.message : 'The request could not be completed.');
-    void api.getCase(id).then((value) => { if (activeCase.current === id) setDetail(value); }).catch(reportApiError);
+    if (reason instanceof ApiError && !isStateConflict(reason)) reportApiError(reason);
+    if (reason instanceof ApiError && reason.status === 401) return;
+    if (isStateConflict(reason)) { void refreshConflict(reason, current); return; }
+    void api.getCase(id).then((value) => { if (current()) setDetail(value); }).catch((error) => { if (current()) reportApiError(error); });
   };
 
   // Show an unread dot when the agent replies while the chat is closed.
@@ -186,14 +213,14 @@ export default function CaseWorkspace() {
     const active = detail.currentRun && ['queued', 'running'].includes(detail.currentRun.status);
     if (!active && !(wantsRun && !detail.currentRun && !detail.revisions.length)) return;
     started.current = true;
-    const controller = new AbortController();
+    const ticket = scope.current.begin();
+    busy.current = true;
     setRunning(true);
-    api.runCase(detail.case.id, (next) => { if (activeCase.current === id) setStage(next); }, controller.signal).then((d) => {
-      if (activeCase.current !== id) return;
-      setDetail(d);
-      setRunning(false);
-    }).catch(failed);
-    return () => { controller.abort(); };
+    api.runCase(detail.case.id, (next) => { if (ticket.current()) setStage(next); }, ticket.signal).then((d) => {
+      if (!ticket.current()) return;
+      busy.current = false; setDetail(d); setRunning(false);
+    }).catch((reason) => { if (ticket.current()) failed(reason, ticket.current); });
+    return () => { ticket.cancel(); };
   }, [detail?.case.id, location.state, id]);
 
   const revision = useMemo(
@@ -204,8 +231,9 @@ export default function CaseWorkspace() {
   const highlight = useCallback((ids: string[]) => {
     if (!ids.length) return;
     setFlash(new Set(ids));
-    setTimeout(() => document.getElementById(`reason-${ids[0]}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
-    setTimeout(() => setFlash(new Set()), 3300);
+    const current = scope.current.capture();
+    setTimeout(() => { if (current()) document.getElementById(`reason-${ids[0]}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
+    setTimeout(() => { if (current()) setFlash(new Set()); }, 3300);
   }, []);
 
   const afterAgent = (d: CaseDetail) => {
@@ -220,7 +248,12 @@ export default function CaseWorkspace() {
   if (detail === undefined)
     return (
       <div className="mx-auto max-w-3xl space-y-3 px-6 py-8">
-        {error && <p role="alert" className="text-brand">{error}</p>}
+        {error && <p role="alert" className="text-brand">{error}
+          <button className="ml-3 underline" onClick={() => {
+            const ticket = scope.current.begin(); setError('');
+            void api.getCase(id).then(value => { if (ticket.current()) setDetail(value); })
+              .catch(reason => { if (ticket.current()) setError(reason instanceof Error ? reason.message : 'Cannot load this case.'); });
+          }}>Reconnect to case</button></p>}
         <Skeleton className="h-28" />
         <Skeleton className="h-20" />
         <Skeleton className="h-20" />
@@ -233,52 +266,64 @@ export default function CaseWorkspace() {
       </div>
     );
 
-  const send = (text: string, kind: 'focus' | 'formatting') => {
-    setDetail({ ...detail, turns: [...detail.turns, { id: 'pending', role: 'operator', text, createdAt: new Date().toISOString() }] });
-    setRunning(true);
-    setStage('interpreting');
-    setError('');
-    api.sendMessage(detail.case.id, text, setStage, kind).then(afterAgent).catch(failed);
+  const perform = (task: (signal: AbortSignal, progress: (stage: RunStage) => void) => Promise<CaseDetail>) => {
+    if (busy.current) return Promise.resolve(false);
+    const ticket = scope.current.begin();
+    busy.current = true; setRunning(true); setError('');
+    return task(ticket.signal, (next) => { if (ticket.current()) setStage(next); }).then((value) => {
+      if (!ticket.current()) return false;
+      busy.current = false; afterAgent(value); return true;
+    }).catch((reason) => { if (ticket.current()) failed(reason, ticket.current); return false; });
   };
-  const answer = (turnId: string, a: string) => {
-    setRunning(true);
-    setStage('interpreting');
-    setError('');
-    api.answerFollowUp(detail.case.id, turnId, a, setStage).then(afterAgent).catch(failed);
-  };
+  const send = (text: string, kind: 'focus' | 'formatting') =>
+    perform((signal, progress) => api.sendMessage(detail.case.id, text, progress, kind, signal));
+  const answer = (turnId: string, a: string) =>
+    perform((signal, progress) => api.answerFollowUp(detail.case.id, turnId, a, progress, signal));
   const select = async (reasonId: string, s: Selection) => {
-    if (selecting || running || revision?.id !== detail.currentRevisionId) return;
+    if (busy.current || selecting || running || serverActive || revision?.id !== detail.currentRevisionId) return;
+    const ticket = scope.current.begin(); busy.current = true;
     const r = revision?.reasons.find((x) => x.id === reasonId);
     const prev = r?.selection ?? 'none';
     const expected = revision?.resultHash ? { resultId: revision.id, resultHash: revision.resultHash } : undefined;
-    setSelecting(true);
+    setSelecting(true); setError('');
     try {
       const updated = await api.setSelection(detail.case.id, reasonId, s, expected);
-      if (activeCase.current !== updated.case.id) return;
+      if (!ticket.current()) return;
       setDetail(updated);
       if (s === 'kept') toast('Kept for the pitch');
-      if (s === 'rejected') toast(`Hidden: ${r?.headline ?? 'item'}`, () => api.setSelection(detail.case.id, reasonId, prev, expected).then((value) => {
-        if (activeCase.current === value.case.id) setDetail(value);
-      }));
-    } catch (reason) { reportApiError(reason); }
-    finally { setSelecting(false); }
+      if (s === 'rejected') toast(`Hidden: ${r?.headline ?? 'item'}`, () => { if (ticket.current() && !busy.current) void select(reasonId, prev); });
+    } catch (reason) { if (ticket.current()) { if (!isStateConflict(reason)) reportApiError(reason); await refreshConflict(reason, ticket.current); } }
+    finally { if (ticket.current()) { busy.current = false; setSelecting(false); } }
   };
-  const setStatus = (s: CaseStatus) => api.setStatus(detail.case.id, s).then((value) => {
-    if (activeCase.current === value.case.id) setDetail(value);
-  });
+  const setStatus = (status: CaseStatus) => {
+    if (busy.current) return;
+    const ticket = scope.current.begin(); busy.current = true;
+    void api.setStatus(detail.case.id, status).then(value => {
+      if (ticket.current()) setDetail(value);
+    }).catch(async reason => { if (ticket.current()) { if (!isStateConflict(reason)) reportApiError(reason); await refreshConflict(reason, ticket.current); } })
+      .finally(() => { if (ticket.current()) busy.current = false; });
+  };
   const kept = revision?.reasons.filter((r) => r.selection === 'kept').length ?? 0;
   const historical = !!revision && revision.id !== detail.currentRevisionId;
   const awaitingAnswers = detail.currentRun?.status === 'waiting_for_input' ||
     (apiMode === 'mock' && detail.turns.some((turn) => turn.followUp && !turn.followUp.answer));
-  const retry = () => {
-    setError(''); setRunning(true);
-    void api.runCase(detail.case.id, setStage).then(afterAgent).catch(failed);
+  const serverActive = !!detail.currentRun && ['queued', 'running'].includes(detail.currentRun.status);
+  const locked = running || serverActive;
+  const action = recoveryAction(detail);
+  const reload = () => {
+    const ticket = scope.current.begin();
+    void api.getCase(id).then(value => {
+      if (ticket.current()) { setDetail(value); setError(''); started.current = false; }
+    }).catch(reason => { if (ticket.current()) failed(reason, ticket.current); });
   };
+  const retry = () => perform((signal, progress) => api.runCase(detail.case.id, progress, signal));
 
   const chat = (
-    <ChatPanel
+    <ChatPanel key={id}
+      draft={chatDraft} onDraftChange={setChatDraft} answerDrafts={answerDrafts}
+      onAnswerDraft={(turnId,value) => setAnswerDrafts(previous => ({...previous,[turnId]:value}))}
       turns={detail.turns}
-      running={running}
+      running={locked}
       awaitingAnswers={awaitingAnswers}
       questionIds={detail.currentRun?.questions?.map((question) => question.id)}
       canRewrite={!!detail.currentRevisionId}
@@ -309,7 +354,7 @@ export default function CaseWorkspace() {
               <VersionMenu detail={detail} current={revision} onPick={setViewedRevisionId} />
             )}
             <span title={kept ? undefined : 'Keep or hide every item, keeping at least one, to export'}>
-              <Button variant="primary" disabled={historical || running || selecting} onClick={() => setExportOpen(true)}>
+              <Button variant="primary" disabled={historical || locked || selecting} onClick={() => setExportOpen(true)}>
                 <Download size={15} aria-hidden /> Export{kept ? ` (${kept})` : ''}
               </Button>
             </span>
@@ -319,7 +364,15 @@ export default function CaseWorkspace() {
 
       {(error || detail.currentRun?.status === 'failed') && <div role="alert" className="border-b border-line bg-white px-6 py-3 text-sm text-brand">
         {error || failureMessage(detail.currentRun?.error_code)}
-        {!running && <button className="ml-3 underline" onClick={retry}>{canReusePack(detail) ? 'Retry report from existing evidence' : 'Retry / resume research'}</button>}
+        {!running && connection !== 'authentication_required' && <button className="ml-3 underline"
+          onClick={action === 'reload' ? reload : action === 'clarify' ? () => setChatOpen(true) : retry}>
+          {({observe:'Reconnect to research', clarify:'Open clarification questions', report:'Retry report from existing evidence', research:'Retry research', reload:'Reload case'})[action]}
+        </button>}
+      </div>}
+      {connection !== 'connected' && <div role="status" className="border-b border-line bg-white px-6 py-3 text-sm">
+        {connection === 'reconnecting' ? 'Connection interrupted. Reconnecting to existing work…' :
+          connection === 'authentication_required' ? 'Authentication is required. Reconnect with your personal token.' :
+          'Progress updates are disconnected. Server work may still be running; your last report is preserved.'}
       </div>}
       {awaitingAnswers && <div role="status" className="border-b border-line bg-white px-6 py-3 text-sm">
         Research needs your answer. <button className="text-brand underline" onClick={() => setChatOpen(true)}>Open clarification questions</button>
@@ -331,7 +384,10 @@ export default function CaseWorkspace() {
         <div className="min-w-0 flex-1 overflow-y-auto" id="case-scroll">
           <div className="mx-auto max-w-3xl px-6 pb-16 pt-4">
             <CaseDataControls key={`${detail.case.id}:${detail.inputId}`} detail={detail}
-              busy={running || selecting || awaitingAnswers || historical} onBusy={setRunning} onChange={setDetail} onStage={setStage} />
+              busy={locked || selecting || awaitingAnswers || historical} onConflict={refreshConflict} onBusy={(value) => { if (activeCase.current === id) { busy.current = value; setRunning(value); } }}
+              onChange={(value) => { if (activeCase.current === id) setDetail(previous =>
+                !previous || (value.revision ?? 0) >= (previous.revision ?? 0) ? value : previous); }}
+              onStage={(value) => { if (activeCase.current === id) setStage(value); }} />
             {running && revision && <div className="mb-6"><ResearchProgress caseId={id} stage={stage} /></div>}
             {revision && <JumpBar revision={revision} />}
             {!revision && running && (
@@ -339,7 +395,7 @@ export default function CaseWorkspace() {
             )}
             {!revision && !running && (
               <p className="mt-10 text-center text-sm text-muted">
-                No brief yet for this case. {!awaitingAnswers && <button onClick={retry} className="font-medium text-brand">Start / resume research</button>}
+                {detail.currentRun?.status === 'succeeded' ? 'Research completed without a report. Check the research outcome before starting again.' : 'No brief yet for this case.'} {!awaitingAnswers && <button onClick={retry} className="font-medium text-brand">Start / resume research</button>}
               </p>
             )}
             {revision && (
@@ -351,7 +407,7 @@ export default function CaseWorkspace() {
                 activeEvidence={drawer ?? undefined}
                 flash={flash}
                 onSelect={select}
-                readOnly={historical || running || selecting}
+                readOnly={historical || locked || selecting}
               />
             )}
           </div>
@@ -379,7 +435,7 @@ export default function CaseWorkspace() {
       </div>
 
       {drawer && detail.evidence[drawer] && <EvidenceDrawer ev={detail.evidence[drawer]} onClose={() => setDrawer(null)} />}
-      {exportOpen && revision && <ExportModal detail={detail} revision={revision} onClose={() => setExportOpen(false)} />}
+      {exportOpen && revision && <ExportModal detail={detail} revision={revision} onConflict={refreshConflict} onClose={() => setExportOpen(false)} />}
     </div>
   );
 }

@@ -15,9 +15,11 @@ explains direct and adjacent matches, and produces a reviewed “Why Bern?” br
 The diabetes-technology pilot treats UniBE, ARTORG and Diabetes Center Berne as
 one ecosystem. Apertus v1.5 interprets needs, extracts and assesses evidence, and
 drafts cited reasons; code controls provenance and export eligibility.
-A real-provider partial report and reviewed PDF have been demonstrated. This
-establishes a working narrow path, not comprehensive expert discovery or measured
-retrieval quality. The challenge's 80% Recall@10 target remains unmeasured.
+A real-provider partial report and reviewed PDF have been demonstrated. Actual-
+Apertus isolated cases also passed clarification, evidence assessment, review and
+export. Combined integration checks passed 310 backend and 57 frontend tests.
+Real-corpus retrieval and later SQL optimization have separate measured receipts.
+Independent expert Recall@10 remains to be measured.
 
 ## 2. Architecture
 
@@ -107,24 +109,21 @@ redistribution rights are assumed.
 
 ## 5. Limitations
 
-The strongest recorded live result is a partial report, not an expert-search
-benchmark. Named-person/facility coverage, direct versus adjacent fit, combined
-real DB/web quality, freshness and bias need review. No independently judged
-Recall@10, factual-accuracy percentage, time-saving figure, cost per case,
-load capacity or DE/FR/IT quality result is claimed. English is the baseline.
+The live-corpus report is partial. A fresh full case after the retrieval fix,
+combined database/web quality and independently reviewed expert Recall@10 remain
+acceptance tasks. Source coverage, freshness, multilingual quality, representative
+latency/cost and load also need evaluation; English is the baseline.
 
-Model assessment can miss unsupported implications even when quotations are
-correct. B2B exposes source passages, missing information and caveats and can
-return partial/no-match output. It cannot establish expert availability,
-willingness to collaborate or clinical suitability. Context limits, provider
-quotas, search failures and capture latency can interrupt research. Checkpoint
-tests do not certify target-host recovery or full credential isolation.
-Optional PPTX, manual plans and own-case memory require activation and assets;
-synthetic tests do not certify their live use.
+Source passages and model support checks make findings inspectable, while human
+review handles unsupported implications and practical follow-up. Current roles,
+availability and willingness to collaborate need confirmation. Optional outputs
+and case memory need validation on the intended deployment.
 
-The [verification guide](docs/judges/VERIFICATION.md) records evidence provenance.
-Deployment acceptance and delivery artifacts remain open in the
-[release checklist](docs/judges/DELIVERY.md).
+The selected air-gapped runtime has not been demonstrated; current development is
+connected. Target-host restart/recovery and checkpoint access isolation remain.
+See [verification](docs/judges/VERIFICATION.md), the
+[retrieval PoC](docs/proof-of-concept/README.md) and the
+[delivery checklist](docs/judges/DELIVERY.md).
 
 ## 6. Reproducibility
 
