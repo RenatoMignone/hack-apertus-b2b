@@ -464,3 +464,12 @@ source quotes without entry metadata and read-only history. Honor server export
 formats; connected PPTX stays unavailable. Optional structured metadata is not
 inferred. The [audit](../team/FRONTEND_RUNTIME_AUDIT.md) records synthetic browser
 checks separately from actual-provider partial PDF acceptance.
+
+## D28 — My desk returns, without colleague to-dos (19 October 2026)
+
+Provenance: user decision; partly reverses D16. `/` is *My desk* again and the board
+moves to `/cases`. The desk has a quick-start text box, an *All cases* card and a
+*Next steps* card. Next steps come only from the operator's own case state (an
+open agent question, unreviewed items, a brief ready to export, an outcome to
+record), with no new API. D16's reasons still hold for the rest: no *Action items*
+page and no colleague, meeting or outreach tracking (E16, E17).

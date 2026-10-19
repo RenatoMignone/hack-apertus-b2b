@@ -38,7 +38,7 @@ sources. Not connected to the live agent yet."
    PowerShell `$env:VITE_API_MODE='mock'; npm --prefix src/frontend run dev`.
    Open the printed localhost URL in Chrome. The top bar must show the **Demo**
    badge, not *Connected*. Use the full window, zoom 100 %.
-2. **Demo → Reset demo data.** The board must show *In review: 0 / No cases*.
+2. **Demo → Reset demo data.** The board (**My cases**, `/cases`) must show *In review: 0 / No cases*.
 3. Close other tabs and notifications. Keep the chat panel open.
 4. Do a dry run of steps 1–7 once, then reset again.
 5. Optional: a recorded walkthrough as a backup, in case the laptop or projector fails.
@@ -59,7 +59,7 @@ The mock agent recognises fixed patterns, not free language. On stage:
 
 | # | Do | Say (short) | What it proves |
 | --- | --- | --- | --- |
-| 0 | Board (`/`), In review empty | "Our user is a business developer. About 300 company cases a year; this is her board." | Case workflow fits their process (E06) |
+| 0 | **My desk** (`/`): point at *Next steps* (Pumpline's open question, outcomes to record). Click **My cases**: the board, In review empty | "Our user is a business developer. About 300 company cases a year. Her desk shows what's waiting on her; this is her board." | Case workflow fits their process (E06) |
 | 1 | **New case** → **Glucose sensor** example. Point at the lock note. → **Ctrl+Enter** | "She types what she knows, in everyday words: a blood-sugar patch. Public information only; confidential business plans never go in." | One natural-language input (R01); confidentiality boundary (R12, E03, E28) |
 | 2 | Run stages play (interpreting → searching → validating → drafting) | "It interprets, searches the three institutions, checks every claim against its source, then drafts." | Pipeline steps; validation before output (R06) |
 | 3 | Results appear. Point at the company card, then *Why Bern* with the three institution dots | "Four people and eight groups, projects and services, across UniBE, ARTORG and DCB." | All three sources as one ecosystem (R03) |
@@ -71,7 +71,7 @@ The mock agent recognises fixed patterns, not free language. On stage:
 | 9 | Chat, type: `Drop the nutrition study, they don't care about meals` → Enter | "She pushes back in plain words." → v3, GoCARB removed. Open the version menu: v1, v2, v3 | Natural-language refinement with history (E29) |
 | 10 | **✓ Keep** Witthauer, Bally, *Needle-free glucose monitoring*, *Research on diabetes in women*, *Access to clinical research facilities*. **Hide** the other 7 (export stays locked until every item is kept or hidden) | "She decides what goes to the company; the tool doesn't. Nothing leaves without her review." | Human relevance judgement and review gate (E04, E14) |
 | 11 | **Export (5)** → show the dialog → **PDF brief** (or **PowerPoint**) and open the file | "A short company-facing brief in the agency's template, every claim with its source in the appendix. Nothing leaves the laptop." | Teaser for the CEO (E13); offline export |
-| 12 | Back to **My cases**: GlucoWave in *In review* → ⋯ → move to **Pitch sent** | "And back on her board." | End-to-end workflow |
+| 12 | **My cases** tab (`/cases`): GlucoWave in *In review* → ⋯ → move to **Pitch sent**. Optional: **My desk** now lists *Record the outcome · GlucoWave* | "And back on her board." | End-to-end workflow |
 
 ### Contrast cases (15–20 s, after step 12)
 

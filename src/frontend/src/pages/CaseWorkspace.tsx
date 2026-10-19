@@ -226,7 +226,7 @@ export default function CaseWorkspace() {
   if (detail === null)
     return (
       <div className="p-10 text-center text-muted">
-        Case not found. <Link to="/" className="text-brand">Back to my cases</Link>
+        Case not found. <Link to="/cases" className="text-brand">Back to my cases</Link>
       </div>
     );
 
@@ -290,7 +290,7 @@ export default function CaseWorkspace() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex min-w-0 items-center gap-3 border-b border-line bg-white px-4 py-2.5 lg:px-5">
-        <Link to="/" className="shrink-0 rounded-md p-1 text-muted hover:bg-canvas hover:text-ink" aria-label="Back to my cases">
+        <Link to="/cases" className="shrink-0 rounded-md p-1 text-muted hover:bg-canvas hover:text-ink" aria-label="Back to my cases">
           <ArrowLeft size={18} />
         </Link>
         <h1 className="min-w-0 truncate font-semibold" title={detail.case.companyLabel}>{detail.case.companyLabel}</h1>

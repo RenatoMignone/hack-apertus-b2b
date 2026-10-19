@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Columns3, Info, Plus } from 'lucide-react';
+import { Columns3, Info, LayoutGrid, Plus } from 'lucide-react';
 import { api, apiMode } from '../api';
 import logo from '../assets/logo.png';
 import { useToast } from './Toast';
@@ -57,24 +57,33 @@ function DemoMenu() {
 export default function TopNav() {
   const { pathname } = useLocation();
   // "My cases" covers the board and every case page, but not the new-case composer.
-  const onCases = pathname === '/' || (pathname.startsWith('/cases/') && pathname !== '/cases/new');
+  const onCases = pathname === '/cases' || (pathname.startsWith('/cases/') && pathname !== '/cases/new');
+  const tabs = [
+    { to: '/', label: 'My desk', Icon: LayoutGrid, active: pathname === '/' },
+    { to: '/cases', label: 'My cases', Icon: Columns3, active: onCases },
+  ];
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-3 border-b border-line bg-white px-4 lg:gap-6 lg:px-5">
-      <Link to="/" aria-label="My cases" className="shrink-0">
+      <Link to="/" aria-label="My desk" className="shrink-0">
         <img src={logo} alt="Bern Economic Development Agency" className="h-7 w-auto lg:h-8" />
       </Link>
       <nav aria-label="Main" className="flex min-w-0 items-center gap-1">
-        <Link
-          to="/"
-          aria-current={onCases ? 'page' : undefined}
-          className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-sm ${
-            onCases ? 'bg-canvas font-medium text-ink' : 'text-muted hover:bg-canvas hover:text-ink'
-          }`}
-        >
-          <Columns3 size={16} aria-hidden />
-          My cases
-        </Link>
+        {tabs.map(({ to, label, Icon, active }) => (
+          <Link
+            key={to}
+            to={to}
+            title={label}
+            aria-label={label}
+            aria-current={active ? 'page' : undefined}
+            className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-sm ${
+              active ? 'bg-canvas font-medium text-ink' : 'text-muted hover:bg-canvas hover:text-ink'
+            }`}
+          >
+            <Icon size={16} aria-hidden />
+            <span className="hidden md:inline">{label}</span>
+          </Link>
+        ))}
       </nav>
       <div className="ml-auto flex shrink-0 items-center gap-2">
         {apiMode === 'mock' ? <DemoMenu /> : <span className="text-xs text-muted">Connected</span>}
