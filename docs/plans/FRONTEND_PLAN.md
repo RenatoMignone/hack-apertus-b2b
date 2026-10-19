@@ -33,3 +33,13 @@ HelioSense is the current hero scenario, not a live company-research result.
 
 For setup use [quickstart](../judges/QUICKSTART.md); exact transport is in
 [HTTP](FRONTEND_BACKEND_API.md). Frontend checks are `npm test` and `npm run build`.
+
+Development Vite hot reload can refresh the page during source merges. Markdown
+and test changes are ignored by its watcher; application/config changes can still
+reload. Polling itself does not navigate/reload the document. Keep source merges
+separate from acceptance, or use a built frontend for stable demonstrations.
+
+A recorded My desk hot update invalidated Fast Refresh because `nextSteps` was
+exported alongside the React component. It is now an internal helper, leaving
+only the component exported. Source edits can still trigger intentional development
+updates; backend research continues independently.

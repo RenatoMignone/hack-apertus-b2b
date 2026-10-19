@@ -274,3 +274,26 @@ def test_multilabel_budget_and_tier_three_subjects_are_source_backed(database, c
     bad = subject.model_copy(update={"name": "Fabricated CT prototype"})
     with pytest.raises(ValueError, match="source support"):
         tagger.assign(access, evidence["document_version_id"], pins["taxonomy_version_id"], [], subjects=[bad])
+
+
+def test_registration_bounds_duplicate_document_spans_before_reader(database, corpus):
+    """A valid page with many stored spans must not exhaust the reader's ID cap."""
+    _, scope, plan, run_context, service = setup_service(database, corpus)
+    original = asyncio.run(service.retrieve(plan, run_context)).evidence[0]
+    with database.begin() as connection:
+        body = connection.execute(select(tables.versions.c.body_text).where(
+            tables.versions.c.document_version_id == original.document_version_id)).scalar_one()
+        # Exact one-character source slices, not fabricated evidence text.
+        for index in range(len(body)-1):
+            for width in (1, 2):
+                connection.execute(insert(tables.spans).values(evidence_id=uuid4(),
+                    document_version_id=original.document_version_id, scope_id=original.scope_id,
+                    char_start=index, char_end=index+width, literal_text=body[index:index+width],
+                    extraction_method="synthetic-span-budget-test"))
+    page = FetchedSource(title="Duplicate", url=original.url, canonical_url=original.url,
+        content="Live text differs", content_hash=content_hash(b"Live text differs"),
+        fetched_at=datetime.now(timezone.utc))
+    registered = asyncio.run(service.register_research(WebResearchResult(status="completed", sources=[page]), run_context))
+    assert len(registered.evidence) == 100
+    assert "web_evidence_span_budget_reached" in registered.limitations
+    assert all(record.document_version_id == original.document_version_id for record in registered.evidence)

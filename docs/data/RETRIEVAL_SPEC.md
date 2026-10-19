@@ -12,6 +12,8 @@ Exact DTO limits live in `contracts/data.py` and `contracts/services.py`.
 2. Encode bounded query inputs with the same compatible encoder configuration as
    ingestion; batch where supported.
 3. Run full-text and vector branches independently against eligible membership.
+   Query variants share a materialized authorized membership projection per branch,
+   retaining per-query top-30 ranks and observed query matches.
    Authorization/language/explicit reliable constraints apply; topic labels and
    keyword hits cannot exclude otherwise eligible vector matches.
 4. Fuse unique chunk ranks using reciprocal rank fusion, deterministic tie-breaking

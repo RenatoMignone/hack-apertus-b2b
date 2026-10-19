@@ -254,13 +254,20 @@ class StructuredTasks:
                 event("model.validation_failed", run_id=context.run_id, task=task,
                       attempt=attempt+1, error_type=type(error).__name__,
                       error_code="repair_exhausted" if attempt else "repair_required")
+                issues = ([{"field": str(e["loc"][0]) if e["loc"] and e["loc"][0] in schema.model_fields
+                            else "$response", "type": e["type"]}
+                           for e in error.errors(include_input=False, include_context=False, include_url=False)[:8]]
+                          if isinstance(error, ValidationError) else [{"field": "$references", "type":
+                            "taxonomy_concept_not_supplied" if str(error) == "taxonomy_concept_not_supplied"
+                            else "domain_field_not_supplied" if str(error) == "company fields must use supplied domain codes or unknown"
+                            else "reference_check"}])
+                for issue in issues:
+                    event("model.validation_issue", run_id=context.run_id, task=task,
+                          attempt=attempt+1, validation_field=issue["field"], validation_type=issue["type"])
                 if attempt:
                     failure = InvalidModelOutput()
                     failure.model_task = task
-                    failure.validation_issues = ([{"field": str(e["loc"][0]) if e["loc"] and
-                        e["loc"][0] in schema.model_fields else "$response", "type": e["type"]}
-                        for e in error.errors(include_input=False, include_context=False, include_url=False)[:8]]
-                        if isinstance(error, ValidationError) else [{"field": "$references", "type": "reference_check"}])
+                    failure.validation_issues = issues
                     raise failure from None
                 # Safe schema locations/messages only; never validation input or provider bodies.
                 diagnostics = (json.dumps(error.errors(include_input=False, include_context=False,

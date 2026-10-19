@@ -95,6 +95,12 @@ class Reads:
                 t.attempts.c.stage == "runtime.execute", t.attempts.c.status == "failed").order_by(
                 t.attempts.c.created_at.desc(), t.attempts.c.attempt_id.desc()).limit(1)).scalar_one_or_none()
             detail = (failure or {}).get("result", {}) if run["status"] == "failed" else {}
+            # Report the failed node, not the last successful predecessor.
+            if detail.get("failed_stage"):
+                step = detail["failed_stage"]
+                stage = ("interpreting" if step.startswith(("interpret", "taxonomy")) else
+                         "searching" if step.startswith(("retrieve", "discover", "fetch", "register", "merge")) else
+                         "drafting" if step.startswith("draft") else "validating")
             return {"schema_version": "1", "case_id": str(case_id), "run_id": str(run_id), "input_id": str(run["input_id"]),
                 "snapshot_id": str(run["snapshot_id"]), "state": run["status"],
                 "status": {"needs_clarification": "waiting_for_input", "completed": "succeeded"}.get(run["status"], run["status"]),
@@ -124,24 +130,39 @@ class Reads:
     def validate_evidence(self, access, run_id, records):
         with self.session(access) as c:
             run = self.run(c, access, run_id, active=True, lock=False)
+            if not records:
+                return
+            # Batch transport, not validation: every literal, owner, scope and
+            # snapshot check below still applies to each supplied record.
+            ids = list(dict.fromkeys(record.evidence_id for record in records))
+            rows = {row["evidence_id"]: row for row in c.execute(select(t.spans,
+                t.versions.c.body_hash, t.scopes.c.kind, t.scopes.c.case_id,
+                t.documents.c.canonical_url, t.versions.c.title, t.versions.c.language)
+                .select_from(t.spans.join(t.versions).join(t.documents).join(t.scopes,
+                    t.scopes.c.scope_id == t.spans.c.scope_id))
+                .where(t.spans.c.evidence_id.in_(ids))).mappings()}
+            if set(rows) != set(ids):
+                raise EvidenceRejected()
+            versions = {row["document_version_id"] for row in rows.values()}
+            bodies = dict(c.execute(select(t.versions.c.document_version_id, t.versions.c.body_text)
+                .where(t.versions.c.document_version_id.in_(versions))).all())
+            membership = set(c.execute(select(t.snapshot_documents.c.document_version_id).where(
+                t.snapshot_documents.c.snapshot_id == run["snapshot_id"],
+                t.snapshot_documents.c.document_version_id.in_(versions))).scalars())
+            for scope in {row["scope_id"] for row in rows.values()}:
+                require_scope(c, scope)
             for record in records:
-                row = c.execute(select(t.spans, t.versions.c.body_hash, t.versions.c.body_text,
-                    t.scopes.c.kind, t.scopes.c.case_id, t.documents.c.canonical_url, t.versions.c.title, t.versions.c.language).select_from(t.spans.join(t.versions).join(t.documents).join(t.scopes,
-                    t.scopes.c.scope_id == t.spans.c.scope_id)).where(
-                    t.spans.c.evidence_id == record.evidence_id)).mappings().one()
-                require_scope(c, row["scope_id"])
+                row = rows[record.evidence_id]
                 if (record.scope_id != row["scope_id"] or record.document_version_id != row["document_version_id"]
                     or record.body_hash != row["body_hash"] or record.char_start != row["char_start"]
                     or record.char_end != row["char_end"] or record.literal_text != row["literal_text"]
-                    or row["body_text"][record.char_start:record.char_end] != record.literal_text
+                    or bodies[row["document_version_id"]][record.char_start:record.char_end] != record.literal_text
                     or record.url != row["canonical_url"] or record.title != row["title"] or record.language != row["language"]):
                     raise EvidenceRejected()
                 if row["kind"] == "case":
                     if row["case_id"] != run["case_id"]:
                         raise EvidenceRejected()
-                elif not c.execute(select(t.snapshot_documents).where(
-                    t.snapshot_documents.c.snapshot_id == run["snapshot_id"],
-                    t.snapshot_documents.c.document_version_id == row["document_version_id"])).first():
+                elif row["document_version_id"] not in membership:
                     raise EvidenceRejected()
 
     def case_rows(self, access, case_id=None, *, limit=None, offset=0):

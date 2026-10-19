@@ -12,7 +12,7 @@ Code availability, database rollout and real research quality are distinct.
 | Data | Immutable source versions, authorized taxonomy/corpus, live case captures and published releases; ongoing ingestion determines actual coverage |
 | Output | Reviewed PDF; optional manual company plans, reviewed PPTX and opt-in own-case similarity implemented behind capability/configuration gates |
 | Operations | Readiness checks, safe timestamped logs, progress projection, lock/lease safeguards and root Make service launcher |
-| Source schema | `0012_membership_lookup`; shared host last independently observed at 0011. Maintainer rollout is ongoing; verify installed revision before acceptance |
+| Source schema | `0012_membership_lookup`; maintainer reports 0012 applied with restricted-role access checks and 20 disposable tests; query impact remains inconclusive and fresh live acceptance remains pending with the operator |
 
 ## Verification available
 
@@ -42,3 +42,19 @@ See [verification](../judges/VERIFICATION.md).
 No fixed source count, current provider availability or completed migration is
 inferred from configuration. Readiness is a configuration/access check, not proof
 of all permissions, corpus completeness or report quality.
+
+## Latest runtime corrections
+
+289 disposable-backend tests and 24 frontend tests/build pass. The original long
+HelioSense request passed live interpretation after excluding nonliteral optional
+lead annotations. Registration now bounds large source span sets before the
+100-record reader, with explicit omissions; it passed that stage on live data.
+Search variants share authorized branch projections, literal validation is batched,
+metadata reuse is request-local, and extraction runs two independent batches at
+once. No scope/support checks are waived. Shared revision 0012 was read-only verified.
+
+The developer-created acceptance cases were cancelled to free the queue for manual
+testing; a fresh latest-code case through report/review/PDF is not yet certified.
+Restart API/worker/frontend after source updates and test a new case. UI hot-reload
+invalidation during the My desk merge was observed and its mixed helper export
+removed; it was separate from durable backend execution.

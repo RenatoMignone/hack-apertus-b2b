@@ -38,7 +38,7 @@ const isOpen = (c: CaseSummary) => c.status !== 'closed' && !c.onHold;
 const byRecent = (a: { updatedAt: string }, b: { updatedAt: string }) => b.updatedAt.localeCompare(a.updatedAt);
 
 /** What is waiting on her, most urgent first. Closed and on-hold cases are skipped. */
-export function nextSteps(cases: CaseSummary[], details: CaseDetail[]): Step[] {
+function nextSteps(cases: CaseSummary[], details: CaseDetail[]): Step[] {
   const detail = new Map(details.map((d) => [d.case.id, d]));
   const steps: Step[] = [];
   for (const c of cases.filter(isOpen)) {

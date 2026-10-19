@@ -1,4 +1,6 @@
 """Bound inference context/output size without changing literal evidence."""
+import asyncio
+
 from backend.contracts.services import EvidenceRejected, ExtractionBatch, InvalidModelOutput, ResearchBundle
 
 
@@ -32,17 +34,36 @@ async def extract_batches(extract, interpretation, research, context):
         gaps.append("Extraction batch budget reached; remaining passages were not assessed.")
     entities, claims, valid = [], [], 0
     last_error = None
-    for index, records in enumerate(batches[:6]):
+    async def source_batches():
+        # Fixed extraction tasks are independent. Two at a time bounds gateway
+        # concurrency without serializing up to twelve generation/repair calls.
+        # Consume in input order so entity keys and truncation stay deterministic.
+        for start in range(0, min(6, len(batches)), 2):
+            pair = batches[start:start+2]
+            tasks = [asyncio.create_task(extract(interpretation, ResearchBundle(evidence=records,
+                existing_entities=research.existing_entities, limitations=research.limitations), context))
+                for records in pair]
+            try:
+                answers = await asyncio.gather(*tasks, return_exceptions=True)
+            finally:
+                for task in tasks:
+                    if not task.done():
+                        task.cancel()
+                await asyncio.gather(*tasks, return_exceptions=True)
+            for offset, answer in enumerate(answers):
+                yield start+offset, answer
+
+    async for index, answer in source_batches():
         if len(entities) >= 30 or len(claims) >= 60:
             gaps.append("Extraction entity/claim budget reached; remaining passages were not assessed.")
             break
-        try:
-            batch = await extract(interpretation, ResearchBundle(evidence=records,
-                existing_entities=research.existing_entities, limitations=research.limitations), context)
-        except InvalidModelOutput as error:
-            last_error = error
+        if isinstance(answer, InvalidModelOutput):
+            last_error = answer
             gaps.append("A source batch did not produce valid extraction after repair; its claims were excluded.")
             continue
+        if isinstance(answer, BaseException):
+            raise answer
+        batch = answer
         valid += 1
         prefix = f"b{index}:" if len(batches) > 1 else ""
         selected = batch.entities[:30-len(entities)]

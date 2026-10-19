@@ -17,6 +17,10 @@
 | Review | Cards → keep/reject decisions and accepted review | All reviewed, at least one kept; exact hashes |
 | Export | Authorized review + current revision → PDF / enabled PPTX | Deterministic renderer; access/hash checks before render and download |
 
+Independent extraction batches run at most two model calls concurrently, consumed
+in deterministic source order. Batch, entity/claim and repair limits remain bounded.
+The literal-object schema exposes required `type` / `value` keys explicitly.
+
 Use batched task calls by responsibility (interpret/extract/assess/draft), rather
 than one unconstrained call for the entire report or one call per output field.
 Valid JSON controls structure; it does not prove semantic support. Reranking

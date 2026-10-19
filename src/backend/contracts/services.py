@@ -4,10 +4,10 @@ These are service boundaries, not persistence models or HTTP requests. Caller
 identity, provenance and budgets are supplied by authorized application code.
 """
 from datetime import datetime
-from typing import Literal, Protocol, runtime_checkable
+from typing import Annotated, Literal, Protocol, runtime_checkable
 from uuid import UUID
 
-from pydantic import Field, model_validator
+from pydantic import WithJsonSchema, Field, model_validator
 
 from backend.contracts.data import AccessContext, Contract, EvidenceHit, QueryPlan
 from backend.contracts.pipeline import (CaseInterpretation, ClaimAssessment, DraftAssessment,
@@ -96,8 +96,11 @@ class ClaimCandidate(Contract):
     key: str = Field(min_length=1)
     subject_key: str = Field(min_length=1)
     predicate: str = Field(min_length=1)
-    object_key: str | None = None
-    typed_literal: dict | None = None
+    object_key: str | None = Field(default=None,
+        description="Local object entity key, or null when typed_literal is supplied. Never supply both.")
+    typed_literal: Annotated[dict, WithJsonSchema({"type": "object",
+        "properties": {"type": {}, "value": {}}, "required": ["type", "value"]})] | None = Field(
+        default=None, description="An object containing type and value, or null for an entity relationship.")
     statement: str = Field(min_length=1)
     evidence_ids: list[UUID] = Field(min_length=1)
     kind: Literal["direct", "adjacent"] = "direct"

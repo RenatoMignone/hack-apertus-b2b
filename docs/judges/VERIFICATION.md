@@ -56,3 +56,12 @@ cannot guarantee every implication; human review remains necessary.
 For release record commit/platform, corpus/profile/taxonomy/encoder/reranker/task
 pins, enabled flags, passed/failed/skipped checks, actual output and limitations.
 Keep case content, provider secrets and copyrighted source artifacts private.
+
+## Runtime regression update
+
+The local follow-up fixes passed 289 backend tests on disposable PostgreSQL/pgvector,
+24 frontend tests and the production build. Added regressions cover model-expanded
+operator leads, span-budget overflow, bounded concurrent extraction and accurate
+failure-stage projection. Literal validation now batches SQL reads while retaining
+all checks. Shared migration 0012 was verified read-only. Fresh real-provider
+report/export acceptance is tracked in [current status](../project/STATUS.md).

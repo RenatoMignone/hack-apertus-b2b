@@ -64,6 +64,7 @@ async def test_http_failure_identifies_model_task_without_provider_text(harness)
     detail = response.json()
     assert detail['status']=='failed' and detail['failure_detail']['model_task']=='interpret'
     assert detail['failure_detail']['failed_stage']=='interpret.0'
+    assert detail['step']=='interpret.0' and detail['stage']=='interpreting'
     assert 'PRIVATE_RESPONSE' not in response.text
 
 

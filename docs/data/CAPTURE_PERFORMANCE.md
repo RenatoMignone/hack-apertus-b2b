@@ -51,3 +51,16 @@ model tasks and finalization separately, then repeat a fresh case → review →
 A faster fixture or higher timeout does not establish acceptable live performance.
 Use the existing performance tests under `src/backend/tests/` with an explicitly
 disposable test DSN; never supply the shared deployment DSN to fixture benchmarks.
+
+Query variants now share a materialized authorized projection per branch while
+retaining each query's top-30 ranks. One read-only existing-capture probe returned
+30 hits in 49.451 seconds versus an earlier logged 114.490-second search; cache
+and load differ, so this is not a causal speedup measurement. A fresh live run
+hit the 30-second lexical bound once and succeeded on its bounded retry. Runtime
+literal validation also batches record/body/membership reads while checking every
+record and scope, avoiding hundreds of network round trips.
+
+Evidence reads reuse fetch/mirror metadata only within one authorized call and
+batch snapshot membership/scope checks; every returned literal and version hash
+is still checked. A read-only 96-record historical-capture projection completed
+in 10.198 seconds. This is one probe, not an end-to-end latency guarantee.

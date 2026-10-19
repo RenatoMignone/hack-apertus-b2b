@@ -70,3 +70,9 @@ The `brave` adapter needs `BRAVE_API_KEY`. Neither is an automatic fallback.
 CAPTCHA/HTTP blocks/timeouts are unavailable; no challenge bypass or public-instance
 rotation is used. SearXNG live pilot queries returned leads, but combined real
 DB/web report quality remains a separate [acceptance](../judges/VERIFICATION.md).
+
+Registration may resolve ten pages to hundreds of stored spans, especially when
+URLs duplicate corpus documents. It selects at most 100 unique existing spans
+round-robin across source versions before invoking the bounded evidence reader.
+`web_evidence_span_budget_reached` makes omissions explicit; registration of a
+page does not imply all its passages were assessed. Exact source text is unchanged.

@@ -118,34 +118,24 @@ class HybridSearch:
             # assume a production index scan without checking EXPLAIN.
             from backend.data.repositories.corpus import LANGUAGE_CONFIGS
             configs = sorted({'simple', *LANGUAGE_CONFIGS.values()})
-            lexical_candidates = " UNION ALL ".join(
-                "SELECT p.chunk_id, ts_rank_cd(p.terms,websearch_to_tsquery('" + config + "',:query)) AS score "
-                "FROM retrieval.search_documents p WHERE p.language_config='" + config + "' "
-                "AND p.search_config_hash=:search_hash AND p.terms @@ websearch_to_tsquery('" + config + "',:query)"
-                for config in configs)
-            search_hash = connection.execute(select(tables.builds.c.search_config_hash).where(
+            from backend.data.retrieval import batched
+            parameters['search_hash'] = connection.execute(select(tables.builds.c.search_config_hash).where(
                 tables.builds.c.build_id == plan.build_id)).scalar_one()
-            parameters['search_hash'] = search_hash
-            for index, (query, query_vector) in enumerate(zip(queries, vectors, strict=True)):
-                with timed('retrieval.lexical', run_id=plan.run_id, attempt=index+1):
-                    lexical_rows = [] if self.strategy == 'dense' else connection.execute(query_statement(
-                        "WITH matches AS MATERIALIZED (" + lexical_candidates + ") "
-                        "SELECT c.chunk_id,max(m.score) AS score " + ELIGIBLE.replace(
-                            "WHERE s.snapshot_id", "JOIN matches m ON m.chunk_id=c.chunk_id WHERE s.snapshot_id") +
-                        " GROUP BY c.chunk_id ORDER BY score DESC,c.chunk_id LIMIT 30"),
-                        {**parameters, "query": query}).mappings().all()
-                with timed('retrieval.vector', run_id=plan.run_id, attempt=index+1):
-                    vector_rows = [] if self.strategy == 'lexical' else connection.execute(query_statement(
-                        "SELECT c.chunk_id, e.vector <=> CAST(:vector AS vector) AS score " + ELIGIBLE +
-                        " ORDER BY score,c.chunk_id LIMIT 30"),
-                        {**parameters, "vector": "[" + ",".join(str(value) for value in query_vector) + "]"}).mappings().all()
-                event('retrieval.candidates', run_id=plan.run_id, attempt=index+1,
-                      candidate_count=len(lexical_rows)+len(vector_rows))
-                for branch, rows in ((lexical, lexical_rows), (vector, vector_rows)):
+            with timed('retrieval.lexical', run_id=plan.run_id, query_count=len(queries)):
+                lexical_rows = [] if self.strategy == 'dense' else batched.lexical(
+                    connection, ELIGIBLE, parameters, queries, configs)
+            with timed('retrieval.vector', run_id=plan.run_id, query_count=len(queries)):
+                vector_rows = [] if self.strategy == 'lexical' else batched.dense(
+                    connection, ELIGIBLE, parameters, vectors)
+            for index, query in enumerate(queries):
+                for branch, all_rows in ((lexical, lexical_rows), (vector, vector_rows)):
+                    rows = [row for row in all_rows if row['idx'] == index]
                     for rank, row in enumerate(rows, start=1):
                         query_matches.setdefault(row["chunk_id"], set()).add(query)
                         if row["chunk_id"] not in branch or rank < branch[row["chunk_id"]]["rank"]:
                             branch[row["chunk_id"]] = {"rank": rank, "score": row["score"]}
+            event('retrieval.candidates', run_id=plan.run_id, query_count=len(queries),
+                  candidate_count=len(set(lexical) | set(vector)))
             lexical = dict(sorted(lexical.items(), key=lambda item: (item[1]["rank"], str(item[0])))[:30])
             vector = dict(sorted(vector.items(), key=lambda item: (item[1]["rank"], str(item[0])))[:30])
             fused = fuse(lexical, vector, limit=60)

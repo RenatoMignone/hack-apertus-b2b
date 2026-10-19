@@ -96,3 +96,25 @@ def test_writer_and_assessor_use_claims_and_caveats_without_bulk_provenance(cont
         assert sent['gaps']==['Availability is unknown.']
     assert pack.coverage['large_source_manifest']=='x'*90000
     assert json.loads(model.calls[-1][1].content)['evidence'][0]['literal_text']==evidence.literal_text
+
+
+@pytest.mark.asyncio
+async def test_extraction_runs_two_independent_batches_with_bounded_concurrency(context, interpretation, evidence):
+    import asyncio
+    from uuid import uuid4
+    from backend.evidence.extraction_batches import extract_batches
+    from backend.contracts.services import ExtractionBatch, ResearchBundle
+    records = [evidence.model_copy(update={'evidence_id':uuid4()}) for _ in range(13)]
+    active = peak = calls = 0
+    async def extract(_interpretation, research, _context):
+        nonlocal active, peak, calls
+        active += 1
+        peak = max(peak, active)
+        calls += 1
+        try:
+            await asyncio.sleep(.01)
+            return ExtractionBatch()
+        finally:
+            active -= 1
+    await extract_batches(extract, interpretation, ResearchBundle(evidence=records), context)
+    assert peak == 2 and active == 0 and calls == 2

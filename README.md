@@ -72,8 +72,8 @@ An integrated baseline passed **284 isolated backend tests and 24 frontend tests
 with TypeScript and production build. A recorded real-provider run produced a
 partial report and reviewed PDF. These checks establish a narrow working path;
 they do not establish the challenge's 80% Recall@10 target, broad source coverage
-or an air-gapped deployment. Source schema is 0012; shared-host rollout is
-maintainer-owned and ongoing. See [verification](docs/judges/VERIFICATION.md) and
+or an air-gapped deployment. Source and verified shared-host schema are 0012;
+real-corpus performance and fresh report acceptance remain separate. See [verification](docs/judges/VERIFICATION.md) and
 [current delivery status](docs/project/STATUS.md).
 
 ## 🎯 The Challenge

@@ -10,7 +10,7 @@ from time import perf_counter
 _context = ContextVar('navigator_log_context', default={})
 _KEYS = {'run_id', 'case_id', 'stage', 'task', 'model', 'attempt', 'status', 'elapsed_ms',
          'count', 'query_count', 'candidate_count', 'prompt_tokens', 'completion_tokens',
-         'error_type', 'error_code', 'request_id', 'method', 'route', 'remaining_seconds'}
+         'error_type', 'error_code', 'validation_field', 'validation_type', 'request_id', 'method', 'route', 'remaining_seconds'}
 
 
 def event(name, **fields):
@@ -18,7 +18,7 @@ def event(name, **fields):
     for key, value in {**_context.get(), **fields}.items():
         if key not in _KEYS or value is None:
             continue
-        if isinstance(value, (int, float, bool)) or re.fullmatch(r'[a-zA-Z0-9_./:{}-]{1,160}', str(value)):
+        if isinstance(value, (int, float, bool)) or re.fullmatch(r'[a-zA-Z0-9_./:{}$-]{1,160}', str(value)):
             safe[key] = value
     logging.getLogger('backend.runtime').info('%s %s', name,
         ' '.join(f'{key}={value}' for key, value in safe.items()))

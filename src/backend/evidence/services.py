@@ -89,9 +89,17 @@ class ApertusReasoningServices:
             if not {value.primary_field, *value.additional_fields} <= set(domain.fields):
                 raise ValueError("company fields must use supplied domain codes or unknown")
             if not set(value.concepts) <= allowed:
-                raise ValueError()
-            if any(lead.casefold() not in message.casefold() for lead in value.leads):
-                raise ValueError("leads must quote names/phrases present in the operator message")
+                raise ValueError("taxonomy_concept_not_supplied")
+            # Leads are optional operator annotations, never public facts. Models
+            # often expand an abbreviation (UniBE -> University of Bern), which
+            # is not a literal operator quote. Exclude such annotations rather
+            # than abort an otherwise valid request; full input remains intact.
+            grounded_leads = [lead for lead in value.leads if lead.casefold() in message.casefold()]
+            if len(grounded_leads) != len(value.leads):
+                from backend.observability.logging import event
+                event("interpret.leads_omitted", run_id=context.run_id,
+                      count=len(value.leads)-len(grounded_leads))
+            value = value.model_copy(update={"leads": grounded_leads})
             value.concepts[:] = list(dict.fromkeys(canonical_concepts[key] for key in value.concepts))
             # Do not discard operator negation even when the model misses it.
             for line in message.splitlines():

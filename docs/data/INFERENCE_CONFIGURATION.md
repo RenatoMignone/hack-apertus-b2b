@@ -54,3 +54,9 @@ quotas, concurrency and deployment cost remain evaluation tasks.
 The key stays backend-only, excluded from logs/traces and frontend variables.
 Hosted inference requires connected mode. Offline requires separately provisioned
 local Apertus serving/assets and disabled external access, with no hosted fallback.
+
+Optional operator `leads` must occur literally in the input. A model-expanded name
+that is not a literal quote is omitted from those annotations rather than failing
+a clear request. The full original request and its constraints remain available;
+this does not create public facts or relax claim/taxonomy validation. Safe
+`model.validation_issue` events identify schema fields/types on actual failures.

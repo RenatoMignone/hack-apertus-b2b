@@ -61,3 +61,9 @@ exact review/export and process recovery. Actual target-host restart/resume,
 combined real database/web report quality and load acceptance remain separately
 recorded in [verification](../judges/VERIFICATION.md). Startup never migrates,
 ingests, publishes, installs dependencies or downloads weights.
+
+Independent extraction batches execute at most two concurrent model tasks and are
+consumed in deterministic source order. Six-batch and entity/claim caps, per-call
+repair and deadline checks remain. A schema-invalid batch cannot supply accepted
+claims. Model-expanded optional operator leads are omitted unless literal in the
+original input; the complete original request remains the retrieval intent.

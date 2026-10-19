@@ -18,7 +18,7 @@ from backend.data.repositories.cases import CaseRepository
 from backend.data.repositories.corpus import CorpusRepository
 from backend.data.repositories.research import ResearchRepository
 from backend.data.retrieval.graph import RelationshipExpansion
-from backend.observability.logging import activity
+from backend.observability.logging import activity, event
 
 
 class BackboneRepository:
@@ -72,35 +72,43 @@ class BackboneRepository:
                 "limitations": ["related_and_broader_terms_are_discovery_hints_not_equivalence"]}
 
     def _evidence(self, connection, context, evidence_ids):
-        rows = connection.execute(select(tables.spans, tables.versions.c.title, tables.versions.c.language, tables.versions.c.body_hash,
+        rows = connection.execute(select(tables.spans, tables.versions.c.document_id, tables.versions.c.title, tables.versions.c.language, tables.versions.c.body_hash,
             tables.versions.c.body_text, tables.versions.c.source_date, tables.versions.c.raw_artifact_id,
             tables.documents.c.canonical_url, tables.scopes.c.case_id).select_from(tables.spans.join(tables.versions).join(tables.documents).join(
                 tables.scopes, tables.scopes.c.scope_id == tables.spans.c.scope_id)).where(tables.spans.c.evidence_id.in_(set(evidence_ids)),
                 tables.versions.c.status == "accepted")).mappings().all()
         if len(rows) != len(set(evidence_ids)):
             raise EvidenceRejected()
-        output = {}
+        versions = {row["document_version_id"] for row in rows}
+        pinned = set(connection.execute(select(tables.snapshot_documents.c.document_version_id).where(
+            tables.snapshot_documents.c.snapshot_id == context.snapshot_id,
+            tables.snapshot_documents.c.document_version_id.in_(versions))).scalars())
+        for scope in {row["scope_id"] for row in rows}:
+            require_scope(connection, scope)
+        verified_versions, output = set(), {}
         for row in rows:
-            require_scope(connection, row["scope_id"])
-            pinned = connection.execute(select(tables.snapshot_documents).where(
-                tables.snapshot_documents.c.snapshot_id == context.snapshot_id,
-                tables.snapshot_documents.c.document_version_id == row["document_version_id"])).first()
-            if not pinned and row["case_id"] != context.case_id:
+            if row["document_version_id"] not in pinned and row["case_id"] != context.case_id:
                 raise EvidenceRejected()
-            if (content_hash(row["body_text"].encode()) != row["body_hash"]
-                    or row["body_text"][row["char_start"]:row["char_end"]] != row["literal_text"]):
+            if row["document_version_id"] not in verified_versions:
+                if content_hash(row["body_text"].encode()) != row["body_hash"]:
+                    raise EvidenceRejected()
+                verified_versions.add(row["document_version_id"])
+            if row["body_text"][row["char_start"]:row["char_end"]] != row["literal_text"]:
                 raise EvidenceRejected()
             output[row["evidence_id"]] = dict(row)
         return output
 
-    def _project(self, connection, context, row):
+    def _project(self, connection, context, row, cache=None):
+        cache = {} if cache is None else cache
         origin = "corpus" if row["case_id"] is None else "web"
         original_record = None
         if row["case_id"]:
-            mirrors = connection.execute(select(tables.derivations.c.inputs).where(tables.derivations.c.scope_id == row["scope_id"],
+            mirror_key = ("mirrors", row["scope_id"], row["document_version_id"])
+            if mirror_key not in cache:
+                cache[mirror_key] = connection.execute(select(tables.derivations.c.inputs).where(tables.derivations.c.scope_id == row["scope_id"],
                 tables.derivations.c.inputs["kind"].astext == "case_mirror",
                 tables.derivations.c.inputs["local_version_id"].astext == str(row["document_version_id"]))).scalars().all()
-            for mirror in mirrors:
+            for mirror in cache[mirror_key]:
                 if mirror["snapshot_id"] != str(context.snapshot_id) or mirror.get("local_evidence_id") != str(row["evidence_id"]):
                     continue
                 from uuid import UUID
@@ -109,16 +117,19 @@ class BackboneRepository:
                 if (mirror["snapshot_id"] == str(context.snapshot_id) and source["body_hash"] == row["body_hash"]
                         and source["literal_text"] == row["literal_text"]):
                     origin = "corpus"
-                    original_record = self._project(connection, context, source)
+                    original_record = self._project(connection, context, source, cache)
                     break
-        fetched_at = connection.execute(select(tables.fetches.c.created_at).where(
-            tables.fetches.c.document_id == connection.execute(select(tables.versions.c.document_id).where(
-                tables.versions.c.document_version_id == row["document_version_id"])).scalar_one(),
-            tables.fetches.c.raw_artifact_id == row["raw_artifact_id"]).order_by(tables.fetches.c.created_at).limit(1)).scalar_one()
-        discovery = connection.execute(select(tables.web_sources.c.payload).join(tables.web_research).where(
-            tables.web_sources.c.document_version_id == row["document_version_id"], tables.web_research.c.run_id == context.run_id)).scalars().first()
-        if discovery:
-            fetched_at = datetime.fromisoformat(discovery["fetched_at"])
+        fetch_key = ("fetched_at", row["document_version_id"])
+        if fetch_key not in cache:
+            fetched_at = connection.execute(select(tables.fetches.c.created_at).where(
+                tables.fetches.c.document_id == row["document_id"],
+                tables.fetches.c.raw_artifact_id == row["raw_artifact_id"])
+                .order_by(tables.fetches.c.created_at).limit(1)).scalar_one()
+            discovery = connection.execute(select(tables.web_sources.c.payload).join(tables.web_research).where(
+                tables.web_sources.c.document_version_id == row["document_version_id"],
+                tables.web_research.c.run_id == context.run_id)).scalars().first()
+            cache[fetch_key] = datetime.fromisoformat(discovery["fetched_at"]) if discovery else fetched_at
+        fetched_at = cache[fetch_key]
         if original_record:
             fetched_at = original_record.fetched_at
         return EvidenceRecord(**{name: row[name] for name in ("evidence_id", "document_version_id", "scope_id", "title",
@@ -132,7 +143,8 @@ class BackboneRepository:
         with transaction(self.engine, context.access) as connection:
             self.authorize(connection, context, historical=True)
             rows = self._evidence(connection, context, evidence_ids)
-            return [self._project(connection, context, rows[key]) for key in dict.fromkeys(evidence_ids)]
+            cache = {}
+            return [self._project(connection, context, rows[key], cache) for key in dict.fromkeys(evidence_ids)]
 
     def heading_evidence(self, version_ids, context):
         """Bounded identity/neighbor expansion; metadata alone is never evidence."""
@@ -222,6 +234,7 @@ class BackboneRepository:
         if len(result.sources) > 10:
             raise BudgetExceeded()
         evidence_ids, limitations = [], list(result.limitations)
+        source_evidence = []
         research_id = self.research.start(context.access, context.run_id, "bounded public-source registration")
         seen_urls = set()
         try:
@@ -250,12 +263,19 @@ class BackboneRepository:
                         http_status=observation.status if observation else None)
                 self.research.record_source(context.access, research_id, source, version_id=None if duplicate else version_id)
                 with transaction(self.engine, context.access) as connection:
-                    evidence_ids.extend(connection.execute(select(tables.spans.c.evidence_id).where(
-                        tables.spans.c.document_version_id == version_id)).scalars())
+                    source_evidence.append(list(connection.execute(select(tables.spans.c.evidence_id).where(
+                        tables.spans.c.document_version_id == version_id).order_by(
+                        tables.spans.c.char_start, tables.spans.c.evidence_id)).scalars()))
             self.research.finish(context.access, research_id, status="completed", diagnostics={"count": len(result.sources)})
         except Exception:
             self.research.finish(context.access, research_id, status="failed", diagnostics={"reason": "registration_failed"})
             raise
+        from backend.data.research_budget import bounded_evidence
+        evidence_ids, omitted = bounded_evidence(source_evidence, limit=100)
+        if omitted:
+            limitations.append("web_evidence_span_budget_reached")
+        event("research.registration", run_id=context.run_id, count=len(evidence_ids),
+              candidate_count=sum(len(group) for group in source_evidence))
         return RegisteredResearch(evidence=self.read_evidence(evidence_ids, context), limitations=list(dict.fromkeys(limitations)))
 
     def _mirror(self, connection, context, scope, row):
