@@ -1,0 +1,2716 @@
+{
+  "started_at": "2026-10-19T09:21:20.137659+00:00",
+  "completed_at": "2026-10-19T09:22:42.998125+00:00",
+  "mode": "real_corpus_real_hosted_embeddings_no_frontend",
+  "strategy": "rrf",
+  "reranker_enabled": false,
+  "reasoning_model_called": false,
+  "database_read_only": true,
+  "cases_created": 0,
+  "schema_revision": "0012_membership_lookup",
+  "capture": {
+    "snapshot_id": "658224cd-9e05-4fa1-bbbb-bc7d309f7fdf",
+    "build_id": "15ea2e50-d169-4ab0-a652-13a6df0df633",
+    "profile_id": "2f062878-4650-5a0e-a8b8-2b5cc713f0ef",
+    "taxonomy_version_id": "701b18e8-e80a-5437-a4b0-7ed58ac41021",
+    "embedding_config_hash": "b9846ffee5c2cc11a371a47be00d1cab898d6ca5b88ba6f08ae4e7e9339e131c",
+    "chunks": 127902
+  },
+  "encoder": {
+    "role": "embedding",
+    "logical_name": "embeddinggemma-2-hf",
+    "artifact": "google/embeddinggemma-2",
+    "revision": "914f7f89142e33e77833254d9c9b90c3cef7303b",
+    "adapter_version": "hf-serve/b805e0ccb5659d44f3ae384858900273d7965076;raw-openai-v1",
+    "tokenizer": "google/embeddinggemma-2@914f7f89142e33e77833254d9c9b90c3cef7303b",
+    "input_limit": 8192,
+    "dimension": 768,
+    "normalization": "l2",
+    "query_template": "task: search result | query: {text}",
+    "document_template": "title: {title} | text: {text}",
+    "precision": "float32",
+    "license": "apache-2.0",
+    "verified": true,
+    "test_only": false
+  },
+  "source_commit": "a35d70af7f654c7cb55614c0040fe56c80d3e239",
+  "demo_fixture": "navigator-demo-helio-sense-v1",
+  "input_sha256": "8055986536c86a6c64bf936014b8c001762ab30a8e88f9a830b4213ddc4a1a6f",
+  "frontend_used": false,
+  "returned_passage_occurrences": 120,
+  "distinct_documents": 52,
+  "exact_slice_checks_passed": 120,
+  "body_hash_checks_passed": 120,
+  "quality_score": null,
+  "review_status": "Assistant source inspection only; no independent human gold labels",
+  "working_tree_note": "Existing local runtime/ingestion changes were present; new PoC scripts were uncommitted.",
+  "queries": [
+    {
+      "id": "full-demo-brief",
+      "query": "# Case brief — HelioSense (fictional demo company)\n\n> **Simulation input only.** HelioSense and every business detail below are\n> fictional. This is not a real company, investment proposal, clinical product,\n> or statement about any University of Bern institution.\n\nHelioSense is a fictional early-stage Swiss medtech company exploring a\nwearable system for continuous glucose monitoring. The team wants to understand\nwhich capabilities in the Bern research ecosystem could be relevant to an\nearly, non-clinical research and development collaboration.\n\nPlease identify source-supported people and units at UniBE, ARTORG and the\nDiabetes Center Berne whose documented work is relevant to one or more of these\nareas: glucose sensing or monitoring, biosensors, wearable or point-of-care\nmeasurement, diabetes technology, signal processing, device development,\npreclinical evaluation, or clinical research infrastructure. Include relevant\nprojects, facilities, services, or contact routes only when an institutional\nsource explicitly documents them.\n\nFor each match, explain the connection in plain language and distinguish a\ndirectly documented match from an adjacent capability. Cite the exact public\nsource pages supporting each person, role, affiliation, expertise, project or\nservice. Do not infer that a person is available, willing to collaborate, or a\ncontact person unless the source says so. Do not claim that a technology is\nclinically validated, compatible with a glucose-monitoring product, or ready\nfor transfer unless the cited source explicitly establishes that.\n\nThe scenario is deliberately exploratory: do not assume that the company has a\nvalidated prototype, clinical data, regulatory approval, funding, or a confirmed\nBern partner. If the indexed pages do not support a requested detail, mark it\nunknown and state the coverage limitation. Keep the fictional company context\nseparate from public facts about institutions and researchers.\n\n**Desired output:** a concise, evidence-backed shortlist for a first internal\ndiscussion, with source links and clear uncertainty. This is not an invitation\nor a claim that any researcher has agreed to meet.\n",
+      "seconds": 24.824,
+      "limitations": [
+        "scores_are_not_confidence",
+        "live_corpus_incomplete_coverage"
+      ],
+      "accepted_entity_count": 0,
+      "hits": [
+        {
+          "rank": 1,
+          "chunk_id": "8772f2d0-d7ab-48ed-9edc-a307eaaa73dc",
+          "document_id": "f044f1a8-1723-4de0-a2d1-6ceef6339040",
+          "document_version_id": "72255b49-62a1-4d12-90ba-6d7a27d9b202",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e212002/e212008/e219816/e219820/files1323938/Student_Assisstant_Master_student_advertisement_small_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e212002/e212008/e219816/e219820/files1323938/Student_Assisstant_Master_student_advertisement_small_eng.pdf",
+          "char_start": 2980,
+          "char_end": 5096,
+          "evidence_ids": [
+            "5e1316c6-6589-4421-a93c-f53771cfd4cb"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 1,
+          "fusion_score": 0.01639344262295082,
+          "cosine_distance": 0.18909249273218154,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "0a8a035a59423e87c0e6f5d869dcf3d124b554e4912389b3e479fc337755850b",
+          "version_created_at": "2026-10-19T00:58:15.259970+00:00"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "ea4ab916-d993-446c-9731-b872cece3bc3",
+          "document_id": "31177c5f-dc15-4fd3-b789-63af6217f7d8",
+          "document_version_id": "48117db2-9f55-4c87-8e2a-13173c2a2db7",
+          "source_url": "https://www.dcberne.com/en/focus-area-sensing-smart-monitoring/",
+          "title": "Focus Area - Sensing & Smart Monitoring - Diabetes Center Berne",
+          "char_start": 1053,
+          "char_end": 1716,
+          "evidence_ids": [
+            "a38cf930-6f77-487a-80cd-0c3f70f48460"
+          ],
+          "lexical_rank": 1,
+          "vector_rank": null,
+          "fusion_score": 0.01639344262295082,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "64d2b8554e5fa8c5acb1a8902a2039aa5768d156e254eff22866355f6ebbacd5",
+          "version_created_at": "2026-10-18T23:50:56.959993+00:00"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "9ab26036-8823-4ebe-83b1-7309a988e155",
+          "document_id": "a399b8b0-cf5b-47da-9b16-e539b26aab30",
+          "document_version_id": "47a6f5e7-f596-4d49-963e-544e40ebb1bd",
+          "source_url": "https://www.artorg.unibe.ch/research/msl/group_members/persons/prof_dr_demory_brice_olivier/index_eng.html",
+          "title": "Research: Prof. Dr. Brice-Olivier Demory - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 153,
+          "char_end": 251,
+          "evidence_ids": [
+            "f33b413b-8590-4a00-adb1-86823d365458"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 2,
+          "fusion_score": 0.016129032258064516,
+          "cosine_distance": 0.1912778615951538,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "bdc143ef696f7ac45a3fe53972e207bab5011f7f5727d4cb1bc863666b4d980d",
+          "version_created_at": "2026-10-18T23:56:25.174804+00:00"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "f2476c2e-89ab-4e25-97bc-e2e4c1c15859",
+          "document_id": "31177c5f-dc15-4fd3-b789-63af6217f7d8",
+          "document_version_id": "48117db2-9f55-4c87-8e2a-13173c2a2db7",
+          "source_url": "https://www.dcberne.com/en/focus-area-sensing-smart-monitoring/",
+          "title": "Focus Area - Sensing & Smart Monitoring - Diabetes Center Berne",
+          "char_start": 287,
+          "char_end": 1053,
+          "evidence_ids": [
+            "bd34c8e8-66bd-44a6-85e9-f0c1b853476c"
+          ],
+          "lexical_rank": 2,
+          "vector_rank": null,
+          "fusion_score": 0.016129032258064516,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "64d2b8554e5fa8c5acb1a8902a2039aa5768d156e254eff22866355f6ebbacd5",
+          "version_created_at": "2026-10-18T23:50:56.959993+00:00"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "4abfe3ea-0b2d-4d6f-ace8-e7b9deddf42c",
+          "document_id": "48449496-1c5e-424d-b54d-f61b20a990e6",
+          "document_version_id": "a919775e-096d-44b1-8ef3-7ee724da2079",
+          "source_url": "https://www.dcberne.com/de/project_category/sensing-smart-monitoring-de/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 6386,
+          "char_end": 6404,
+          "evidence_ids": [
+            "b0f3545c-5a69-447e-aa09-791a8a708c33"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 3,
+          "fusion_score": 0.015873015873015872,
+          "cosine_distance": 0.2008145809416344,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "39315c12cf68a942aec3b8732894e6db4e9664d5bdf260d6af337a05016d30cb",
+          "version_created_at": "2026-10-19T01:19:20.883760+00:00"
+        },
+        {
+          "rank": 6,
+          "chunk_id": "51e19776-2492-4ea8-9272-e45665148479",
+          "document_id": "57d87264-87a1-4e98-bfbe-b9ee4ece35a8",
+          "document_version_id": "66935890-97a6-4439-b28a-bb82f7d22522",
+          "source_url": "https://www.dcberne.com/en/category/linkedin/page/6/",
+          "title": "Linkedin Archives - Page 6 of 6 - Diabetes Center Berne",
+          "char_start": 1449,
+          "char_end": 2063,
+          "evidence_ids": [
+            "1d734e66-496a-4b51-995a-9403d1786ee0"
+          ],
+          "lexical_rank": 3,
+          "vector_rank": null,
+          "fusion_score": 0.015873015873015872,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "6b292d0228848969c6c8469d800a521b07c777e7eba44d8700720bf9a0c3e2a7",
+          "version_created_at": "2026-10-19T02:25:30.805108+00:00"
+        },
+        {
+          "rank": 7,
+          "chunk_id": "638f8bf1-1d4c-47c0-b470-19c29b65386f",
+          "document_id": "9213d33f-f872-43c3-b45d-002687414c76",
+          "document_version_id": "3d2cfb1f-1226-4e83-8c52-9302b40f888b",
+          "source_url": "https://www.dcberne.com/en/2022/11/",
+          "title": "November 2022 - Diabetes Center Berne",
+          "char_start": 5523,
+          "char_end": 6137,
+          "evidence_ids": [
+            "314b594d-76b2-4b96-a289-d9a367329d9b"
+          ],
+          "lexical_rank": 4,
+          "vector_rank": null,
+          "fusion_score": 0.015625,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "eba0a8795c65341acae3798a7b902513f87dfd7cd73b4f26f385ae5ed500a00f",
+          "version_created_at": "2026-10-18T23:23:26.923781+00:00"
+        },
+        {
+          "rank": 8,
+          "chunk_id": "903e085c-6661-4037-90de-c1336de3288c",
+          "document_id": "2750c267-6e04-438b-85fe-4059c5528a24",
+          "document_version_id": "d7fd0b26-e498-4ff9-b010-b3efd8a0113f",
+          "source_url": "https://www.dcberne.com/en/project_category/sensing-smart-monitoring/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 5908,
+          "char_end": 5926,
+          "evidence_ids": [
+            "e1da355c-e2ac-445f-b8e7-4d9a382346f0"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 4,
+          "fusion_score": 0.015625,
+          "cosine_distance": 0.2008145809416344,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "3bae26394488cb1ab0f7e6408cbda2de4ad4e4e5b46ac96a15f4f760a352fa2b",
+          "version_created_at": "2026-10-18T21:43:45.423129+00:00"
+        },
+        {
+          "rank": 9,
+          "chunk_id": "3980afcc-550e-4f37-882f-e3896fa4ad33",
+          "document_id": "48449496-1c5e-424d-b54d-f61b20a990e6",
+          "document_version_id": "a919775e-096d-44b1-8ef3-7ee724da2079",
+          "source_url": "https://www.dcberne.com/de/project_category/sensing-smart-monitoring-de/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 6421,
+          "char_end": 6438,
+          "evidence_ids": [
+            "96f57116-a601-4912-9f80-3539dd8a276e"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 5,
+          "fusion_score": 0.015384615384615385,
+          "cosine_distance": 0.20288478161854262,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "39315c12cf68a942aec3b8732894e6db4e9664d5bdf260d6af337a05016d30cb",
+          "version_created_at": "2026-10-19T01:19:20.883760+00:00"
+        },
+        {
+          "rank": 10,
+          "chunk_id": "c205fa6d-1cbb-4183-83b9-167a01bdded1",
+          "document_id": "faf7698c-bb21-44d9-9f50-f15e9ec3eb39",
+          "document_version_id": "166a2bf4-7273-40e9-9240-ce91bfeff9d8",
+          "source_url": "https://www.dcberne.com/en/dcb-newsletter-9-looking-back-what-happened-to-the-dcb-open-innovation-challenge-winner-2021/",
+          "title": "DCB Newsletter #9: Looking back - what happened to the DCB Open Innovation Challenge winner 2021? - Diabetes Center Berne",
+          "char_start": 1334,
+          "char_end": 1948,
+          "evidence_ids": [
+            "c60061ca-309a-4cad-90df-79cce586bb71"
+          ],
+          "lexical_rank": 5,
+          "vector_rank": null,
+          "fusion_score": 0.015384615384615385,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "7192903b585b1d7fea88d40b18ce9f28a77ef9305dadba856a7834184b286a7d",
+          "version_created_at": "2026-10-19T00:12:49.683082+00:00"
+        },
+        {
+          "rank": 11,
+          "chunk_id": "4f44b4d3-69e0-496b-9308-f3ac0776f75e",
+          "document_id": "2750c267-6e04-438b-85fe-4059c5528a24",
+          "document_version_id": "d7fd0b26-e498-4ff9-b010-b3efd8a0113f",
+          "source_url": "https://www.dcberne.com/en/project_category/sensing-smart-monitoring/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 5943,
+          "char_end": 5960,
+          "evidence_ids": [
+            "ed9c1306-692e-4234-86a2-184a02f867af"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 6,
+          "fusion_score": 0.015151515151515152,
+          "cosine_distance": 0.20288478161854262,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "3bae26394488cb1ab0f7e6408cbda2de4ad4e4e5b46ac96a15f4f760a352fa2b",
+          "version_created_at": "2026-10-18T21:43:45.423129+00:00"
+        },
+        {
+          "rank": 12,
+          "chunk_id": "680ad75b-ef13-473f-abc7-b39feaa1a840",
+          "document_id": "2750c267-6e04-438b-85fe-4059c5528a24",
+          "document_version_id": "d7fd0b26-e498-4ff9-b010-b3efd8a0113f",
+          "source_url": "https://www.dcberne.com/en/project_category/sensing-smart-monitoring/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 2618,
+          "char_end": 3044,
+          "evidence_ids": [
+            "793da36f-7a7c-4767-861c-eb5539d6a6f3"
+          ],
+          "lexical_rank": 6,
+          "vector_rank": null,
+          "fusion_score": 0.015151515151515152,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "3bae26394488cb1ab0f7e6408cbda2de4ad4e4e5b46ac96a15f4f760a352fa2b",
+          "version_created_at": "2026-10-18T21:43:45.423129+00:00"
+        },
+        {
+          "rank": 13,
+          "chunk_id": "609dbe69-0c8a-4bd1-b3c2-76945541a14a",
+          "document_id": "add457c5-24ed-4807-be1f-ce4d90ba6d63",
+          "document_version_id": "71b85401-37fa-4c07-8c16-7be726098cc3",
+          "source_url": "https://www.artorg.unibe.ch/research/msl/group_members/persons/nivlet_galle/index_eng.html",
+          "title": "Research: Gaëlle Nivlet - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 92,
+          "char_end": 190,
+          "evidence_ids": [
+            "81b32767-2b4a-42e5-b5b0-e029bcdc55f4"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 7,
+          "fusion_score": 0.014925373134328358,
+          "cosine_distance": 0.20334143658527215,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "46f86b327c09b204eb6fb0b9f8dda8e54b7106dd8cfadd4a89565a32fe995b47",
+          "version_created_at": "2026-10-19T01:30:05.812188+00:00"
+        },
+        {
+          "rank": 14,
+          "chunk_id": "d5b450f1-fec3-4f32-8c96-e384f6c4da45",
+          "document_id": "2b02f85a-f446-4239-b0ba-ea33e1863cf4",
+          "document_version_id": "c1933dcc-3869-468b-a58a-08139475331d",
+          "source_url": "https://www.artorg.unibe.ch/research/cve/group_members/staff/stievano_gaia/index_eng.html",
+          "title": "Research: Gaia Stievano - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 90,
+          "char_end": 188,
+          "evidence_ids": [
+            "bc53077d-5dff-488d-bec5-fdc9e220b760"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 8,
+          "fusion_score": 0.014705882352941176,
+          "cosine_distance": 0.2050525309161102,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "65e3cf799319756c1dced25a56c469626cda6e952e71d5c394fd009e8c949102",
+          "version_created_at": "2026-10-19T00:55:55.348459+00:00"
+        },
+        {
+          "rank": 15,
+          "chunk_id": "c329e4bc-c9bf-4bc3-a9a4-0e0197538f59",
+          "document_id": "5ff8460f-ed7c-488b-95da-0f2b95ea9822",
+          "document_version_id": "e09db339-18b2-4299-b274-131c44801e82",
+          "source_url": "https://www.artorg.unibe.ch/research/msl/index_eng.html",
+          "title": "Research: Medical Sensing Laboratory - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 188,
+          "char_end": 207,
+          "evidence_ids": [
+            "2fc9dbc0-7d4b-4486-b89e-4b3fe06135aa"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 9,
+          "fusion_score": 0.014492753623188406,
+          "cosine_distance": 0.20515108108520508,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "b266613c07ae184b2c79de8c47f2d9163ab3469779467867127d580e14f3803a",
+          "version_created_at": "2026-10-18T21:30:39.623079+00:00"
+        },
+        {
+          "rank": 16,
+          "chunk_id": "0ea91353-82ff-48fc-b207-3cf372be3ff5",
+          "document_id": "cd471c31-0c1e-4523-afbb-e893b73b1765",
+          "document_version_id": "bac119c7-4afd-4228-a42e-a3dea870fc14",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e978913/files1521128/20240523_ARTORG_FlyerA3_updated_ohne_Schnittmarken_web_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e978913/files1521128/20240523_ARTORG_FlyerA3_updated_ohne_Schnittmarken_web_eng.pdf",
+          "char_start": 0,
+          "char_end": 488,
+          "evidence_ids": [
+            "776463c2-956b-4ded-98c8-c05746cc7f08"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 10,
+          "fusion_score": 0.014285714285714285,
+          "cosine_distance": 0.20724395535123175,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4467fa1b09e3a261710720629c228043aaf19bb0dbd3532dd1e701c4afdd4afc",
+          "version_created_at": "2026-10-19T00:27:50.023351+00:00"
+        },
+        {
+          "rank": 17,
+          "chunk_id": "f227b379-c192-458b-8476-d14cc98b7a5e",
+          "document_id": "eaf80f75-abf9-4f8b-b27e-5fd4a0414dc8",
+          "document_version_id": "cf921ff1-9d2d-4e57-8d67-7631cbd31262",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e978913/files979004/PDF_low_web_ARTORG_Annaul_Report_2019_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e978913/files979004/PDF_low_web_ARTORG_Annaul_Report_2019_eng.pdf",
+          "char_start": 109647,
+          "char_end": 109763,
+          "evidence_ids": [
+            "7b5dd57b-ac02-4485-b488-a959f3771615"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 11,
+          "fusion_score": 0.014084507042253521,
+          "cosine_distance": 0.20747065544128418,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "cb4f0f88f2aeb110ed236390ebc0a6c5634dd09811c0d4037febbac474b5f79d",
+          "version_created_at": "2026-10-19T00:28:32.772646+00:00"
+        },
+        {
+          "rank": 18,
+          "chunk_id": "0f8b2329-e378-4bed-81fc-5e5b492fc34e",
+          "document_id": "d9202ec7-b0fc-43df-a30c-f7dd2f4a2c9b",
+          "document_version_id": "76e79099-fdee-48d2-bf8d-aca34ded8e74",
+          "source_url": "https://www.artorg.unibe.ch/research/ger/contact/index_eng.html",
+          "title": "Research: Contact - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 281,
+          "char_end": 301,
+          "evidence_ids": [
+            "3f42e113-74b0-44d3-b54c-2668b1c7fe46"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 12,
+          "fusion_score": 0.013888888888888888,
+          "cosine_distance": 0.21103949612614348,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "88a27e005a756052e07a40f0eaf5eb5874b19bfb110a365c5774c7c0c6fc13af",
+          "version_created_at": "2026-10-18T23:41:26.439811+00:00"
+        },
+        {
+          "rank": 19,
+          "chunk_id": "cb4a2e47-8cd8-4bdb-8260-035a0f3b2217",
+          "document_id": "6e279728-e1b4-4ba0-a14e-000c1c25879e",
+          "document_version_id": "f79b21c7-6cb0-4b31-88da-7f0732fd697a",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e978913/files1090534/17_6_LOW_kl_Datei_ARTORG_Annaul_Report_2020_online_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e978913/files1090534/17_6_LOW_kl_Datei_ARTORG_Annaul_Report_2020_online_eng.pdf",
+          "char_start": 121911,
+          "char_end": 122027,
+          "evidence_ids": [
+            "e47c9103-7d30-4c6d-ad25-5151abc1c106"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 13,
+          "fusion_score": 0.0136986301369863,
+          "cosine_distance": 0.21171603237736292,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "ea09979d5edd7769347a5483f39375021a728a079531cc8fe1b790709cc2ca59",
+          "version_created_at": "2026-10-19T00:26:08.493414+00:00"
+        },
+        {
+          "rank": 20,
+          "chunk_id": "0791a5de-6fa6-40b9-8869-cdff5554276e",
+          "document_id": "0efe8f25-d2ea-462e-bcf1-2f3ee7a62653",
+          "document_version_id": "5fd2e62d-ff2e-4fce-b7c3-af4844d669d2",
+          "source_url": "https://www.artorg.unibe.ch/research/msl/group_members/persons/dr_patty_lucas/index_eng.html",
+          "title": "Research: Dr. Lucas Patty - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 99,
+          "char_end": 240,
+          "evidence_ids": [
+            "55cd66cf-2adc-4563-aaa1-58ebb7c71d4e"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 14,
+          "fusion_score": 0.013513513513513514,
+          "cosine_distance": 0.21295361441650162,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "92373c3869c6c722eeba88d19f9e029b172e003ed6c6f78f3b63314310165d9c",
+          "version_created_at": "2026-10-19T01:29:43.781040+00:00"
+        },
+        {
+          "rank": 21,
+          "chunk_id": "23237b05-56b6-4bfe-bf95-f9431d364555",
+          "document_id": "cf63825b-d51a-40df-b9e4-ae54fa8da7d6",
+          "document_version_id": "1b887268-055d-4096-9803-0a4999c5e410",
+          "source_url": "https://www.artorg.unibe.ch/research/cve/group_members/staff/zikken_babette/index_eng.html",
+          "title": "Research: Babette Zikken - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 87,
+          "char_end": 185,
+          "evidence_ids": [
+            "9b3268b7-afe9-44b8-81c0-6ced63f9551a"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 15,
+          "fusion_score": 0.013333333333333334,
+          "cosine_distance": 0.21313922326926904,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "7bd5420aa4bb8093f603267917c3bba09e25bc206be111eee68ddf6bdf84774d",
+          "version_created_at": "2026-10-19T00:56:06.880211+00:00"
+        },
+        {
+          "rank": 22,
+          "chunk_id": "d09db9cb-359c-41e2-8e14-c4253f708876",
+          "document_id": "c77e01cd-b31f-4b31-b884-c7f3de26f5fa",
+          "document_version_id": "07be3c8a-9072-4c73-99e5-5b9e0c170ed2",
+          "source_url": "https://www.artorg.unibe.ch/research/ger/group_members/persons/prof_dr_saner_hugo_ernst/index_eng.html",
+          "title": "Research: Prof. Dr. Hugo Ernst Saner - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 2363,
+          "char_end": 2426,
+          "evidence_ids": [
+            "59217319-f51f-43d8-b248-e011dc17e080"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 16,
+          "fusion_score": 0.013157894736842105,
+          "cosine_distance": 0.2146640185911658,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "0ef434b9246d2510ef77570320477dc642fe9f8e99e591d00072b114101df376",
+          "version_created_at": "2026-10-19T01:06:14.420907+00:00"
+        },
+        {
+          "rank": 23,
+          "chunk_id": "f648a322-37a3-4685-85b4-f7ed45175467",
+          "document_id": "ada34f5c-0d51-40cc-b919-8fadeab5d118",
+          "document_version_id": "90f215d3-b669-4b1f-afec-62838e0c53fd",
+          "source_url": "https://www.artorg.unibe.ch/research/ooc/group_members/persons/favrod_coune_marc/index_eng.html",
+          "title": "Research: Marc Favrod-Coune - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 94,
+          "char_end": 246,
+          "evidence_ids": [
+            "d2dce390-a94d-45ee-bf89-6fe002aef11c"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 17,
+          "fusion_score": 0.012987012987012988,
+          "cosine_distance": 0.21490459353300229,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "6cf9dd4f735a77863e98c4bec9211388d24c4a920ac068ad407e89604c1c071d",
+          "version_created_at": "2026-10-19T01:45:29.608003+00:00"
+        },
+        {
+          "rank": 24,
+          "chunk_id": "0daa021f-fa8d-4c8e-b50b-082387091872",
+          "document_id": "60ed4e41-b27f-4961-b612-cd971601245a",
+          "document_version_id": "b58f06c8-a3d1-48b2-b6e0-8485889a0751",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e212002/e861724/20250825_ARTORG_ResearchPortfolio_web_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e212002/e861724/20250825_ARTORG_ResearchPortfolio_web_eng.pdf",
+          "char_start": 20693,
+          "char_end": 21000,
+          "evidence_ids": [
+            "49db7828-875d-4109-86a1-e80cb572d70b"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 18,
+          "fusion_score": 0.01282051282051282,
+          "cosine_distance": 0.21518754959106445,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "cef0f33cc2d4b5c84724e8e194436f9a959655d356f9417f5667bb14f3e9d3c5",
+          "version_created_at": "2026-10-18T21:31:46.270975+00:00"
+        },
+        {
+          "rank": 25,
+          "chunk_id": "a86c9c71-b042-49fa-a2ae-f84f5b079f2e",
+          "document_id": "fa255a0a-d81a-416b-a664-9b6ac462b1e8",
+          "document_version_id": "c3cabf6c-7c9b-43f6-b718-eefc40d49bc5",
+          "source_url": "https://www.dcberne.com/de/project_category/artificial-pancreas-biological-feedback-de/",
+          "title": "Artificial Pancreas & Biological Feedback Archives - Diabetes Center Berne",
+          "char_start": 1583,
+          "char_end": 1601,
+          "evidence_ids": [
+            "15f1cb15-6149-42ae-bb4f-70eb468634a1"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 19,
+          "fusion_score": 0.012658227848101266,
+          "cosine_distance": 0.21614406156969224,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "17f44af69f28247bad77eaaa086dfe797d65fa3bf7a201bcbb0e956451aa9ddd",
+          "version_created_at": "2026-10-19T02:03:13.857558+00:00"
+        },
+        {
+          "rank": 26,
+          "chunk_id": "b8c99f05-d747-44d6-b412-12fd55544463",
+          "document_id": "a4b0af2c-d346-48c5-b4ae-fb906ad2d347",
+          "document_version_id": "18cf0613-1c90-44e8-b389-86611a48b8c0",
+          "source_url": "https://www.dcberne.com/en/project_category/artificial-pancreas-biological-feedback/",
+          "title": "Artificial Pancreas & Biological Feedback Archives - Diabetes Center Berne",
+          "char_start": 1531,
+          "char_end": 1549,
+          "evidence_ids": [
+            "65a0aae3-c021-4451-b7e3-d4b5a63dea7f"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 20,
+          "fusion_score": 0.0125,
+          "cosine_distance": 0.21614406156969224,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4bf7f49226e5c9fa05361a05787fb88b071bce2651c7dd7c54e68e28f4e79461",
+          "version_created_at": "2026-10-19T01:58:13.865830+00:00"
+        },
+        {
+          "rank": 27,
+          "chunk_id": "183ec4bd-fb09-4505-bc9e-b1ef70fed126",
+          "document_id": "170e3727-058a-4613-a82b-69cfabff8b01",
+          "document_version_id": "3a6cb39a-5640-4852-8ca3-9879fa4df8d0",
+          "source_url": "https://www.artorg.unibe.ch/research/cve/group_members/staff/jaisli_jonas/index_eng.html",
+          "title": "Research: Jonas Jaisli - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 95,
+          "char_end": 193,
+          "evidence_ids": [
+            "8389fa4d-38c7-4d6a-9eb6-1bbc4cb8a18d"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 21,
+          "fusion_score": 0.012345679012345678,
+          "cosine_distance": 0.216235386357581,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "bdb485168ab0d2509258b2184b81168455fc73a08bc8c157b4fe951de46f7007",
+          "version_created_at": "2026-10-19T00:54:26.344299+00:00"
+        },
+        {
+          "rank": 28,
+          "chunk_id": "3f3a90c9-6d40-45d5-b54c-ac7345e4cd14",
+          "document_id": "15637cf3-9596-4eae-95ca-cf9dfb932a0e",
+          "document_version_id": "0b0da8fe-7206-47f7-9857-6a691349b549",
+          "source_url": "https://www.dcberne.com/de/project_category/in-progress-de/",
+          "title": "In progress Archives - Diabetes Center Berne",
+          "char_start": 8684,
+          "char_end": 8702,
+          "evidence_ids": [
+            "54dddee6-8623-4b41-836a-d2a3522479fa"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 22,
+          "fusion_score": 0.012195121951219513,
+          "cosine_distance": 0.21716401628148574,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "ced239f86e1a9cfa92bee3d2382c8a750fab94d99296a4fb594c859bf8bcde2a",
+          "version_created_at": "2026-10-19T02:03:34.224880+00:00"
+        },
+        {
+          "rank": 29,
+          "chunk_id": "658e07f9-18d9-48e4-a082-b80f34b6a5c1",
+          "document_id": "de48f562-2305-41b5-b895-49c97e0c9b64",
+          "document_version_id": "57e64a36-57ed-446a-a91c-1b6a4a7fbb18",
+          "source_url": "https://www.dcberne.com/en/project_category/in-progress/",
+          "title": "In progress Archives - Diabetes Center Berne",
+          "char_start": 11283,
+          "char_end": 11301,
+          "evidence_ids": [
+            "0a98ae15-4429-4478-b8dc-04540f1791c2"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 23,
+          "fusion_score": 0.012048192771084338,
+          "cosine_distance": 0.21716401628148574,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "ed3335858c32cc051c8c9f40a0a0feacc218e427f9fbff5734d29240ad35e8f5",
+          "version_created_at": "2026-10-19T01:57:19.354114+00:00"
+        },
+        {
+          "rank": 30,
+          "chunk_id": "21da64b9-d341-4160-9f14-14606aa7634f",
+          "document_id": "c786b0bc-196b-4e2e-9143-600f20118489",
+          "document_version_id": "a0c07bb7-804f-4749-aa52-61b9506a6fdb",
+          "source_url": "https://www.artorg.unibe.ch/ueber_uns/mitarbeitende/bethge_diana/index_ger.html",
+          "title": "Über uns: Diana Bethge - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 100,
+          "char_end": 170,
+          "evidence_ids": [
+            "f3c9afb1-768b-4a3a-b87b-9a5cea6e4156"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 24,
+          "fusion_score": 0.011904761904761904,
+          "cosine_distance": 0.21728278501527076,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "98709955565829716fbcd198701b231a2055ed6568ac406e35bb91beb19fedb1",
+          "version_created_at": "2026-10-19T00:19:59.210144+00:00"
+        }
+      ]
+    },
+    {
+      "id": "glucose-sensors",
+      "query": "Which UniBE, ARTORG or Diabetes Center Berne groups or researchers have documented expertise relevant to glucose sensors or continuous glucose monitoring for an exploratory wearable medtech R&D project? Show exact sources and distinguish direct from adjacent matches.",
+      "seconds": 21.839,
+      "limitations": [
+        "scores_are_not_confidence",
+        "live_corpus_incomplete_coverage"
+      ],
+      "accepted_entity_count": 0,
+      "hits": [
+        {
+          "rank": 1,
+          "chunk_id": "0782800e-f578-43b7-8c21-96be3b9c3b38",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 1635,
+          "char_end": 1691,
+          "evidence_ids": [
+            "3de3ac32-5696-46db-b8bf-d701bcf7b7c8"
+          ],
+          "lexical_rank": 1,
+          "vector_rank": null,
+          "fusion_score": 0.01639344262295082,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "bfb1aa4f-168a-44dc-ac14-6cbc0e5cdf66",
+          "document_id": "eaf80f75-abf9-4f8b-b27e-5fd4a0414dc8",
+          "document_version_id": "cf921ff1-9d2d-4e57-8d67-7631cbd31262",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e978913/files979004/PDF_low_web_ARTORG_Annaul_Report_2019_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e978913/files979004/PDF_low_web_ARTORG_Annaul_Report_2019_eng.pdf",
+          "char_start": 8173,
+          "char_end": 10573,
+          "evidence_ids": [
+            "13e95170-0a4d-472f-8b2d-090c95a380f0"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 1,
+          "fusion_score": 0.01639344262295082,
+          "cosine_distance": 0.20213346468606663,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "cb4f0f88f2aeb110ed236390ebc0a6c5634dd09811c0d4037febbac474b5f79d",
+          "version_created_at": "2026-10-19T00:28:32.772646+00:00"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "1a0ac785-db94-4778-ab18-9f12280002c7",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 1166,
+          "char_end": 1544,
+          "evidence_ids": [
+            "3a3c8e29-8ed5-474c-804e-08fc746e82d9"
+          ],
+          "lexical_rank": 2,
+          "vector_rank": null,
+          "fusion_score": 0.016129032258064516,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "efb4b59d-9aea-4e16-a329-c09d0820580b",
+          "document_id": "2750c267-6e04-438b-85fe-4059c5528a24",
+          "document_version_id": "d7fd0b26-e498-4ff9-b010-b3efd8a0113f",
+          "source_url": "https://www.dcberne.com/en/project_category/sensing-smart-monitoring/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 7260,
+          "char_end": 7863,
+          "evidence_ids": [
+            "149ebfa1-d2d9-4ed0-87b6-eea3d2bb7246"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 2,
+          "fusion_score": 0.016129032258064516,
+          "cosine_distance": 0.20815378427505493,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "3bae26394488cb1ab0f7e6408cbda2de4ad4e4e5b46ac96a15f4f760a352fa2b",
+          "version_created_at": "2026-10-18T21:43:45.423129+00:00"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "23c4eb4b-981e-4fbb-91db-d6eebcacd033",
+          "document_id": "d3b8c11c-2214-437a-9659-4ed9752b4f45",
+          "document_version_id": "abe7a7d1-1b8c-41e9-ac62-93e295e67933",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/05/Innovation-Challenge-2024-TOP20-Website.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/05/Innovation-Challenge-2024-TOP20-Website.pdf",
+          "char_start": 2323,
+          "char_end": 3269,
+          "evidence_ids": [
+            "8108aa1c-7db7-4343-bceb-3ada82f625f0"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 3,
+          "fusion_score": 0.015873015873015872,
+          "cosine_distance": 0.20958645400920095,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "eb871e517b2beb8ea9f53fae37b0f6ae10dfa39cba5800f71f485958507eecce",
+          "version_created_at": "2026-10-19T01:51:19.191066+00:00"
+        },
+        {
+          "rank": 6,
+          "chunk_id": "3d57d4f0-3711-4b06-b801-51b40287ce93",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 1691,
+          "char_end": 1945,
+          "evidence_ids": [
+            "a3f04e7d-0849-4383-88c5-238edc5dc814"
+          ],
+          "lexical_rank": 3,
+          "vector_rank": null,
+          "fusion_score": 0.015873015873015872,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 7,
+          "chunk_id": "41482c83-dc73-44ba-8a54-307786db6523",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 2448,
+          "char_end": 2623,
+          "evidence_ids": [
+            "e0f2abb1-4ecb-4465-8a00-1440f85ad6c3"
+          ],
+          "lexical_rank": 4,
+          "vector_rank": null,
+          "fusion_score": 0.015625,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 8,
+          "chunk_id": "8d4b184a-51c2-4345-a45d-8dd79f07e9e8",
+          "document_id": "fbfd42e9-239e-4826-aeac-19a96b8dddab",
+          "document_version_id": "97eac77f-009e-40d6-ad02-e9c62b4623ba",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "char_start": 76377,
+          "char_end": 78777,
+          "evidence_ids": [
+            "84779da6-caa9-4136-9f45-b4775d4d580f"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 4,
+          "fusion_score": 0.015625,
+          "cosine_distance": 0.210862649134554,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4274d2d1c5f702b3570c6da0c959ebd600ac0b4c821cbc5f3a83c93c74a2a0a6",
+          "version_created_at": "2026-10-19T00:31:51.494243+00:00"
+        },
+        {
+          "rank": 9,
+          "chunk_id": "32ec9261-839e-4453-8d7e-5a04680365bf",
+          "document_id": "6e279728-e1b4-4ba0-a14e-000c1c25879e",
+          "document_version_id": "f79b21c7-6cb0-4b31-88da-7f0732fd697a",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e978913/files1090534/17_6_LOW_kl_Datei_ARTORG_Annaul_Report_2020_online_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e978913/files1090534/17_6_LOW_kl_Datei_ARTORG_Annaul_Report_2020_online_eng.pdf",
+          "char_start": 11138,
+          "char_end": 13538,
+          "evidence_ids": [
+            "291e5e9b-79e7-4a9a-be94-b9566e6673f6"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 5,
+          "fusion_score": 0.015384615384615385,
+          "cosine_distance": 0.2116743813461971,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "ea09979d5edd7769347a5483f39375021a728a079531cc8fe1b790709cc2ca59",
+          "version_created_at": "2026-10-19T00:26:08.493414+00:00"
+        },
+        {
+          "rank": 10,
+          "chunk_id": "5b8a5cdc-7601-4c64-9b98-fec08c5efdac",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 2370,
+          "char_end": 2448,
+          "evidence_ids": [
+            "0eea4435-a57a-45fd-836d-ffd56def30d7"
+          ],
+          "lexical_rank": 5,
+          "vector_rank": null,
+          "fusion_score": 0.015384615384615385,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 11,
+          "chunk_id": "5f47ce1c-477d-493f-b331-e5d04e586bca",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 2713,
+          "char_end": 2716,
+          "evidence_ids": [
+            "e7fb9cc3-43ef-480e-a8f6-c595a910c3f8"
+          ],
+          "lexical_rank": 6,
+          "vector_rank": null,
+          "fusion_score": 0.015151515151515152,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 12,
+          "chunk_id": "a03465e9-4ebd-4fa3-a9ca-dedaa11d9507",
+          "document_id": "48449496-1c5e-424d-b54d-f61b20a990e6",
+          "document_version_id": "a919775e-096d-44b1-8ef3-7ee724da2079",
+          "source_url": "https://www.dcberne.com/de/project_category/sensing-smart-monitoring-de/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 7818,
+          "char_end": 8335,
+          "evidence_ids": [
+            "14fa5127-1a66-4965-9ff4-7faacae74f0c"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 6,
+          "fusion_score": 0.015151515151515152,
+          "cosine_distance": 0.2121211290359497,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "39315c12cf68a942aec3b8732894e6db4e9664d5bdf260d6af337a05016d30cb",
+          "version_created_at": "2026-10-19T01:19:20.883760+00:00"
+        },
+        {
+          "rank": 13,
+          "chunk_id": "270952d8-c4fc-4a8a-8517-3d79c113d443",
+          "document_id": "ba5cbbe9-29b0-4cc4-b5b4-85bb95cb7449",
+          "document_version_id": "12fc1dfb-4583-4500-ae64-cfc0637d6c53",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/08/dJournal_Ausgabe_2_24_fr_web_def_DCB.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/08/dJournal_Ausgabe_2_24_fr_web_def_DCB.pdf",
+          "char_start": 0,
+          "char_end": 2400,
+          "evidence_ids": [
+            "edc9d473-b8e1-4dc6-9409-ebea3402ef09"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 7,
+          "fusion_score": 0.014925373134328358,
+          "cosine_distance": 0.21750330924987793,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "1e7c3979e7ae796b88cf8cc68d75b7974c28ef7586ce530317a011baff47cb6a",
+          "version_created_at": "2026-10-18T23:54:43.364893+00:00"
+        },
+        {
+          "rank": 14,
+          "chunk_id": "7b5b20ff-6b75-401d-bd08-05e5db765c8d",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 1945,
+          "char_end": 2370,
+          "evidence_ids": [
+            "c73a785b-2358-48d6-a507-2f98d205e57c"
+          ],
+          "lexical_rank": 7,
+          "vector_rank": null,
+          "fusion_score": 0.014925373134328358,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 15,
+          "chunk_id": "a282d2c0-eba1-4e96-bc58-cf204c79e2a0",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 717,
+          "char_end": 1166,
+          "evidence_ids": [
+            "abce9587-ac92-4f12-909b-350506e5ff97"
+          ],
+          "lexical_rank": 8,
+          "vector_rank": null,
+          "fusion_score": 0.014705882352941176,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 16,
+          "chunk_id": "c0268f28-cb64-4d41-bf8a-e610533ee6e0",
+          "document_id": "cef0a6be-b42a-4c8e-940a-5054a8e9c760",
+          "document_version_id": "cbbaeb56-b8c2-4edc-8a9e-b7dd5e6fcf15",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2026/05/2025_DCB_Annual-Report_english.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2026/05/2025_DCB_Annual-Report_english.pdf",
+          "char_start": 41847,
+          "char_end": 43657,
+          "evidence_ids": [
+            "e647ddd2-460c-4cf9-8fdc-5742855fe8c2"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 8,
+          "fusion_score": 0.014705882352941176,
+          "cosine_distance": 0.21953241708681348,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "44de8ffb09b2524ef1ded211e4cdadd4c33e2aa20ff7629eafa7d0759388aea0",
+          "version_created_at": "2026-10-18T23:59:59.212505+00:00"
+        },
+        {
+          "rank": 17,
+          "chunk_id": "1a8b06bd-3897-48ee-b77e-bd32f2c6b23f",
+          "document_id": "15b1ba23-40b5-48b0-a708-ae121de9e1c6",
+          "document_version_id": "9029720a-879b-4f8f-9cc1-ec7fc1a5989a",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/08/dJournal_Ausgabe_2_24_de_web_def_DCB.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/08/dJournal_Ausgabe_2_24_de_web_def_DCB.pdf",
+          "char_start": 0,
+          "char_end": 2400,
+          "evidence_ids": [
+            "d82fc30d-cc1c-4f42-8501-de898da2c77c"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 9,
+          "fusion_score": 0.014492753623188406,
+          "cosine_distance": 0.21965515613555908,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "e78e11f504838d1d447f493fc56da72174c38a357d327be72b77d73c2ad7a6ad",
+          "version_created_at": "2026-10-18T23:54:25.109727+00:00"
+        },
+        {
+          "rank": 18,
+          "chunk_id": "a83df038-b6f9-42f8-9754-77e22dc89154",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 470,
+          "char_end": 717,
+          "evidence_ids": [
+            "717ef276-5cf9-4869-aab1-7472770f2a93"
+          ],
+          "lexical_rank": 9,
+          "vector_rank": null,
+          "fusion_score": 0.014492753623188406,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 19,
+          "chunk_id": "1907f038-4573-4df7-ab3f-2e456f534ce9",
+          "document_id": "fbfd42e9-239e-4826-aeac-19a96b8dddab",
+          "document_version_id": "97eac77f-009e-40d6-ad02-e9c62b4623ba",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "char_start": 78777,
+          "char_end": 80753,
+          "evidence_ids": [
+            "1cfb7015-a662-4cf5-a121-6610a59ee0e7"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 10,
+          "fusion_score": 0.014285714285714285,
+          "cosine_distance": 0.2207810878753662,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4274d2d1c5f702b3570c6da0c959ebd600ac0b4c821cbc5f3a83c93c74a2a0a6",
+          "version_created_at": "2026-10-19T00:31:51.494243+00:00"
+        },
+        {
+          "rank": 20,
+          "chunk_id": "b7002759-dc0f-4d25-835b-b706c937d85a",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 1544,
+          "char_end": 1635,
+          "evidence_ids": [
+            "9486f4a0-29c0-41e2-8edf-258a5836eee8"
+          ],
+          "lexical_rank": 10,
+          "vector_rank": null,
+          "fusion_score": 0.014285714285714285,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 21,
+          "chunk_id": "b8b960c7-4d95-4241-9aa3-dcd7448e55f7",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 2623,
+          "char_end": 2713,
+          "evidence_ids": [
+            "2ffe3d7c-dae3-4dad-b0aa-85c460eb2fc8"
+          ],
+          "lexical_rank": 11,
+          "vector_rank": null,
+          "fusion_score": 0.014084507042253521,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 22,
+          "chunk_id": "bbba0977-9999-4468-908d-9a75d494c605",
+          "document_id": "f3ba72d3-8912-4dc8-94c9-d8618365a155",
+          "document_version_id": "1a248c78-fabf-4d02-9c17-8079c239e6f5",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2023/02/Sonntagszeitung_12_2022_DCB.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2023/02/Sonntagszeitung_12_2022_DCB.pdf",
+          "char_start": 0,
+          "char_end": 2400,
+          "evidence_ids": [
+            "071bf87f-03a7-4f91-a5cc-a63f819b3edb"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 11,
+          "fusion_score": 0.014084507042253521,
+          "cosine_distance": 0.22094881534576416,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "86027f97f4d18768ddd5cb183d7af6e9727def80b0f46f1420866b81a6c19469",
+          "version_created_at": "2026-10-18T23:51:37.355517+00:00"
+        },
+        {
+          "rank": 23,
+          "chunk_id": "86125930-a3d4-4868-bc45-502e6eff8d9f",
+          "document_id": "fbfd42e9-239e-4826-aeac-19a96b8dddab",
+          "document_version_id": "97eac77f-009e-40d6-ad02-e9c62b4623ba",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "char_start": 83155,
+          "char_end": 84486,
+          "evidence_ids": [
+            "2576f056-1101-413c-a80b-ae1b5d0b0cdb"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 12,
+          "fusion_score": 0.013888888888888888,
+          "cosine_distance": 0.22098606824874878,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4274d2d1c5f702b3570c6da0c959ebd600ac0b4c821cbc5f3a83c93c74a2a0a6",
+          "version_created_at": "2026-10-19T00:31:51.494243+00:00"
+        },
+        {
+          "rank": 24,
+          "chunk_id": "bb3938d0-695e-4253-9000-8d96cff12b86",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 196,
+          "char_end": 470,
+          "evidence_ids": [
+            "a9ad5988-8594-443d-a407-3b3db0a53150"
+          ],
+          "lexical_rank": 12,
+          "vector_rank": null,
+          "fusion_score": 0.013888888888888888,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 25,
+          "chunk_id": "d7978ff2-06be-4414-9147-a117c54f385c",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 133,
+          "char_end": 196,
+          "evidence_ids": [
+            "83fe4eec-1b38-4212-8415-245ca52800bd"
+          ],
+          "lexical_rank": 13,
+          "vector_rank": null,
+          "fusion_score": 0.0136986301369863,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 26,
+          "chunk_id": "fda246c6-c0da-446d-9fd8-00ed9856c9a8",
+          "document_id": "31ada180-e4e0-453c-93de-0b5b07025150",
+          "document_version_id": "345574f3-14cf-4041-896b-179a15a68279",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2023/08/DE_dJournal_01_2023_web_Partnerseite.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2023/08/DE_dJournal_01_2023_web_Partnerseite.pdf",
+          "char_start": 3022,
+          "char_end": 5422,
+          "evidence_ids": [
+            "543d6b78-5566-4ad0-a942-84e45225eab1"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 13,
+          "fusion_score": 0.0136986301369863,
+          "cosine_distance": 0.2212346064308507,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "be7c0c4edad6b5063893bbb1f8b12230a599320531f8828742fb743524c863d7",
+          "version_created_at": "2026-10-18T23:52:16.100142+00:00"
+        },
+        {
+          "rank": 27,
+          "chunk_id": "3a7b30fa-2cf8-468f-b0d5-550b17a8ede7",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 50,
+          "char_end": 66,
+          "evidence_ids": [
+            "4413eabd-34ba-40d4-92cf-abe5273b99f2"
+          ],
+          "lexical_rank": 14,
+          "vector_rank": null,
+          "fusion_score": 0.013513513513513514,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 28,
+          "chunk_id": "eac54e84-18e2-4d63-9b45-a280fcb62c0e",
+          "document_id": "d3b8c11c-2214-437a-9659-4ed9752b4f45",
+          "document_version_id": "abe7a7d1-1b8c-41e9-ac62-93e295e67933",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/05/Innovation-Challenge-2024-TOP20-Website.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/05/Innovation-Challenge-2024-TOP20-Website.pdf",
+          "char_start": 72,
+          "char_end": 1204,
+          "evidence_ids": [
+            "8a42c73d-dadb-4dae-adca-7a8fe6030f91"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 14,
+          "fusion_score": 0.013513513513513514,
+          "cosine_distance": 0.22131311893463135,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "eb871e517b2beb8ea9f53fae37b0f6ae10dfa39cba5800f71f485958507eecce",
+          "version_created_at": "2026-10-19T01:51:19.191066+00:00"
+        },
+        {
+          "rank": 29,
+          "chunk_id": "44dd8692-1283-468b-8ea8-a33e4e2f3f33",
+          "document_id": "fa9c65e0-cfa4-45fc-88cd-28ee3f84ff3f",
+          "document_version_id": "71cd25a1-4b5a-4a7a-818b-fe198273780b",
+          "source_url": "https://www.artorg.unibe.ch/news_and_events/2025/nic_krummenacher_receives_unibe_inno_grant/index_eng.html",
+          "title": "News and Events: Nic Krummenacher receives UniBE INNO Grant for DextEgg Project - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 0,
+          "char_end": 50,
+          "evidence_ids": [
+            "6d501513-ce2d-4761-8bcc-8be740c85f3d"
+          ],
+          "lexical_rank": 15,
+          "vector_rank": null,
+          "fusion_score": 0.013333333333333334,
+          "cosine_distance": null,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "56ff77cc091c0cc97fb4e5727e9febfb622f2cd1f5301e91debf37d76bbc4b28",
+          "version_created_at": "2026-10-19T02:01:55.650221+00:00"
+        },
+        {
+          "rank": 30,
+          "chunk_id": "e40357b4-f654-4a09-b05f-5a64dadadf79",
+          "document_id": "53b84b92-9e6d-459b-90fa-1fc536706845",
+          "document_version_id": "64b68a05-4e9b-4848-b4ce-b1f062abde0c",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/08/Annual_Report_DCB_23-24_EN.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/08/Annual_Report_DCB_23-24_EN.pdf",
+          "char_start": 18468,
+          "char_end": 19695,
+          "evidence_ids": [
+            "a4a0c53f-0cb3-4223-bdc1-2f64803c5d96"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 15,
+          "fusion_score": 0.013333333333333334,
+          "cosine_distance": 0.22275859117507935,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "bf9c0b3257e8b6808752cc9295616936801fe4650b9b2dd80affdc29ed4506b1",
+          "version_created_at": "2026-10-19T01:51:45.330389+00:00"
+        }
+      ]
+    },
+    {
+      "id": "cgm",
+      "query": "For a fictional wearable medtech R&D scenario, find source-backed Bern expertise relevant to CGM (continuous glucose monitoring). Include people, units, projects and services only where the UniBE, ARTORG or Diabetes Center Berne pages support them; explain missing fields.",
+      "seconds": 18.119,
+      "limitations": [
+        "scores_are_not_confidence",
+        "live_corpus_incomplete_coverage"
+      ],
+      "accepted_entity_count": 0,
+      "hits": [
+        {
+          "rank": 1,
+          "chunk_id": "8772f2d0-d7ab-48ed-9edc-a307eaaa73dc",
+          "document_id": "f044f1a8-1723-4de0-a2d1-6ceef6339040",
+          "document_version_id": "72255b49-62a1-4d12-90ba-6d7a27d9b202",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e212002/e212008/e219816/e219820/files1323938/Student_Assisstant_Master_student_advertisement_small_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e212002/e212008/e219816/e219820/files1323938/Student_Assisstant_Master_student_advertisement_small_eng.pdf",
+          "char_start": 2980,
+          "char_end": 5096,
+          "evidence_ids": [
+            "5e1316c6-6589-4421-a93c-f53771cfd4cb"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 1,
+          "fusion_score": 0.01639344262295082,
+          "cosine_distance": 0.21190247571177678,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "0a8a035a59423e87c0e6f5d869dcf3d124b554e4912389b3e479fc337755850b",
+          "version_created_at": "2026-10-19T00:58:15.259970+00:00"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "4abfe3ea-0b2d-4d6f-ace8-e7b9deddf42c",
+          "document_id": "48449496-1c5e-424d-b54d-f61b20a990e6",
+          "document_version_id": "a919775e-096d-44b1-8ef3-7ee724da2079",
+          "source_url": "https://www.dcberne.com/de/project_category/sensing-smart-monitoring-de/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 6386,
+          "char_end": 6404,
+          "evidence_ids": [
+            "b0f3545c-5a69-447e-aa09-791a8a708c33"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 2,
+          "fusion_score": 0.016129032258064516,
+          "cosine_distance": 0.22404847216750567,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "39315c12cf68a942aec3b8732894e6db4e9664d5bdf260d6af337a05016d30cb",
+          "version_created_at": "2026-10-19T01:19:20.883760+00:00"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "903e085c-6661-4037-90de-c1336de3288c",
+          "document_id": "2750c267-6e04-438b-85fe-4059c5528a24",
+          "document_version_id": "d7fd0b26-e498-4ff9-b010-b3efd8a0113f",
+          "source_url": "https://www.dcberne.com/en/project_category/sensing-smart-monitoring/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 5908,
+          "char_end": 5926,
+          "evidence_ids": [
+            "e1da355c-e2ac-445f-b8e7-4d9a382346f0"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 3,
+          "fusion_score": 0.015873015873015872,
+          "cosine_distance": 0.22404847216750567,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "3bae26394488cb1ab0f7e6408cbda2de4ad4e4e5b46ac96a15f4f760a352fa2b",
+          "version_created_at": "2026-10-18T21:43:45.423129+00:00"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "efb4b59d-9aea-4e16-a329-c09d0820580b",
+          "document_id": "2750c267-6e04-438b-85fe-4059c5528a24",
+          "document_version_id": "d7fd0b26-e498-4ff9-b010-b3efd8a0113f",
+          "source_url": "https://www.dcberne.com/en/project_category/sensing-smart-monitoring/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 7260,
+          "char_end": 7863,
+          "evidence_ids": [
+            "149ebfa1-d2d9-4ed0-87b6-eea3d2bb7246"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 4,
+          "fusion_score": 0.015625,
+          "cosine_distance": 0.2241833209991455,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "3bae26394488cb1ab0f7e6408cbda2de4ad4e4e5b46ac96a15f4f760a352fa2b",
+          "version_created_at": "2026-10-18T21:43:45.423129+00:00"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "a03465e9-4ebd-4fa3-a9ca-dedaa11d9507",
+          "document_id": "48449496-1c5e-424d-b54d-f61b20a990e6",
+          "document_version_id": "a919775e-096d-44b1-8ef3-7ee724da2079",
+          "source_url": "https://www.dcberne.com/de/project_category/sensing-smart-monitoring-de/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 7818,
+          "char_end": 8335,
+          "evidence_ids": [
+            "14fa5127-1a66-4965-9ff4-7faacae74f0c"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 5,
+          "fusion_score": 0.015384615384615385,
+          "cosine_distance": 0.22795283794403076,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "39315c12cf68a942aec3b8732894e6db4e9664d5bdf260d6af337a05016d30cb",
+          "version_created_at": "2026-10-19T01:19:20.883760+00:00"
+        },
+        {
+          "rank": 6,
+          "chunk_id": "3980afcc-550e-4f37-882f-e3896fa4ad33",
+          "document_id": "48449496-1c5e-424d-b54d-f61b20a990e6",
+          "document_version_id": "a919775e-096d-44b1-8ef3-7ee724da2079",
+          "source_url": "https://www.dcberne.com/de/project_category/sensing-smart-monitoring-de/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 6421,
+          "char_end": 6438,
+          "evidence_ids": [
+            "96f57116-a601-4912-9f80-3539dd8a276e"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 6,
+          "fusion_score": 0.015151515151515152,
+          "cosine_distance": 0.22799949896330818,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "39315c12cf68a942aec3b8732894e6db4e9664d5bdf260d6af337a05016d30cb",
+          "version_created_at": "2026-10-19T01:19:20.883760+00:00"
+        },
+        {
+          "rank": 7,
+          "chunk_id": "4f44b4d3-69e0-496b-9308-f3ac0776f75e",
+          "document_id": "2750c267-6e04-438b-85fe-4059c5528a24",
+          "document_version_id": "d7fd0b26-e498-4ff9-b010-b3efd8a0113f",
+          "source_url": "https://www.dcberne.com/en/project_category/sensing-smart-monitoring/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 5943,
+          "char_end": 5960,
+          "evidence_ids": [
+            "ed9c1306-692e-4234-86a2-184a02f867af"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 7,
+          "fusion_score": 0.014925373134328358,
+          "cosine_distance": 0.22799949896330818,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "3bae26394488cb1ab0f7e6408cbda2de4ad4e4e5b46ac96a15f4f760a352fa2b",
+          "version_created_at": "2026-10-18T21:43:45.423129+00:00"
+        },
+        {
+          "rank": 8,
+          "chunk_id": "609dbe69-0c8a-4bd1-b3c2-76945541a14a",
+          "document_id": "add457c5-24ed-4807-be1f-ce4d90ba6d63",
+          "document_version_id": "71b85401-37fa-4c07-8c16-7be726098cc3",
+          "source_url": "https://www.artorg.unibe.ch/research/msl/group_members/persons/nivlet_galle/index_eng.html",
+          "title": "Research: Gaëlle Nivlet - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 92,
+          "char_end": 190,
+          "evidence_ids": [
+            "81b32767-2b4a-42e5-b5b0-e029bcdc55f4"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 8,
+          "fusion_score": 0.014705882352941176,
+          "cosine_distance": 0.23357947072860286,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "46f86b327c09b204eb6fb0b9f8dda8e54b7106dd8cfadd4a89565a32fe995b47",
+          "version_created_at": "2026-10-19T01:30:05.812188+00:00"
+        },
+        {
+          "rank": 9,
+          "chunk_id": "9ab26036-8823-4ebe-83b1-7309a988e155",
+          "document_id": "a399b8b0-cf5b-47da-9b16-e539b26aab30",
+          "document_version_id": "47a6f5e7-f596-4d49-963e-544e40ebb1bd",
+          "source_url": "https://www.artorg.unibe.ch/research/msl/group_members/persons/prof_dr_demory_brice_olivier/index_eng.html",
+          "title": "Research: Prof. Dr. Brice-Olivier Demory - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 153,
+          "char_end": 251,
+          "evidence_ids": [
+            "f33b413b-8590-4a00-adb1-86823d365458"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 9,
+          "fusion_score": 0.014492753623188406,
+          "cosine_distance": 0.2346583604812622,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "bdc143ef696f7ac45a3fe53972e207bab5011f7f5727d4cb1bc863666b4d980d",
+          "version_created_at": "2026-10-18T23:56:25.174804+00:00"
+        },
+        {
+          "rank": 10,
+          "chunk_id": "bbba0977-9999-4468-908d-9a75d494c605",
+          "document_id": "f3ba72d3-8912-4dc8-94c9-d8618365a155",
+          "document_version_id": "1a248c78-fabf-4d02-9c17-8079c239e6f5",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2023/02/Sonntagszeitung_12_2022_DCB.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2023/02/Sonntagszeitung_12_2022_DCB.pdf",
+          "char_start": 0,
+          "char_end": 2400,
+          "evidence_ids": [
+            "071bf87f-03a7-4f91-a5cc-a63f819b3edb"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 10,
+          "fusion_score": 0.014285714285714285,
+          "cosine_distance": 0.23476934432983398,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "86027f97f4d18768ddd5cb183d7af6e9727def80b0f46f1420866b81a6c19469",
+          "version_created_at": "2026-10-18T23:51:37.355517+00:00"
+        },
+        {
+          "rank": 11,
+          "chunk_id": "9e111a3e-ed84-48c0-ae14-91fff139c8c8",
+          "document_id": "71225055-e965-4ac9-b6d5-9ffaa6995376",
+          "document_version_id": "179c74a0-e103-4440-bc3b-b6d2e8935a9c",
+          "source_url": "https://www.dcberne.com/en/category/innovation/page/4/",
+          "title": "Innovation Archives - Page 4 of 7 - Diabetes Center Berne",
+          "char_start": 4171,
+          "char_end": 4266,
+          "evidence_ids": [
+            "96c85c10-c4e1-4448-90dd-0f41b026f3c9"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 11,
+          "fusion_score": 0.014084507042253521,
+          "cosine_distance": 0.23500411301826618,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "923623742f3a39ded92fcb35e9c9127237651f3ae2c5649083a8365d366c7ffd",
+          "version_created_at": "2026-10-19T02:12:32.147830+00:00"
+        },
+        {
+          "rank": 12,
+          "chunk_id": "aca79f44-f86d-435d-940e-e139595f797f",
+          "document_id": "b4be5ee2-32de-4d56-86e2-9ab39a51e442",
+          "document_version_id": "653c0302-456e-4fea-9170-d3097cdbcadc",
+          "source_url": "https://www.dcberne.com/en/project/smartstart-health-unlocking-life-changing-benefits-of-cgm-in-diabetes/",
+          "title": "SmartStart Health: Unlocking life​-​changing benefits of CGM in diabetes - Diabetes Center Berne",
+          "char_start": 3365,
+          "char_end": 3375,
+          "evidence_ids": [
+            "fcf707d9-1f02-4b5d-b165-c9a37bf93a76"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 12,
+          "fusion_score": 0.013888888888888888,
+          "cosine_distance": 0.23553178416287224,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4cdbed9b0c5cbc09a4c5f7208bf10e667b5d91df329a62afa88afd9a931b16ed",
+          "version_created_at": "2026-10-19T01:08:57.986310+00:00"
+        },
+        {
+          "rank": 13,
+          "chunk_id": "bf413ff7-2f81-4841-92fa-d2dbdd4fd92d",
+          "document_id": "5eee9e83-855e-4662-a8bd-e9fd8cf08a69",
+          "document_version_id": "58be26fe-562e-490a-88a5-997f3314063d",
+          "source_url": "https://www.dcberne.com/de/category/innovation-de/page/4/",
+          "title": "Innovation Archives - Seite 4 von 7 - Diabetes Center Berne",
+          "char_start": 4701,
+          "char_end": 4800,
+          "evidence_ids": [
+            "f97185f7-edd8-4585-80b1-bc9dbb4110cc"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 13,
+          "fusion_score": 0.0136986301369863,
+          "cosine_distance": 0.23567545413970947,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "78c43a5766418c70873c07c4a83957b54d02759160a2d2edcb66dc9feb944794",
+          "version_created_at": "2026-10-19T02:15:51.822896+00:00"
+        },
+        {
+          "rank": 14,
+          "chunk_id": "04b7df3f-64f4-49ac-add8-c7f92de06fe4",
+          "document_id": "fbfd42e9-239e-4826-aeac-19a96b8dddab",
+          "document_version_id": "97eac77f-009e-40d6-ad02-e9c62b4623ba",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "char_start": 531,
+          "char_end": 2931,
+          "evidence_ids": [
+            "35d8e7f1-a81f-464e-9b21-37e87a5ea4b5"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 14,
+          "fusion_score": 0.013513513513513514,
+          "cosine_distance": 0.23714337459633839,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4274d2d1c5f702b3570c6da0c959ebd600ac0b4c821cbc5f3a83c93c74a2a0a6",
+          "version_created_at": "2026-10-19T00:31:51.494243+00:00"
+        },
+        {
+          "rank": 15,
+          "chunk_id": "c1a87a55-662f-4375-b30b-24831c053b67",
+          "document_id": "32c18c41-2fa9-4318-a692-f4c58e8777f6",
+          "document_version_id": "7bbb7b7e-d5a4-4db1-b91f-21e8944f4613",
+          "source_url": "https://www.dcberne.com/en/category/innovation/page/6/",
+          "title": "Innovation Archives - Page 6 of 7 - Diabetes Center Berne",
+          "char_start": 7738,
+          "char_end": 7767,
+          "evidence_ids": [
+            "260d12e0-c57c-492f-af7f-286e681fbd40"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 15,
+          "fusion_score": 0.013333333333333334,
+          "cosine_distance": 0.23763898723241617,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "f2bb3f8aa6ad9dc548863fb28c69e9ab2646bca403d1e4c4e81bed3a9c66dd0a",
+          "version_created_at": "2026-10-19T02:22:04.793806+00:00"
+        },
+        {
+          "rank": 16,
+          "chunk_id": "eefe4a46-6dc2-4fc8-9ee5-41c124d9ef7e",
+          "document_id": "23a7642b-6cb9-43fa-be53-ad96b8d213de",
+          "document_version_id": "1d01fa54-4591-45f3-a648-468cd2ee586e",
+          "source_url": "https://www.dcberne.com/en/category/innovation/page/5/",
+          "title": "Innovation Archives - Page 5 of 7 - Diabetes Center Berne",
+          "char_start": 10068,
+          "char_end": 10141,
+          "evidence_ids": [
+            "3eb66cd2-5ccd-4e97-96a6-cddd18311508"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 16,
+          "fusion_score": 0.013157894736842105,
+          "cosine_distance": 0.23778420686721802,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4edf2bcd6bf82bf7eeedb567cae9b4146f9d748db4544a209120b6189e72e197",
+          "version_created_at": "2026-10-19T02:17:42.685002+00:00"
+        },
+        {
+          "rank": 17,
+          "chunk_id": "8d4b184a-51c2-4345-a45d-8dd79f07e9e8",
+          "document_id": "fbfd42e9-239e-4826-aeac-19a96b8dddab",
+          "document_version_id": "97eac77f-009e-40d6-ad02-e9c62b4623ba",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "char_start": 76377,
+          "char_end": 78777,
+          "evidence_ids": [
+            "84779da6-caa9-4136-9f45-b4775d4d580f"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 17,
+          "fusion_score": 0.012987012987012988,
+          "cosine_distance": 0.237894191616426,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4274d2d1c5f702b3570c6da0c959ebd600ac0b4c821cbc5f3a83c93c74a2a0a6",
+          "version_created_at": "2026-10-19T00:31:51.494243+00:00"
+        },
+        {
+          "rank": 18,
+          "chunk_id": "d5b450f1-fec3-4f32-8c96-e384f6c4da45",
+          "document_id": "2b02f85a-f446-4239-b0ba-ea33e1863cf4",
+          "document_version_id": "c1933dcc-3869-468b-a58a-08139475331d",
+          "source_url": "https://www.artorg.unibe.ch/research/cve/group_members/staff/stievano_gaia/index_eng.html",
+          "title": "Research: Gaia Stievano - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 90,
+          "char_end": 188,
+          "evidence_ids": [
+            "bc53077d-5dff-488d-bec5-fdc9e220b760"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 18,
+          "fusion_score": 0.01282051282051282,
+          "cosine_distance": 0.2381846677715974,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "65e3cf799319756c1dced25a56c469626cda6e952e71d5c394fd009e8c949102",
+          "version_created_at": "2026-10-19T00:55:55.348459+00:00"
+        },
+        {
+          "rank": 19,
+          "chunk_id": "c4cad2d3-1b92-40e4-bea4-cb5a433263d7",
+          "document_id": "55623017-9002-4cf6-8c44-986a628b0627",
+          "document_version_id": "be09d1fa-f33b-4aa3-8ccb-ba39a0903702",
+          "source_url": "https://www.dcberne.com/de/collaboration-with-smartstart-health-to-unlock-life-changing-benefits-of-cgm-in-diabetes/",
+          "title": "Zusammenarbeit mit SmartStart Health zur Erschließung der lebensverändernden Vorteile von CGM bei Diabetes - Diabetes Center Berne",
+          "char_start": 5655,
+          "char_end": 5760,
+          "evidence_ids": [
+            "4012faa1-a0f2-4299-87a1-699f4d0121ff"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 19,
+          "fusion_score": 0.012658227848101266,
+          "cosine_distance": 0.23836147785186768,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "989fe802d2dca4218bd0ec356727ce35bdc4fafc806f8b6ffbec8b6a60ff5e79",
+          "version_created_at": "2026-10-19T00:18:45.272949+00:00"
+        },
+        {
+          "rank": 20,
+          "chunk_id": "6587bce9-ef82-4d4f-bd7e-24805cef2d68",
+          "document_id": "31177c5f-dc15-4fd3-b789-63af6217f7d8",
+          "document_version_id": "48117db2-9f55-4c87-8e2a-13173c2a2db7",
+          "source_url": "https://www.dcberne.com/en/focus-area-sensing-smart-monitoring/",
+          "title": "Focus Area - Sensing & Smart Monitoring - Diabetes Center Berne",
+          "char_start": 0,
+          "char_end": 43,
+          "evidence_ids": [
+            "7a33dbfa-3fd3-4091-b74c-62374325c7a0"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 20,
+          "fusion_score": 0.0125,
+          "cosine_distance": 0.23853738537653457,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "64d2b8554e5fa8c5acb1a8902a2039aa5768d156e254eff22866355f6ebbacd5",
+          "version_created_at": "2026-10-18T23:50:56.959993+00:00"
+        },
+        {
+          "rank": 21,
+          "chunk_id": "a1eee9c4-d8cd-4c8d-aa12-97598d5148a0",
+          "document_id": "31177c5f-dc15-4fd3-b789-63af6217f7d8",
+          "document_version_id": "48117db2-9f55-4c87-8e2a-13173c2a2db7",
+          "source_url": "https://www.dcberne.com/en/focus-area-sensing-smart-monitoring/",
+          "title": "Focus Area - Sensing & Smart Monitoring - Diabetes Center Berne",
+          "char_start": 2389,
+          "char_end": 2432,
+          "evidence_ids": [
+            "4dd3051a-4af7-4e98-b8e3-ad9dabf38ce3"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 21,
+          "fusion_score": 0.012345679012345678,
+          "cosine_distance": 0.23853738537653457,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "64d2b8554e5fa8c5acb1a8902a2039aa5768d156e254eff22866355f6ebbacd5",
+          "version_created_at": "2026-10-18T23:50:56.959993+00:00"
+        },
+        {
+          "rank": 22,
+          "chunk_id": "e40357b4-f654-4a09-b05f-5a64dadadf79",
+          "document_id": "53b84b92-9e6d-459b-90fa-1fc536706845",
+          "document_version_id": "64b68a05-4e9b-4848-b4ce-b1f062abde0c",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/08/Annual_Report_DCB_23-24_EN.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/08/Annual_Report_DCB_23-24_EN.pdf",
+          "char_start": 18468,
+          "char_end": 19695,
+          "evidence_ids": [
+            "a4a0c53f-0cb3-4223-bdc1-2f64803c5d96"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 22,
+          "fusion_score": 0.012195121951219513,
+          "cosine_distance": 0.24009108543395996,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "bf9c0b3257e8b6808752cc9295616936801fe4650b9b2dd80affdc29ed4506b1",
+          "version_created_at": "2026-10-19T01:51:45.330389+00:00"
+        },
+        {
+          "rank": 23,
+          "chunk_id": "2cdd1a05-17a9-4503-8adf-dbee27d32fe5",
+          "document_id": "3cf07b36-c55c-4ac6-a89f-8a50123205ad",
+          "document_version_id": "4a489451-2c32-4332-a79d-e747d7bfb5d0",
+          "source_url": "https://www.dcberne.com/de/snaq-bringt-den-ersten-ki-ernaehrungsberater-fuer-cgm-nutzer-mit-diabetes-auf-den-markt/",
+          "title": "SNAQ bringt den ersten KI-Ernährungsberater für CGM-Nutzer mit Diabetes auf den Markt - Diabetes Center Berne",
+          "char_start": 2556,
+          "char_end": 2599,
+          "evidence_ids": [
+            "e45136a4-21dd-49c1-bf69-18bc0f4be567"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 23,
+          "fusion_score": 0.012048192771084338,
+          "cosine_distance": 0.2402172088623047,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "f6c3b88b2495124e148523c854cdcada2151a54c9e5e16191b6fc2b20cc67855",
+          "version_created_at": "2026-10-18T21:46:41.934474+00:00"
+        },
+        {
+          "rank": 24,
+          "chunk_id": "a644af66-0063-4295-b276-c7638d3e8965",
+          "document_id": "3cf07b36-c55c-4ac6-a89f-8a50123205ad",
+          "document_version_id": "4a489451-2c32-4332-a79d-e747d7bfb5d0",
+          "source_url": "https://www.dcberne.com/de/snaq-bringt-den-ersten-ki-ernaehrungsberater-fuer-cgm-nutzer-mit-diabetes-auf-den-markt/",
+          "title": "SNAQ bringt den ersten KI-Ernährungsberater für CGM-Nutzer mit Diabetes auf den Markt - Diabetes Center Berne",
+          "char_start": 0,
+          "char_end": 43,
+          "evidence_ids": [
+            "8213dbf5-dd88-4ba2-9645-c70dc5821634"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 24,
+          "fusion_score": 0.011904761904761904,
+          "cosine_distance": 0.2402172088623047,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "f6c3b88b2495124e148523c854cdcada2151a54c9e5e16191b6fc2b20cc67855",
+          "version_created_at": "2026-10-18T21:46:41.934474+00:00"
+        },
+        {
+          "rank": 25,
+          "chunk_id": "f648a322-37a3-4685-85b4-f7ed45175467",
+          "document_id": "ada34f5c-0d51-40cc-b919-8fadeab5d118",
+          "document_version_id": "90f215d3-b669-4b1f-afec-62838e0c53fd",
+          "source_url": "https://www.artorg.unibe.ch/research/ooc/group_members/persons/favrod_coune_marc/index_eng.html",
+          "title": "Research: Marc Favrod-Coune - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 94,
+          "char_end": 246,
+          "evidence_ids": [
+            "d2dce390-a94d-45ee-bf89-6fe002aef11c"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 25,
+          "fusion_score": 0.011764705882352941,
+          "cosine_distance": 0.2406868195124363,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "6cf9dd4f735a77863e98c4bec9211388d24c4a920ac068ad407e89604c1c071d",
+          "version_created_at": "2026-10-19T01:45:29.608003+00:00"
+        },
+        {
+          "rank": 26,
+          "chunk_id": "bab4af69-7640-451d-9f33-1275e1be19d9",
+          "document_id": "9bf7124d-1455-4006-9eaa-c6e0e9ef24a3",
+          "document_version_id": "a6d3c704-4acc-459e-b113-88427ce45844",
+          "source_url": "https://www.dcberne.com/en/project_category/commitment-clinical-studies/page/2/",
+          "title": "Clinical Studies Archives - Page 2 of 2 - Diabetes Center Berne",
+          "char_start": 8890,
+          "char_end": 9573,
+          "evidence_ids": [
+            "4dcbf792-d141-4f2d-a772-cd94116bff5c"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 26,
+          "fusion_score": 0.011627906976744186,
+          "cosine_distance": 0.2406938528601006,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "b5289bb581f5947bea90990c95f70673beafc87ca35efe16b542cd3334f1e481",
+          "version_created_at": "2026-10-19T01:15:21.697664+00:00"
+        },
+        {
+          "rank": 27,
+          "chunk_id": "52c32904-c0b4-46ba-9f98-b996c683dba1",
+          "document_id": "f028f9bc-3154-470f-a843-ca6ed1da3b1d",
+          "document_version_id": "1c613e08-3c68-4a63-a7da-8234db14b1c1",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2023/06/Annual_Report_DCB_22-23_EN-compressed.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2023/06/Annual_Report_DCB_22-23_EN-compressed.pdf",
+          "char_start": 25256,
+          "char_end": 27656,
+          "evidence_ids": [
+            "2ae025a8-77bc-4425-b689-dca0477ed460"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 27,
+          "fusion_score": 0.011494252873563218,
+          "cosine_distance": 0.24125037316234,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "0c62f48d782b0788c50e51128895f25f9bf2b0cf18a2545d200bfcf9cdbffb66",
+          "version_created_at": "2026-10-19T01:46:18.943483+00:00"
+        },
+        {
+          "rank": 28,
+          "chunk_id": "1b5afadd-83f1-4c93-be2b-bf5762b30142",
+          "document_id": "55623017-9002-4cf6-8c44-986a628b0627",
+          "document_version_id": "be09d1fa-f33b-4aa3-8ccb-ba39a0903702",
+          "source_url": "https://www.dcberne.com/de/collaboration-with-smartstart-health-to-unlock-life-changing-benefits-of-cgm-in-diabetes/",
+          "title": "Zusammenarbeit mit SmartStart Health zur Erschließung der lebensverändernden Vorteile von CGM bei Diabetes - Diabetes Center Berne",
+          "char_start": 6518,
+          "char_end": 6561,
+          "evidence_ids": [
+            "99a69e81-f8e9-440d-ba40-94634c9fb4b6"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 28,
+          "fusion_score": 0.011363636363636364,
+          "cosine_distance": 0.2413170337677002,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "989fe802d2dca4218bd0ec356727ce35bdc4fafc806f8b6ffbec8b6a60ff5e79",
+          "version_created_at": "2026-10-19T00:18:45.272949+00:00"
+        },
+        {
+          "rank": 29,
+          "chunk_id": "74942ee7-31bb-4b73-ada6-2c2b25656bf6",
+          "document_id": "55623017-9002-4cf6-8c44-986a628b0627",
+          "document_version_id": "be09d1fa-f33b-4aa3-8ccb-ba39a0903702",
+          "source_url": "https://www.dcberne.com/de/collaboration-with-smartstart-health-to-unlock-life-changing-benefits-of-cgm-in-diabetes/",
+          "title": "Zusammenarbeit mit SmartStart Health zur Erschließung der lebensverändernden Vorteile von CGM bei Diabetes - Diabetes Center Berne",
+          "char_start": 0,
+          "char_end": 43,
+          "evidence_ids": [
+            "7f92d452-3020-413b-8298-1a9667bb5daa"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 29,
+          "fusion_score": 0.011235955056179775,
+          "cosine_distance": 0.2413170337677002,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "989fe802d2dca4218bd0ec356727ce35bdc4fafc806f8b6ffbec8b6a60ff5e79",
+          "version_created_at": "2026-10-19T00:18:45.272949+00:00"
+        },
+        {
+          "rank": 30,
+          "chunk_id": "df10c657-dcd7-4079-87a3-ba8e6d28a212",
+          "document_id": "0001c017-31c9-4227-8de5-7a3e155a53c5",
+          "document_version_id": "0296d21d-a0b4-402e-9de9-87c78c4bf34d",
+          "source_url": "https://www.artorg.unibe.ch/research/aihn/group_members/prof_em_dr_diem_peter/index_eng.html",
+          "title": "Research: Prof. em. Dr. Peter Diem - ARTORG Center for Biomedical Engineering Research",
+          "char_start": 198,
+          "char_end": 231,
+          "evidence_ids": [
+            "71fb0efc-3e46-42d4-b611-34c5b7b8106a"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 30,
+          "fusion_score": 0.011111111111111112,
+          "cosine_distance": 0.24151241779327393,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "ded2662bc449ca4d5d4c561fde6532c4d6fcadf7a48e5127a2e3486b95479cce",
+          "version_created_at": "2026-10-18T21:39:59.929782+00:00"
+        }
+      ]
+    },
+    {
+      "id": "biosensing-lay-terms",
+      "query": "A fictional startup wants a wearable that measures blood sugar continuously. Who or what in the UniBE, ARTORG and Diabetes Center Berne ecosystem has documented work on biosensing, wearable measurements, diabetes technology or related device evaluation? Link every factual match to its source and label adjacent work clearly.",
+      "seconds": 17.542,
+      "limitations": [
+        "scores_are_not_confidence",
+        "live_corpus_incomplete_coverage"
+      ],
+      "accepted_entity_count": 0,
+      "hits": [
+        {
+          "rank": 1,
+          "chunk_id": "01dc35c5-df12-4688-b96c-dd9545ea8fea",
+          "document_id": "d2d730c6-ae90-4dcd-9b90-73f7ee49dd5c",
+          "document_version_id": "bd2f87db-127e-4e9e-a49b-94130e23be36",
+          "source_url": "https://www.dcberne.com/de/category/innovation-de/page/5/",
+          "title": "Innovation Archives - Seite 5 von 7 - Diabetes Center Berne",
+          "char_start": 10948,
+          "char_end": 11030,
+          "evidence_ids": [
+            "269b796e-da4e-4068-8aa5-1d14c168ed4e"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 1,
+          "fusion_score": 0.01639344262295082,
+          "cosine_distance": 0.2062699794769287,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "8a719824d268de978e87e23f9dc624ddd595ca72164f3581301bb68869982e59",
+          "version_created_at": "2026-10-19T02:20:26.655794+00:00"
+        },
+        {
+          "rank": 2,
+          "chunk_id": "0b6e0ec4-0dbc-4b68-bd37-f9285df2b699",
+          "document_id": "d2d730c6-ae90-4dcd-9b90-73f7ee49dd5c",
+          "document_version_id": "bd2f87db-127e-4e9e-a49b-94130e23be36",
+          "source_url": "https://www.dcberne.com/de/category/innovation-de/page/5/",
+          "title": "Innovation Archives - Seite 5 von 7 - Diabetes Center Berne",
+          "char_start": 28916,
+          "char_end": 28998,
+          "evidence_ids": [
+            "f36ab691-fd1d-44ba-bf78-864d7b1e9bee"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 2,
+          "fusion_score": 0.016129032258064516,
+          "cosine_distance": 0.2062699794769287,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "8a719824d268de978e87e23f9dc624ddd595ca72164f3581301bb68869982e59",
+          "version_created_at": "2026-10-19T02:20:26.655794+00:00"
+        },
+        {
+          "rank": 3,
+          "chunk_id": "fda246c6-c0da-446d-9fd8-00ed9856c9a8",
+          "document_id": "31ada180-e4e0-453c-93de-0b5b07025150",
+          "document_version_id": "345574f3-14cf-4041-896b-179a15a68279",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2023/08/DE_dJournal_01_2023_web_Partnerseite.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2023/08/DE_dJournal_01_2023_web_Partnerseite.pdf",
+          "char_start": 3022,
+          "char_end": 5422,
+          "evidence_ids": [
+            "543d6b78-5566-4ad0-a942-84e45225eab1"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 3,
+          "fusion_score": 0.015873015873015872,
+          "cosine_distance": 0.20755379154957443,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "be7c0c4edad6b5063893bbb1f8b12230a599320531f8828742fb743524c863d7",
+          "version_created_at": "2026-10-18T23:52:16.100142+00:00"
+        },
+        {
+          "rank": 4,
+          "chunk_id": "8d4b184a-51c2-4345-a45d-8dd79f07e9e8",
+          "document_id": "fbfd42e9-239e-4826-aeac-19a96b8dddab",
+          "document_version_id": "97eac77f-009e-40d6-ad02-e9c62b4623ba",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "char_start": 76377,
+          "char_end": 78777,
+          "evidence_ids": [
+            "84779da6-caa9-4136-9f45-b4775d4d580f"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 4,
+          "fusion_score": 0.015625,
+          "cosine_distance": 0.20801068592135086,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4274d2d1c5f702b3570c6da0c959ebd600ac0b4c821cbc5f3a83c93c74a2a0a6",
+          "version_created_at": "2026-10-19T00:31:51.494243+00:00"
+        },
+        {
+          "rank": 5,
+          "chunk_id": "23c4eb4b-981e-4fbb-91db-d6eebcacd033",
+          "document_id": "d3b8c11c-2214-437a-9659-4ed9752b4f45",
+          "document_version_id": "abe7a7d1-1b8c-41e9-ac62-93e295e67933",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/05/Innovation-Challenge-2024-TOP20-Website.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/05/Innovation-Challenge-2024-TOP20-Website.pdf",
+          "char_start": 2323,
+          "char_end": 3269,
+          "evidence_ids": [
+            "8108aa1c-7db7-4343-bceb-3ada82f625f0"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 5,
+          "fusion_score": 0.015384615384615385,
+          "cosine_distance": 0.209771943674798,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "eb871e517b2beb8ea9f53fae37b0f6ae10dfa39cba5800f71f485958507eecce",
+          "version_created_at": "2026-10-19T01:51:19.191066+00:00"
+        },
+        {
+          "rank": 6,
+          "chunk_id": "89a57a39-d34d-43cb-bfcd-f5a60d4cfb5a",
+          "document_id": "7c949da6-f9f6-429e-963c-164222b11d18",
+          "document_version_id": "49ef7af4-1741-49c2-9b76-9f9d1406c27e",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2025/09/29-08-2025_DCB_Annual-Report-v3.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2025/09/29-08-2025_DCB_Annual-Report-v3.pdf",
+          "char_start": 32855,
+          "char_end": 35255,
+          "evidence_ids": [
+            "40e60e17-4afe-49b5-9c75-8b3793c705c9"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 6,
+          "fusion_score": 0.015151515151515152,
+          "cosine_distance": 0.21222960948944092,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "2b95dfee13e2e7b8b22a56562206bee3283d36783be25290e71b163f0e9873f6",
+          "version_created_at": "2026-10-19T01:01:09.255924+00:00"
+        },
+        {
+          "rank": 7,
+          "chunk_id": "4d46449b-196d-417f-bc63-9dc149029244",
+          "document_id": "2750c267-6e04-438b-85fe-4059c5528a24",
+          "document_version_id": "d7fd0b26-e498-4ff9-b010-b3efd8a0113f",
+          "source_url": "https://www.dcberne.com/en/project_category/sensing-smart-monitoring/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 4570,
+          "char_end": 4601,
+          "evidence_ids": [
+            "ec363950-7f64-400f-b0ba-864651624948"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 7,
+          "fusion_score": 0.014925373134328358,
+          "cosine_distance": 0.21281354350962833,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "3bae26394488cb1ab0f7e6408cbda2de4ad4e4e5b46ac96a15f4f760a352fa2b",
+          "version_created_at": "2026-10-18T21:43:45.423129+00:00"
+        },
+        {
+          "rank": 8,
+          "chunk_id": "86125930-a3d4-4868-bc45-502e6eff8d9f",
+          "document_id": "fbfd42e9-239e-4826-aeac-19a96b8dddab",
+          "document_version_id": "97eac77f-009e-40d6-ad02-e9c62b4623ba",
+          "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "title": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+          "char_start": 83155,
+          "char_end": 84486,
+          "evidence_ids": [
+            "2576f056-1101-413c-a80b-ae1b5d0b0cdb"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 8,
+          "fusion_score": 0.014705882352941176,
+          "cosine_distance": 0.21287423372268677,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4274d2d1c5f702b3570c6da0c959ebd600ac0b4c821cbc5f3a83c93c74a2a0a6",
+          "version_created_at": "2026-10-19T00:31:51.494243+00:00"
+        },
+        {
+          "rank": 9,
+          "chunk_id": "270952d8-c4fc-4a8a-8517-3d79c113d443",
+          "document_id": "ba5cbbe9-29b0-4cc4-b5b4-85bb95cb7449",
+          "document_version_id": "12fc1dfb-4583-4500-ae64-cfc0637d6c53",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/08/dJournal_Ausgabe_2_24_fr_web_def_DCB.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/08/dJournal_Ausgabe_2_24_fr_web_def_DCB.pdf",
+          "char_start": 0,
+          "char_end": 2400,
+          "evidence_ids": [
+            "edc9d473-b8e1-4dc6-9409-ebea3402ef09"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 9,
+          "fusion_score": 0.014492753623188406,
+          "cosine_distance": 0.2130507230758667,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "1e7c3979e7ae796b88cf8cc68d75b7974c28ef7586ce530317a011baff47cb6a",
+          "version_created_at": "2026-10-18T23:54:43.364893+00:00"
+        },
+        {
+          "rank": 10,
+          "chunk_id": "d6a5d8c7-7892-49c6-9535-3c47994afd8f",
+          "document_id": "2750c267-6e04-438b-85fe-4059c5528a24",
+          "document_version_id": "d7fd0b26-e498-4ff9-b010-b3efd8a0113f",
+          "source_url": "https://www.dcberne.com/en/project_category/sensing-smart-monitoring/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 2415,
+          "char_end": 2448,
+          "evidence_ids": [
+            "f72c8736-f34e-496d-80c2-ea8fa48c7623"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 10,
+          "fusion_score": 0.014285714285714285,
+          "cosine_distance": 0.21332274595959366,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "3bae26394488cb1ab0f7e6408cbda2de4ad4e4e5b46ac96a15f4f760a352fa2b",
+          "version_created_at": "2026-10-18T21:43:45.423129+00:00"
+        },
+        {
+          "rank": 11,
+          "chunk_id": "f84f733d-4d66-442d-a2f8-986f5bb3718a",
+          "document_id": "2750c267-6e04-438b-85fe-4059c5528a24",
+          "document_version_id": "d7fd0b26-e498-4ff9-b010-b3efd8a0113f",
+          "source_url": "https://www.dcberne.com/en/project_category/sensing-smart-monitoring/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 143,
+          "char_end": 176,
+          "evidence_ids": [
+            "fd68adc3-7721-4e4a-87a3-bc2ff366f95a"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 11,
+          "fusion_score": 0.014084507042253521,
+          "cosine_distance": 0.21332274595959366,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "3bae26394488cb1ab0f7e6408cbda2de4ad4e4e5b46ac96a15f4f760a352fa2b",
+          "version_created_at": "2026-10-18T21:43:45.423129+00:00"
+        },
+        {
+          "rank": 12,
+          "chunk_id": "50479898-4895-4ee0-9c76-4d8606941bcc",
+          "document_id": "cef0a6be-b42a-4c8e-940a-5054a8e9c760",
+          "document_version_id": "cbbaeb56-b8c2-4edc-8a9e-b7dd5e6fcf15",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2026/05/2025_DCB_Annual-Report_english.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2026/05/2025_DCB_Annual-Report_english.pdf",
+          "char_start": 33046,
+          "char_end": 35446,
+          "evidence_ids": [
+            "3e4e46fd-2a14-4ff3-9e6a-9432aafba4a7"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 12,
+          "fusion_score": 0.013888888888888888,
+          "cosine_distance": 0.2134353518486023,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "44de8ffb09b2524ef1ded211e4cdadd4c33e2aa20ff7629eafa7d0759388aea0",
+          "version_created_at": "2026-10-18T23:59:59.212505+00:00"
+        },
+        {
+          "rank": 13,
+          "chunk_id": "de0583aa-af28-4721-b0a4-a73af7954a21",
+          "document_id": "25e83b93-552c-491c-9af1-1360780418f5",
+          "document_version_id": "edb22ec5-6116-4320-9ce7-d4cade30eedd",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/10/20241004_PR_Gewinner_Open_Innovation_Challenge_DE.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/10/20241004_PR_Gewinner_Open_Innovation_Challenge_DE.pdf",
+          "char_start": 0,
+          "char_end": 2400,
+          "evidence_ids": [
+            "8d2c79c6-cf0f-4cb5-a547-d872dbd66c45"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 13,
+          "fusion_score": 0.0136986301369863,
+          "cosine_distance": 0.2149639129638672,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "d92e0eb6dd3e59965212ce30bcd029f88b45122b76253e529e05b47d07a2d447",
+          "version_created_at": "2026-10-19T01:40:56.765172+00:00"
+        },
+        {
+          "rank": 14,
+          "chunk_id": "eac54e84-18e2-4d63-9b45-a280fcb62c0e",
+          "document_id": "d3b8c11c-2214-437a-9659-4ed9752b4f45",
+          "document_version_id": "abe7a7d1-1b8c-41e9-ac62-93e295e67933",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/05/Innovation-Challenge-2024-TOP20-Website.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/05/Innovation-Challenge-2024-TOP20-Website.pdf",
+          "char_start": 72,
+          "char_end": 1204,
+          "evidence_ids": [
+            "8a42c73d-dadb-4dae-adca-7a8fe6030f91"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 14,
+          "fusion_score": 0.013513513513513514,
+          "cosine_distance": 0.21633028984069824,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "eb871e517b2beb8ea9f53fae37b0f6ae10dfa39cba5800f71f485958507eecce",
+          "version_created_at": "2026-10-19T01:51:19.191066+00:00"
+        },
+        {
+          "rank": 15,
+          "chunk_id": "007f4bc8-5f2a-44ca-9aa2-9b299b47cb6f",
+          "document_id": "6d09f385-1a74-4c24-acec-636aae8f509a",
+          "document_version_id": "f4221ee2-aac2-4596-8594-9a7d5b1a437e",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/11/dJournal_Ausgabe_3_24_de_DCB.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/11/dJournal_Ausgabe_3_24_de_DCB.pdf",
+          "char_start": 4800,
+          "char_end": 6301,
+          "evidence_ids": [
+            "08a5fa4d-abdb-468e-846b-987e4b9926ff"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 15,
+          "fusion_score": 0.013333333333333334,
+          "cosine_distance": 0.21663177013397217,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "ce76ad998bd3aa461f935fcd8f5820072326cda8b2b2b9e63101aa825eae478a",
+          "version_created_at": "2026-10-18T23:54:52.881892+00:00"
+        },
+        {
+          "rank": 16,
+          "chunk_id": "9fa1dea1-e067-4da4-8332-b002b2286598",
+          "document_id": "6d09f385-1a74-4c24-acec-636aae8f509a",
+          "document_version_id": "f4221ee2-aac2-4596-8594-9a7d5b1a437e",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/11/dJournal_Ausgabe_3_24_de_DCB.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/11/dJournal_Ausgabe_3_24_de_DCB.pdf",
+          "char_start": 2400,
+          "char_end": 4800,
+          "evidence_ids": [
+            "df36f403-fecd-4848-965e-dca590fbea78"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 16,
+          "fusion_score": 0.013157894736842105,
+          "cosine_distance": 0.21667832136154175,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "ce76ad998bd3aa461f935fcd8f5820072326cda8b2b2b9e63101aa825eae478a",
+          "version_created_at": "2026-10-18T23:54:52.881892+00:00"
+        },
+        {
+          "rank": 17,
+          "chunk_id": "1be9767d-f2c9-482e-a08e-615e879e3e64",
+          "document_id": "2750c267-6e04-438b-85fe-4059c5528a24",
+          "document_version_id": "d7fd0b26-e498-4ff9-b010-b3efd8a0113f",
+          "source_url": "https://www.dcberne.com/en/project_category/sensing-smart-monitoring/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 228,
+          "char_end": 337,
+          "evidence_ids": [
+            "73b28228-1bd7-433d-addd-16a0959fb3e7"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 17,
+          "fusion_score": 0.012987012987012988,
+          "cosine_distance": 0.2167601351964511,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "3bae26394488cb1ab0f7e6408cbda2de4ad4e4e5b46ac96a15f4f760a352fa2b",
+          "version_created_at": "2026-10-18T21:43:45.423129+00:00"
+        },
+        {
+          "rank": 18,
+          "chunk_id": "bbba0977-9999-4468-908d-9a75d494c605",
+          "document_id": "f3ba72d3-8912-4dc8-94c9-d8618365a155",
+          "document_version_id": "1a248c78-fabf-4d02-9c17-8079c239e6f5",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2023/02/Sonntagszeitung_12_2022_DCB.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2023/02/Sonntagszeitung_12_2022_DCB.pdf",
+          "char_start": 0,
+          "char_end": 2400,
+          "evidence_ids": [
+            "071bf87f-03a7-4f91-a5cc-a63f819b3edb"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 18,
+          "fusion_score": 0.01282051282051282,
+          "cosine_distance": 0.218028724193573,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "86027f97f4d18768ddd5cb183d7af6e9727def80b0f46f1420866b81a6c19469",
+          "version_created_at": "2026-10-18T23:51:37.355517+00:00"
+        },
+        {
+          "rank": 19,
+          "chunk_id": "d900d46f-7de0-4e2a-9f4d-0fcf79141929",
+          "document_id": "cef0a6be-b42a-4c8e-940a-5054a8e9c760",
+          "document_version_id": "cbbaeb56-b8c2-4edc-8a9e-b7dd5e6fcf15",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2026/05/2025_DCB_Annual-Report_english.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2026/05/2025_DCB_Annual-Report_english.pdf",
+          "char_start": 11467,
+          "char_end": 12963,
+          "evidence_ids": [
+            "a7bddb52-1599-4c54-9518-3a0b9e04687c"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 19,
+          "fusion_score": 0.012658227848101266,
+          "cosine_distance": 0.219147778128021,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "44de8ffb09b2524ef1ded211e4cdadd4c33e2aa20ff7629eafa7d0759388aea0",
+          "version_created_at": "2026-10-18T23:59:59.212505+00:00"
+        },
+        {
+          "rank": 20,
+          "chunk_id": "eefe4a46-6dc2-4fc8-9ee5-41c124d9ef7e",
+          "document_id": "23a7642b-6cb9-43fa-be53-ad96b8d213de",
+          "document_version_id": "1d01fa54-4591-45f3-a648-468cd2ee586e",
+          "source_url": "https://www.dcberne.com/en/category/innovation/page/5/",
+          "title": "Innovation Archives - Page 5 of 7 - Diabetes Center Berne",
+          "char_start": 10068,
+          "char_end": 10141,
+          "evidence_ids": [
+            "3eb66cd2-5ccd-4e97-96a6-cddd18311508"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 20,
+          "fusion_score": 0.0125,
+          "cosine_distance": 0.22009950876235962,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4edf2bcd6bf82bf7eeedb567cae9b4146f9d748db4544a209120b6189e72e197",
+          "version_created_at": "2026-10-19T02:17:42.685002+00:00"
+        },
+        {
+          "rank": 21,
+          "chunk_id": "d32dd7a3-0fad-4f47-a6b9-8afcdda7f329",
+          "document_id": "00ecbbc0-96be-49d1-80bb-bf3588bddd00",
+          "document_version_id": "8b46f1ac-4343-431d-9cdd-1228e5db232b",
+          "source_url": "https://www.dcberne.com/de/category/innovation-de/page/2/",
+          "title": "Innovation Archives - Seite 2 von 7 - Diabetes Center Berne",
+          "char_start": 17804,
+          "char_end": 17907,
+          "evidence_ids": [
+            "2c90a022-dc0f-4c0a-9306-5b980a65ba7e"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 21,
+          "fusion_score": 0.012345679012345678,
+          "cosine_distance": 0.2201130855016048,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "c496f024c6214e10a1344154366bee957cdbc3d218f006e367b6d034c9c8b564",
+          "version_created_at": "2026-10-19T01:38:18.454466+00:00"
+        },
+        {
+          "rank": 22,
+          "chunk_id": "c0268f28-cb64-4d41-bf8a-e610533ee6e0",
+          "document_id": "cef0a6be-b42a-4c8e-940a-5054a8e9c760",
+          "document_version_id": "cbbaeb56-b8c2-4edc-8a9e-b7dd5e6fcf15",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2026/05/2025_DCB_Annual-Report_english.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2026/05/2025_DCB_Annual-Report_english.pdf",
+          "char_start": 41847,
+          "char_end": 43657,
+          "evidence_ids": [
+            "e647ddd2-460c-4cf9-8fdc-5742855fe8c2"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 22,
+          "fusion_score": 0.012195121951219513,
+          "cosine_distance": 0.22016178249348373,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "44de8ffb09b2524ef1ded211e4cdadd4c33e2aa20ff7629eafa7d0759388aea0",
+          "version_created_at": "2026-10-18T23:59:59.212505+00:00"
+        },
+        {
+          "rank": 23,
+          "chunk_id": "1a8b06bd-3897-48ee-b77e-bd32f2c6b23f",
+          "document_id": "15b1ba23-40b5-48b0-a708-ae121de9e1c6",
+          "document_version_id": "9029720a-879b-4f8f-9cc1-ec7fc1a5989a",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2024/08/dJournal_Ausgabe_2_24_de_web_def_DCB.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2024/08/dJournal_Ausgabe_2_24_de_web_def_DCB.pdf",
+          "char_start": 0,
+          "char_end": 2400,
+          "evidence_ids": [
+            "d82fc30d-cc1c-4f42-8501-de898da2c77c"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 23,
+          "fusion_score": 0.012048192771084338,
+          "cosine_distance": 0.2211132049560547,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "e78e11f504838d1d447f493fc56da72174c38a357d327be72b77d73c2ad7a6ad",
+          "version_created_at": "2026-10-18T23:54:25.109727+00:00"
+        },
+        {
+          "rank": 24,
+          "chunk_id": "32eab3a9-2366-4ab1-961b-0b7640392f82",
+          "document_id": "b9f6242c-dd9a-42b2-a19f-ffd245b78a56",
+          "document_version_id": "1ed53ee4-0b37-4dc0-a3e5-6604cae704c1",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2023/08/TOP-20-Digital-Diabetes-2023.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2023/08/TOP-20-Digital-Diabetes-2023.pdf",
+          "char_start": 4294,
+          "char_end": 5791,
+          "evidence_ids": [
+            "b8906542-a28e-4597-ac37-6c9ecb97f414"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 24,
+          "fusion_score": 0.011904761904761904,
+          "cosine_distance": 0.2213832139968872,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "a99092c446a8756d52d33d7096acfdd6219335d0b5eadaa260ed7a9b0d493827",
+          "version_created_at": "2026-10-19T01:47:04.603623+00:00"
+        },
+        {
+          "rank": 25,
+          "chunk_id": "9bc2bc23-7e4e-4b06-b382-ac4fc27e24df",
+          "document_id": "48449496-1c5e-424d-b54d-f61b20a990e6",
+          "document_version_id": "a919775e-096d-44b1-8ef3-7ee724da2079",
+          "source_url": "https://www.dcberne.com/de/project_category/sensing-smart-monitoring-de/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 4297,
+          "char_end": 4383,
+          "evidence_ids": [
+            "ab85e251-d432-47af-a75b-23aa462730b9"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 25,
+          "fusion_score": 0.011764705882352941,
+          "cosine_distance": 0.22192332809934967,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "39315c12cf68a942aec3b8732894e6db4e9664d5bdf260d6af337a05016d30cb",
+          "version_created_at": "2026-10-19T01:19:20.883760+00:00"
+        },
+        {
+          "rank": 26,
+          "chunk_id": "a8d1af9f-0f1b-4900-8e7a-078ac2187665",
+          "document_id": "48449496-1c5e-424d-b54d-f61b20a990e6",
+          "document_version_id": "a919775e-096d-44b1-8ef3-7ee724da2079",
+          "source_url": "https://www.dcberne.com/de/project_category/sensing-smart-monitoring-de/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 9073,
+          "char_end": 9159,
+          "evidence_ids": [
+            "b715090a-d9ea-4726-8b2a-8be29c032276"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 26,
+          "fusion_score": 0.011627906976744186,
+          "cosine_distance": 0.22192332809934967,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "39315c12cf68a942aec3b8732894e6db4e9664d5bdf260d6af337a05016d30cb",
+          "version_created_at": "2026-10-19T01:19:20.883760+00:00"
+        },
+        {
+          "rank": 27,
+          "chunk_id": "ff19124d-c2fe-40c3-8157-73e188672b4a",
+          "document_id": "48449496-1c5e-424d-b54d-f61b20a990e6",
+          "document_version_id": "a919775e-096d-44b1-8ef3-7ee724da2079",
+          "source_url": "https://www.dcberne.com/de/project_category/sensing-smart-monitoring-de/",
+          "title": "Sensing & Smart Monitoring Archives - Diabetes Center Berne",
+          "char_start": 2012,
+          "char_end": 2098,
+          "evidence_ids": [
+            "4cf5fa2e-ffb3-43ba-b18c-2c643a5e56be"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 27,
+          "fusion_score": 0.011494252873563218,
+          "cosine_distance": 0.22192332809934967,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "39315c12cf68a942aec3b8732894e6db4e9664d5bdf260d6af337a05016d30cb",
+          "version_created_at": "2026-10-19T01:19:20.883760+00:00"
+        },
+        {
+          "rank": 28,
+          "chunk_id": "52c32904-c0b4-46ba-9f98-b996c683dba1",
+          "document_id": "f028f9bc-3154-470f-a843-ca6ed1da3b1d",
+          "document_version_id": "1c613e08-3c68-4a63-a7da-8234db14b1c1",
+          "source_url": "https://www.dcberne.com/wp-content/uploads/2023/06/Annual_Report_DCB_22-23_EN-compressed.pdf",
+          "title": "https://www.dcberne.com/wp-content/uploads/2023/06/Annual_Report_DCB_22-23_EN-compressed.pdf",
+          "char_start": 25256,
+          "char_end": 27656,
+          "evidence_ids": [
+            "2ae025a8-77bc-4425-b689-dca0477ed460"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 28,
+          "fusion_score": 0.011363636363636364,
+          "cosine_distance": 0.22217044896395322,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "0c62f48d782b0788c50e51128895f25f9bf2b0cf18a2545d200bfcf9cdbffb66",
+          "version_created_at": "2026-10-19T01:46:18.943483+00:00"
+        },
+        {
+          "rank": 29,
+          "chunk_id": "1cfeca1d-e129-495f-b450-794398b09e9a",
+          "document_id": "7a878a14-4121-4a6e-bb7b-d68cbbf94e55",
+          "document_version_id": "284a236e-e36e-4922-bc9f-df74c4f7ec40",
+          "source_url": "https://www.dcberne.com/en/top-3-diabetes-devices-2023/",
+          "title": "DCB Innovation Challenge: Meet the Top 3 Diabetes Devices 2023! - Diabetes Center Berne",
+          "char_start": 1494,
+          "char_end": 1570,
+          "evidence_ids": [
+            "877eaa5c-e625-4ae2-a1e0-e9eb0d27fdeb"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 29,
+          "fusion_score": 0.011235955056179775,
+          "cosine_distance": 0.22249162197113037,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4678c4967c09daa25d7f275bb2591cd837dc7aff1c35ef8342f224103591de72",
+          "version_created_at": "2026-10-19T00:29:37.182715+00:00"
+        },
+        {
+          "rank": 30,
+          "chunk_id": "8a72d637-992e-4848-9bda-d970c4bc8471",
+          "document_id": "23a7642b-6cb9-43fa-be53-ad96b8d213de",
+          "document_version_id": "1d01fa54-4591-45f3-a648-468cd2ee586e",
+          "source_url": "https://www.dcberne.com/en/category/innovation/page/5/",
+          "title": "Innovation Archives - Page 5 of 7 - Diabetes Center Berne",
+          "char_start": 12467,
+          "char_end": 12543,
+          "evidence_ids": [
+            "90559d2b-95ce-40e4-8413-0044a50049ec"
+          ],
+          "lexical_rank": null,
+          "vector_rank": 30,
+          "fusion_score": 0.011111111111111112,
+          "cosine_distance": 0.22271132469177246,
+          "exact_body_slice": true,
+          "body_sha256_valid": true,
+          "body_sha256": "4edf2bcd6bf82bf7eeedb567cae9b4146f9d748db4544a209120b6189e72e197",
+          "version_created_at": "2026-10-19T02:17:42.685002+00:00"
+        }
+      ]
+    }
+  ],
+  "selected_examples": [
+    {
+      "name": "Lilian Witthauer",
+      "query_id": "biosensing-lay-terms",
+      "rank": 3,
+      "classification": "Direct sensing research lead in a 2023 source",
+      "interpretation": "The retrieved interview identifies Witthauer with diabetes technology at UniBE/DCB and describes a continuous blood-glucose sensor. This supports an exploratory sensing lead for HelioSense.",
+      "boundary": "Historical 2023 interview. Current role, technology readiness and availability require confirmation.",
+      "quotes": [
+        {
+          "text": "Lilian Witthauer ist Assistenzprofessorin für Diabetestechnologie an \nder Universität Bern und dem Diabetes Center Berne (DCB).",
+          "char_start": 5138,
+          "char_end": 5265
+        },
+        {
+          "text": "Eines meiner aktuellen Projekte be -\nfasst sich mit der Entwicklung eines \nSensors, der kontinuierlich und verzö-\ngerungsfrei den Glukosegehalt im Blut \nmisst.",
+          "char_start": 3202,
+          "char_end": 3361
+        }
+      ],
+      "source_url": "https://www.dcberne.com/wp-content/uploads/2023/08/DE_dJournal_01_2023_web_Partnerseite.pdf",
+      "chunk_id": "fda246c6-c0da-446d-9fd8-00ed9856c9a8",
+      "evidence_ids": [
+        "543d6b78-5566-4ad0-a942-84e45225eab1"
+      ],
+      "body_sha256": "be7c0c4edad6b5063893bbb1f8b12230a599320531f8828742fb743524c863d7"
+    },
+    {
+      "name": "José García-Tirado",
+      "query_id": "biosensing-lay-terms",
+      "rank": 9,
+      "classification": "Adjacent systems/control capability in a 2024 source",
+      "interpretation": "The DCB publication lists García-Tirado with closed-loop systems. The same passage describes glucose sensors, insulin pumps and algorithmic control. This is a documented systems connection, not proof of a HelioSense-compatible sensor.",
+      "boundary": "2024 source context; no claim of a verified current appointment or willingness to collaborate.",
+      "quotes": [
+        {
+          "text": "Prof. Dr José García-Tirado, \nSystèmes en boucle fermée",
+          "char_start": 159,
+          "char_end": 214
+        },
+        {
+          "text": "technologiques composés de capteurs \nde glucose et de pompes à insuline,",
+          "char_start": 610,
+          "char_end": 682
+        }
+      ],
+      "source_url": "https://www.dcberne.com/wp-content/uploads/2024/08/dJournal_Ausgabe_2_24_fr_web_def_DCB.pdf",
+      "chunk_id": "270952d8-c4fc-4a8a-8517-3d79c113d443",
+      "evidence_ids": [
+        "edc9d473-b8e1-4dc6-9409-ebea3402ef09"
+      ],
+      "body_sha256": "1e7c3979e7ae796b88cf8cc68d75b7974c28ef7586ce530317a011baff47cb6a"
+    },
+    {
+      "name": "Stavroula Mougiakakou",
+      "query_id": "glucose-sensors",
+      "rank": 19,
+      "classification": "Historical diabetes algorithms lead; follow-up verification needed",
+      "interpretation": "The ARTORG report names Mougiakakou in Diabetes Technology Research and discusses glucose-profile prediction with statistical/computational methods. This supports historical relevance to signal processing.",
+      "boundary": "The URL identifies a 2012 report. This is historical evidence, not a current role/contact listing.",
+      "quotes": [
+        {
+          "text": "Diabetes Technology Research\nStavroula Mougiakakou, Technical Head of Research Group",
+          "char_start": 80319,
+          "char_end": 80403
+        },
+        {
+          "text": "Data-driven models, based on \nadvanced statistical and computational intelligence meth-\nods are developed for the prediction of glucose profile \nin the near future",
+          "char_start": 79430,
+          "char_end": 79593
+        }
+      ],
+      "source_url": "https://www.artorg.unibe.ch/unibe/portal/fak_medizin/dept_weitere/ins_artorg/content/e977173/e977178/e977270/pane977271/e993919/files993926/2012-ISTB_eng.pdf",
+      "chunk_id": "1907f038-4573-4df7-ab3f-2e456f534ce9",
+      "evidence_ids": [
+        "1cfb7015-a662-4cf5-a121-6610a59ee0e7"
+      ],
+      "body_sha256": "4274d2d1c5f702b3570c6da0c959ebd600ac0b4c821cbc5f3a83c93c74a2a0a6"
+    }
+  ],
+  "capability_example": {
+    "query_id": "full-demo-brief",
+    "rank": 2,
+    "source_url": "https://www.dcberne.com/en/focus-area-sensing-smart-monitoring/",
+    "quote": {
+      "text": "For the glucose sensors, different optical methods are combined that measure the glucose concentration directly in the blood.",
+      "char_start": 1053,
+      "char_end": 1178
+    }
+  },
+  "limitations": [
+    "Document retrieval and researcher mentions are demonstrated; accepted canonical entity profiles returned: zero for every query.",
+    "No independent expert precision, Recall@10 or semantic-support percentage is measured.",
+    "No names were inserted into the queries or used to prefilter retrieval. Examples were selected after inspecting results.",
+    "Results contain weak candidates and historical publications; relevance and freshness still need review.",
+    "These returned documents cover ARTORG/UniBE and DCB, not proof of UniBE-outside-ARTORG coverage.",
+    "Reranking, web, Apertus interpretation/drafting, API review/export and frontend integration were not exercised.",
+    "Times are single-run observations with a connected encoder, not production latency benchmarks."
+  ]
+}

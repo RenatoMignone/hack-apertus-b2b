@@ -20,6 +20,11 @@ The application makes direct/adjacent fit, source status and missing information
 visible. A unit can be useful without an invented contact person. The operator's
 keep/reject decision is editorial; it cannot establish factual truth.
 
+If the frontend is unavailable, open the
+[standalone retrieval proof of concept](../proof-of-concept/README.md). It records
+actual demo-query retrieval, source quotations, timings and limitations without
+requiring the UI or live connectivity to inspect the PDF.
+
 The [delivery checklist](DELIVERY.md) records final artifact/access requirements;
 [current status](../project/STATUS.md) distinguishes implemented features from
 host migration, real-corpus quality and deployment acceptance. Connected provider

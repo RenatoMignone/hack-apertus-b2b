@@ -16,6 +16,12 @@ Built for the Bern Economic Development Agency challenge at Hack Apertus.
 [Architecture](docs/plans/ARCHITECTURE.md) · [Technical report](technical_report.md) ·
 [Documentation](docs/README.md)
 
+**Frontend-independent demonstration:** the
+[retrieval proof of concept](docs/proof-of-concept/README.md) includes a standalone
+PDF and real-corpus rank/source records for the fictional HelioSense case. Four
+queries returned source-backed researcher mentions; accepted structured profiles
+were not returned, so this is not an expert-recall benchmark.
+
 ## Why B2B
 
 - **Understands intent:** Apertus v1.5 maps everyday wording to a reviewed domain
