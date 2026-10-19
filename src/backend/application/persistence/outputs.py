@@ -1,4 +1,5 @@
 """Idempotent graph persistence. All writes reuse evidence/draft repository gates."""
+from datetime import datetime, timedelta
 
 from sqlalchemy import select
 
@@ -35,7 +36,15 @@ class Outputs:
                 t.spans.c.evidence_id.in_(evidence_ids), t.scopes.c.kind == "case",
                 t.scopes.c.case_id == pack_context_case(c, run_id))).scalars())
             manifest = repo.manifest(access, run_id, local) if local else None
-            return {"pack_id": str(repo.freeze(access, run_id, pack, manifest_id=manifest))}
+            pack_id = repo.freeze(access, run_id, pack, manifest_id=manifest)
+            created = c.execute(select(t.packs.c.created_at).where(t.packs.c.pack_id == pack_id)).scalar_one()
+            config = c.execute(select(t.runs.c.configuration).where(t.runs.c.run_id == run_id)).scalar_one()
+            deadline = datetime.fromisoformat(config['deadline_at'])
+            allowance = timedelta(seconds=config.get('draft_deadline_seconds', 0))
+            # Anchor to the immutable pack timestamp, not to retries or worker
+            # restarts. Never extend beyond the research deadline + allowance.
+            draft_deadline = min(max(deadline, created + allowance), deadline + allowance)
+            return {"pack_id": str(pack_id), "draft_deadline_at": draft_deadline.isoformat()}
         return self.commit_stage(access, run_id, "pack.persist", pack.model_dump(mode="json"), {}, callback)
 
     def save_draft(self, access, context, pack_id, draft, assessment, expected_revision, parent_id):

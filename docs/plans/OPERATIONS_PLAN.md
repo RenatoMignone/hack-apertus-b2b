@@ -38,6 +38,22 @@ share the per-run tool budget (eleven by default). Failed calls consume budget.
 Apertus task validation has bounded repair; no silent model fallback or infinite
 retries. Infrastructure/provider errors remain distinct from valid no-match output.
 
+The initial research deadline includes queue time after run creation. Once the pack
+is frozen, `RUNTIME_DRAFT_DEADLINE_SECONDS` (default 300, range 0–1800) guarantees
+a bounded writing/repair/assessment allowance: the later of the research deadline
+and pack creation plus allowance, capped at research deadline plus allowance.
+Zero keeps the original single deadline. The allowance is pinned at run creation;
+the derived deadline is saved atomically with `pack.persist` and carried in the
+graph checkpoint context. Retries/restarts reuse that same timestamp rather than
+extending it. Research cannot use the additional drafting time. Existing saved
+outputs without the new deadline retain their old behavior.
+
+SQL statement timeout and output-token limits are separate. Stage deadline failures
+retain the actual failed stage for recovery/UI diagnostics. When a frozen pack
+exists for unchanged input, retry the report: the API creates a new run with a fresh
+configured deadline and revalidates existing support without repeating discovery,
+retrieval or extraction. Changing settings cannot extend an already-persisted run.
+
 ## Progress and logs
 
 Timestamped console events include run/case/stage IDs, elapsed milliseconds,

@@ -38,6 +38,7 @@ class CaseState(TypedDict, total=False):
     web_query: str
     search_observations: list[dict]
     round_started_at: str
+    research_deadline_at: str
     reuse_prepared_evidence: bool
 
 

@@ -165,6 +165,28 @@ def test_pack_only_drafting_and_exact_hash_assessment(context, interpretation, c
     assert checked.draft_hash != configuration_hash(result.model_dump(mode="json"))
 
 
+def test_draft_kind_instructions_and_bounded_repair(context, interpretation, claim, pdf_input):
+    pack = ReportEvidencePack(interpretation=interpretation, claims=[claim], outcome='complete')
+    valid = pdf_input.draft.model_copy(update={'reasons': pdf_input.draft.reasons[:1]}).model_dump(mode='json')
+    invalid = {**valid, 'reasons': [{**valid['reasons'][0], 'kind': 'documented'}]}
+    service, model = services(invalid, valid)
+    draft = run(service.draft(pack, 'Write report', context))
+    assert draft.reasons[0].kind == 'direct'
+    assert len(model.calls) == 2
+    assert 'kind must be exactly direct or idea' in model.calls[0][0].content
+    assert 'literal_error' in model.calls[1][-1].content
+
+
+def test_invalid_draft_kind_is_never_silently_reclassified(context, interpretation, claim, pdf_input):
+    pack = ReportEvidencePack(interpretation=interpretation, claims=[claim], outcome='complete')
+    value = pdf_input.draft.model_copy(update={'reasons': pdf_input.draft.reasons[:1]}).model_dump(mode='json')
+    value['reasons'][0]['kind'] = 'adjacent'
+    service, model = services(value, value)
+    with pytest.raises(InvalidModelOutput):
+        run(service.draft(pack, 'Write report', context))
+    assert len(model.calls) == 2
+
+
 def test_invented_citations_fail_draft_check(context, interpretation, claim, pdf_input):
     pack = ReportEvidencePack(interpretation=interpretation, claims=[], gaps=["No evidence"], outcome="no_match")
     service, model = services()

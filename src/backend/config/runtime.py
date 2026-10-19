@@ -39,6 +39,7 @@ class RuntimeSettings:
     cors_origins: tuple[str, ...] = ()
     capture_timeout_seconds: int = 30
     deadline_seconds: int = 600
+    draft_deadline_seconds: int = 300
     max_research_rounds: int = 3
     max_output_tokens: int = 4096
     max_tool_calls: int = 11
@@ -87,6 +88,8 @@ class RuntimeSettings:
             raise ValueError("invalid deployment mode or research budget")
         if not 1 <= self.deadline_seconds <= 3600 or not 0 <= self.max_tool_calls <= 30:
             raise ValueError("invalid runtime deadline or tool budget")
+        if not 0 <= self.draft_deadline_seconds <= 1800:
+            raise ValueError("draft deadline must be 0–1800 seconds")
         if not 1 <= self.max_output_tokens <= 65536 or not 4096 <= self.max_request_bytes <= 1_000_000:
             raise ValueError("invalid token or input budget")
         if not 15 <= self.worker_lease_seconds <= 3600:
@@ -130,6 +133,7 @@ class RuntimeSettings:
             cors_origins=tuple(x.strip() for x in os.getenv("RUNTIME_CORS_ORIGINS", "").split(",") if x.strip()),
             capture_timeout_seconds=int(os.getenv("RUNTIME_CAPTURE_TIMEOUT_SECONDS", "30")),
             deadline_seconds=int(os.getenv("RUNTIME_DEADLINE_SECONDS", "600")),
+            draft_deadline_seconds=int(os.getenv("RUNTIME_DRAFT_DEADLINE_SECONDS", "300")),
             max_research_rounds=int(os.getenv("RUNTIME_RESEARCH_ROUNDS", "3")),
             max_output_tokens=int(os.getenv("RUNTIME_MAX_OUTPUT_TOKENS", "4096")),
             max_tool_calls=int(os.getenv("RUNTIME_MAX_TOOL_CALLS", "11")),

@@ -93,3 +93,10 @@ clarification repair. Draft assessment requires complete reason/caveat findings;
 code derives its verdict. Follow-up research with identical passages/entity context
 reuses assessed work with unresolved gaps; unchanged evidence after a draft failure
 stops rather than regenerating repeatedly. Restart API/worker after updating.
+
+Latest local drafting correction: **325 disposable-backend tests passed**. New runs
+pin a 300-second drafting allowance at pack persistence (configurable, bounded,
+stable across retries); follow-up research retains its original deadline. Report
+reason-kind instructions are explicit, and stage timeouts retain their failed-stage
+identity. Tests confirm report-only recovery reuses the saved pack without new
+retrieval. A real operator retry through reviewed export remains unverified.

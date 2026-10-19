@@ -8,6 +8,11 @@ never retrieves new facts or runs inference. Template/version hashes bind output
 Draft assessment returns exact per-reason findings and one preservation check per
 pack gap. Code checks complete coverage and derives the verdict; prose cannot
 override an unsupported finding or a lost caveat. The public assessment is unchanged.
+Reason kinds remain strictly `direct` / `idea`; writing instructions explicitly
+separate those values from fit-stage terminology such as `adjacent`.
+After pack persistence, the graph uses the pinned bounded drafting allowance;
+restarting a worker never refreshes that timestamp. Failed report recovery reuses
+the frozen pack under a new run and rechecks support.
 
 Read the [focused specification](../../../docs/plans/OUTPUT_REPORT_STRUCTURE.md) and [module map](../../../docs/plans/MODULE_HANDOFFS.md).
 Coordinate shared DTO/schema/configuration changes with their consumers and run

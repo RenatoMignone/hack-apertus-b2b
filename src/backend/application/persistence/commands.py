@@ -57,6 +57,7 @@ class Commands:
         config = {"runtime_version": "1", "mode": self.settings.mode, "model": self.settings.llm_name,
             "model_endpoint": self.settings.llm_base_url, "deadline_at": (datetime.now(timezone.utc) +
                 timedelta(seconds=self.settings.deadline_seconds)).isoformat(),
+            "draft_deadline_seconds": self.settings.draft_deadline_seconds,
             "max_research_rounds": self.settings.max_research_rounds, "max_output_tokens": self.settings.max_output_tokens,
             "max_tool_calls": self.settings.max_tool_calls, "request_id": request_id,
             "expected_revision": case["revision"], "instruction": instruction,

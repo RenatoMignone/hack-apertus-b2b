@@ -128,7 +128,11 @@ class PipelineNodes(ResearchNodes):
         pack = pack.model_copy(update={"coverage": {**pack.coverage, "search_trace": trace,
             "operator_business_context": business}})
         saved = await asyncio.to_thread(self.store.save_pack, execution.context.access, execution.context.run_id, pack, assessment)
-        return {**saved, "pack": pack.model_dump(mode="json")}
+        updated = {**saved, "pack": pack.model_dump(mode="json")}
+        if saved.get('draft_deadline_at'):
+            updated['research_deadline_at'] = state.get('research_deadline_at', state['context']['deadline_at'])
+            updated['context'] = {**state['context'], 'deadline_at': saved['draft_deadline_at']}
+        return updated
 
     async def load_pack(self, state):
         execution = self.execution(state)
@@ -181,8 +185,11 @@ class PipelineNodes(ResearchNodes):
             if assessment.status != "supported" or assessment.draft_hash != configuration_hash(draft.model_dump(mode="json")):
                 raise EvidenceRejected()
         except (EvidenceRejected, InvalidModelOutput) as error:
-            return {"draft_error": True, "pending_gaps": list(getattr(error, "gaps", ())) or [
+            failed = {"draft_error": True, "pending_gaps": list(getattr(error, "gaps", ())) or [
                 "The draft wording could not be supported by the current capability evidence."]}
+            if state.get('research_deadline_at'):
+                failed['context'] = {**state['context'], 'deadline_at': state['research_deadline_at']}
+            return failed
         saved = await asyncio.to_thread(self.store.save_draft, execution.context.access, execution.context,
             UUID(state["pack_id"]), draft, assessment, state["expected_revision"],
             UUID(state["parent_result_id"]) if state.get("parent_result_id") else None)

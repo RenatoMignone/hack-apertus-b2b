@@ -25,10 +25,13 @@ class Execution:
     def __init__(self, store, context, tracer=None):
         self.store, self.context, self.tracer = store, context, tracer
 
-    def remaining(self):
+    def remaining(self, stage=None):
         remaining = (self.context.deadline_at - datetime.now(timezone.utc)).total_seconds()
         if remaining <= 0:
-            raise BudgetExceeded()
+            error = BudgetExceeded()
+            if stage:
+                error.failed_stage = stage
+            raise error
         return remaining
 
     async def call(self, name, inputs, task):
@@ -37,7 +40,7 @@ class Execution:
         if cached is not None:
             event("stage.reused", run_id=self.context.run_id, case_id=self.context.case_id, stage=name)
             return cached["value"]
-        self.remaining()
+        self.remaining(name)
         started = datetime.now(timezone.utc)
         progress = hasattr(self.store, "start_activity")
         if progress:
@@ -48,11 +51,13 @@ class Execution:
                 event("stage.progress_unavailable", run_id=self.context.run_id, stage=name)
         succeeded = False
         try:
-            async with activity("stage", run_id=self.context.run_id, case_id=self.context.case_id, stage=name), asyncio.timeout(self.remaining()):
+            async with activity("stage", run_id=self.context.run_id, case_id=self.context.case_id, stage=name), asyncio.timeout(self.remaining(name)):
                 value = encoded(await task())
                 succeeded = True
         except TimeoutError:
-            raise BudgetExceeded() from None
+            error = BudgetExceeded()
+            error.failed_stage = name
+            raise error from None
         except ValidationError:
             error = InvalidModelOutput()
             error.failed_stage = name
