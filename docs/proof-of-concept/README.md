@@ -42,9 +42,9 @@ This experiment did not run Apertus drafting, web research, reranking or UI expo
 
 | Separate evidence | Result |
 | --- | --- |
-| [Actual-Apertus isolated pipeline](../project/PIPELINE_RELIABILITY.md) | Fictional sources; match, clarification/resume and no-match; assessed drafts, review and PDF export with PostgreSQL checkpoints |
-| [Frontend/backend recovery](../project/FRONTEND_RECOVERY.md) | Navigation, stale revisions, authentication and export recovery; combined checks passed 310 backend and 57 frontend tests |
-| [Live retrieval optimization](../data/LIVE_RETRIEVAL_PERFORMANCE.md) | Six-input SQL retrieval over 144,268 chunks: 6.04-7.43 s; full RRF: 6.81 s with cached real query vectors, excluding encoding/reranking |
+| Actual-Apertus isolated pipeline | Fictional sources; match, clarification/resume and no-match; assessed drafts, review and PDF export with PostgreSQL checkpoints |
+| Frontend/backend integration | Navigation, authentication, evidence review and export behavior; combined automated checks passed |
+| Live retrieval optimization | SQL retrieval and RRF timing were measured on an authorized corpus; this remains separate from the PoC |
 
 These are separate experiments with different inputs and timing boundaries.
 A fresh complete case on the optimized live corpus, reviewed expert recall and

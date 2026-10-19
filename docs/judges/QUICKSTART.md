@@ -169,12 +169,12 @@ For single-operator local testing, `RUNTIME_LOCAL_ACCESS=true` may be set in the
 private backend env with exactly one existing identity binding. Bind the API to
 loopback; the frontend then auto-connects without token entry. Role, namespace
 and source/case access checks remain. Keep this flag false for shared deployments.
-See [local access and service restart guidance](../plans/OPERATIONS_PLAN.md).
+See the [local setup runbook](../data/LIVE_SETUP.md).
 
 Startup does not migrate, download weights, populate the corpus or configure
 checkpoint tables. Optional web uses [SearXNG/Crawl4AI](../data/WEB_RESEARCH.md);
-optional reranking needs [assets](../data/RERANKING.md). PPTX/manual plans and
-case memory need [activation](../data/LIVE_SETUP.md).
+optional reranking needs separately provisioned compatible assets. PPTX/manual
+plans and case memory need explicit activation in the private environment.
 Only use formats the backend advertises.
 
 ## Troubleshooting

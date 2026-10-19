@@ -35,3 +35,36 @@ htmlcov/
 coverage/
 playwright-report/
 test-results/
+
+# Internal working documentation — keep public judge and usage docs below
+docs/plans/
+docs/plans/*
+!docs/plans/
+!docs/plans/ARCHITECTURE.md
+!docs/plans/EXECUTION_GRAPH.md
+!docs/plans/OUTPUT_REPORT_STRUCTURE.md
+!docs/plans/REPORT_PROCESSING_BOUNDARIES.md
+
+docs/project/
+docs/recordings/
+docs/sources/
+
+# Internal data-layer design and measurement notes
+docs/data/
+docs/data/*
+!docs/data/
+!docs/data/CAPTURE_PERFORMANCE.md
+!docs/data/DATA_AND_PROVENANCE.md
+!docs/data/DEPLOYMENT.md
+!docs/data/DOMAIN_PROFILES.md
+!docs/data/HOSTED_EMBEDDINGS.md
+!docs/data/INFERENCE_CONFIGURATION.md
+!docs/data/LIVE_SETUP.md
+!docs/data/RICH_OUTPUTS.md
+!docs/data/WEB_RESEARCH.md
+
+# Local evaluation outputs are not part of the submission package
+docs/evaluation/
+docs/evaluation/*
+!docs/evaluation/
+!docs/evaluation/PILOT_QUERIES.json

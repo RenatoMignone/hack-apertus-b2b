@@ -4,7 +4,7 @@
 - **Event:** Hack Apertus, on-site Liebefeld
 - **Team:** Stregoni — Renato Mignone, Elia Innocenti, Eric Ruiz Giménez, Mohamed Kechiche
 - **Demo:** Pending video URL; [reproducible walkthrough](docs/judges/DEMO.md)
-- **Status:** Delivery draft, 19 October 2026; integrated main, with final artifacts/acceptance tracked in the delivery checklist
+- **Status:** Delivery draft, 19 October 2026; final artifacts and acceptance are tracked in the [delivery checklist](docs/judges/DELIVERY.md)
 
 ## 1. Summary
 
@@ -173,6 +173,6 @@ Repository code uses [Apache-2.0](LICENSE); third-party material keeps its right
 3. [Processing and evidence gates](docs/plans/REPORT_PROCESSING_BOUNDARIES.md).
 4. [Apertus configuration](docs/data/INFERENCE_CONFIGURATION.md).
 5. [Embedding protocol and pins](docs/data/HOSTED_EMBEDDINGS.md).
-6. [Recorded live partial report and PDF](docs/project/STATUS.md).
+6. [Recorded live partial report and PDF](docs/judges/VERIFICATION.md).
 7. [Capture-performance evidence](docs/data/CAPTURE_PERFORMANCE.md).
 8. [Evaluation method](docs/challenge/EVALUATION.md).
