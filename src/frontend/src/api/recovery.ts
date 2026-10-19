@@ -26,3 +26,11 @@ export function isStateConflict(error: unknown): boolean {
   const value = error as {status?: number; code?: string};
   return value.status === 409 && ['stale_revision', 'conflict'].includes(value.code ?? '');
 }
+
+export function recoveryAction(detail: Pick<CaseDetail, 'currentRun' | 'inputId'>) {
+  const status = detail.currentRun?.status;
+  if (status === 'queued' || status === 'running') return 'observe';
+  if (status === 'waiting_for_input') return 'clarify';
+  if (status === 'failed') return canReusePack(detail) ? 'report' : 'research';
+  return 'reload';
+}

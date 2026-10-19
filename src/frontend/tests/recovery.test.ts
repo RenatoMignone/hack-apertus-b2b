@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { canReusePack, failureMessage, isStateConflict } from '../src/api/recovery.ts';
+import { canReusePack, failureMessage, isStateConflict, recoveryAction } from '../src/api/recovery.ts';
 
 test('retry label and command share current input and failed-run requirements', () => {
   const detail = {inputId: 'now', currentRun: {run_id:'r', input_id:'now', status:'failed', pack_id:'p'}} as const;
@@ -22,4 +22,14 @@ test('model rejection is not mistaken for a stale edit conflict', () => {
   assert.equal(isStateConflict({status:409,code:'stale_revision'}), true);
   assert.equal(isStateConflict({status:409,code:'conflict'}), true);
   assert.equal(isStateConflict({status:503,code:'service_unavailable'}), false);
+});
+
+
+test('recovery actions distinguish observation, clarification and actual failed work', () => {
+  const base = {inputId:'input',currentRun:{run_id:'r',input_id:'input',status:'running' as const}};
+  assert.equal(recoveryAction(base),'observe');
+  assert.equal(recoveryAction({...base,currentRun:{...base.currentRun,status:'waiting_for_input'}}),'clarify');
+  assert.equal(recoveryAction({...base,currentRun:{...base.currentRun,status:'failed'}}),'research');
+  assert.equal(recoveryAction({...base,currentRun:{...base.currentRun,status:'failed',pack_id:'p'}}),'report');
+  assert.equal(recoveryAction({...base,currentRun:{...base.currentRun,status:'succeeded'}}),'reload');
 });

@@ -240,3 +240,10 @@ test('navigation aborts an in-flight status read without transport retry', async
   await assert.rejects(api.runCase('case',()=>{},controller.signal), {name:'AbortError'});
   assert.equal(reads,1);
 });
+
+
+test('reconnect after the run finishes returns its result without starting research', async () => {
+  const {api,calls} = harness(() => ({...detail(),currentRun:{run_id:'run',input_id:'input',status:'succeeded'}}));
+  await api.runCase('case',()=>{});
+  assert.equal(calls.filter(c => c.method !== 'GET').length,0);
+});

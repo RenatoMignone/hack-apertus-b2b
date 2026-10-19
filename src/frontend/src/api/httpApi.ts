@@ -1,3 +1,4 @@
+import { publishObservation } from './observation.ts';
 import { canReusePack, failureMessage } from './recovery.ts';
 import { nextPollDelay, publishProgress } from './progress.ts';
 import type { NavigatorApi } from './index';
@@ -116,11 +117,18 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     } finally { signal.removeEventListener('abort', abort); }
     signal.throwIfAborted();
   }
-  async function observe<T>(url: string, signal?: AbortSignal): Promise<T> {
+  async function observe<T>(url: string, signal?: AbortSignal, caseId?: string): Promise<T> {
     for (let attempt = 0; ; attempt++) {
-      try { return await request<T>(url, 'GET', undefined, false, signal); }
+      try {
+        const value = await request<T>(url, 'GET', undefined, false, signal);
+        if (caseId) publishObservation(caseId, 'connected');
+        return value;
+      }
       catch (error) {
         const transient = error instanceof ConnectionError || error instanceof ApiError && [502, 503, 504].includes(error.status);
+        if (signal?.aborted) throw error;
+        if (caseId) publishObservation(caseId, error instanceof ApiError && error.status === 401
+          ? 'authentication_required' : transient && attempt < 3 ? 'reconnecting' : 'disconnected');
         if (!transient || attempt >= 3) throw error;
         await wait(nextPollDelay(pollInterval, attempt), signal);
       }
@@ -130,7 +138,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     let last = "", unchanged = 0;
     for (let n = 0; n < maxPolls; n++) {
       signal?.throwIfAborted();
-      const run = await observe<CaseRun>(url, signal);
+      const run = await observe<CaseRun>(url, signal, caseId);
       signal?.throwIfAborted();
       publishProgress(caseId, run);
       const signature = JSON.stringify([run.status, run.stage, run.step, run.activity]);
@@ -174,6 +182,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
       const detail = await requireCase(caseId);
       signal?.throwIfAborted();
       const run = detail.currentRun;
+      if (run?.status === 'succeeded') return detail;
       if (run && ['queued', 'running', 'waiting_for_input'].includes(run.status)) {
         return poll(caseId, `${path(caseId)}/runs/${run.run_id}`, onStage, signal);
       }

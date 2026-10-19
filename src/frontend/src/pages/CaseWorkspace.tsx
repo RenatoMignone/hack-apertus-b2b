@@ -1,6 +1,7 @@
+import { observationStatus, subscribeObservation } from '../api/observation';
 import { OperationScope } from '../api/operationScope';
-import { canReusePack, failureMessage, isStateConflict } from '../api/recovery';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { failureMessage, isStateConflict, recoveryAction } from '../api/recovery';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, Download, MessageSquare } from 'lucide-react';
 import { api, apiMode } from '../api';
@@ -130,6 +131,7 @@ export default function CaseWorkspace() {
   const started = useRef(false);
   const [viewedRevisionId, setViewedRevisionId] = useState<string>();
   const [selecting, setSelecting] = useState(false);
+  const connection = useSyncExternalStore(subscribeObservation, () => observationStatus(id));
   const scope = useRef(new OperationScope(id));
   scope.current.reset(id);
   const busy = useRef(false);
@@ -264,7 +266,7 @@ export default function CaseWorkspace() {
   const answer = (turnId: string, a: string) =>
     perform((signal, progress) => api.answerFollowUp(detail.case.id, turnId, a, progress, signal));
   const select = async (reasonId: string, s: Selection) => {
-    if (busy.current || selecting || running || revision?.id !== detail.currentRevisionId) return;
+    if (busy.current || selecting || running || serverActive || revision?.id !== detail.currentRevisionId) return;
     const ticket = scope.current.begin(); busy.current = true;
     const r = revision?.reasons.find((x) => x.id === reasonId);
     const prev = r?.selection ?? 'none';
@@ -293,12 +295,21 @@ export default function CaseWorkspace() {
   const historical = !!revision && revision.id !== detail.currentRevisionId;
   const awaitingAnswers = detail.currentRun?.status === 'waiting_for_input' ||
     (apiMode === 'mock' && detail.turns.some((turn) => turn.followUp && !turn.followUp.answer));
+  const serverActive = !!detail.currentRun && ['queued', 'running'].includes(detail.currentRun.status);
+  const locked = running || serverActive;
+  const action = recoveryAction(detail);
+  const reload = () => {
+    const ticket = scope.current.begin();
+    void api.getCase(id).then(value => {
+      if (ticket.current()) { setDetail(value); setError(''); started.current = false; }
+    }).catch(reason => { if (ticket.current()) failed(reason, ticket.current); });
+  };
   const retry = () => perform((signal, progress) => api.runCase(detail.case.id, progress, signal));
 
   const chat = (
     <ChatPanel key={id}
       turns={detail.turns}
-      running={running}
+      running={locked}
       awaitingAnswers={awaitingAnswers}
       questionIds={detail.currentRun?.questions?.map((question) => question.id)}
       canRewrite={!!detail.currentRevisionId}
@@ -329,7 +340,7 @@ export default function CaseWorkspace() {
               <VersionMenu detail={detail} current={revision} onPick={setViewedRevisionId} />
             )}
             <span title={kept ? undefined : 'Keep or hide every item, keeping at least one, to export'}>
-              <Button variant="primary" disabled={historical || running || selecting} onClick={() => setExportOpen(true)}>
+              <Button variant="primary" disabled={historical || locked || selecting} onClick={() => setExportOpen(true)}>
                 <Download size={15} aria-hidden /> Export{kept ? ` (${kept})` : ''}
               </Button>
             </span>
@@ -339,7 +350,15 @@ export default function CaseWorkspace() {
 
       {(error || detail.currentRun?.status === 'failed') && <div role="alert" className="border-b border-line bg-white px-6 py-3 text-sm text-brand">
         {error || failureMessage(detail.currentRun?.error_code)}
-        {!running && <button className="ml-3 underline" onClick={retry}>{canReusePack(detail) ? 'Retry report from existing evidence' : 'Retry / resume research'}</button>}
+        {!running && connection !== 'authentication_required' && <button className="ml-3 underline"
+          onClick={action === 'reload' ? reload : action === 'clarify' ? () => setChatOpen(true) : retry}>
+          {({observe:'Reconnect to research', clarify:'Open clarification questions', report:'Retry report from existing evidence', research:'Retry research', reload:'Reload case'})[action]}
+        </button>}
+      </div>}
+      {connection !== 'connected' && <div role="status" className="border-b border-line bg-white px-6 py-3 text-sm">
+        {connection === 'reconnecting' ? 'Connection interrupted. Reconnecting to existing work…' :
+          connection === 'authentication_required' ? 'Authentication is required. Reconnect with your personal token.' :
+          'Progress updates are disconnected. Server work may still be running; your last report is preserved.'}
       </div>}
       {awaitingAnswers && <div role="status" className="border-b border-line bg-white px-6 py-3 text-sm">
         Research needs your answer. <button className="text-brand underline" onClick={() => setChatOpen(true)}>Open clarification questions</button>
@@ -351,7 +370,7 @@ export default function CaseWorkspace() {
         <div className="min-w-0 flex-1 overflow-y-auto" id="case-scroll">
           <div className="mx-auto max-w-3xl px-6 pb-16 pt-4">
             <CaseDataControls key={`${detail.case.id}:${detail.inputId}`} detail={detail}
-              busy={running || selecting || awaitingAnswers || historical} onConflict={refreshConflict} onBusy={(value) => { if (activeCase.current === id) { busy.current = value; setRunning(value); } }}
+              busy={locked || selecting || awaitingAnswers || historical} onConflict={refreshConflict} onBusy={(value) => { if (activeCase.current === id) { busy.current = value; setRunning(value); } }}
               onChange={(value) => { if (activeCase.current === id) setDetail(previous =>
                 !previous || (value.revision ?? 0) >= (previous.revision ?? 0) ? value : previous); }}
               onStage={(value) => { if (activeCase.current === id) setStage(value); }} />
@@ -362,7 +381,7 @@ export default function CaseWorkspace() {
             )}
             {!revision && !running && (
               <p className="mt-10 text-center text-sm text-muted">
-                No brief yet for this case. {!awaitingAnswers && <button onClick={retry} className="font-medium text-brand">Start / resume research</button>}
+                {detail.currentRun?.status === 'succeeded' ? 'Research completed without a report. Check the research outcome before starting again.' : 'No brief yet for this case.'} {!awaitingAnswers && <button onClick={retry} className="font-medium text-brand">Start / resume research</button>}
               </p>
             )}
             {revision && (
@@ -374,7 +393,7 @@ export default function CaseWorkspace() {
                 activeEvidence={drawer ?? undefined}
                 flash={flash}
                 onSelect={select}
-                readOnly={historical || running || selecting}
+                readOnly={historical || locked || selecting}
               />
             )}
           </div>
