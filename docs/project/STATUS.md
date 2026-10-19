@@ -12,9 +12,15 @@ Code availability, database rollout and real research quality are distinct.
 | Data | Immutable source versions, authorized taxonomy/corpus, live case captures and published releases; ongoing ingestion determines actual coverage |
 | Output | Reviewed PDF; optional manual company plans, reviewed PPTX and opt-in own-case similarity implemented behind capability/configuration gates |
 | Operations | Readiness checks, safe timestamped logs, progress projection, lock/lease safeguards and root Make service launcher |
-| Source schema | `0012_membership_lookup`; maintainer reports 0012 applied with restricted-role access checks and 20 disposable tests; query impact remains inconclusive and fresh live acceptance remains pending with the operator |
+| Source schema | `0013_retrieval_scope_sets`, applied on shared host; real `dev_ren` six-input SQL retrieval 6.04–7.43 s over 144,268 chunks; 310 backend tests passed on disposable PostgreSQL; operator API/worker restart and fresh full-report acceptance remain |
 
 ## Verification available
+
+19 October retrieval fix: both original branches reproduced 30-second timeouts
+under Renato's actual restricted identity. Shared eligibility and read-policy work
+now complete with identical authorized membership and exact dense ranking. The
+complete RRF adapter returned 30 hits in 6.81 s using cached real embeddings, without
+reranking. See the [measured receipt, plans and restart commands](../data/LIVE_RETRIEVAL_PERFORMANCE.md).
 
 The integrated runtime baseline `88f5b75` passed **284 backend tests** against
 disposable PostgreSQL/pgvector and **24 frontend tests**, TypeScript and production
@@ -27,8 +33,9 @@ See [verification](../judges/VERIFICATION.md).
 
 ## Remaining acceptance and delivery
 
-- Confirm maintainer migration rollout and measure capture/retrieval/registration
-  latency on the current host; repeat a fresh live case through review/export.
+- Pull and restart each operator's API/worker for the measured retrieval fix;
+  repeat a fresh live case through review/export. Shared migration 0013 is applied;
+  broader capture/registration latency and report/provider acceptance remain separate.
 - Validate combined database/web provenance and deduplication on actual providers.
 - Build reviewed expected experts/units and measure Recall@10, support quality,
   source-family coverage, reranker value and representative latency/cost.
@@ -43,7 +50,7 @@ No fixed source count, current provider availability or completed migration is
 inferred from configuration. Readiness is a configuration/access check, not proof
 of all permissions, corpus completeness or report quality.
 
-## Latest runtime corrections
+## Earlier runtime corrections and verification
 
 297 disposable-backend tests pass, including real SQL timeout/savepoint recovery;
 the last frontend verification passed 24 tests/build. The original long

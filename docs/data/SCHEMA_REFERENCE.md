@@ -1,6 +1,6 @@
 # Exact application schema reference
 
-Generated from `src/backend/data/schema.py`; migration head **`0012_membership_lookup`**.
+Generated from `src/backend/data/schema.py`; migration head **`0013_retrieval_scope_sets`**.
 Do not edit by hand. Regenerate with `PYTHONPATH=src python -m backend.data.schema_docs`.
 
 **65 application tables.** Read [schema decisions](RELATIONAL_SCHEMA.md) and

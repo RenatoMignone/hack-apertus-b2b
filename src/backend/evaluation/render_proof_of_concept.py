@@ -210,7 +210,9 @@ def main():
     p("For each of 120 returned passage occurrences, the ordinary authorized connection read the stored document version, "
       "compared body[char_start:char_end] with the hit and recomputed the complete body's SHA-256. All passed. "
       "Literal integrity does not establish semantic correctness or source truth.")
-    p("Connections enforced read-only transactions and bounded statement/lock timeouts. An existing owned capture "
+    p(("Connections enforced read-only transactions" if data.get("database_read_only") else
+       "Connections permitted only temporary retrieval tables and no persistent writes") +
+      " and bounded statement/lock timeouts. An existing owned capture "
       "was reused. No case, snapshot, claim, grant, corpus update or migration was created.")
     grid([["Item","Recorded value"],["Schema",data["schema_revision"]],
           ["Snapshot",data["capture"]["snapshot_id"]],["Build",data["capture"]["build_id"]],
@@ -265,7 +267,7 @@ def main():
         "with the matching encoder configuration/tokenizer:","","~~~text",
         "python -m backend.evaluation.proof_of_concept --env-file PRIVATE_ENV --run-id OWNED_RUN_ID","~~~","",
         "Optional --db-host HOST --db-port PORT selects the connection address of the same authorized database. "
-        "The harness enforces read-only connections and prints no credentials. It makes real configured "
+        "Current replays allow temporary retrieval tables but no persistent writes and print no credentials. They make real configured "
         "hosted-embedding calls using permitted fictional/public input. It creates no case or migration.","",
         "Exact queries, model/capture pins, all rank/source records, hashes and selected quotes are in "
         "retrieval-results.json. Full raw text remains in ignored .local/proof-concept/raw-results.json "
