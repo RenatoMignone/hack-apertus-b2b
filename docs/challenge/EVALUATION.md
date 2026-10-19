@@ -168,3 +168,12 @@ The [data-layer specs](../data/DATA_LAYER.md) add concrete acceptance cases:
   revocation across old snapshots, checkpoints, traces and dependent exports.
 
 These extend engineering validation; they do not add organizer scoring rules.
+
+## Executable retrieval measurement — 19 October 2026
+
+`python -m backend.evaluation --help` compares lexical, dense, RRF and provisioned
+reranking on an existing owned capture. [Candidate queries](../evaluation/PILOT_QUERIES.json)
+are unjudged; no expected experts are invented. Add independent reviewed labels
+to unlock the existing intent-balanced Recall@10 metric. The CLI records pins,
+ranked source/entity references, failures and repeated timing separately.
+[Checkpoint evidence](../team/COMPLETION_ROADMAP.md) records the actual smoke run.

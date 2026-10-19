@@ -1,0 +1,10 @@
+{
+  "version": "bern-diabetes-candidate-v1",
+  "cases": [
+    {"id":"biosensing-1","intent":"biosensing","query":"Find Bern researchers and groups developing biosensors for continuous glucose monitoring."},
+    {"id":"biosensing-2","intent":"biosensing","query":"Who in Bern studies wearable glucose sensing technologies and continuous metabolic measurement?"},
+    {"id":"algorithms-1","intent":"algorithms","query":"Find Bern expertise in physiological signal processing and closed-loop insulin delivery algorithms."},
+    {"id":"facilities-1","intent":"facilities","query":"Find documented medical-device prototyping and sensor testing facilities in Bern; do not assume access or availability."},
+    {"id":"negative-1","intent":"negative","kind":"negative","query":"Find documented Bern grain commodity trading research infrastructure."}
+  ]
+}

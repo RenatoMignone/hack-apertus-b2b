@@ -46,11 +46,15 @@ def query_statement(statement):
 
 
 class HybridSearch:
-    def __init__(self, engine, embedder, reranker=None, tracer=None):
+    def __init__(self, engine, embedder, reranker=None, tracer=None, *, strategy=None):
         self.engine = engine
         self.embedder = embedder
         self.reranker = reranker
         self.tracer = tracer
+        self.default_strategy = strategy is None
+        self.strategy = strategy or ('reranked' if reranker else 'rrf')
+        if self.strategy not in {'lexical', 'dense', 'rrf', 'reranked'}:
+            raise ValueError('unknown retrieval strategy')
 
     def search(self, access, plan: QueryPlan) -> SearchResult:
         started = perf_counter()
@@ -88,17 +92,17 @@ class HybridSearch:
                     or self.embedder.config_hash != pin["config_hash"]):
                 raise ValueError("query profile, taxonomy, snapshot, build or embedding space is incompatible")
         queries = list(dict.fromkeys([plan.original_request, *plan.variants]))
-        vectors = [validate_vector(self.embedder.embed_query(query), pin["dimension"]) for query in queries]
+        vectors = [validate_vector(self.embedder.embed_query(query), pin["dimension"]) for query in queries] if self.strategy != 'lexical' else [None]*len(queries)
         lexical, vector, rows_by_id, query_matches = {}, {}, {}, {}
         with transaction(self.engine, access) as connection:
             for query, query_vector in zip(queries, vectors, strict=True):
-                lexical_rows = connection.execute(query_statement("""
+                lexical_rows = [] if self.strategy == 'dense' else connection.execute(query_statement("""
                     SELECT c.chunk_id, max(ts_rank_cd(p.terms, websearch_to_tsquery(CAST(p.language_config AS regconfig),:query))) AS score
                 """ + ELIGIBLE.replace("WHERE s.snapshot_id", "JOIN retrieval.search_documents p ON p.chunk_id=c.chunk_id AND p.search_config_hash=b.search_config_hash WHERE s.snapshot_id") + """
                     AND p.terms @@ websearch_to_tsquery(CAST(p.language_config AS regconfig),:query)
                     GROUP BY c.chunk_id ORDER BY score DESC,c.chunk_id LIMIT 30
                 """), {**parameters, "query": query}).mappings().all()
-                vector_rows = connection.execute(query_statement("SELECT c.chunk_id, e.vector <=> CAST(:vector AS vector) AS score " +
+                vector_rows = [] if self.strategy == 'lexical' else connection.execute(query_statement("SELECT c.chunk_id, e.vector <=> CAST(:vector AS vector) AS score " +
                     ELIGIBLE + " ORDER BY score,c.chunk_id LIMIT 30"),
                     {**parameters, "vector": "[" + ",".join(str(value) for value in query_vector) + "]"}).mappings().all()
                 for branch, rows in ((lexical, lexical_rows), (vector, vector_rows)):
@@ -126,12 +130,13 @@ class HybridSearch:
         passages = [f"Title: {row['title']}\nHeadings: {' / '.join(row['heading_path'])}\nPassage: {row['literal_text']}"
                     for row in rows_by_id.values()]
         details = None
+        reranker = self.reranker if self.strategy == 'reranked' else None
         try:
-            if self.reranker and passages and hasattr(self.reranker, "score_with_details"):
-                details = self.reranker.score_with_details(plan.original_request, passages)
+            if reranker and passages and hasattr(reranker, "score_with_details"):
+                details = reranker.score_with_details(plan.original_request, passages)
                 reranked = [row["score"] for row in details]
             else:
-                reranked = self.reranker.score(plan.original_request, passages) if self.reranker and passages else None
+                reranked = reranker.score(plan.original_request, passages) if reranker and passages else None
         except ServiceUnavailable:
             reranked = None
         if reranked is not None and (len(reranked) != len(passages) or not all(math.isfinite(score) for score in reranked)):
@@ -156,4 +161,4 @@ class HybridSearch:
                 require_scope(connection, row["scope_id"])
         return SearchResult(hits=hits, limitations=["scores_are_not_confidence"]
             + (["live_corpus_incomplete_coverage"] if pin["status"] == "live" else [])
-            + ([] if reranked is not None else ["reranker_unavailable"]))
+            + (["reranker_unavailable"] if (self.default_strategy or self.strategy == 'reranked') and reranked is None else []))
