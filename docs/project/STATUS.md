@@ -91,9 +91,9 @@ stops rather than regenerating repeatedly. Restart API/worker after updating.
 
 ## Frontend recovery branch acceptance
 
-`codex/frontend-backend-recovery` is unmerged. Its local checks passed 39 transport/
-helper tests, 18 React interaction tests, TypeScript/build and 304 disposable-backend
-tests. Browser fault injection verified reconnect/conflict/export recovery; a fresh
+`codex/frontend-backend-recovery` is integrated into `main`. Combined verification
+with the latest retrieval fixes passed 39 transport/helper tests, 18 React interaction
+tests, TypeScript/build and 310 disposable-backend tests. Browser fault injection verified reconnect/conflict/export recovery; a fresh
 actual-Apertus fictional HTTP case passed review/export and stale-download rejection.
 No shared database or public HTTP contract changed. See the
 [recovery receipt](FRONTEND_RECOVERY.md) for scope, limits and reproduction.

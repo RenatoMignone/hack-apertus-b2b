@@ -1,7 +1,7 @@
 # Frontend/backend recovery receipt
 
-Measured 19 October 2026 on `codex/frontend-backend-recovery`. This branch is
-unmerged. No backend endpoints, retrieval SQL, migrations or shared-host settings
+Measured 19 October 2026 on `codex/frontend-backend-recovery`; integrated into
+`main` after merging the latest retrieval-performance changes. No backend endpoints, retrieval SQL, migrations or shared-host settings
 changed.
 
 ## Behavior
@@ -50,6 +50,10 @@ changed.
 - A fresh actual-Apertus 70B isolated fictional match passed: two assessed reasons,
   review/PDF, wording revision and stale-download rejection in **63.271 seconds**.
   This HTTP acceptance is separate from the browser fault-injection checks.
+
+After integration with `18ef3a6`, all **310 backend tests** and **57 frontend tests**,
+TypeScript and production build passed again on the combined tree. No shared-host
+migration or configuration was performed by this integration.
 
 These checks establish local integration/recovery, not real-corpus quality,
 shared-host retrieval performance or deployment acceptance.
