@@ -225,3 +225,18 @@ test('authentication stops observation immediately; unavailable reads have a bou
     assert.equal(reads, status === 401 ? 1 : 4);
   }
 });
+
+test('navigation aborts an in-flight status read without transport retry', async () => {
+  const controller = new AbortController(); let reads = 0;
+  const fetcher: typeof fetch = async (url, init) => {
+    if (!String(url).endsWith('/runs/run')) return Response.json(detail());
+    reads++;
+    return new Promise((_, reject) => {
+      init!.signal!.addEventListener('abort', () => reject(new DOMException('stopped','AbortError')), {once:true});
+      controller.abort();
+    });
+  };
+  const api = createHttpApi({token:()=>'',fetcher});
+  await assert.rejects(api.runCase('case',()=>{},controller.signal), {name:'AbortError'});
+  assert.equal(reads,1);
+});

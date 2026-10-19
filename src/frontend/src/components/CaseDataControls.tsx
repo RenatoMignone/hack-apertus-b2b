@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api } from '../api';
 import type { BusinessContext, CaseDetail, RunStage } from '../types/contract';
 
@@ -7,6 +7,9 @@ export default function CaseDataControls({ detail, busy, onBusy, onChange, onSta
   detail: CaseDetail; busy: boolean; onBusy: (busy: boolean) => void;
   onChange: (detail: CaseDetail) => void; onStage: (stage: RunStage) => void;
 }) {
+  const alive = useRef(true);
+  const pending = useRef(false);
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
   const [confirmed, setConfirmed] = useState(false);
   const [plansConfirmed, setPlansConfirmed] = useState(false);
   const [error, setError] = useState('');
@@ -19,9 +22,11 @@ export default function CaseDataControls({ detail, busy, onBusy, onChange, onSta
   const reviewed = !!result?.resultHash && result.reasons.some((r) => r.selection === 'kept')
     && result.reasons.every((r) => r.selection !== 'none');
   const perform = async (task: () => Promise<CaseDetail>) => {
-    setError(''); onBusy(true);
-    try { onChange(await task()); } catch (e) { setError(e instanceof Error ? e.message : 'The update failed.'); }
-    finally { onBusy(false); }
+    if (pending.current) return;
+    pending.current = true; setError(''); onBusy(true);
+    try { const value = await task(); if (alive.current) onChange(value); }
+    catch (e) { if (alive.current) setError(e instanceof Error ? e.message : 'The update failed.'); }
+    finally { pending.current = false; if (alive.current) onBusy(false); }
   };
   if (!detail.memory?.available && !detail.businessContextAvailable) return null;
   const savePlans = () => {

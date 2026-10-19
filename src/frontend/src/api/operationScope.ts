@@ -1,0 +1,17 @@
+/** Component-local ownership. A -> B -> A must never revive an old response. */
+export class OperationScope {
+  private generation = 0;
+  private controller?: AbortController;
+  private identity: string;
+  constructor(identity: string) { this.identity = identity; }
+  reset(identity: string) {
+    if (identity !== this.identity) { this.stop(); this.identity = identity; }
+  }
+  stop() { this.generation++; this.controller?.abort(); this.controller = undefined; }
+  begin() {
+    this.stop();
+    const generation = this.generation;
+    const controller = this.controller = new AbortController();
+    return { signal: controller.signal, current: () => generation === this.generation && !controller.signal.aborted };
+  }
+}

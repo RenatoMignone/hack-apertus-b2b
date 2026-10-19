@@ -1,3 +1,4 @@
+import { OperationScope } from '../api/operationScope';
 import { canReusePack, failureMessage } from '../api/recovery';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
@@ -129,6 +130,9 @@ export default function CaseWorkspace() {
   const started = useRef(false);
   const [viewedRevisionId, setViewedRevisionId] = useState<string>();
   const [selecting, setSelecting] = useState(false);
+  const scope = useRef(new OperationScope(id));
+  scope.current.reset(id);
+  const busy = useRef(false);
   const activeCase = useRef(id);
   activeCase.current = id;
   const [chatPref, setChatPref] = useState(readChatPref);
@@ -151,7 +155,8 @@ export default function CaseWorkspace() {
   };
 
   useEffect(() => {
-    let alive = true;
+    const ticket = scope.current.begin();
+    busy.current = false;
     started.current = false;
     setViewedRevisionId(undefined);
     setSelecting(false);
@@ -159,17 +164,18 @@ export default function CaseWorkspace() {
     setRunning(false); setError('');
     setDrawer(null);
     setDetail(undefined);
-    api.getCase(id).then((data) => { if (alive) setDetail(data); }).catch((reason) => {
-      if (alive) setError(reason instanceof Error ? reason.message : 'Cannot load this case.');
+    api.getCase(id).then((data) => { if (ticket.current()) setDetail(data); }).catch((reason) => {
+      if (ticket.current()) setError(reason instanceof Error ? reason.message : 'Cannot load this case.');
     });
-    return () => { alive = false; };
+    return () => { scope.current.stop(); busy.current = false; };
   }, [id]);
 
-  const failed = (reason: unknown) => {
+  const failed = (reason: unknown, current = () => activeCase.current === id) => {
     if (activeCase.current !== id || (reason instanceof DOMException && reason.name === "AbortError")) return;
+    busy.current = false;
     setRunning(false);
     setError(reason instanceof Error ? reason.message : 'The request could not be completed.');
-    void api.getCase(id).then((value) => { if (activeCase.current === id) setDetail(value); }).catch(reportApiError);
+    void api.getCase(id).then((value) => { if (current()) setDetail(value); }).catch((error) => { if (current()) reportApiError(error); });
   };
 
   // Show an unread dot when the agent replies while the chat is closed.
@@ -186,14 +192,14 @@ export default function CaseWorkspace() {
     const active = detail.currentRun && ['queued', 'running'].includes(detail.currentRun.status);
     if (!active && !(wantsRun && !detail.currentRun && !detail.revisions.length)) return;
     started.current = true;
-    const controller = new AbortController();
+    const ticket = scope.current.begin();
+    busy.current = true;
     setRunning(true);
-    api.runCase(detail.case.id, (next) => { if (activeCase.current === id) setStage(next); }, controller.signal).then((d) => {
-      if (activeCase.current !== id) return;
-      setDetail(d);
-      setRunning(false);
-    }).catch(failed);
-    return () => { controller.abort(); };
+    api.runCase(detail.case.id, (next) => { if (ticket.current()) setStage(next); }, ticket.signal).then((d) => {
+      if (!ticket.current()) return;
+      busy.current = false; setDetail(d); setRunning(false);
+    }).catch((reason) => { if (ticket.current()) failed(reason, ticket.current); });
+    return () => { scope.current.stop(); };
   }, [detail?.case.id, location.state, id]);
 
   const revision = useMemo(
@@ -233,47 +239,50 @@ export default function CaseWorkspace() {
       </div>
     );
 
-  const send = (text: string, kind: 'focus' | 'formatting') => {
-    setDetail({ ...detail, turns: [...detail.turns, { id: 'pending', role: 'operator', text, createdAt: new Date().toISOString() }] });
-    setRunning(true);
-    setStage('interpreting');
-    setError('');
-    api.sendMessage(detail.case.id, text, setStage, kind).then(afterAgent).catch(failed);
+  const perform = (task: (signal: AbortSignal, progress: (stage: RunStage) => void) => Promise<CaseDetail>) => {
+    if (busy.current) return;
+    const ticket = scope.current.begin();
+    busy.current = true; setRunning(true); setError('');
+    void task(ticket.signal, (next) => { if (ticket.current()) setStage(next); }).then((value) => {
+      if (!ticket.current()) return;
+      busy.current = false; afterAgent(value);
+    }).catch((reason) => { if (ticket.current()) failed(reason, ticket.current); });
   };
-  const answer = (turnId: string, a: string) => {
-    setRunning(true);
-    setStage('interpreting');
-    setError('');
-    api.answerFollowUp(detail.case.id, turnId, a, setStage).then(afterAgent).catch(failed);
-  };
+  const send = (text: string, kind: 'focus' | 'formatting') =>
+    perform((signal, progress) => api.sendMessage(detail.case.id, text, progress, kind, signal));
+  const answer = (turnId: string, a: string) =>
+    perform((signal, progress) => api.answerFollowUp(detail.case.id, turnId, a, progress, signal));
   const select = async (reasonId: string, s: Selection) => {
-    if (selecting || running || revision?.id !== detail.currentRevisionId) return;
+    if (busy.current || selecting || running || revision?.id !== detail.currentRevisionId) return;
+    const ticket = scope.current.begin(); busy.current = true;
     const r = revision?.reasons.find((x) => x.id === reasonId);
     const prev = r?.selection ?? 'none';
     const expected = revision?.resultHash ? { resultId: revision.id, resultHash: revision.resultHash } : undefined;
     setSelecting(true);
     try {
       const updated = await api.setSelection(detail.case.id, reasonId, s, expected);
-      if (activeCase.current !== updated.case.id) return;
+      if (!ticket.current()) return;
       setDetail(updated);
       if (s === 'kept') toast('Kept for the pitch');
       if (s === 'rejected') toast(`Hidden: ${r?.headline ?? 'item'}`, () => api.setSelection(detail.case.id, reasonId, prev, expected).then((value) => {
-        if (activeCase.current === value.case.id) setDetail(value);
+        if (ticket.current()) setDetail(value);
       }));
-    } catch (reason) { reportApiError(reason); }
-    finally { setSelecting(false); }
+    } catch (reason) { if (ticket.current()) reportApiError(reason); }
+    finally { if (ticket.current()) { busy.current = false; setSelecting(false); } }
   };
-  const setStatus = (s: CaseStatus) => api.setStatus(detail.case.id, s).then((value) => {
-    if (activeCase.current === value.case.id) setDetail(value);
-  });
+  const setStatus = (status: CaseStatus) => {
+    if (busy.current) return;
+    const ticket = scope.current.begin(); busy.current = true;
+    void api.setStatus(detail.case.id, status).then(value => {
+      if (ticket.current()) setDetail(value);
+    }).catch(reason => { if (ticket.current()) reportApiError(reason); })
+      .finally(() => { if (ticket.current()) busy.current = false; });
+  };
   const kept = revision?.reasons.filter((r) => r.selection === 'kept').length ?? 0;
   const historical = !!revision && revision.id !== detail.currentRevisionId;
   const awaitingAnswers = detail.currentRun?.status === 'waiting_for_input' ||
     (apiMode === 'mock' && detail.turns.some((turn) => turn.followUp && !turn.followUp.answer));
-  const retry = () => {
-    setError(''); setRunning(true);
-    void api.runCase(detail.case.id, setStage).then(afterAgent).catch(failed);
-  };
+  const retry = () => perform((signal, progress) => api.runCase(detail.case.id, progress, signal));
 
   const chat = (
     <ChatPanel
@@ -331,7 +340,10 @@ export default function CaseWorkspace() {
         <div className="min-w-0 flex-1 overflow-y-auto" id="case-scroll">
           <div className="mx-auto max-w-3xl px-6 pb-16 pt-4">
             <CaseDataControls key={`${detail.case.id}:${detail.inputId}`} detail={detail}
-              busy={running || selecting || awaitingAnswers || historical} onBusy={setRunning} onChange={setDetail} onStage={setStage} />
+              busy={running || selecting || awaitingAnswers || historical} onBusy={(value) => { if (activeCase.current === id) { busy.current = value; setRunning(value); } }}
+              onChange={(value) => { if (activeCase.current === id) setDetail(previous =>
+                !previous || (value.revision ?? 0) >= (previous.revision ?? 0) ? value : previous); }}
+              onStage={(value) => { if (activeCase.current === id) setStage(value); }} />
             {running && revision && <div className="mb-6"><ResearchProgress caseId={id} stage={stage} /></div>}
             {revision && <JumpBar revision={revision} />}
             {!revision && running && (

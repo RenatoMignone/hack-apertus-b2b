@@ -46,7 +46,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     return result;
   };
 
-  async function request<T>(url: string, method = 'GET', body?: unknown, blob = false): Promise<T> {
+  async function request<T>(url: string, method = 'GET', body?: unknown, blob = false, signal?: AbortSignal): Promise<T> {
     // Server-returned paths stay on the configured API origin, including downloads.
     if (!url.startsWith('/api/v1/') || url.includes('://') || url.includes('\\')) throw new Error('Invalid API path.');
     const credential = token();
@@ -55,7 +55,10 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     // Retry transport failures once with the SAME idempotency key; never retry a conflict.
     for (let attempt = 0; attempt < 2; attempt++) {
+      signal?.throwIfAborted();
       const controller = new AbortController();
+      const abort = () => controller.abort();
+      signal?.addEventListener('abort', abort, { once: true });
       // Live-corpus capture can exceed a short read timeout. Mutations retain
       // their idempotency key if a lost response requires a transport retry.
       const timeout = setTimeout(() => controller.abort(), method === 'GET' ? 30000 : 120000);
@@ -69,10 +72,11 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
         }
         return (blob ? await response.blob() : await response.json()) as T;
       } catch (error) {
+        signal?.throwIfAborted();
         if (error instanceof ApiError) throw error;
         if (attempt) throw new ConnectionError();
-        await pause(300);
-      } finally { clearTimeout(timeout); }
+        await wait(300, signal);
+      } finally { clearTimeout(timeout); signal?.removeEventListener('abort', abort); }
     }
     throw new Error('Cannot reach the backend.');
   }
@@ -100,13 +104,25 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     if (!detail || detail.revision === undefined || !detail.inputId) throw new Error('Case is unavailable.');
     return detail;
   }
-  async function observe<T>(url: string): Promise<T> {
+  async function wait(ms: number, signal?: AbortSignal) {
+    signal?.throwIfAborted();
+    if (!signal) return pause(ms);
+    let abort: () => void = () => {};
+    try {
+      await Promise.race([pause(ms), new Promise<never>((_, reject) => {
+        abort = () => reject(signal.reason ?? new DOMException('Observation stopped', 'AbortError'));
+        signal.addEventListener('abort', abort, { once: true });
+      })]);
+    } finally { signal.removeEventListener('abort', abort); }
+    signal.throwIfAborted();
+  }
+  async function observe<T>(url: string, signal?: AbortSignal): Promise<T> {
     for (let attempt = 0; ; attempt++) {
-      try { return await request<T>(url); }
+      try { return await request<T>(url, 'GET', undefined, false, signal); }
       catch (error) {
         const transient = error instanceof ConnectionError || error instanceof ApiError && [502, 503, 504].includes(error.status);
         if (!transient || attempt >= 3) throw error;
-        await pause(nextPollDelay(pollInterval, attempt));
+        await wait(nextPollDelay(pollInterval, attempt), signal);
       }
     }
   }
@@ -114,7 +130,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     let last = "", unchanged = 0;
     for (let n = 0; n < maxPolls; n++) {
       signal?.throwIfAborted();
-      const run = await observe<CaseRun>(url);
+      const run = await observe<CaseRun>(url, signal);
       signal?.throwIfAborted();
       publishProgress(caseId, run);
       const signature = JSON.stringify([run.status, run.stage, run.step, run.activity]);
@@ -129,7 +145,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
         emit();
         throw new ApiError(409, run.error_code ?? 'conflict');
       }
-      await pause(nextPollDelay(pollInterval, unchanged));
+      await wait(nextPollDelay(pollInterval, unchanged), signal);
     }
     throw new Error('Research is still running. Reopen this case to resume progress updates.');
   }
@@ -156,6 +172,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     },
     async runCase(caseId, onStage, signal) {
       const detail = await requireCase(caseId);
+      signal?.throwIfAborted();
       const run = detail.currentRun;
       if (run && ['queued', 'running', 'waiting_for_input'].includes(run.status)) {
         return poll(caseId, `${path(caseId)}/runs/${run.run_id}`, onStage, signal);
@@ -172,22 +189,22 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
       if (!started.status_url) throw new Error('The server did not return a run.');
       return poll(caseId, started.status_url, onStage, signal);
     },
-    async sendMessage(caseId, text, onStage, kind = 'focus') {
+    async sendMessage(caseId, text, onStage, kind = 'focus', signal) {
       const detail = await requireCase(caseId);
       if (detail.currentRun?.status === 'waiting_for_input') throw new Error('Answer the clarification question before sending a new request.');
       const started = await request<Accepted>(`${path(caseId)}/messages`, 'POST', {
         text, kind, expected_revision: detail.revision });
       if (!started.status_url) throw new Error('The server did not return a run.');
-      return poll(caseId, started.status_url, onStage);
+      return poll(caseId, started.status_url, onStage, signal);
     },
-    async answerFollowUp(caseId, turnId, answer, onStage) {
+    async answerFollowUp(caseId, turnId, answer, onStage, signal) {
       const detail = await requireCase(caseId);
       const question = detail.turns.find((turn) => turn.id === turnId)?.followUp;
       if (!detail.currentRun || !question) throw new Error('This clarification is no longer available.');
       const accepted = await request<Accepted>(`${path(caseId)}/runs/${detail.currentRun.run_id}/answers`, 'POST', {
         input_id: detail.inputId, question_id: question.id, answer });
       if (!accepted.status_url) throw new Error('The server did not return a run.');
-      return poll(caseId, accepted.status_url, onStage);
+      return poll(caseId, accepted.status_url, onStage, signal);
     },
     async setSelection(caseId, reasonId, selection, expected) {
       const detail = await requireCase(caseId), result = current(detail);
