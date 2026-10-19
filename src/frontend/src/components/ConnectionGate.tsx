@@ -1,6 +1,6 @@
 import { type ReactNode, useState } from 'react';
 import { apiBaseUrl, apiMode } from '../api';
-import { accessToken, setAccessToken } from '../api/session';
+import { accessToken, setAccessToken, setCapabilities } from '../api/session';
 import { Button } from './ui';
 
 export default function ConnectionGate({ children }: { children: ReactNode }) {
@@ -17,6 +17,7 @@ export default function ConnectionGate({ children }: { children: ReactNode }) {
         headers: { Authorization: `Bearer ${value.trim()}` }, credentials: 'omit', redirect: 'error',
         signal: AbortSignal.timeout(15000), cache: 'no-store' });
       if (!response.ok) throw new Error(response.status === 401 ? 'Access token rejected.' : 'Backend unavailable. Check its configuration and database connection.');
+      setCapabilities(await response.json());
       setAccessToken(value.trim()); setValue(''); setConnected(true);
     } catch (reason) { setError(reason instanceof Error ? reason.message : 'Cannot reach the backend.'); }
     finally { setBusy(false); }

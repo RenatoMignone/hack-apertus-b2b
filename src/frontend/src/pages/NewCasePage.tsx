@@ -43,6 +43,8 @@ export default function NewCasePage() {
           <textarea
             autoFocus
             aria-label="Company description"
+            disabled={busy}
+            maxLength={50000}
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => {
@@ -72,6 +74,7 @@ export default function NewCasePage() {
           {EXAMPLES.map((e) => (
             <button
               key={e.label}
+              disabled={busy}
               onClick={() => (text.trim() && text !== e.text ? setPending(e.text) : setText(e.text))}
               className="rounded-full border border-line bg-white px-3 py-1 text-sm text-muted hover:border-ink/30 hover:text-ink"
             >

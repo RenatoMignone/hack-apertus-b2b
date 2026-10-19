@@ -113,3 +113,21 @@ async def test_rejected_wording_gets_one_same_pack_rewrite_and_fresh_assessment(
     with h.store.engine.connect() as c:
         rows=c.execute(select(t.attempts.c.stage).where(t.attempts.c.run_id==UUID(case['run_id']))).scalars().all()
     assert 'runtime.node.draft_rewrite.1' in rows and 'runtime.node.draft_rewrite_assessment.1' in rows
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
+@pytest.mark.parametrize('entity_type', ['facility', 'service'])
+async def test_infrastructure_types_reach_the_frontend_section(harness, entity_type):
+    h=harness
+    original=h.reasoning.extract
+    async def extract(*args):
+        batch=await original(*args)
+        return batch.model_copy(update={'entities':[entity.model_copy(update={'entity_type':entity_type}) for entity in batch.entities]})
+    h.reasoning.extract=extract
+    case=h.store.create(h.access,'infrastructure',{'prompt':'Public testing facilities'},'infrastructure')
+    await h.worker.run_once(h.access)
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=h.app),base_url='http://test',headers=h.headers) as client:
+        response=await client.get('/api/v1/cases/'+case['case_id'])
+    assert response.status_code==200,response.text
+    assert response.json()['revisions'][-1]['reasons'][0]['category']=='infrastructure'

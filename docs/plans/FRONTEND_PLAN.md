@@ -1,6 +1,6 @@
 # Frontend — screens, HTTP behavior and demo mode
 
-18 October 2026 · Latest `ui-polish` integrated with the authenticated HTTP client.
+19 October 2026 · Integrated HTTP client audited against the backend.
 [HTTP contract](FRONTEND_BACKEND_API.md) owns transport; [integration evidence](../team/INTEGRATION.md)
 separates synthetic checks from pending live acceptance.
 
@@ -37,20 +37,25 @@ fixtures; the current backend does not yet supply all of them. Never infer missi
 metadata in the browser. Introduction suggestions do not confirm availability.
 Next steps include questions and material coverage limitations even without a
 named introduction. Source badges distinguish new case-local web evidence.
-The Sankey uses recorded links only; missing live lineage is unavailable.
+The Sankey uses recorded query/evidence links only; missing lineage is unavailable.
+Narrow screens show a text/source fallback. No-match caveats remain visible.
 
-Chat defaults to new focus/research. Formatting-only edits exist in the HTTP API;
-explicit UI selection remains pending. Company context remains attributed to the
-operator, separate from public evidence. Backend categories currently map person/
-project and group fallback; infrastructure classification needs a coordinated
-backend enhancement before live cards can use that category reliably.
+Chat explicitly chooses new focus/research or rewriting the existing report.
+Blocking questions support free-text answers and use durable question/input/run IDs.
+Only the current run’s questions are actionable. Draft failures with an owned pack
+retry drafting; earlier failures repeat research. Company context remains attributed to the
+operator, separate from public evidence. Backend categories map people, projects, facilities/services and group fallback
+from actual subject types. Optional hierarchy/expertise data stays absent unless
+supplied by the backend.
 
 ## Review and exports
 
 All cards reviewed plus at least one kept gates every export. HTTP PDF uses the
 backend's exact displayed result hash, current selection hash, immutable review,
 queued export and authenticated download. Browser renderers cannot replace that
-approval path. Server PDF remains the authoritative connected output.
+approval path. Server PDF remains the authoritative connected output. The UI honors the server’s
+formats capability. Older versions are browsed locally as read-only history;
+viewing one cannot silently replace the active backend report or its selections.
 
 Demo mode additionally offers browser PDF (pdfmake) and editable PPTX built with
 the supplied partner template (JSZip). Assets remain local and challenge-only.
@@ -68,6 +73,6 @@ methods even though their old standalone screens were removed.
 The evidence drawer shows exact passages, URLs, dates, origins and review flags.
 
 Run transport and export-policy tests, typecheck and the locked build. Use the
-isolated synthetic browser smoke for integrated interaction checks; a published
-pilot profile plus real providers is still required for live acceptance.
+isolated synthetic browser smoke for integrated interaction checks; an authorized live capture or published
+profile plus real providers is required for live acceptance.
 [Status](../project/STATUS.md) owns deployment gates and current measured results.

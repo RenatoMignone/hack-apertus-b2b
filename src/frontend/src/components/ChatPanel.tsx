@@ -3,6 +3,29 @@ import { ArrowUp, PanelRightClose } from 'lucide-react';
 import type { DialogueTurn, RunStage } from '../types/contract';
 import RunStepper from './RunStepper';
 
+function ClarificationAnswer({ turn, running, onAnswer }: {
+  turn: DialogueTurn; running: boolean; onAnswer: (turnId: string, answer: string) => void;
+}) {
+  const [answer, setAnswer] = useState('');
+  if (!turn.followUp || turn.followUp.answer) return null;
+  return <form className="space-y-2" onSubmit={(event) => {
+    event.preventDefault();
+    if (answer.trim() && !running) onAnswer(turn.id, answer.trim());
+  }}>
+    <div className="flex flex-wrap gap-1.5">
+      {turn.followUp.choices.map((choice) => <button type="button" key={choice} disabled={running}
+        onClick={() => onAnswer(turn.id, choice)} className="rounded-full border border-brand/40 px-3 py-1 text-sm text-brand disabled:opacity-40">{choice}</button>)}
+    </div>
+    <label className="block text-xs text-muted">Your answer
+      <textarea aria-label={`Answer: ${turn.followUp.question}`} value={answer} disabled={running}
+        maxLength={10000} onChange={(event) => setAnswer(event.target.value)} rows={2}
+        className="mt-1 w-full rounded-lg border border-line p-2 text-sm text-ink" />
+    </label>
+    <button type="submit" disabled={running || !answer.trim()}
+      className="rounded-lg bg-brand px-3 py-1.5 text-sm text-white disabled:opacity-40">Submit answer</button>
+  </form>;
+}
+
 export default function ChatPanel({
   turns,
   running,
@@ -11,16 +34,23 @@ export default function ChatPanel({
   onSend,
   onAnswer,
   onClose,
+  awaitingAnswers = false,
+  questionIds,
+  canRewrite = false,
 }: {
   turns: DialogueTurn[];
   running: boolean;
   stage: RunStage;
   suggestions: string[];
-  onSend: (text: string) => void;
+  onSend: (text: string, kind: 'focus' | 'formatting') => void;
   onAnswer: (turnId: string, answer: string) => void;
   onClose: () => void;
+  awaitingAnswers?: boolean;
+  questionIds?: string[];
+  canRewrite?: boolean;
 }) {
   const [text, setText] = useState('');
+  const [kind, setKind] = useState<'focus' | 'formatting'>('focus');
   const end = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,8 +58,8 @@ export default function ChatPanel({
   }, [turns.length, running]);
 
   const send = (t = text) => {
-    if (!t.trim() || running) return;
-    onSend(t.trim());
+    if (!t.trim() || running || awaitingAnswers) return;
+    onSend(t.trim(), canRewrite ? kind : 'focus');
     setText('');
   };
 
@@ -51,25 +81,8 @@ export default function ChatPanel({
           ) : (
             <div key={t.id} className="mr-8 space-y-2">
               <div className="rounded-2xl rounded-bl-sm bg-canvas px-3.5 py-2 text-sm leading-relaxed">{t.text}</div>
-              {t.followUp && (
-                <div className="flex flex-wrap gap-1.5">
-                  {t.followUp.choices.map((c) => {
-                    const chosen = t.followUp!.answer === c;
-                    return (
-                      <button
-                        key={c}
-                        disabled={!!t.followUp!.answer || running}
-                        onClick={() => onAnswer(t.id, c)}
-                        className={`rounded-full border px-3 py-1 text-sm ${
-                          chosen ? 'border-brand bg-brand text-white' : 'border-brand/40 text-brand hover:bg-brand-soft disabled:opacity-40'
-                        }`}
-                      >
-                        {c}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+              {t.followUp?.answer && <p className="text-sm text-muted">Your answer: {t.followUp.answer}</p>}
+              {awaitingAnswers && (!questionIds || questionIds.includes(t.followUp?.id ?? '')) && <ClarificationAnswer turn={t} running={running} onAnswer={onAnswer} />}
             </div>
           ),
         )}
@@ -82,11 +95,19 @@ export default function ChatPanel({
       </div>
 
       <div className="border-t border-line p-3">
+        {canRewrite && <label className="mb-2 block text-xs text-muted">Request type
+          <select aria-label="Request type" value={kind} disabled={running || awaitingAnswers}
+            onChange={(event) => setKind(event.target.value as 'focus' | 'formatting')}
+            className="ml-2 rounded border border-line bg-white p-1 text-ink">
+            <option value="focus">Research / change focus</option>
+            <option value="formatting">Rewrite existing report</option>
+          </select>
+        </label>}
         <div className="mb-2 flex flex-wrap gap-1.5">
           {suggestions.map((s) => (
             <button
               key={s}
-              disabled={running}
+              disabled={running || awaitingAnswers}
               onClick={() => send(s)}
               className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted hover:border-ink/40 hover:text-ink disabled:opacity-40"
             >
@@ -97,6 +118,8 @@ export default function ChatPanel({
         <div className="flex items-end gap-2 rounded-xl border border-line bg-white p-2 focus-within:border-ink/40">
           <textarea
             aria-label="Message the agent"
+            disabled={running || awaitingAnswers}
+            maxLength={50000}
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => {
@@ -106,12 +129,12 @@ export default function ChatPanel({
               }
             }}
             rows={1}
-            placeholder="Push back or ask…"
+            placeholder={awaitingAnswers ? 'Answer the clarification above to continue.' : 'Push back or ask…'}
             className="flex-1 resize-none bg-transparent px-1 py-1 text-sm outline-none"
           />
           <button
             onClick={() => send()}
-            disabled={!text.trim() || running}
+            disabled={!text.trim() || running || awaitingAnswers}
             className="rounded-lg bg-brand p-1.5 text-white hover:bg-brand-dark disabled:opacity-40"
             aria-label="Send"
           >

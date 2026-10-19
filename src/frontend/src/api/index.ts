@@ -11,7 +11,7 @@ export interface NavigatorApi {
   /** Creates a case from the operator's first message and runs the research. */
   createCase(prompt: string): Promise<CaseDetail>;
   runCase(caseId: string, onStage: (s: RunStage) => void): Promise<CaseDetail>;
-  sendMessage(caseId: string, text: string, onStage: (s: RunStage) => void): Promise<CaseDetail>;
+  sendMessage(caseId: string, text: string, onStage: (s: RunStage) => void, kind?: 'focus' | 'formatting'): Promise<CaseDetail>;
   answerFollowUp(caseId: string, turnId: string, answer: string, onStage: (s: RunStage) => void): Promise<CaseDetail>;
   setSelection(caseId: string, reasonId: string, selection: Selection, expected?: ReportExpectation): Promise<CaseDetail>;
   setStatus(caseId: string, status: CaseStatus): Promise<CaseDetail>;

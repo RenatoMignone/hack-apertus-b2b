@@ -16,8 +16,10 @@ code; allocate shared changes to one integrator for each new task.
 Implemented: authenticated FastAPI/application, durable LangGraph worker, A/B/C
 reasoning/retrieval/evidence adapters, deterministic PDF, HTTP React frontend,
 PostgreSQL/pgvector through `0008_live_corpus`, artifacts, checkpoints and
-masked tracing. Cross-lane tests use synthetic inference/embeddings. Team-host
-migration, verified model assets, published corpus and live deployment remain gates.
+masked tracing. Shared migration head and Elia’s live assets/access are verified;
+a real-provider partial report and reviewed PDF passed. Cross-lane tests use
+synthetic inference/embeddings. Publication is optional for live development;
+combined DB/web quality and target deployment remain gates.
 
 **The frontend belongs to another teammate. Do not modify anything under
 `src/frontend/` in backend/documentation tasks.** Read its existing `NavigatorApi`

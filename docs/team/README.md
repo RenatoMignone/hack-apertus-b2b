@@ -29,3 +29,5 @@ pre-merge branch instructions no longer govern the integrated baseline. Their
 remaining deployment/quality issues are reconciled in the active register.
 Source manifests and diagnostic results are evidence; deleting the entire
 folder would remove useful provenance and break references. No move is needed.
+
+- [Frontend/runtime audit, 19 October](FRONTEND_RUNTIME_AUDIT.md): clarification, retry, history and reviewed PDF integration checks.

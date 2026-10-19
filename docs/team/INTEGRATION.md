@@ -120,3 +120,13 @@ board home, authenticated case creation, cited result, unavailable-trace wording
 blocked export before review, kept selection, exact-hash review, queued export and
 HTTP 200 PDF download. Connected export offered PDF only. Source providers and
 company input in this smoke were synthetic; no shared host was contacted.
+
+## 19 October integration audit
+
+Backend research completion `66b86cb` and the subsequent authorized frontend audit
+supersede the earlier missing lineage/clarification/formatting status above. Current
+shared schema head is `0008_live_corpus`. See [current status](../project/STATUS.md),
+[backend acceptance](BACKEND_RESEARCH_COMPLETION.md) and
+[frontend interaction checks](FRONTEND_RUNTIME_AUDIT.md). The combined suite passes
+243 backend tests and 15 frontend tests/build. A real-provider partial report and
+reviewed PDF passed; combined DB/web quality and target deployment remain open.

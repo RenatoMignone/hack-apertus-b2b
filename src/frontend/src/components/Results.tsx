@@ -7,7 +7,7 @@ import SearchSankey from './SearchSankey';
 
 type Open = (evidenceId: string) => void;
 
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+const plural = (n: number, word: string) => `${n} ${n === 1 ? word : word === 'query' ? 'queries' : word + 's'}`;
 
 const CATEGORIES: { key: ReasonCategory; label: string; Icon: typeof Users }[] = [
   { key: 'people', label: 'People', Icon: Users },
@@ -97,6 +97,7 @@ function ReasonCard({
   active,
   flash,
   onSelect,
+  readOnly = false,
 }: {
   r: Reason;
   n: number;
@@ -105,6 +106,7 @@ function ReasonCard({
   active?: string;
   flash: boolean;
   onSelect: (s: Selection) => void;
+  readOnly?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const kept = r.selection === 'kept';
@@ -124,12 +126,12 @@ function ReasonCard({
         <span>
           <span className="line-through">{r.headline}</span> · hidden
         </span>
-        <button onClick={() => onSelect('none')} className="text-xs font-medium text-ink hover:underline">Show again</button>
+        <button disabled={readOnly} onClick={() => onSelect('none')} className="text-xs font-medium text-ink hover:underline disabled:opacity-40">Show again</button>
       </div>
     );
   }
 
-  const sources = [...new Set(r.entries.flatMap((e) => e.evidenceIds))].map((id) => evidence[id]).filter(Boolean);
+  const sources = [...new Set([...r.line.evidenceIds, ...r.entries.flatMap((e) => e.evidenceIds)])].map((id) => evidence[id]).filter(Boolean);
 
   return (
     <div
@@ -199,6 +201,7 @@ function ReasonCard({
         <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
           <button
             aria-pressed={kept}
+            disabled={readOnly}
             onClick={() => onSelect(kept ? 'none' : 'kept')}
             className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium ${
               kept ? 'bg-ok text-white' : 'text-muted ring-1 ring-line hover:text-ok hover:ring-ok'
@@ -206,7 +209,7 @@ function ReasonCard({
           >
             <Check size={14} aria-hidden /> {kept ? 'Kept' : 'Keep'}
           </button>
-          <button onClick={() => onSelect('rejected')} className="rounded-lg px-2 py-1 text-sm text-muted ring-1 ring-line hover:text-bad hover:ring-bad">
+          <button disabled={readOnly} onClick={() => onSelect('rejected')} className="rounded-lg px-2 py-1 text-sm text-muted ring-1 ring-line hover:text-bad hover:ring-bad disabled:opacity-40">
             Hide
           </button>
           <button
@@ -248,6 +251,7 @@ export default function Results({
   activeEvidence,
   flash,
   onSelect,
+  readOnly = false,
 }: {
   revision: BriefRevision;
   companyLabel: string;
@@ -256,6 +260,7 @@ export default function Results({
   activeEvidence?: string;
   flash: Set<string>;
   onSelect: (reasonId: string, s: Selection) => void;
+  readOnly?: boolean;
 }) {
   const [traceOpen, setTraceOpen] = useState(false);
   const { reasons, coverage, openQuestions, trace } = revision;
@@ -276,6 +281,9 @@ export default function Results({
         <SearchX className="mx-auto text-muted" />
         <h2 className="mt-3 font-semibold">{coverage.resultKind === 'out_of_scope' ? 'Out of scope' : 'No reliable match'}</h2>
         <p className="mt-1 text-sm text-muted">{revision.emptyMessage}</p>
+        {[...new Set([...openQuestions, ...coverage.limitations])].length > 0 && <ul className="mt-4 space-y-2 text-left text-sm text-muted">
+          {[...new Set([...openQuestions, ...coverage.limitations])].map((item) => <li key={item}>{item}</li>)}
+        </ul>}
       </div>
     );
   }
@@ -334,6 +342,7 @@ export default function Results({
                     active={activeEvidence}
                     flash={flash.has(r.id)}
                     onSelect={(s) => onSelect(r.id, s)}
+                    readOnly={readOnly}
                   />
                 ))}
               </div>
@@ -414,7 +423,7 @@ export default function Results({
         <button onClick={() => setTraceOpen(!traceOpen)} aria-expanded={traceOpen} className="flex w-full items-center gap-2 px-4 py-3 text-sm">
           <span className="font-medium">How I searched</span>
           <span className="text-muted">
-            {plural(trace.inputs.length, 'word')} → {plural(trace.terms.length, 'term')} → {plural(sourceCount, 'source')}
+            {plural(trace.inputs.length, 'input')} → {plural(trace.terms.length, 'query')} → {plural(sourceCount, 'source')}
           </span>
           <ChevronDown size={16} className={`ml-auto text-muted transition ${traceOpen ? 'rotate-180' : ''}`} />
         </button>

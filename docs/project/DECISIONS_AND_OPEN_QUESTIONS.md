@@ -454,3 +454,13 @@ implications. Bound fit to accepted support, reserve finalization time, and allo
 one same-pack wording rewrite with independent exact-hash reassessment. Supply
 canonical cited passages to that assessment; do not relax factual/export gates.
 User authorization now includes pushing to main and a subsequent frontend audit.
+
+## D27 — Frontend integration and core workflow (19 October 2026)
+
+Provenance: user explicitly requested frontend/backend compatibility fixes and
+pushing the working core to main, permitting removal of unsupported extras. Add
+free-text durable clarification, same-pack draft retry, explicit rewrite mode,
+source quotes without entry metadata and read-only history. Honor server export
+formats; connected PPTX stays unavailable. Optional structured metadata is not
+inferred. The [audit](../team/FRONTEND_RUNTIME_AUDIT.md) records synthetic browser
+checks separately from actual-provider partial PDF acceptance.

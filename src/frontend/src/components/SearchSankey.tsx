@@ -89,13 +89,13 @@ export default function SearchSankey({
         <div className="relative" style={{ height: height + 28 }}>
           {/* Column headers, aligned with their columns */}
           <div className="absolute left-0 top-0 text-right text-xs font-semibold uppercase tracking-wide text-muted" style={{ width: (colX(0)?.x0 ?? leftW) - 12 }}>
-            Your words
+            Your input
           </div>
           <div
             className="absolute top-0 -translate-x-1/2 text-xs font-semibold uppercase tracking-wide text-muted"
             style={{ left: ((colX(1)?.x0 ?? 0) + (colX(1)?.x1 ?? 0)) / 2 }}
           >
-            Terms searched
+            Queries searched
           </div>
           <div className="absolute top-0 text-xs font-semibold uppercase tracking-wide text-muted" style={{ left: (colX(2)?.x1 ?? 0) + 12 }}>
             Sources
@@ -183,6 +183,12 @@ export default function SearchSankey({
         </div>
       )}
       {graph && <p className="mt-3 text-xs text-muted">Hover to trace a path. Click a source to read the quote.</p>}
+      {!graph && <div className="space-y-3 text-sm">
+        <p className="text-muted">Recorded queries</p>
+        <ul className="list-inside list-disc break-words">{trace.terms.map((term) => <li key={term.id}>{term.label}</li>)}</ul>
+        <div className="flex flex-wrap gap-2">{entryIds.map((id) => <button key={id} onClick={() => onOpen(id)}
+          className="text-left text-brand underline">{evidence[id].label}</button>)}</div>
+      </div>}
     </div>
   );
 }

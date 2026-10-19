@@ -92,7 +92,7 @@ export interface Reason {
   selection: Selection;
 }
 
-/** Search trace for the Sankey: message phrases → ontology terms → source entries (evidence ids). */
+/** Recorded input → search queries → cited evidence; no inferred ontology mapping. */
 export interface SearchTrace {
   inputs: { id: string; label: string }[];
   terms: { id: string; label: string }[];
@@ -180,6 +180,9 @@ export interface CaseRun {
   status: 'queued' | 'running' | 'waiting_for_input' | 'succeeded' | 'failed' | 'cancelled' | 'superseded';
   stage?: RunStage;
   error_code?: string;
+  pack_id?: string;
+  failure_detail?: { failed_stage?: string; model_task?: string; validation_issues?: { field: string; type: string }[] };
+  questions?: { id: string; question: string; status: string }[];
 }
 
 export type RunStage = 'interpreting' | 'searching' | 'validating' | 'drafting' | 'done';

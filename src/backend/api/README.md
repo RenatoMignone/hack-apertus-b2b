@@ -20,3 +20,8 @@ Keep the separately owned frontend unchanged; propose client updates in that han
 focused read path, outputs and acceptance checks. [Active questions](../../../docs/project/OPEN_QUESTIONS.md)
 own unresolved inputs. Implement scoped behavior against agreed contracts and
 fixtures; coordinate shared schema/config changes. Leave `src/frontend/` untouched.
+
+19 October integration: reason categories include actual facility/service subjects
+as `infrastructure`. The current [HTTP contract](../../../docs/plans/FRONTEND_BACKEND_API.md)
+and [frontend audit](../../../docs/team/FRONTEND_RUNTIME_AUDIT.md) describe the
+authorized clarification/retry/history and reviewed-export client integration.

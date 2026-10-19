@@ -81,17 +81,17 @@ Errors contain safe code/message/request ID, never raw provider/SQL details.
 401 requires reconnecting; 404 does not disclose another owner; 409 requires
 refresh/review; 422 is field validation; 413 is size; 502 is invalid model output;
 503 is service/storage unavailable. Failure never becomes an invented no-match.
-HTTP failure never switches to mock data. Chat defaults conservatively to focus;
-explicit formatting-only API edits reuse the pack and reassess the wording.
+HTTP failure never switches to mock data. Chat explicitly selects focus/research
+or formatting-only edits; formatting reuses the pack and reassesses the wording.
 
-## Latest UI compatibility — 18 October 2026
+## Current UI compatibility — 19 October 2026
 
 Board-as-home replaces the desk/action pages; backend action resources remain.
 Optional `ReasonEntry.unitPath`, `expertise`, `Reason.missingFields` and the
-`infrastructure` category are frontend additions, with demo fixtures. Current
-backend projections omit those optional fields and do not yet classify
-infrastructure separately. Supply them only from assessed evidence in a future
-coordinated contract change; omission must not be replaced by invented metadata.
+`infrastructure` category are supported by the frontend. Backend projections
+classify actual facility/service subjects as infrastructure. They omit the
+optional hierarchy/expertise fields; supply those only from assessed evidence,
+never inferred browser metadata.
 HTTP PDF remains the reviewed server artifact; browser PDF/PPTX are explicit demo
 features. Connected PPTX requires a new supported format plus the same immutable
 review/export gates, not client generation from an unapproved projection.
@@ -107,3 +107,23 @@ results: original input → actual query → exact canonical supporting evidence
 These are retrieval paths, not invented ontology concepts or calibrated weights.
 Older packs without recorded paths retain their empty/unavailable trace. Wording
 edits reuse the original pack/trace. Frontend source files were not changed.
+
+## 19 October frontend compatibility audit
+
+The user authorized frontend integration changes. Connection verifies schema 1,
+polling transport and server format capabilities. Only connected PDF is exposed
+when configured. Mutations allow 120 seconds for live capture; a transport retry
+retains its idempotency key. Read requests retain a 30-second timeout.
+
+Clarifications provide free text even when `choices=[]`; only IDs from the current
+run are actionable. New focus messages are blocked while an answer is pending.
+Chat explicitly selects `focus` or `formatting`; formatting reuses the frozen pack.
+A failed run with a current-input `pack_id` retries `POST /reports` with that pack
+and current case revision. A failure without a reusable pack starts new research.
+
+History selection changes only the browser’s viewed revision. Older reports are
+read-only; no `PATCH current_revision_id` is sent merely to inspect history.
+Selection/export still bind the current result hash and reviewed selection hash.
+Cards resolve sources from both line and entry citations, including empty entries.
+No-match coverage/gaps remain visible. `facility`/`service` subjects map to the
+additive `infrastructure` reason category. Optional structured fields stay absent.

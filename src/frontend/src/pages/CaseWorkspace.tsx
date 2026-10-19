@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, Download, MessageSquare } from 'lucide-react';
-import { api } from '../api';
+import { api, apiMode } from '../api';
 import type { BriefRevision, CaseDetail, CaseStatus, RunStage, Selection } from '../types/contract';
 import ChatPanel from '../components/ChatPanel';
 import EvidenceDrawer from '../components/EvidenceDrawer';
@@ -125,6 +125,10 @@ export default function CaseWorkspace() {
   const [flash, setFlash] = useState<Set<string>>(new Set());
   const [exportOpen, setExportOpen] = useState(false);
   const [started, setStarted] = useState(false);
+  const [viewedRevisionId, setViewedRevisionId] = useState<string>();
+  const [selecting, setSelecting] = useState(false);
+  const activeCase = useRef(id);
+  activeCase.current = id;
   const [chatPref, setChatPref] = useState(readChatPref);
   const [narrowChat, setNarrowChat] = useState(false);
   const [unread, setUnread] = useState(false);
@@ -147,6 +151,9 @@ export default function CaseWorkspace() {
   useEffect(() => {
     let alive = true;
     setStarted(false);
+    setViewedRevisionId(undefined);
+    setSelecting(false);
+    setExportOpen(false);
     setRunning(false); setError('');
     setDrawer(null);
     setDetail(undefined);
@@ -157,9 +164,10 @@ export default function CaseWorkspace() {
   }, [id]);
 
   const failed = (reason: unknown) => {
+    if (activeCase.current !== id) return;
     setRunning(false);
     setError(reason instanceof Error ? reason.message : 'The request could not be completed.');
-    void api.getCase(id).then(setDetail).catch(reportApiError);
+    void api.getCase(id).then((value) => { if (activeCase.current === id) setDetail(value); }).catch(reportApiError);
   };
 
   // Show an unread dot when the agent replies while the chat is closed.
@@ -177,15 +185,16 @@ export default function CaseWorkspace() {
     if (!active && !(wantsRun && !detail.currentRun && !detail.revisions.length)) return;
     setStarted(true);
     setRunning(true);
-    api.runCase(detail.case.id, setStage).then((d) => {
+    api.runCase(detail.case.id, (next) => { if (activeCase.current === id) setStage(next); }).then((d) => {
+      if (activeCase.current !== id) return;
       setDetail(d);
       setRunning(false);
     }).catch(failed);
   }, [detail, location.state, started]);
 
   const revision = useMemo(
-    () => detail?.revisions.find((r) => r.id === detail.currentRevisionId),
-    [detail],
+    () => detail?.revisions.find((r) => r.id === (viewedRevisionId ?? detail.currentRevisionId)),
+    [detail, viewedRevisionId],
   );
 
   const highlight = useCallback((ids: string[]) => {
@@ -196,6 +205,8 @@ export default function CaseWorkspace() {
   }, []);
 
   const afterAgent = (d: CaseDetail) => {
+    if (activeCase.current !== d.case.id) return;
+    setViewedRevisionId(undefined);
     setDetail(d);
     setRunning(false);
     const rev = d.revisions.find((r) => r.id === d.currentRevisionId);
@@ -218,12 +229,12 @@ export default function CaseWorkspace() {
       </div>
     );
 
-  const send = (text: string) => {
+  const send = (text: string, kind: 'focus' | 'formatting') => {
     setDetail({ ...detail, turns: [...detail.turns, { id: 'pending', role: 'operator', text, createdAt: new Date().toISOString() }] });
     setRunning(true);
     setStage('interpreting');
     setError('');
-    api.sendMessage(detail.case.id, text, setStage).then(afterAgent).catch(failed);
+    api.sendMessage(detail.case.id, text, setStage, kind).then(afterAgent).catch(failed);
   };
   const answer = (turnId: string, a: string) => {
     setRunning(true);
@@ -232,15 +243,29 @@ export default function CaseWorkspace() {
     api.answerFollowUp(detail.case.id, turnId, a, setStage).then(afterAgent).catch(failed);
   };
   const select = async (reasonId: string, s: Selection) => {
+    if (selecting || running || revision?.id !== detail.currentRevisionId) return;
     const r = revision?.reasons.find((x) => x.id === reasonId);
     const prev = r?.selection ?? 'none';
     const expected = revision?.resultHash ? { resultId: revision.id, resultHash: revision.resultHash } : undefined;
-    setDetail(await api.setSelection(detail.case.id, reasonId, s, expected));
-    if (s === 'kept') toast('Kept for the pitch');
-    if (s === 'rejected') toast(`Hidden: ${r?.headline ?? 'item'}`, () => api.setSelection(detail.case.id, reasonId, prev, expected).then(setDetail));
+    setSelecting(true);
+    try {
+      const updated = await api.setSelection(detail.case.id, reasonId, s, expected);
+      if (activeCase.current !== updated.case.id) return;
+      setDetail(updated);
+      if (s === 'kept') toast('Kept for the pitch');
+      if (s === 'rejected') toast(`Hidden: ${r?.headline ?? 'item'}`, () => api.setSelection(detail.case.id, reasonId, prev, expected).then((value) => {
+        if (activeCase.current === value.case.id) setDetail(value);
+      }));
+    } catch (reason) { reportApiError(reason); }
+    finally { setSelecting(false); }
   };
-  const setStatus = (s: CaseStatus) => api.setStatus(detail.case.id, s).then(setDetail);
+  const setStatus = (s: CaseStatus) => api.setStatus(detail.case.id, s).then((value) => {
+    if (activeCase.current === value.case.id) setDetail(value);
+  });
   const kept = revision?.reasons.filter((r) => r.selection === 'kept').length ?? 0;
+  const historical = !!revision && revision.id !== detail.currentRevisionId;
+  const awaitingAnswers = detail.currentRun?.status === 'waiting_for_input' ||
+    (apiMode === 'mock' && detail.turns.some((turn) => turn.followUp && !turn.followUp.answer));
   const retry = () => {
     setError(''); setRunning(true);
     void api.runCase(detail.case.id, setStage).then(afterAgent).catch(failed);
@@ -249,7 +274,10 @@ export default function CaseWorkspace() {
   const chat = (
     <ChatPanel
       turns={detail.turns}
-      running={running && !!revision}
+      running={running}
+      awaitingAnswers={awaitingAnswers}
+      questionIds={detail.currentRun?.questions?.map((question) => question.id)}
+      canRewrite={!!detail.currentRevisionId}
       stage={stage}
       suggestions={suggestionsFor(revision)}
       onSend={send}
@@ -274,10 +302,10 @@ export default function CaseWorkspace() {
         {revision && (
           <div className="ml-auto flex shrink-0 items-center gap-2">
             {detail.revisions.length > 1 && (
-              <VersionMenu detail={detail} current={revision} onPick={(rid) => api.setCurrentRevision(detail.case.id, rid).then(setDetail)} />
+              <VersionMenu detail={detail} current={revision} onPick={setViewedRevisionId} />
             )}
             <span title={kept ? undefined : 'Keep at least one item (✓ Keep) to export it'}>
-              <Button variant="primary" onClick={() => setExportOpen(true)}>
+              <Button variant="primary" disabled={historical || running || selecting} onClick={() => setExportOpen(true)}>
                 <Download size={15} aria-hidden /> Export{kept ? ` (${kept})` : ''}
               </Button>
             </span>
@@ -287,8 +315,13 @@ export default function CaseWorkspace() {
 
       {(error || detail.currentRun?.status === 'failed') && <div role="alert" className="border-b border-line bg-white px-6 py-3 text-sm text-brand">
         {error || 'Research stopped before a report could be published.'}
-        {!running && <button className="ml-3 underline" onClick={retry}>Retry / resume research</button>}
+        {!running && <button className="ml-3 underline" onClick={retry}>{detail.currentRun?.pack_id ? 'Retry report from existing evidence' : 'Retry / resume research'}</button>}
       </div>}
+      {awaitingAnswers && <div role="status" className="border-b border-line bg-white px-6 py-3 text-sm">
+        Research needs your answer. <button className="text-brand underline" onClick={() => setChatOpen(true)}>Open clarification questions</button>
+      </div>}
+      {historical && <p className="border-b border-line bg-white px-6 py-3 text-sm text-muted">Viewing an older report. Selections and export are available on the current report.
+        <button className="ml-2 text-brand underline" onClick={() => setViewedRevisionId(undefined)}>Show current report</button></p>}
 
       <div className="relative flex min-h-0 flex-1">
         <div className="min-w-0 flex-1 overflow-y-auto" id="case-scroll">
@@ -313,6 +346,7 @@ export default function CaseWorkspace() {
                 activeEvidence={drawer ?? undefined}
                 flash={flash}
                 onSelect={select}
+                readOnly={historical || running || selecting}
               />
             )}
           </div>

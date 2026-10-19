@@ -6,6 +6,7 @@ import { useToast } from './Toast';
 import { api, apiMode } from '../api';
 import { reportApiError } from './ApiErrors';
 import { assertExportAllowed } from '../export/policy';
+import { serverFormats } from '../api/session';
 
 type Format = 'pdf' | 'pptx';
 
@@ -19,6 +20,7 @@ export default function ExportModal({ detail, revision, onClose }: { detail: Cas
   const toast = useToast();
   const kept = keptOf(revision);
   const unreviewed = revision.reasons.filter((r) => r.selection === 'none').length;
+  const pdfAvailable = apiMode === 'mock' || serverFormats().includes('pdf');
 
   const run = async (format: Format) => {
     setBusy(format);
@@ -56,7 +58,7 @@ export default function ExportModal({ detail, revision, onClose }: { detail: Cas
   const option = (format: Format, Icon: typeof FileText, title: string, hint: string) => (
     <button
       onClick={() => run(format)}
-      disabled={!kept.length || unreviewed > 0 || busy !== null || (apiMode === 'http' && !revision.resultHash)}
+      disabled={!kept.length || unreviewed > 0 || busy !== null || (format === 'pdf' && !pdfAvailable) || (apiMode === 'http' && !revision.resultHash)}
       className="flex w-full items-start gap-3 rounded-xl border border-line p-3 text-left hover:border-ink/40 hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-50"
     >
       <Icon size={20} className="mt-0.5 shrink-0 text-brand" aria-hidden />
@@ -95,6 +97,7 @@ export default function ExportModal({ detail, revision, onClose }: { detail: Cas
 
         <div className="mt-4 space-y-2">
           {unreviewed > 0 && <p className="text-sm text-muted">Review all {unreviewed} remaining item(s) before exporting.</p>}
+          {!pdfAvailable && <p className="text-sm text-muted">PDF export is unavailable on the connected server.</p>}
           {option('pdf', FileText, 'PDF brief', 'Short company-facing brief with the agency logo and a source appendix.')}
           {apiMode === 'mock' && option('pptx', Presentation, 'PowerPoint (agency template)', 'Editable demo slides in the agency design, ready to adjust.')}
         </div>

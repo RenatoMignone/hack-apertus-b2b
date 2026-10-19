@@ -1,5 +1,7 @@
 """Deterministic wording for diagnostic codes at report/UI presentation boundaries."""
 LIMITATIONS = {
+    "live_corpus_incomplete_coverage": "The source collection is still being populated; this report has incomplete coverage.",
+    "source_context_expansion_budget_reached": "The source-context search reached its limit; additional names or capabilities may be missing.",
     "web_search_partial_engines": "Some search engines were unavailable; available search results were used.",
     "scores_are_not_confidence": "Search relevance does not establish factual certainty.",
     "reranker_unavailable": "Results use the initial search ranking; additional relevance ranking was unavailable.",

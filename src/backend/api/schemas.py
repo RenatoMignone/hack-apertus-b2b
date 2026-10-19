@@ -108,7 +108,7 @@ class ReasonEntry(BaseModel):
 
 class Reason(BaseModel):
     id: str
-    category: Literal["people", "groups", "projects", "ideas"]
+    category: Literal["people", "groups", "projects", "infrastructure", "ideas"]
     headline: str
     line: CitedText
     entries: list[ReasonEntry]

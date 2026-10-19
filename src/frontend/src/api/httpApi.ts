@@ -60,7 +60,9 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     // Retry transport failures once with the SAME idempotency key; never retry a conflict.
     for (let attempt = 0; attempt < 2; attempt++) {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 30000);
+      // Live-corpus capture can exceed a short read timeout. Mutations retain
+      // their idempotency key if a lost response requires a transport retry.
+      const timeout = setTimeout(() => controller.abort(), method === 'GET' ? 30000 : 120000);
       try {
         const response = await fetcher(base + url, { method, headers, credentials: 'omit',
           redirect: 'error', cache: 'no-store', signal: controller.signal,
@@ -137,14 +139,23 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
       if (run && ['queued', 'running', 'waiting_for_input'].includes(run.status)) {
         return poll(caseId, `${path(caseId)}/runs/${run.run_id}`, onStage);
       }
+      if (run?.status === 'failed' && run.pack_id && run.input_id === detail.inputId) {
+        const started = await request<Accepted>(`${path(caseId)}/reports`, 'POST', {
+          pack_id: run.pack_id, expected_revision: detail.revision,
+          instruction: 'Create a concise cited draft from the existing evidence pack. Preserve caveats and avoid unsupported implications.',
+        });
+        if (!started.status_url) throw new Error('The server did not return a report run.');
+        return poll(caseId, started.status_url, onStage);
+      }
       const started = await request<Accepted>(`${path(caseId)}/runs`, 'POST', { input_id: detail.inputId });
       if (!started.status_url) throw new Error('The server did not return a run.');
       return poll(caseId, started.status_url, onStage);
     },
-    async sendMessage(caseId, text, onStage) {
+    async sendMessage(caseId, text, onStage, kind = 'focus') {
       const detail = await requireCase(caseId);
+      if (detail.currentRun?.status === 'waiting_for_input') throw new Error('Answer the clarification question before sending a new request.');
       const started = await request<Accepted>(`${path(caseId)}/messages`, 'POST', {
-        text, kind: 'focus', expected_revision: detail.revision });
+        text, kind, expected_revision: detail.revision });
       if (!started.status_url) throw new Error('The server did not return a run.');
       return poll(caseId, started.status_url, onStage);
     },

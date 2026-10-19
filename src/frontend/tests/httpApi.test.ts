@@ -117,3 +117,36 @@ test('run failures stay visible and server download URLs cannot change origin', 
   await assert.rejects(unsafe.api.exportDeck('case', expected), /Invalid API path/);
   assert.ok(unsafe.calls.every((c) => c.url.startsWith('http://localhost:8000/')));
 });
+
+test('failed drafting reuses its owned frozen pack instead of repeating retrieval', async () => {
+  const failed = { ...detail(), currentRun: { run_id: 'failed', input_id: 'input', status: 'failed', pack_id: 'pack' } };
+  const { api, calls } = harness((url, method) => method === 'POST'
+    ? { status_url: '/api/v1/cases/case/runs/retry' }
+    : url.endsWith('/runs/retry') ? { status: 'succeeded', stage: 'done' } : failed);
+  await api.runCase('case', () => {});
+  const command = calls.find((call) => call.method === 'POST')!;
+  assert.ok(command.url.endsWith('/reports'));
+  assert.equal(command.body.pack_id, 'pack');
+  assert.equal(command.body.expected_revision, 3);
+  assert.ok(!calls.some((call) => call.method === 'POST' && call.url.endsWith('/runs')));
+});
+
+test('research failures without a current-input pack start a new research run', async () => {
+  const failed = { ...detail(), currentRun: { run_id: 'failed', input_id: 'older-input', status: 'failed', pack_id: 'old-pack' } };
+  const { api, calls } = harness((url, method) => method === 'POST'
+    ? { status_url: '/api/v1/cases/case/runs/retry' }
+    : url.endsWith('/runs/retry') ? { status: 'succeeded' } : failed);
+  await api.runCase('case', () => {});
+  assert.ok(calls.find((call) => call.method === 'POST')!.url.endsWith('/runs'));
+});
+
+test('formatting is explicit and unanswered clarification cannot become a new focus request', async () => {
+  const { api, calls } = harness((url, method) => method === 'POST'
+    ? { status_url: '/api/v1/cases/case/runs/run' }
+    : url.endsWith('/runs/run') ? { status: 'succeeded' } : detail());
+  await api.sendMessage('case', 'Make it shorter', () => {}, 'formatting');
+  assert.equal(calls.find((call) => call.method === 'POST')!.body.kind, 'formatting');
+  const waiting = harness(() => ({ ...detail(), currentRun: { run_id: 'run', input_id: 'input', status: 'waiting_for_input' } }));
+  await assert.rejects(waiting.api.sendMessage('case', 'My answer', () => {}), /Answer the clarification/);
+  assert.equal(waiting.calls.filter((call) => call.method === 'POST').length, 0);
+});

@@ -53,7 +53,9 @@ def case_view(data, evidence):
             view = reason_view(reason, claims, choices.get(str(row["result_id"]) + ":" + reason.id, "none"))
             types = [data.get("claim_types", {}).get(str(key)) for key in reason.claim_ids]
             primary = next((kind for kind in types if kind), None)
-            view["category"] = "ideas" if reason.kind == "idea" else {"person": "people", "project": "projects"}.get(primary, "groups")
+            view["category"] = "ideas" if reason.kind == "idea" else {
+                "person": "people", "project": "projects", "facility": "infrastructure",
+                "service": "infrastructure"}.get(primary, "groups")
             reasons.append(view)
         revisions.append({"id": str(row["result_id"]), "version": version,
             "parentId": str(row["parent_id"]) if row["parent_id"] else None, "createdAt": row["created_at"].isoformat(),

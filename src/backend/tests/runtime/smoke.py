@@ -4,6 +4,9 @@ PYTHONPATH=src NAVIGATOR_TEST_ADMIN_DSN=postgresql://TEST_ADMIN@localhost:PORT/p
   python -m backend.tests.runtime.smoke
 """
 import asyncio
+import argparse
+import json
+import sys
 from contextlib import asynccontextmanager
 import hashlib
 from pathlib import Path
@@ -35,16 +38,28 @@ from backend.tests.runtime.test_integrated_lanes import synthetic_transport
 from backend.tests.run import require_test_admin_dsn
 
 
-async def serve(engine, artifacts, fixture, principal):
+async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=False):
     token = "synthetic-browser-smoke"
     binding = IdentityBinding(token_sha256=hashlib.sha256(token.encode()).hexdigest(),
         principal_id=principal, namespace=fixture["namespace"])
     settings = RuntimeSettings(mode="offline", llm_base_url="http://llm:8080/v1", bindings=(binding,),
-        default_profile_id=UUID(fixture["profile_id"]), cors_origins=("http://127.0.0.1:5173", "http://localhost:5173"),
-        template_version="challenge-v1", renderer_version="reportlab-v1")
+        default_profile_id=UUID(fixture["profile_id"]), cors_origins=("http://127.0.0.1:5173", "http://localhost:5173",
+            "http://127.0.0.1:5174", "http://localhost:5174"),
+        template_version="challenge-v1", renderer_version="reportlab-v1",
+        pdf_factory="backend.application.factories:pdf")
     store = RuntimeStore(engine, settings, artifacts)
+    def transport(request):
+        response = synthetic_transport(request)
+        body = json.loads(request.content)
+        if clarify and 'TASK: interpret\n' in body['messages'][0]['content'] and 'Clarification:' not in json.loads(body['messages'][1]['content'])['message']:
+            result = response.json()
+            content = json.loads(result['choices'][0]['message']['content'])
+            content['blocking_questions'] = ['Which sensor application should this synthetic search focus on?']
+            result['choices'][0]['message']['content'] = json.dumps(content)
+            return httpx.Response(200, json=result)
+        return response
     services = Services(reasoning=create_reasoning_services(ModelSettings(base_url=settings.llm_base_url, local=True),
-        transport=httpx.MockTransport(synthetic_transport)),
+        transport=httpx.MockTransport(transport)),
         backbone=create_backbone(engine, artifacts, FixtureEmbedder()), pdf=create_pdf_renderer())
     application = RuntimeApplication(store, services)
     saver = InMemorySaver()
@@ -68,13 +83,17 @@ async def serve(engine, artifacts, fixture, principal):
     task = asyncio.create_task(work())
     print("LOCAL SYNTHETIC SMOKE ONLY. Access token: synthetic-browser-smoke", flush=True)
     try:
-        await uvicorn.Server(uvicorn.Config(create_app(Registry()), host="127.0.0.1", port=8000)).serve()
+        await uvicorn.Server(uvicorn.Config(create_app(Registry()), host="127.0.0.1", port=port)).serve()
     finally:
         task.cancel()
         await asyncio.gather(task, return_exceptions=True)
 
 
-def main():
+def main(argv=()):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--port', type=int, default=8000)
+    parser.add_argument('--clarify', action='store_true', help='Exercise a free-text blocking clarification before research.')
+    args = parser.parse_args(argv)
     admin_dsn = require_test_admin_dsn()
     name, role = "navigator_browser_" + uuid4().hex, "browser_" + uuid4().hex[:12]
     with psycopg.connect(admin_dsn, autocommit=True) as c:
@@ -92,7 +111,7 @@ def main():
             grant_scope(database, principal, UUID(fixture["scope_id"]))
             application_engine = engine_for(database.url.set(username=role, password=password).render_as_string(hide_password=False))
             try:
-                asyncio.run(serve(application_engine, artifacts, fixture, principal))
+                asyncio.run(serve(application_engine, artifacts, fixture, principal, port=args.port, clarify=args.clarify))
             except KeyboardInterrupt:
                 pass
     finally:
@@ -108,4 +127,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
