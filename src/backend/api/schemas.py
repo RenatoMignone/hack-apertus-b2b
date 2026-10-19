@@ -107,6 +107,7 @@ class CitedText(BaseModel):
 
 
 class ReasonEntry(BaseModel):
+    institutionLabel: str | None = None
     id: str
     name: str
     institution: Literal["UniBE", "ARTORG", "DCB", "Other"]

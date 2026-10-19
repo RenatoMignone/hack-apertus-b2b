@@ -137,3 +137,9 @@ review, call POST `/cases/{id}/memory` with the documented attestations/revision
 result hash, and allow opt-out. Hide controls when unavailable. Display score as
 an uncalibrated similarity index out of 100, not a percentage probability; show
 index date/differences. New fields are additive; no frontend files were changed.
+
+Domain profiles: entries retain the current `institution` badge enum and add
+optional `institutionLabel` for the exact supported institution outside the pilot.
+Render that label with a neutral badge when institution=Other. See
+[domain configuration](../data/DOMAIN_PROFILES.md). Backend fields are generic;
+existing frontend files remain unchanged.

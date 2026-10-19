@@ -79,10 +79,15 @@ class ApertusReasoningServices:
                     "What capability are you seeking in Bern, and for what objective?"])
         from backend.evidence.taxonomy_context import interpretation_taxonomy
         model_taxonomy, canonical_concepts = interpretation_taxonomy(taxonomy_context)
+        from backend.config.domain import DomainVocabulary
+        domain = DomainVocabulary.from_taxonomy(taxonomy_context)
+        model_taxonomy["domain"] = domain.model_dump(mode="json")
         allowed = set(canonical_concepts)
         from backend.evidence.interpretation_response import InterpretationResponse, interpretation_value
         def check(response):
             value = interpretation_value(response)
+            if not {value.primary_field, *value.additional_fields} <= set(domain.fields):
+                raise ValueError("company fields must use supplied domain codes or unknown")
             if not set(value.concepts) <= allowed:
                 raise ValueError()
             if any(lead.casefold() not in message.casefold() for lead in value.leads):
@@ -112,6 +117,7 @@ class ApertusReasoningServices:
             "For example, 'find biosensing groups and testing facilities in Bern' has clear "
             "intent: ambiguities=[], blocking_questions=[]; unknown experts/facilities are "
             "research_questions. Do NOT ask the user to name the very groups they ask you to find. "
+            "Use only supplied domain.fields codes for primary/additional fields; unknown is valid. "
             "Do not invent company facts.",
             {"message": message, "taxonomy": model_taxonomy}, InterpretationResponse, context, check=check)
         return check(response)

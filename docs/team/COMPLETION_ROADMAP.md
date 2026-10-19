@@ -10,7 +10,7 @@ comes first; agency-wide sharing is deferred. Confidential documents remain out.
 | 1 | Retrieval-quality evaluation and performance measurements | Complete; focused tests + live read-only smoke passed |
 | 2 | Source validation/tagging tooling on isolated data | Complete; 12 focused tests passed |
 | 3 | Own-case similarity | Complete backend; optional migration/activation pending |
-| 4 | Domain-independent configuration | Queued |
+| 4 | Domain-independent configuration | Complete backend; profile onboarding documented |
 | 5 | Local DB/web and actual checkpoint restart tests | Queued |
 | 6 | Reviewed PPTX and richer attributed case/output fields | Queued |
 
@@ -46,3 +46,10 @@ investment/currency and timeline. No automatic model extraction of business figu
 versioned profiles, owner/configuration filters, indexed cosine shortlisting and
 frozen matches. Frontend controls are handed off to its owner. Shared schema 0008
 remains supported with the feature disabled; Eric must apply 0009 before activation.
+
+## Checkpoint 4
+
+[Versioned domain profiles](../data/DOMAIN_PROFILES.md) supply company field and
+institution vocabulary without changing orchestration. Unknowns and independent
+vector eligibility survive. Synthetic materials-domain service checks passed; new
+corpus/taxonomy/index provisioning remains an explicit owner operation.

@@ -8,7 +8,8 @@ def reason_view(reason: DraftReason, claims: dict, selection="none") -> dict:
         return sorted({str(evidence) for key in keys for evidence in claims[key].evidence_ids})
     return {"id": reason.id, "headline": reason.headline,
             "line": {"text": reason.text, "evidenceIds": evidence_ids(reason.claim_ids)},
-            "entries": [{"id": entry.id, "name": entry.name, "institution": entry.institution,
+            "entries": [{"id": entry.id, "name": entry.name, "institution": entry.institution if entry.institution in {"UniBE", "ARTORG", "DCB", "Other"} else "Other",
+                         "institutionLabel": entry.institution,
                          "evidenceIds": evidence_ids(entry.claim_ids)} for entry in reason.entries],
             "kind": reason.kind, "fromLead": reason.from_lead, "selection": selection}
 

@@ -23,8 +23,8 @@ class CompanyField(StrEnum):
 class CaseInterpretation(Contract):
     company_name: str | None = None
     company_summary: str = Field(min_length=1)
-    primary_field: CompanyField = CompanyField.UNKNOWN
-    additional_fields: list[CompanyField] = Field(default_factory=list)
+    primary_field: str = Field(default="unknown", min_length=1, max_length=80, pattern=r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
+    additional_fields: list[str] = Field(default_factory=list)
     activity_label: str = Field(min_length=1, pattern=r"^\S+(?:\s+\S+){0,2}$",
         description="One to three words only, e.g. glucose sensors or insulin pumps. Put longer technical detail in needs/company_summary.")
     bern_intents: list[str] = Field(default_factory=list)
@@ -128,7 +128,7 @@ class ReportEvidencePack(Contract):
 class ReasonEntry(Contract):
     id: str
     name: str
-    institution: Literal["UniBE", "ARTORG", "DCB", "Other"]
+    institution: str = Field(min_length=1, max_length=200)
     claim_ids: list[UUID] = Field(min_length=1)
 
 

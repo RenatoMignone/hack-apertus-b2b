@@ -40,7 +40,7 @@ async def draft_report(tasks, pack, instruction, context):
         "context attributed to the operator. Preserve exclusions. Do not remove material caveats "
         "even if requested. No browsing, tools or retrieval. Include the pack gaps in open_questions. "
         "Use short reason/entry keys; institution=Other unless the cited claim explicitly supports "
-        "UniBE/ARTORG/DCB. from_lead MUST be false unless actual operator leads are supplied. "
+        "the institution name/code; do not infer affiliation from the deployment region. from_lead MUST be false unless actual operator leads are supplied. "
         "Leave trace inputs/terms/links empty: code, not the writer, owns actual "
         "retrieval lineage. If claims cannot yield a supported reason, return no reasons and a gap.",
         {"pack": pack.model_dump(mode="json", exclude={"coverage"}), "editorial_instruction": instruction},

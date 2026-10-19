@@ -86,3 +86,38 @@ async def test_display_fallback_does_not_accept_invalid_factual_fields(context, 
     service = create_reasoning_services(model=FixtureChatModel(responses=[response, response]))
     with pytest.raises(InvalidModelOutput):
         await service.interpret('Find research in Bern', {}, context)
+
+
+@pytest.mark.asyncio
+async def test_nonmedical_profile_supplies_vocabulary_without_code_changes(context, interpretation):
+    response = interpretation.model_dump(mode='json')
+    response.update(primary_field='materials', additional_fields=['manufacturing'],
+                    company_summary='Operator describes a materials company.', activity_label='polymer testing',
+                    needs=['polymer characterization'], concepts=[])
+    model = FixtureChatModel(responses=[response])
+    taxonomy = {'profile': {'configuration': {'domain': {'version': 'materials-v1',
+        'fields': {'materials': 'Materials science', 'manufacturing': 'Manufacturing'},
+        'institutions': {'Empa': 'Empa'}}}}, 'concepts': []}
+    result = await create_reasoning_services(model=model).interpret('Find polymer testing in Bern', taxonomy, context)
+    assert result.primary_field == 'materials'
+    assert result.additional_fields == ['manufacturing']
+    sent = json.loads(model.calls[0][1].content)['taxonomy']['domain']
+    assert sent['institutions'] == {'Empa': 'Empa'} and 'unknown' in sent['fields']
+    from backend.contracts.pipeline import DraftReason, ReasonEntry, SupportedClaim
+    from backend.contracts.frontend import reason_view
+    claim = SupportedClaim(claim_id=uuid4(), text='Empa tests polymers', evidence_ids=[uuid4()])
+    entry = ReasonEntry(id='empa', name='Empa', institution='Empa', claim_ids=[claim.claim_id])
+    reason = DraftReason(id='test', headline='Polymer testing', text=claim.text, claim_ids=[claim.claim_id], entries=[entry])
+    view = reason_view(reason, {claim.claim_id: claim})
+    assert view['entries'][0]['institution'] == 'Other'  # existing frontend badge compatibility
+    assert view['entries'][0]['institutionLabel'] == 'Empa'
+
+
+@pytest.mark.asyncio
+async def test_profile_rejects_unsupplied_company_field(context, interpretation):
+    from backend.contracts.services import InvalidModelOutput
+    response = interpretation.model_dump(mode='json')
+    response['primary_field'] = 'invented_field'
+    model = FixtureChatModel(responses=[response, response])
+    with pytest.raises(InvalidModelOutput):
+        await create_reasoning_services(model=model).interpret('Find research in Bern', {}, context)

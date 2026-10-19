@@ -48,3 +48,8 @@ novel gap-driven queries; the workflow owns budgets, persistence and execution.
 
 Need-fit payloads include only accepted claims and their canonical support; unrelated
 retrieval text remains in coverage and cannot exhaust the fit model context.
+
+Domain vocabulary is read from the pinned profile's `configuration.domain`; see
+[profile onboarding](../../../docs/data/DOMAIN_PROFILES.md). Company fields use its
+codes (unknown allowed), independent of topic/vector eligibility. Institutions in
+draft entries are generic bounded source-supported names, not fixed pilot enums.
