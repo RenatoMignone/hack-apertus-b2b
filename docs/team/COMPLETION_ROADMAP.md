@@ -80,3 +80,10 @@ Final verification: **267 backend tests passed** with disposable PostgreSQL;
 **20 frontend transport/policy tests passed**, and the frontend production build
 passed. Focused final capability/history/manual-output checks also passed.
 Provider quality, human labels and shared feature activation are not implied.
+
+After the final push, Elia's API and worker restarted on current main using the
+unchanged private configuration. Health and authenticated capabilities returned
+200, advertising PDF only while optional migrations/flags remain pending.
+Disposable browser/test services were stopped. Case-memory shortlisting uses a
+single distance ordering and literal dimension predicate so the partial ANN index
+remains eligible; deterministic tie ordering follows the bounded shortlist.

@@ -3,7 +3,7 @@ import asyncio
 from uuid import UUID, uuid4
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import cast, insert, select, text, update
+from sqlalchemy import cast, insert, literal_column, select, text, update
 
 from backend.contracts.data import configuration_hash, validate_vector
 from backend.contracts.pipeline import CaseInterpretation
@@ -133,9 +133,12 @@ class CaseMemory:
                 t.case_memory.c.namespace == access.namespace, t.case_memory.c.enabled,
                 t.case_memory.c.case_id != case_id, t.case_memory.c.input_id == t.cases.c.current_input_id,
                 t.case_memory.c.embedding_config_hash == self.embedder.config_hash,
-                t.case_memory.c.dimension == len(vector)).order_by(distance, t.case_memory.c.memory_id).limit(50)).mappings().all()
+                t.case_memory.c.dimension == literal_column(str(len(vector)))).order_by(distance).limit(50)).mappings().all()
             result = []
-            for row in rows:
+            # Keep SQL ordering eligible for the ANN operator index; stabilize
+            # ties only after the bounded shortlist. Dimension is a validated
+            # integer literal so generic plans can use the partial 768 index.
+            for row in sorted(rows, key=lambda r: (float(r['distance']), str(r['memory_id']))):
                 score = round(max(0, min(1, 1-float(row['distance'])))*100, 1)
                 if score < self.minimum_score:
                     continue

@@ -404,7 +404,7 @@ export default function Results({
                 <div className="min-w-0 flex-1">
                   <div className="font-medium">{s.companyLabel}</div>
                   {s.indexedAt && <p className="text-xs text-muted">Indexed {new Date(s.indexedAt).toLocaleDateString()} · Needs similarity, not success probability</p>}
-                  {!!s.differences?.length && <p className="text-xs text-muted">Additional current needs: {s.differences.join('; ')}</p>}
+                  {!!s.differences?.length && <p className="text-xs text-muted">Current needs not listed verbatim: {s.differences.join('; ')}</p>}
                   <div className="mt-1 flex flex-wrap gap-1">
                     {s.shared.map((x) => (
                       <span key={x} className="rounded-full bg-canvas px-2 py-0.5 text-xs text-muted">{x}</span>
