@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, ArrowUp, Columns3, ListChecks, Lock } from 'lucide-react';
 import { api, apiMode } from '../api';
@@ -13,14 +13,14 @@ import type { CaseDetail, CaseSummary } from '../types/contract';
 
 function Card({ icon, title, count, children, footer }: { icon: ReactNode; title: string; count?: number; children: ReactNode; footer: ReactNode }) {
   return (
-    <section className="flex flex-col rounded-2xl border border-line bg-white p-5">
-      <header className="mb-4 flex items-center gap-2.5">
+    <section className="flex flex-col rounded-2xl border border-line bg-white p-4">
+      <header className="mb-3 flex items-center gap-2.5">
         <span className="rounded-lg bg-canvas p-1.5 text-muted" aria-hidden>{icon}</span>
-        <h2 className="font-semibold">{title}</h2>
-        {count !== undefined && <span className="ml-auto text-2xl font-semibold tabular-nums">{count}</span>}
+        <h2 className="text-sm font-semibold">{title}</h2>
+        {count !== undefined && <span className="ml-auto text-xl font-semibold tabular-nums">{count}</span>}
       </header>
       <div className="flex-1">{children}</div>
-      <footer className="mt-4 flex items-center justify-between text-sm text-muted">{footer}</footer>
+      <footer className="mt-3 flex items-center justify-between text-sm text-muted">{footer}</footer>
     </section>
   );
 }
@@ -74,6 +74,15 @@ function QuickStart() {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
+  const box = useRef<HTMLTextAreaElement>(null);
+
+  // Start roomy and grow with the text, so longer descriptions stay readable.
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 320) + 'px';
+  }, [text]);
 
   const submit = async () => {
     if (!text.trim() || busy) return;
@@ -86,10 +95,11 @@ function QuickStart() {
   };
 
   return (
-    <div className="mb-5 rounded-2xl bg-ink px-6 py-5 text-white">
+    <div className="mb-5 rounded-2xl bg-ink px-6 py-6 text-white">
       <div className="text-lg font-semibold">Start a new case</div>
-      <div className="mt-3 rounded-xl bg-white p-2 text-ink">
+      <div className="mt-3 rounded-xl bg-white p-3 text-ink">
         <textarea
+          ref={box}
           aria-label="Company description"
           disabled={busy}
           maxLength={50000}
@@ -98,7 +108,7 @@ function QuickStart() {
           onKeyDown={(e) => {
             if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submit();
           }}
-          rows={2}
+          rows={4}
           placeholder="Describe a company in your own words: what they do, what they need…"
           className="w-full resize-none bg-transparent px-2 py-1 text-[15px] leading-relaxed outline-none placeholder:text-muted/60"
         />
@@ -151,7 +161,7 @@ export default function DeskPage() {
             }
           >
             {!cases ? (
-              <Skeleton className="h-32" />
+              <Skeleton className="h-24" />
             ) : (
               <>
                 <div className="flex h-2 gap-0.5 overflow-hidden rounded-full" role="img" aria-label={byStatus.map(({ s, n }) => `${n} ${STATUS[s].label}`).join(', ')}>
@@ -167,7 +177,7 @@ export default function DeskPage() {
                     </span>
                   ))}
                 </div>
-                <ul className="mt-4 space-y-1">
+                <ul className="mt-3 space-y-0.5">
                   {cases.slice(0, 3).map((c) => (
                     <li key={c.id}>
                       <Link to={`/cases/${c.id}`} className="flex items-center gap-2 rounded-lg px-1 py-1.5 text-sm hover:text-brand">
@@ -197,11 +207,11 @@ export default function DeskPage() {
             }
           >
             {!steps ? (
-              <Skeleton className="h-32" />
+              <Skeleton className="h-24" />
             ) : steps.length === 0 ? (
-              <p className="py-6 text-center text-sm text-muted">Nothing waiting. All clear.</p>
+              <p className="py-4 text-center text-sm text-muted">Nothing waiting. All clear.</p>
             ) : (
-              <ul className="space-y-1">
+              <ul className="space-y-0.5">
                 {steps.slice(0, 5).map((s) => (
                   <li key={s.caseId}>
                     <Link to={`/cases/${s.caseId}`} className="flex items-center gap-2 rounded-lg px-1 py-1.5 text-sm hover:text-brand">

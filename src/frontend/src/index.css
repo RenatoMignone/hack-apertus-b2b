@@ -73,6 +73,17 @@ textarea:focus-visible {
   animation: slide-in 0.2s ease-out;
 }
 
+/* Horizontal strips that scroll without a visible scrollbar; the fade hints at more. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.fade-right {
+  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+}
+
 mark.ev {
   background: #fff1a8;
   padding: 0 2px;
