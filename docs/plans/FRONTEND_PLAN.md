@@ -15,18 +15,18 @@ remain visible; failures never switch to mocks. Reload requires reconnection;
 durable jobs continue and polling resumes.
 
 `VITE_API_MODE=mock` explicitly enables seeded companies and browser-local demo
-state (v5). Demo evidence is illustrative; it is not a live research result.
+state (v7). Demo evidence is illustrative; it is not a live research result.
 
 ## Screens
 
-Two main places: the cases board and a case workspace. Navigation shows My cases,
-New case, and Connected or an explicit Demo menu. The former My desk and standalone
-Action items pages are removed. Backend action-item resources remain available.
+Three places: My desk (home), the cases board and a case workspace. Navigation
+shows My desk, My cases, New case, and Connected or an explicit Demo menu. The
+standalone Action items page stays removed. Backend action-item resources remain available.
 
 | Route | Behavior |
 | --- | --- |
-| `/` | Cases board: research, review, pitch sent and closed; search, hold and outcome flags |
-| `/cases` | Redirect to the board |
+| `/` | My desk: quick-start text box (creates and runs a case), *All cases* (status bar, 3 most recent) and *Next steps* derived only from case state: answer the agent's question, review N items, export the brief, record the outcome. Closed and on-hold cases are skipped |
+| `/cases` | Cases board: research, review, pitch sent and closed; search, hold and outcome flags |
 | `/cases/new` | Permitted-text composer; confidential plans/one-pagers stay outside the app |
 | `/cases/:id` | Results, revisions, chat, evidence drawer, selections and export |
 
@@ -76,3 +76,7 @@ Run transport and export-policy tests, typecheck and the locked build. Use the
 isolated synthetic browser smoke for integrated interaction checks; an authorized live capture or published
 profile plus real providers is required for live acceptance.
 [Status](../project/STATUS.md) owns deployment gates and current measured results.
+
+Demo mode seeds a hero case for the pitch: GlucoWave is not on the board at start and
+is created live from the *Glucose sensor* example, written in lay terms, then refined
+through a follow-up answer and an exclusion. Run sheet: [DEMO_SCRIPT.md](../project/DEMO_SCRIPT.md).

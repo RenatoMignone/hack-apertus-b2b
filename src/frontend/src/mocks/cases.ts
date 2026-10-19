@@ -1,9 +1,9 @@
 import type { BriefRevision, CaseDetail, CaseOutcome, CaseStatus, Coverage, Institution, Reason, SearchTrace } from '../types/contract';
 import { EVIDENCE } from './evidence';
 
-// Seeded demo cases. Company names are synthetic. Institutions, projects and
-// excerpts come from public pages (see evidence.ts). No person names are used:
-// the captured pages do not name contacts.
+// Seeded demo cases. Company names are synthetic. Institutions, projects, people
+// and excerpts come from public pages (see evidence.ts); people are named only
+// as their source pages state them.
 
 const coverage = (resultKind: Coverage['resultKind'], limitations: string[] = []): Coverage => ({
   snapshotDate: '18 Oct 2026',
@@ -29,12 +29,19 @@ export function pruneTrace(trace: SearchTrace, evidenceIds: Set<string>): Search
 export const reasonEvidence = (reasons: Reason[]) =>
   new Set(reasons.flatMap((r) => [...r.line.evidenceIds, ...r.entries.flatMap((e) => e.evidenceIds)]));
 
-// ---------- Case A: wearable glucose sensor ----------
+// ---------- Hero case: wearable glucose sensor ----------
+// Not on the board at start: the presenter creates it live from the composer's
+// "Glucose sensor" example (see docs/project/DEMO_SCRIPT.md). The prompt uses
+// everyday words ("blood-sugar patch") so the search trace shows the bridge to
+// scientific terms such as continuous glucose monitoring.
 
-const PROMPT_A =
-  'GlucoWave (demo) builds a needle-free wearable glucose sensor. They want partners for clinical studies and the ' +
-  'algorithms behind it, and are considering a Swiss R&D site. Most early users are women. I think DCB did something ' +
-  'on diabetes and the menstrual cycle.';
+export const HERO_PROMPT =
+  'GlucoWave makes a blood-sugar patch: a needle-free wearable that tracks glucose all day. They need partners for ' +
+  'clinical studies and for the app’s algorithms, and are considering a Swiss R&D site. Most early users are women; ' +
+  'I think DCB looked at diabetes and the menstrual cycle.';
+
+/** The agent's one clarification question for the hero case. */
+export const HERO_FOLLOW_UP = { question: 'Study partner, R&D site, or both?', choices: ['Study partner', 'R&D site', 'Both'] };
 
 // Unit paths, expertise and missing fields only restate what the captured pages
 // say; anything a page does not state is listed in missingFields.
@@ -168,9 +175,9 @@ const reasonsA: Reason[] = [
 
 const traceA: SearchTrace = {
   inputs: [
-    { id: 'in-sensor', label: 'glucose sensor' },
+    { id: 'in-sensor', label: 'blood-sugar patch' },
     { id: 'in-needle', label: 'needle-free' },
-    { id: 'in-algo', label: 'algorithms' },
+    { id: 'in-algo', label: 'app’s algorithms' },
     { id: 'in-clinical', label: 'clinical studies' },
     { id: 'in-women', label: 'women' },
   ],
@@ -208,59 +215,26 @@ const traceA: SearchTrace = {
   ],
 };
 
-const revA1: BriefRevision = {
+/** First draft for the hero case, served by the mock when the hero prompt runs. */
+export const HERO_REVISION: BriefRevision = {
   id: 'revA-1',
   version: 1,
   createdAt: '2026-10-18T14:05:00Z',
   changeNote: 'First version',
   changedReasonIds: [],
   company: {
-    summary: 'Builds a needle-free wearable glucose sensor and is looking for a Swiss R&D base.',
+    summary: 'Makes a needle-free wearable glucose sensor (a “blood-sugar patch”) and is considering a Swiss R&D site.',
     facts: ['Medtech', 'Wearable sensor', 'Users mostly women', 'Wants: clinical + algorithm partners'],
   },
   reasons: reasonsA,
-  openQuestions: ['Which sensing method do they use?', 'Study partner, R&D site, or both?'],
+  openQuestions: ['Which sensing method do they use?', HERO_FOLLOW_UP.question],
   similarCases: [
     { caseId: 'case-d1', companyLabel: 'NordSense', score: 78, shared: ['Non-invasive sensing', 'Metabolite monitoring'], status: 'pitch_sent' },
     { caseId: 'case-d4', companyLabel: 'MedPatch', score: 61, shared: ['Wearable device', 'Clinical validation'], status: 'pitch_sent' },
     { caseId: 'case-d3', companyLabel: 'Diabeto App', score: 44, shared: ['Diabetes', 'Algorithms'], status: 'researching' },
   ],
   trace: traceA,
-  coverage: coverage('ok', ['Contact details: public profile pages only.']),
-};
-
-const reasonsA2 = reasonsA.filter((r) => r.id !== 'rA-trial');
-const revA2: BriefRevision = {
-  ...revA1,
-  id: 'revA-2',
-  version: 2,
-  parentId: 'revA-1',
-  createdAt: '2026-10-18T14:12:00Z',
-  changeNote: 'Removed nutrition',
-  changedReasonIds: [],
-  reasons: reasonsA2,
-  trace: pruneTrace(traceA, reasonEvidence(reasonsA2)),
-};
-
-const caseA: CaseDetail = {
-  case: {
-    id: 'case-glucowave',
-    companyLabel: 'GlucoWave',
-    oneLineNeed: 'Needle-free glucose sensor: validation + algorithms',
-    status: 'in_review',
-    createdAt: '2026-10-18T14:00:00Z',
-    updatedAt: '2026-10-18T14:12:00Z',
-    keptCount: 0,
-  },
-  revisions: [revA1, revA2],
-  currentRevisionId: 'revA-2',
-  turns: [
-    { id: 'tA-1', role: 'operator', text: PROMPT_A, createdAt: '2026-10-18T14:00:00Z' },
-    { id: 'tA-2', role: 'agent', text: 'Found 4 people and 6 groups/projects across UniBE, ARTORG and DCB. Your menstrual-cycle lead checks out.', createdAt: '2026-10-18T14:05:00Z', revisionId: 'revA-1' },
-    { id: 'tA-3', role: 'operator', text: 'Drop the nutrition stuff, they don’t care about meals.', createdAt: '2026-10-18T14:11:00Z' },
-    { id: 'tA-4', role: 'agent', text: 'Removed the nutrition reason.', createdAt: '2026-10-18T14:12:00Z', revisionId: 'revA-2' },
-  ],
-  evidence: EVIDENCE,
+  coverage: coverage('partial', ['Waiting for your answer in the chat.', 'Contact details: public profile pages only.']),
 };
 
 // ---------- Case B: insulin delivery, follow-up pending ----------
@@ -341,6 +315,22 @@ export const NETWORK_REASON: Reason = {
   selection: 'none',
 };
 
+/** Adds the search path to NETWORK_REASON's evidence after a "clinical" follow-up answer. */
+export function withNetworkTrace(trace: SearchTrace): SearchTrace {
+  if (trace.links.some((l) => l.target === 'ev-dcb-network')) return trace;
+  const from = trace.inputs.find((i) => /clinic|r&d/i.test(i.label)) ?? trace.inputs[0];
+  const term = { id: 't-network', label: 'diabetes technology research' };
+  return {
+    inputs: trace.inputs,
+    terms: trace.terms.some((t) => t.id === term.id) ? trace.terms : [...trace.terms, term],
+    links: [
+      ...trace.links,
+      ...(from && !trace.links.some((l) => l.source === from.id && l.target === term.id) ? [{ source: from.id, target: term.id, value: 1 }] : []),
+      { source: term.id, target: 'ev-dcb-network', value: 1 },
+    ],
+  };
+}
+
 export const TRACE_B: SearchTrace = {
   inputs: [
     { id: 'in-pump', label: 'insulin pump' },
@@ -407,7 +397,7 @@ const caseB: CaseDetail = {
     {
       id: 'tB-2',
       role: 'agent',
-      text: 'First draft ready. One question:',
+      text: 'First draft ready. One question: R&D partner or clinical validation?',
       createdAt: '2026-10-18T13:21:00Z',
       revisionId: 'revB-1',
       followUp: { id: 'fB-1', question: 'R&D partner or clinical validation?', choices: ['R&D partner', 'Clinical validation', 'Both'] },
@@ -514,7 +504,6 @@ const K: Mini = ['people', 'Prof. Dr. Lisa Koch', 'Holds DCB’s data-science an
 const G: Mini = ['people', 'Prof. Dr. José Garcia', 'Holds DCB’s professorship for automated insulin therapy.', 'Prof. Dr. José Garcia', 'DCB', ['ev-dcb-profs-b'], 'DCB professorship · automatisierte Insulintherapie'];
 
 export const SEED_CASES: CaseDetail[] = [
-  caseA,
   caseB,
   caseC,
   miniCase('case-d1', 'NordSense', 'Sweat-based metabolite sensing', 'pitch_sent', '2026-10-15T09:30:00Z', 2, ['Medtech', 'metabolite sensing'], [
