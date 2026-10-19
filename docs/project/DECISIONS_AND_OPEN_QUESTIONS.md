@@ -427,3 +427,30 @@ keep DB retrieval and case-local source provenance. No frontend/schema changes.
 [Evaluation](../data/WEB_SEARCH_EVALUATION.md) records experiments, alternatives,
 observed limitations and primary references; [setup](../data/WEB_RESEARCH.md) owns
 the private service/configuration. This supersedes D24's browser default.
+
+
+## D26 — Gap follow-up, literal context and local reranking (19 October 2026)
+
+Provenance: Elia requested updated-main testing, diagnosis of Renato's Helvetic
+case failure and implementation of remaining backend research work on a new
+branch. `codex/backend-research-completion` fixes the reproduced display-label
+failure without accepting unsupported factual references; public research
+unknowns are distinct from unclear operator intent.
+
+Retain prior supported work across bounded novel gap queries and freeze after
+research. Add literal source identity/neighbor expansion; title metadata remains
+a discovery hint. Code records actual query/evidence paths with exact mirror
+resolution. The writer cannot invent ontology links.
+
+Provision pinned multilingual MiniLM locally as the compact CPU option, with
+asset/runtime verification, full original query and exact bounded passage windows.
+BGE remains an optional comparison; neither is a measured relevance winner.
+[Setup/evidence](../data/RERANKING.md) and [branch acceptance](../team/BACKEND_RESEARCH_COMPLETION.md)
+separate measured adapter checks from useful real-case/PDF acceptance. Shared
+schema, ingestion and source artifacts were not modified by this task.
+
+Actual worker acceptance exposed oversized fit context and unsupported draft
+implications. Bound fit to accepted support, reserve finalization time, and allow
+one same-pack wording rewrite with independent exact-hash reassessment. Supply
+canonical cited passages to that assessment; do not relax factual/export gates.
+User authorization now includes pushing to main and a subsequent frontend audit.

@@ -40,6 +40,8 @@ query plans and retrieval observations.
    extract atomic claims in bounded evidence batches, then assess semantic
    support, need-to-capability fit, contradictions and gaps. Code checks IDs,
    membership, exact Unicode slices and hashes. Reranking is not validation.
+   Novel follow-up queries derive from assessed/extraction/fit gaps, including partial
+   matches; preserve earlier evidence/claims and stop if no novel query is supplied.
    At most three research rounds and one structured-output repair per task;
    deadline/token/tool budgets belong to the pinned run configuration. Exhausted
    budgets yield explicit gaps/partial output. Never invent a missing field.
@@ -113,3 +115,22 @@ actual recorded input → concept → evidence decisions, not a generated story.
 Case statuses describe the business lifecycle; run stages describe execution.
 Similar-case scores remain unavailable without an authorized dataset/method.
 The [HTTP handoff](FRONTEND_BACKEND_API.md) defines the implemented endpoints.
+
+## 19 October implementation additions
+
+Display-label formatting cannot abort research: overlong labels use a neutral
+short label with the entire scientific phrase preserved in search terms. Public
+unknowns use `research_questions`, not blocking clarification about the user's
+intent. Extraction is bounded into literal batches and all exclusions are explicit.
+
+Need-fit proposals precede the final authoritative pack freeze, allowing novel
+gap-driven rounds without drafting interim packs. Actual query/evidence lineage is
+stored by code in pack coverage. It resolves exact canonical mirror identities;
+the writer's trace stays empty. [Branch evidence](../team/BACKEND_RESEARCH_COMPLETION.md)
+and [reranking setup](../data/RERANKING.md) distinguish tests from live acceptance.
+
+Need-fit calls use canonical support for accepted claims, not the entire retrieval
+pool. Follow-up planning compares remaining time with the observed preceding-round
+cost and reserves 120 seconds for finalization/drafting; if time is insufficient,
+it preserves supported partial/no-match work with an explicit limitation. This is
+a conservative planning default, not a measured performance optimum.

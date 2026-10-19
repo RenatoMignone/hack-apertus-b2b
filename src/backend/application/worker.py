@@ -79,7 +79,11 @@ class Worker:
                 try:
                     if job["stage"] == "runtime.execute":
                         await self.db("mark_run", access, job["run_id"], "failed", code)
-                    await self.db("finish_job", access, job["attempt_id"], self.worker_id, {"error_code": code}, failed=True)
+                    detail = {"error_code": code}
+                    for key in ("failed_stage", "model_task", "validation_issues"):
+                        if hasattr(error, key):
+                            detail[key] = getattr(error, key)
+                    await self.db("finish_job", access, job["attempt_id"], self.worker_id, detail, failed=True)
                 except (StaleRevision, ValueError):
                     pass
             finally:

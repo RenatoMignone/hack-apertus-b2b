@@ -139,6 +139,8 @@ class EvidenceHit(Contract):
     cosine_distance: float | None = None
     fusion_score: float
     reranker_score: float | None = None
+    reranker_windows: list[dict] = Field(default_factory=list)
+    query_matches: list[str] = Field(default_factory=list)
     ranking_version: str = "rrf60-v1"
 
 

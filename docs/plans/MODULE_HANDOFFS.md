@@ -15,7 +15,7 @@ code; allocate shared changes to one integrator for each new task.
 
 Implemented: authenticated FastAPI/application, durable LangGraph worker, A/B/C
 reasoning/retrieval/evidence adapters, deterministic PDF, HTTP React frontend,
-PostgreSQL/pgvector through `0007_frontend_lifecycle`, artifacts, checkpoints and
+PostgreSQL/pgvector through `0008_live_corpus`, artifacts, checkpoints and
 masked tracing. Cross-lane tests use synthetic inference/embeddings. Team-host
 migration, verified model assets, published corpus and live deployment remain gates.
 

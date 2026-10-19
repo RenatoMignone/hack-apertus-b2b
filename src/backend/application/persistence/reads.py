@@ -53,16 +53,21 @@ class Reads:
             step = run["last_successful_stage"] or ""
             stage = ("done" if run["status"] == "completed" else "drafting" if step.startswith("draft") else
                 "validating" if step.startswith(("extract", "persist_extraction", "evidence", "assess", "propose_pack", "pack")) else
-                "searching" if step.startswith(("retrieve", "discover", "fetch", "register", "merge")) else
+                "searching" if step.startswith(("replan", "retrieve", "discover", "fetch", "register", "merge")) else
                 "interpreting" if step or run["status"] == "running" else None)
             result = c.execute(select(t.attempts.c.outputs).where(t.attempts.c.run_id == run_id,
                 t.attempts.c.stage == "runtime.node.draft.persist").order_by(t.attempts.c.created_at.desc()).limit(1)).scalar_one_or_none()
             pack = c.execute(select(t.packs).where(t.packs.c.run_id == run_id).order_by(
                 t.packs.c.created_at.desc(), t.packs.c.pack_id.desc()).limit(1)).mappings().one_or_none()
+            failure = c.execute(select(t.attempts.c.outputs).where(t.attempts.c.run_id == run_id,
+                t.attempts.c.stage == "runtime.execute", t.attempts.c.status == "failed").order_by(
+                t.attempts.c.created_at.desc(), t.attempts.c.attempt_id.desc()).limit(1)).scalar_one_or_none()
+            detail = (failure or {}).get("result", {}) if run["status"] == "failed" else {}
             return {"schema_version": "1", "case_id": str(case_id), "run_id": str(run_id), "input_id": str(run["input_id"]),
                 "snapshot_id": str(run["snapshot_id"]), "state": run["status"],
                 "status": {"needs_clarification": "waiting_for_input", "completed": "succeeded"}.get(run["status"], run["status"]),
                 "stage": stage, "step": step or None, "error_code": run["failure_reason"],
+                "failure_detail": {k: detail[k] for k in ("failed_stage", "model_task", "validation_issues") if k in detail},
                 "result_id": result.get("result_id") if result else None,
                 "pack_id": str(pack["pack_id"]) if pack else run["configuration"].get("reuse_pack_id"),
                 "outcome": pack["payload"].get("outcome") if pack else None,

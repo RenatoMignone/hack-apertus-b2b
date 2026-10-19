@@ -168,7 +168,9 @@ class KeeraChatModel(BaseChatModel):
                     data = json.loads(body)
                     choice = data["choices"][0]
                     if choice.get("finish_reason") == "length":
-                        raise InvalidModelOutput()
+                        error = InvalidModelOutput()
+                        error.validation_issues = [{"field": "$response", "type": "output_token_limit"}]
+                        raise error
                     raw = choice["message"]
                     content = raw.get("content") or ""
                     if not isinstance(content, str):
@@ -208,6 +210,9 @@ class StructuredTasks:
             async with asyncio.timeout(remaining(context)):
                 with tracing_context(enabled=False):
                     result = await self.model.ainvoke(messages, context=context, config={"callbacks": []}, **kwargs)
+        except InvalidModelOutput as error:
+            error.model_task = task
+            raise
         except TimeoutError:
             raise BudgetExceeded() from None
         if self.receipt:
@@ -240,7 +245,13 @@ class StructuredTasks:
                 return value
             except (ValidationError, ValueError, KeyError, TypeError) as error:
                 if attempt:
-                    raise InvalidModelOutput() from None
+                    failure = InvalidModelOutput()
+                    failure.model_task = task
+                    failure.validation_issues = ([{"field": str(e["loc"][0]) if e["loc"] and
+                        e["loc"][0] in schema.model_fields else "$response", "type": e["type"]}
+                        for e in error.errors(include_input=False, include_context=False, include_url=False)[:8]]
+                        if isinstance(error, ValidationError) else [{"field": "$references", "type": "reference_check"}])
+                    raise failure from None
                 # Safe schema locations/messages only; never validation input or provider bodies.
                 diagnostics = (json.dumps(error.errors(include_input=False, include_context=False,
                     include_url=False)) if isinstance(error, ValidationError)

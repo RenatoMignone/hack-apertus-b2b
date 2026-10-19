@@ -52,7 +52,8 @@ never overwrite another agent's work or independently rename shared fields.
   real disposable PostgreSQL. Eric reports shared head 0008 and narrow per-user runtime bindings.
   [Live corpus mode](docs/data/LIVE_CORPUS_RUNTIME.md) captures ready authorized
   evidence per case during ingestion; publication is optional for this development
-  mode. A combined live provider-backed case remains an acceptance step.
+  mode. A live DB/provider partial report and reviewed PDF passed on Elia; combined DB/web
+  quality and target-host restart/resume remain acceptance steps.
 - Connected inference: CSCS via Keera, `https://gateway.keera.ch/api/v1`, connected examples now select
   `apertus-v1-5-70b` explicitly (user configuration; no automatic fallback). Four supplied aliases and tool/thinking rules are in
   [inference configuration](docs/data/INFERENCE_CONFIGURATION.md). Authenticated synthetic Keera probes passed; broader quality, current key validity
@@ -61,7 +62,8 @@ never overwrite another agent's work or independently rename shared fields.
   shared ingestion/query adapter and local tokenizer; [configuration and live
   verification](docs/data/HOSTED_EMBEDDINGS.md). Local assets remain the offline
   option. Protocol/parity checks passed; retrieval quality remains unmeasured.
-  BGE reranker is optional. Each model uses its own compatible tokenizer.
+  The backend provisions a compact multilingual CPU reranker;
+  [setup and measured limits](docs/data/RERANKING.md). Each model uses its own compatible tokenizer.
 - Pilot: Bern diabetes technology, covering UniBE, ARTORG and DCB as one ecosystem.
   Development host is shared Windows/WSL2/Docker with individual SSH tunnels;
   running end-to-end connected/offline deployments have not been established.

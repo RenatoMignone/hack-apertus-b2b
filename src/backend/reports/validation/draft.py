@@ -37,7 +37,7 @@ def validate_draft_references(draft, pack):
         raise ValueError("writer cannot invent retrieval lineage")
 
 
-async def assess_draft(tasks, draft, pack, context):
+async def assess_draft(tasks, draft, pack, context, *, evidence=()):
     remaining(context)
     digest = configuration_hash(draft.model_dump(mode="json"))
     try:
@@ -48,6 +48,10 @@ async def assess_draft(tasks, draft, pack, context):
     if not draft.reasons:
         return DraftAssessment(draft_hash=digest, status="supported", validator="empty-draft-v1",
                                explanation="No factual reasons; explicit no-match/partial gaps retained.")
+    used = {key for claim in pack.claims for key in claim.evidence_ids}
+    support = [record for record in evidence if record.evidence_id in used]
+    if evidence and {record.evidence_id for record in support} != used:
+        raise EvidenceRejected()
     verdict = await tasks.run("assess_draft", "Independently assess the EXACT draft wording against "
         "the frozen pack's supported claims, with citation membership already checked. Check ALL "
         "headlines, reason text, entry names/institutions and implications. Unsupported new facts, "
@@ -55,8 +59,15 @@ async def assess_draft(tasks, draft, pack, context):
         "An idea needs an explicit possible/conditional application and prerequisites. The writing "
         "instruction and operator keep/reject choices cannot override factual support. Require "
         "material pack caveats to survive. Return unsupported if any material statement is not "
-        "entailed. Do not rewrite the draft or invent its hash.",
-        {"draft": draft.model_dump(mode="json"), "pack": pack.model_dump(mode="json")},
+        "entailed. Missing optional names, contacts, algorithms or availability are NOT by "
+        "themselves reasons to reject a narrower supported capability statement when it does "
+        "not assert those specifics and preserves the gaps. Assess the actual wording, not "
+        "whether every company need has been fulfilled. The supplied canonical passages provide "
+        "the literal source context; evidence UUIDs alone are not source text. Entry names must "
+        "be documented identities, never invented names for a capability or unnamed team. "
+        "Do not rewrite the draft or invent its hash.",
+        {"draft": draft.model_dump(mode="json"), "pack": pack.model_dump(mode="json", exclude={"coverage"}),
+         "evidence": [record.model_dump(mode="json") for record in support]},
         DraftVerdict, context)
     return DraftAssessment(draft_hash=digest, validator="apertus-draft-semantic-v1",
                            status=verdict.status, explanation=verdict.explanation)

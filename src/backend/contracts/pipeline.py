@@ -34,6 +34,7 @@ class CaseInterpretation(Contract):
     constraints: list[str] = Field(default_factory=list)
     leads: list[str] = Field(default_factory=list)
     ambiguities: list[str] = Field(default_factory=list)
+    research_questions: list[str] = Field(default_factory=list)
     blocking_questions: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")

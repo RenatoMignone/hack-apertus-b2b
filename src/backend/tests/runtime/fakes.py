@@ -8,7 +8,7 @@ from backend.contracts.data import Span, configuration_hash
 from backend.contracts.pipeline import (CaseInterpretation, ClaimAssessment, DraftAssessment, DraftReason,
     DraftRevision, ReportEvidencePack, SupportedClaim)
 from backend.contracts.services import (ClaimCandidate, EntityCandidate, EvidenceAssessment, EvidenceRecord,
-    ExtractionBatch, PersistedClaims, RegisteredResearch, ResearchBundle, WebResearchResult)
+    ExtractionBatch, PersistedClaims, RegisteredResearch, ResearchBundle, ResearchQueries, WebResearchResult)
 from backend.data import schema as t
 from backend.data.admin import grant_scope
 from backend.data.repositories.corpus import CorpusRepository
@@ -21,6 +21,10 @@ class FixtureReasoning:
         self.bad_draft = False
         self.empty = False
         self.unsupported = False
+
+    async def revise_queries(self, interpretation, gaps, previous_queries, context):
+        self.calls["replan"] += 1
+        return ResearchQueries()
 
     async def interpret(self, message, taxonomy_context, context):
         self.calls["interpret"] += 1
@@ -58,7 +62,7 @@ class FixtureReasoning:
             text="Unverified invented wording" if self.bad_draft else pack.claims[0].text,
             claim_ids=[pack.claims[0].claim_id])] if pack.claims else [], change_note=instruction or "Initial draft")
 
-    async def assess_draft(self, draft, pack, context):
+    async def assess_draft(self, draft, pack, context, *, evidence=()):
         return DraftAssessment(draft_hash=configuration_hash(draft.model_dump(mode="json")),
             status="unsupported" if self.bad_draft else "supported", validator="synthetic-test",
             explanation="Synthetic fixture assessment, not semantic model validation")

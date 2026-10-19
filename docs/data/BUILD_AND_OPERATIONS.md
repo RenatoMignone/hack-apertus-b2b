@@ -15,7 +15,7 @@ Do not download weights/provision endpoints as part of documentation work.
 | `reasoning_primary` | Keera `apertus-v1-5-70b` (current explicit env) | Permitted request or bounded source passages → structured interpretation, enrichment, support assessment or grounded prose | Authenticated gateway behavior, served revision, tokenizer/chat template and resource limits |
 | `reasoning_fallback` | No automatic fallback; 8B/70B are explicit configurations | Difficult permitted task → same validated output contract | Availability, routing criteria, resources, quality/cost |
 | `embedding` | `google/embeddinggemma-2`, proposed local text-only | Original document chunks or contextual queries → finite dense vectors | Immutable revision/runtime and local benchmark; encoding defaults in embedding deployment; native dimension 768 |
-| `reranking` | BGE-reranker-v2-m3, initial candidate | Contextual request + original passage → relevance score | Source/revision, tokenizer/pair limit, score handling and latency |
+| `reranking` | Pinned multilingual MiniLM CPU option; BGE remains a candidate | Full request + exact passage windows → relevance score | [Provisioned runtime and measured checks](RERANKING.md); reviewed relevance/target-host latency remain |
 
 Named candidates are not measured winners. Preserve the ability to replace an
 adapter while rebuilding compatible index data explicitly. Each model consumes

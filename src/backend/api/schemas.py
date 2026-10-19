@@ -205,6 +205,7 @@ class RunView(BaseModel):
     stage: Literal["interpreting", "searching", "validating", "drafting", "done"] | None = None
     step: str | None = None
     error_code: str | None = None
+    failure_detail: dict = Field(default_factory=dict)
     result_id: UUID | None = None
     pack_id: UUID | None = None
     outcome: str | None = None

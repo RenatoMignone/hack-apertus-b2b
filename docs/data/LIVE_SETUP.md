@@ -85,11 +85,10 @@ capture. Do not publish synthetic fixtures into the real namespace.
 2. Keep your tunnel open, replacing the username with the account Eric supplied:
 
    ```text
-   ssh -N -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -L 15432:127.0.0.1:5432 -L 19000:127.0.0.1:9000 YOUR_SSH_USER@192.168.10.230
+   ssh -N -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -L 15432:127.0.0.1:5432 -L 19000:127.0.0.1:9000 YOUR_SSH_USER@YOUR_SSH_HOST
    ```
 
-   This is the previously supplied LAN host address; confirm it if DHCP/network
-   changed. The reported SSH policy permits destination ports 5432 and 9000.
+   Use the current privately supplied LAN host address; it can change with DHCP/network. The reported SSH policy permits destination ports 5432 and 9000.
    Both navigator and langgraph databases use PostgreSQL port 5432, but each needs
    its own credentials. A tunnel to a host-run API on port 8000 requires Eric to
    explicitly extend that policy; do not assume it is allowed.
@@ -186,13 +185,23 @@ A synthetic browser smoke already passed; this live acceptance still needs real
 assets/corpus/providers. Later evaluate research quality and target-host restart.
 No shared tests, migration or model download happen automatically at startup.
 
-### Current integration checkpoint — 19 October 2026
+### Current Mac runtime — 19 October 2026
 
-The private live binding is installed, existing credentials/operator token are
-preserved, and an actual owned-case capture of 13,705 ready chunks passed in a
-transaction that was rolled back. The combined backend passed 221 isolated tests.
-Eric applied the missing SELECT grant on `public.alembic_version`. All network
-readiness checks and actual production application bootstrap now pass; see
-[runtime access status](../team/RUNTIME_ACCESS_STATUS.md). No shared schema or
-grants were changed from this checkout. Restart both API and worker, then perform
-full real-provider case-to-PDF acceptance.
+Elia's live binding, separate checkpoint/MinIO credentials and existing operator
+token are installed privately. The changed LAN address is pinned in ignored
+`.local/ssh-config`; its SSH host fingerprint matches the original handoff.
+Start `ssh -F .local/ssh-config -N bern-runtime` if no tunnel already owns local
+ports 15432/19000. Keep this configuration private; DHCP addresses can change.
+
+All network readiness checks pass from this Mac. Local API/worker are running;
+health and authenticated capabilities return HTTP 200. A real authorized source
+artifact was read and its 73,373-byte body verified by hash. The actual worker
+uses PostgreSQL checkpoints. No shared migrations, grants or ingestion changes
+were performed. Earlier fixture credentials and route failures are historical.
+
+The live Helvetic case completed retrieval, extraction and claim assessment, then
+exposed context and draft-quality failures. See the current
+[backend acceptance handoff](../team/BACKEND_RESEARCH_COMPLETION.md) for the latest
+outcome. Reachable services and passing synthetic tests do not establish report
+quality. Combined DB/web acceptance, controlled target-host restart and reviewed
+relevance evaluation remain separate checks.

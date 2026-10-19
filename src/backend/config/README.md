@@ -16,7 +16,7 @@ pinned per run. `EMBEDDING_CONFIGURATION` points to verified ModelConfiguration 
 uses `EMBEDDING_MODEL_PATH`. Both build and runtime use `load_configured`; hosted
 mode is forbidden offline. [HF handoff](../../../docs/data/HOSTED_EMBEDDINGS.md)
 owns the verified configuration. Optional reranking
-uses the equivalent `RERANKER_*` fields. These must match the published snapshot;
+uses the equivalent `RERANKER_*` fields. Embedding settings must match the live capture or published snapshot;
 legacy model-name/dimension hints alone cannot configure an index. See the
 [integration handoff](../../../docs/team/INTEGRATION.md).
 
@@ -48,3 +48,6 @@ wiring; each feature documents what it requires. All credentials stay backend-on
 `published` retains the reviewed-release path. Both need the accessible domain
 profile and matching encoder configuration. `RUNTIME_LIVE_TAXONOMY_ID` is only
 needed when the profile lacks a taxonomy pin. See [live runtime](../../../docs/data/LIVE_CORPUS_RUNTIME.md).
+
+[Local reranker setup](../../../docs/data/RERANKING.md) pins assets/runtime separately
+from embeddings. Changing reranker weights does not re-encode the corpus.

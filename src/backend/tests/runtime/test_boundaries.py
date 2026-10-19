@@ -83,7 +83,8 @@ async def test_semantically_rejected_draft_has_bounded_research(harness):
     await h.worker.run_once(h.access)
     state = h.store.run_view(h.access, UUID(case["case_id"]), UUID(case["run_id"]))
     assert state["state"] == "failed" and state["error_code"] == "evidence_rejected"
-    assert h.backbone.calls["retrieve"] == h.settings.max_research_rounds
+    # No novel query was proposed: do not repeat the same failed research.
+    assert h.backbone.calls["retrieve"] == 1 and h.reasoning.calls["replan"] == 1
     assert h.store.case_rows(h.access, UUID(case["case_id"]))[0]["results"] == []
 
 
@@ -95,11 +96,16 @@ async def test_changed_pack_after_draft_gap_has_separate_durable_stage(harness):
         pack = await original(*args)
         return pack.model_copy(update={"gaps": [f"Synthetic research-round limitation {h.reasoning.calls['pack']}"]})
     h.reasoning.propose_pack = changed
+    from backend.contracts.services import ResearchQueries
+    async def revised(interpretation, gaps, previous, context):
+        return ResearchQueries(variants=[f"sensor capability detail {len(previous)}"])
+    h.reasoning.revise_queries = revised
     case = new(h)
     await h.worker.run_once(h.access)
     state = h.store.run_view(h.access, UUID(case["case_id"]), UUID(case["run_id"]))
     assert state["error_code"] == "evidence_rejected", state
-    assert h.reasoning.calls["draft"] == 3
+    # Close gaps before freezing/drafting. Only the final pack is drafted.
+    assert h.reasoning.calls["draft"] == 2 and h.backbone.calls["retrieve"] == 3
 
 
 async def test_optional_real_web_tool_budget_does_not_abort_supported_database_result(harness):

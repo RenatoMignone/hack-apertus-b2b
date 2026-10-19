@@ -1,24 +1,36 @@
-"""Constrained model response shape; the public interpretation stays unchanged."""
+"""Tolerant display-label input; factual/public interpretation stays strict."""
 from copy import deepcopy
-from typing import Annotated
 
-from pydantic import BeforeValidator, Field, StringConstraints, create_model
+from pydantic import Field, create_model
 
 from backend.contracts.pipeline import CaseInterpretation
 
-Word = Annotated[str, StringConstraints(pattern=r"^\S+$")]
-# Existing fixtures/adapters may provide the public string shape. Apply exactly
-# the same word-count validation after splitting; never discard excess words.
-ActivityWords = Annotated[list[Word], BeforeValidator(
-    lambda value: value.split() if isinstance(value, str) else value)]
 fields = {name: (field.annotation, deepcopy(field))
           for name, field in CaseInterpretation.model_fields.items()}
-fields["activity_label"] = (ActivityWords, Field(min_length=1, max_length=3,
-    description="An array of one to three individual words, e.g. [glucose, sensors]. Each item is exactly one word. Longer descriptions belong in needs/company_summary."))
+fields["activity_label"] = (str | list[str], Field(
+    description="A short display label, preferably one to three words, e.g. glucose sensors."))
+fields["ambiguities"][1].description = (
+    "ONLY ambiguity in what the USER wants, requiring their answer before search. "
+    "MUST be [] for a clear research request. Missing public facts are research_questions.")
+fields["research_questions"][1].description = (
+    "Questions the AGENT should research in sources: experts, facilities, projects, "
+    "availability, suitability. These do not require user clarification.")
+# Do not inherit public validators before translating the private wire shape.
 InterpretationResponse = create_model("InterpretationResponse",
     __config__=CaseInterpretation.model_config, **fields)
 
 
 def interpretation_value(value) -> CaseInterpretation:
-    return CaseInterpretation.model_validate({**value.model_dump(),
-        "activity_label": " ".join(value.activity_label)})
+    body = value.model_dump()
+    label = body["activity_label"]
+    label = " ".join(label) if isinstance(label, list) else label
+    label = " ".join(label.split())
+    if not label:
+        raise ValueError("activity_label must not be empty")
+    if len(label.split()) > 3:
+        # Presentation must not abort research. Preserve ALL scientific wording
+        # as a query aid, never truncate the intent to fit a display field.
+        body["search_terms"] = list(dict.fromkeys([*body["search_terms"], label]))
+        label = "Research request"
+    body["activity_label"] = label
+    return CaseInterpretation.model_validate(body)

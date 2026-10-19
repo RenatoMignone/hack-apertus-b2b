@@ -89,7 +89,7 @@ class HybridSearch:
                 raise ValueError("query profile, taxonomy, snapshot, build or embedding space is incompatible")
         queries = list(dict.fromkeys([plan.original_request, *plan.variants]))
         vectors = [validate_vector(self.embedder.embed_query(query), pin["dimension"]) for query in queries]
-        lexical, vector, rows_by_id = {}, {}, {}
+        lexical, vector, rows_by_id, query_matches = {}, {}, {}, {}
         with transaction(self.engine, access) as connection:
             for query, query_vector in zip(queries, vectors, strict=True):
                 lexical_rows = connection.execute(query_statement("""
@@ -103,6 +103,7 @@ class HybridSearch:
                     {**parameters, "vector": "[" + ",".join(str(value) for value in query_vector) + "]"}).mappings().all()
                 for branch, rows in ((lexical, lexical_rows), (vector, vector_rows)):
                     for rank, row in enumerate(rows, start=1):
+                        query_matches.setdefault(row["chunk_id"], set()).add(query)
                         if row["chunk_id"] not in branch or rank < branch[row["chunk_id"]]["rank"]:
                             branch[row["chunk_id"]] = {"rank": rank, "score": row["score"]}
             lexical = dict(sorted(lexical.items(), key=lambda item: (item[1]["rank"], str(item[0])))[:30])
@@ -124,8 +125,13 @@ class HybridSearch:
                     break
         passages = [f"Title: {row['title']}\nHeadings: {' / '.join(row['heading_path'])}\nPassage: {row['literal_text']}"
                     for row in rows_by_id.values()]
+        details = None
         try:
-            reranked = self.reranker.score(plan.original_request, passages) if self.reranker and passages else None
+            if self.reranker and passages and hasattr(self.reranker, "score_with_details"):
+                details = self.reranker.score_with_details(plan.original_request, passages)
+                reranked = [row["score"] for row in details]
+            else:
+                reranked = self.reranker.score(plan.original_request, passages) if self.reranker and passages else None
         except ServiceUnavailable:
             reranked = None
         if reranked is not None and (len(reranked) != len(passages) or not all(math.isfinite(score) for score in reranked)):
@@ -138,7 +144,10 @@ class HybridSearch:
                 snapshot_id=plan.snapshot_id, build_id=plan.build_id, lexical_rank=lexical.get(chunk_id, {}).get("rank"),
                 vector_rank=vector.get(chunk_id, {}).get("rank"), lexical_score=lexical.get(chunk_id, {}).get("score"),
                 cosine_distance=vector.get(chunk_id, {}).get("score"), fusion_score=row["fusion_score"],
-                reranker_score=reranked[index] if reranked is not None else None))
+                reranker_score=reranked[index] if reranked is not None else None,
+                reranker_windows=details[index]["windows"] if details is not None else [],
+                query_matches=[q for q in queries if q in query_matches[chunk_id]],
+                ranking_version="rrf60-rerank-max-window-v1" if details is not None else "rrf60-v1"))
         if reranked is not None:
             hits.sort(key=lambda hit: (-hit.reranker_score, str(hit.chunk_id)))
         with transaction(self.engine, access) as connection:

@@ -35,6 +35,16 @@ Labels and edges use explicit column legends; UUID repetition, row timestamps
 and repeated reviewer bookkeeping stay out of the prompt. It does not shortlist
 by keywords, truncate meaning or increase model input limits.
 
-`interpretation_response.py` asks the model for activity-label words as a bounded
-array, then joins them into the existing public string field. Excess/multiword
-items are rejected with field-specific repair diagnostics, never truncated.
+`interpretation_response.py` accepts model display labels as strings/arrays.
+Overlong wording is retained in search terms with a neutral short display fallback;
+factual/reference validation is unchanged. `research_questions` are non-blocking
+source questions; ambiguity in operator intent still requires clarification.
+
+`extraction_batches.py` bounds source context and output cardinality, retains exact
+literal records and distinct batch-local keys, and makes exclusions explicit.
+Failed batches supply no claims; all-invalid batches still fail. Title metadata is
+not a substitute for literal entity-name support. `query_planning.py` proposes
+novel gap-driven queries; the workflow owns budgets, persistence and execution.
+
+Need-fit payloads include only accepted claims and their canonical support; unrelated
+retrieval text remains in coverage and cannot exhaust the fit model context.

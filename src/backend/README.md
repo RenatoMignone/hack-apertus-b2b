@@ -94,3 +94,6 @@ For development during ingestion use `RUNTIME_CORPUS_MODE=live`: each owned run
 captures ready authorized evidence; completed publication is optional. Follow
 [live corpus setup](../../docs/data/LIVE_CORPUS_RUNTIME.md). Keep the schema
 version check enabled; the runtime role needs SELECT on `public.alembic_version`.
+
+Optional CPU reranking has a separate locked install and explicit asset provisioning:
+[reranker setup](../../docs/data/RERANKING.md). Source downloads never happen at startup.

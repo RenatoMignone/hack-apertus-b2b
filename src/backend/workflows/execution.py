@@ -6,7 +6,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ValidationError
 
-from backend.contracts.services import BudgetExceeded, InvalidModelOutput
+from backend.contracts.services import BudgetExceeded, InvalidModelOutput, ServiceError
 
 
 def encoded(value):
@@ -42,7 +42,12 @@ class Execution:
         except TimeoutError:
             raise BudgetExceeded() from None
         except ValidationError:
-            raise InvalidModelOutput() from None
+            error = InvalidModelOutput()
+            error.failed_stage = name
+            raise error from None
+        except ServiceError as error:
+            error.failed_stage = name
+            raise
         result = await asyncio.to_thread(self.store.commit_stage, self.context.access, self.context.run_id,
                                         name, inputs, {"value": value})
         if self.tracer:

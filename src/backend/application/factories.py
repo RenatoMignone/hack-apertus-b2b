@@ -35,6 +35,26 @@ class ConfiguredEmbedding:
         return self.loaded.embed_query(text)
 
 
+class ConfiguredReranker:
+    """Only the worker's first retrieval loads weights; API construction stays light."""
+    def __init__(self, configuration, path, device):
+        configuration.require_resolved()
+        if configuration.test_only:
+            raise ValueError("production factory refuses fixture reranker configurations")
+        self.configuration, self.path, self.device = configuration, path, device
+        self.loaded, self.lock = None, Lock()
+
+    def score_with_details(self, query, passages):
+        with self.lock:
+            if self.loaded is None:
+                from backend.models.reranking.local import load_reranker
+                self.loaded = load_reranker(self.configuration, self.path, device=self.device)
+        return self.loaded.score_with_details(query, passages)
+
+    def score(self, query, passages):
+        return [row["score"] for row in self.score_with_details(query, passages)]
+
+
 def reasoning(*, settings, engine, artifacts):
     from backend.evidence import create_reasoning_services
     from backend.models.reasoning import ModelSettings
@@ -49,12 +69,9 @@ def backbone(*, settings, engine, artifacts):
     if settings.reranker_configuration or settings.reranker_model_path:
         if not (settings.reranker_configuration and settings.reranker_model_path):
             raise ValueError("reranker configuration and local path must be supplied together")
-        from backend.models.reranking.local import load_reranker
         configuration = ModelConfiguration.model_validate_json(
             Path(settings.reranker_configuration).read_text(encoding="utf-8"))
-        if configuration.test_only:
-            raise ValueError("production factory refuses fixture reranker configurations")
-        reranker = load_reranker(configuration, settings.reranker_model_path, device=settings.model_device)
+        reranker = ConfiguredReranker(configuration, settings.reranker_model_path, settings.model_device)
     return create_backbone(engine, artifacts, ConfiguredEmbedding(settings), reranker=reranker)
 
 

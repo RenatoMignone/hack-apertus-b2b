@@ -28,15 +28,22 @@ async def draft_report(tasks, pack, instruction, context):
     draft = await tasks.run("draft", "Compose concise Why Bern reason cards using ONLY the frozen "
         "pack's supported claims. Every headline, line and entry is backed by claim_ids; entries "
         "use only a subset of their reason's claims. Do not invent names, roles, contacts, facts, "
-        "numbers, clinical suitability or willingness. Use kind=idea for a possible adjacent "
-        "application and explain prerequisites/uncertainty, not a proven capability. Keep company "
+        "or team/group labels. Use only an exact documented entity name present in a cited claim; "
+        "leave entries empty if the claim does not name one. A capability is not a named group. "
+        "numbers, clinical suitability or willingness. "
+        "Prefer concise documented capability statements in headlines/text. Expertise does not "
+        "establish a collaboration offer or intent: never describe a unit as offering a partnership "
+        "without a supporting claim. Conditional uses must follow the pack's actual fit arguments "
+        "and prerequisites; unresolved introductions/availability belong in open_questions. "
+        "Use kind=idea for a possible adjacent application and explain prerequisites/uncertainty, "
+        "not a proven capability. Keep company "
         "context attributed to the operator. Preserve exclusions. Do not remove material caveats "
         "even if requested. No browsing, tools or retrieval. Include the pack gaps in open_questions. "
         "Use short reason/entry keys; institution=Other unless the cited claim explicitly supports "
         "UniBE/ARTORG/DCB. from_lead MUST be false unless actual operator leads are supplied. "
         "Leave trace inputs/terms/links empty: code, not the writer, owns actual "
         "retrieval lineage. If claims cannot yield a supported reason, return no reasons and a gap.",
-        {"pack": pack.model_dump(mode="json"), "editorial_instruction": instruction},
+        {"pack": pack.model_dump(mode="json", exclude={"coverage"}), "editorial_instruction": instruction},
         DraftRevision, context, check=check)
     return DraftRevision.model_validate({**draft.model_dump(mode="json"), "open_questions":
         list(dict.fromkeys([*draft.open_questions, *pack.gaps])),

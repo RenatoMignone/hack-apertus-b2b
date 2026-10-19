@@ -7,6 +7,7 @@ and [open questions](../project/OPEN_QUESTIONS.md).
 
 | Document | Use now |
 | --- | --- |
+| [Research completion branch](BACKEND_RESEARCH_COMPLETION.md) | Activity-label fix, gap queries, reranking, recorded lineage and current acceptance limits |
 | [Current backend checklist](RUNTIME_CHECKLIST.md) | Current 14-area readiness and remaining live/output gaps |
 | [INTEGRATION.md](INTEGRATION.md) | Current merged baseline, reviewed tips, fixes and dated verification |
 | [Runtime access status](RUNTIME_ACCESS_STATUS.md) | Eric's live binding; Renato's case/capture, network readiness and production bootstrap pass after metadata grant |

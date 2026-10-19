@@ -42,7 +42,7 @@ do not feed an excluded keyword into lexical search as a positive requirement.
 3. Run PostgreSQL full-text and pgvector cosine retrieval independently over
    eligible candidates. Keyword results do **not** gate the semantic branch.
 4. Fuse ranks, deduplicate overlapping chunks and rerank bounded query/passage
-   pairs with the BGE reranker. Retain separate score components and IDs.
+   pairs with the configured local reranker. Retain separate score components and IDs.
 5. Aggregate candidates into unique typed persons/units, obtain supporting
    profiles/projects and neighboring spans, and validate factual/constraint fit.
 6. Close material gaps with bounded revised queries or eligible connected fetches;
@@ -135,3 +135,16 @@ corpus versions. New case-local evidence requires literal checks and explicit
 claim assessments before pack assembly; it is flagged even when supported.
 The taxonomy's short activity label never replaces full intent in either search
 branch. Existing independent lexical/vector fusion and budgets remain active.
+
+## 19 October implemented additions
+
+See [local reranking](RERANKING.md) for the pinned CPU model, exact pair windows,
+asset verification and measured live retrieval check. `EvidenceHit.query_matches`
+records actual lexical/vector query membership; `reranker_windows` records scoring
+context windows, not body-evidence offsets. No inferred ontology path is added.
+
+Retrieval also expands existing literal source identity/neighbor spans. Metadata
+title components are discovery hints only; source claims still need exact literal
+passages. Gap-driven planning preserves original intent and earlier supported work
+and stops when a bounded model proposal contains no novel queries. These changes
+do not gate vectors by keywords, modify authorization or alter the shared corpus.

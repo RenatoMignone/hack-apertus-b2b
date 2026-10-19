@@ -126,6 +126,9 @@ async def test_real_lanes_restricted_role_review_and_actual_pdf(harness, restric
         detail = (await client.get(case_url)).json()
         result = detail["revisions"][0]
         assert detail["evidence"] and result["reasons"][0]["line"]["evidenceIds"]
+        assert result["trace"]["inputs"] and result["trace"]["terms"] and result["trace"]["links"]
+        targets = {link["target"] for link in result["trace"]["links"]}
+        assert targets & set(detail["evidence"])
         report_url = case_url + "/reports/" + result["id"]
         selected = await client.put(report_url + "/reasons/sensor/selection", headers={"Idempotency-Key": "keep"},
             json={"selection": "kept", "expected_result_hash": result["resultHash"]})

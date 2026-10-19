@@ -55,13 +55,34 @@ async def test_large_database_taxonomy_fits_interpretation_without_dropping_conc
 
 
 @pytest.mark.asyncio
-async def test_activity_label_repair_identifies_field_instead_of_root(context, interpretation):
+async def test_long_display_label_preserves_science_without_blocking_research(context, interpretation):
     bad = interpretation.model_dump(mode='json')
     bad['activity_label'] = 'continuous glucose monitoring sensors'
-    model = FixtureChatModel(responses=[bad, interpretation.model_dump(mode='json')])
+    model = FixtureChatModel(responses=[bad])
     service = create_reasoning_services(model=model)
     result = await service.interpret('Find glucose sensors research in Bern', {}, context)
-    assert result.activity_label == interpretation.activity_label
-    assert len(model.calls) == 2
-    assert 'activity_label' in model.calls[1][-1].content
-    assert 'too_long' in model.calls[1][-1].content
+    assert result.activity_label == 'Research request'
+    assert bad['activity_label'] in result.search_terms
+    assert len(model.calls) == 1
+
+
+@pytest.mark.asyncio
+async def test_live_multitoken_label_array_and_research_unknowns(context, interpretation):
+    response = interpretation.model_dump(mode='json')
+    response.update(activity_label=['glucose', 'sensors', 'continuous monitoring'],
+                    research_questions=['Facility availability needs source research.'])
+    model = FixtureChatModel(responses=[response])
+    result = await create_reasoning_services(model=model).interpret('Find glucose research in Bern', {}, context)
+    assert result.activity_label == 'Research request'
+    assert 'glucose sensors continuous monitoring' in result.search_terms
+    assert result.research_questions and not result.blocking_questions
+
+
+@pytest.mark.asyncio
+async def test_display_fallback_does_not_accept_invalid_factual_fields(context, interpretation):
+    from backend.contracts.services import InvalidModelOutput
+    response = interpretation.model_dump(mode='json')
+    response.update(activity_label='a long technical label', concepts=['invented'])
+    service = create_reasoning_services(model=FixtureChatModel(responses=[response, response]))
+    with pytest.raises(InvalidModelOutput):
+        await service.interpret('Find research in Bern', {}, context)

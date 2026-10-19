@@ -1,15 +1,18 @@
 # Reranking adapter
 
-`local.py` implements `LocalReranker.score` and local-files-only `load_reranker`.
-It checks exact revision/runtime/tokenizer identity and per-pair token limits;
-no silent truncation or implicit model download. Missing service availability is
-explicit. The [lane handoff](../../../../docs/team/backbone/HANDOFF.md) lists gates.
+[Setup, pinned model, measured checks and limitations](../../../../docs/data/RERANKING.md).
 
-Read [retrieval](../../../../docs/data/RETRIEVAL_SPEC.md) and
-[model/build configuration](../../../../docs/data/BUILD_AND_OPERATIONS.md).
-BGE-reranker-v2-m3 is a candidate, not a resolved artifact or measured winner.
+`local.py` implements the existing `Reranker.score(query, passages)` port. The
+optional `score_with_details` returns exact windows and pair-token counts for
+retrieval observations. Longer passages use complete literal windows; the original
+query is never truncated. Invalid scores fail; budget/unavailability retains RRF
+with an explicit limitation. Scores are not factual support or probabilities.
 
-The adapter implements `Reranker.score(query, passages)` from `contracts/data.py`, returning
-one finite relevance score per passage in the same order. Respect pair/token
-budgets, deterministic tie handling and explicit service errors. Reranking is
-not a claim-entailment validator. It cannot change evidence text or permissions.
+`provision.py` explicitly downloads/verifies the pinned compact multilingual model
+at build time and runs a synthetic sanity check. Runtime is local-files-only and
+checks configuration/revision/runtime/tokenizer plus an asset-hash manifest.
+The factory loads weights lazily on first retrieval, not API construction.
+
+Install `requirements.reranker.lock`; provision the model/configuration and set
+`RERANKER_CONFIGURATION` / `RERANKER_MODEL_PATH`. The lock is measured on macOS
+arm64/Python 3.13; verify wheels on other hosts. BGE remains an evaluation candidate.

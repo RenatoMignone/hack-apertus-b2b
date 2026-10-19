@@ -137,6 +137,10 @@ class EvidenceAssessment(Contract):
     gaps: list[str] = Field(default_factory=list)
 
 
+class ResearchQueries(Contract):
+    variants: list[str] = Field(default_factory=list, max_length=5)
+
+
 class WebResearchResult(Contract):
     status: Literal["completed", "unavailable", "failed"]
     sources: list[FetchedSource] = Field(default_factory=list)
@@ -207,12 +211,14 @@ class StaleRevision(ServiceError):
 @runtime_checkable
 class ReasoningServices(Protocol):
     async def interpret(self, message: str, taxonomy_context: dict, context: RunContext) -> CaseInterpretation: ...
+    async def revise_queries(self, interpretation: CaseInterpretation, gaps: list[str], previous_queries: list[str], context: RunContext) -> ResearchQueries: ...
     async def extract(self, interpretation: CaseInterpretation, research: ResearchBundle, context: RunContext) -> ExtractionBatch: ...
     async def assess(self, claims: PersistedClaims, evidence: list[EvidenceRecord], context: RunContext) -> EvidenceAssessment: ...
     async def propose_pack(self, interpretation: CaseInterpretation, claims: PersistedClaims,
                            assessment: EvidenceAssessment, research: ResearchBundle, context: RunContext) -> ReportEvidencePack: ...
     async def draft(self, pack: ReportEvidencePack, instruction: str, context: RunContext) -> DraftRevision: ...
-    async def assess_draft(self, draft: DraftRevision, pack: ReportEvidencePack, context: RunContext) -> DraftAssessment: ...
+    async def assess_draft(self, draft: DraftRevision, pack: ReportEvidencePack, context: RunContext,
+                           *, evidence: list[EvidenceRecord] = ()) -> DraftAssessment: ...
 
 
 @runtime_checkable

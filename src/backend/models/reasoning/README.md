@@ -29,3 +29,8 @@ with `PYTHONPATH=src python -m pytest src/backend/tests/intelligence -q`.
 The opt-in `backend.tests.intelligence.benchmark` uses synthetic non-confidential
 fixtures only; [comparison findings](../../../../docs/team/intelligence/MODEL_COMPARISON.md)
 record limitations rather than claiming model quality.
+
+Invalid structured results retain safe model-task and schema-field/type diagnostics
+for authorized run status. Provider bodies, validation input and prompts are excluded.
+Truncated responses are identified as `output_token_limit`; there is no automatic
+model switch or larger unbounded output retry.

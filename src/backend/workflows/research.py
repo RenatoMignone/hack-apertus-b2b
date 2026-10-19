@@ -17,9 +17,9 @@ def research_tools(adapter, context):
     return (StructuredTool.from_function(coroutine=discover), StructuredTool.from_function(coroutine=fetch))
 
 
-def public_query(interpretation):
+def public_query(interpretation, variants=None):
     # Never send the whole case prompt/company summary to a discovery provider.
-    terms = [interpretation.activity_label, *interpretation.search_terms[:4]]
+    terms = variants[:2] if variants is not None else [interpretation.activity_label, *interpretation.search_terms[:4]]
     company = (interpretation.company_name or "").casefold()
     return " ".join(term[:80] for term in terms if "@" not in term and "://" not in term
                     and (not company or company not in term.casefold()))[:400]

@@ -55,6 +55,16 @@ def main():
         else:
             required(runtime.embedding_model_path and Path(runtime.embedding_model_path).exists())
     check("embedding configuration and local assets (not contacted)", embedding)
+    if runtime.reranker_configuration or runtime.reranker_model_path:
+        def reranker():
+            from backend.contracts.data import ModelConfiguration
+            from backend.models.reranking.local import runtime_identity, verify_assets
+            configuration = ModelConfiguration.model_validate_json(Path(runtime.reranker_configuration).read_text())
+            configuration.require_resolved()
+            required(configuration.role == "reranking" and not configuration.test_only)
+            required(configuration.adapter_version == runtime_identity())
+            verify_assets(runtime.reranker_model_path, configuration)
+        check("reranker configuration/runtime/local asset integrity (not contacted)", reranker)
     check("PDF logo exists", lambda: required(Path(runtime.pdf_logo_path).is_file()))
 
     def artifacts():

@@ -163,3 +163,23 @@ historical pack reads without requiring the old input to remain current;
 research writes still require active input. Migration 0006 provisions case scopes
 through an owner-checked restricted function, not direct app-role grant writes.
 Shared contract/configuration changes have one integrator per new task.
+
+
+## 19 October in-process extension
+
+The integrated `ReasoningServices` adds
+`revise_queries(interpretation, gaps, previous_queries, context) -> ResearchQueries`,
+with at most five variants. Update injected reasoning fixtures with this method;
+there is no runtime fallback to invented queries. Transport schema version remains
+1; no SQL migration is required. `CaseInterpretation.research_questions` is an
+additive list of non-blocking source questions.
+
+`EvidenceHit` adds actual `query_matches` and optional `reranker_windows`. Code
+resolves query/evidence links into `ReportEvidencePack.coverage.search_trace` at
+freeze. Draft trace remains empty and cannot override those observations.
+
+`assess_draft(..., *, evidence=())` accepts canonical `EvidenceRecord` support.
+The graph supplies the pack's actual passages, including when reusing a pack,
+through authorized backbone reads. The assessor checks exact wording and identities;
+missing optional company needs alone do not invalidate a narrower supported fact.
+The pack remains unchanged; bulk retrieval data is not added to drafting context.

@@ -31,6 +31,13 @@ class CaseState(TypedDict, total=False):
     assessment: dict
     pack: dict
     draft_error: bool
+    pending_gaps: list[str]
+    research_exhausted: bool
+    query_history: list[str]
+    fetched_urls: list[str]
+    web_query: str
+    search_observations: list[dict]
+    round_started_at: str
 
 
 def build_graph(store, reasoning, backbone, web, checkpointer, tracer=None):
@@ -40,7 +47,8 @@ def build_graph(store, reasoning, backbone, web, checkpointer, tracer=None):
     mapping = {"interpret": nodes.interpret, "ask_clarification": nodes.questions, "clarify": nodes.clarify,
         "plan": nodes.plan, "retrieve": nodes.retrieve, "web_search": nodes.web_research, "merge": nodes.merge,
         "extract": nodes.extract, "persist_candidates": nodes.persist_candidates, "assess": nodes.assess,
-        "propose_pack": nodes.propose_pack, "load_pack": nodes.load_pack, "draft": nodes.draft,
+        "propose_pack": nodes.propose_pack, "freeze_pack": nodes.freeze_pack,
+        "load_pack": nodes.load_pack, "draft": nodes.draft,
         "reject_draft": nodes.reject_draft}
     for name, function in mapping.items():
         graph.add_node(name, function, retry_policy=policy)
@@ -48,16 +56,16 @@ def build_graph(store, reasoning, backbone, web, checkpointer, tracer=None):
     graph.add_conditional_edges("interpret", lambda s: "ask_clarification" if s["interpretation"]["blocking_questions"] else "plan")
     graph.add_edge("ask_clarification", "clarify")
     graph.add_edge("clarify", "interpret")
-    graph.add_edge("plan", "retrieve")
-    graph.add_edge("plan", "web_search")
+    graph.add_conditional_edges("plan", lambda s: ("reject_draft" if s.get("draft_error") else "freeze_pack")
+        if s.get("research_exhausted") else ["retrieve", "web_search"])
     graph.add_edge(["retrieve", "web_search"], "merge")
     graph.add_edge("merge", "extract")
     graph.add_edge("extract", "persist_candidates")
     graph.add_edge("persist_candidates", "assess")
-    graph.add_conditional_edges("assess", lambda s: "plan" if s["assessment"]["gaps"] and
-        not any(a["status"] == "supported" for a in s["assessment"]["assessments"]) and
-        s["round"] < s["context"]["max_research_rounds"] else "propose_pack")
-    graph.add_edge("propose_pack", "draft")
+    graph.add_edge("assess", "propose_pack")
+    graph.add_conditional_edges("propose_pack", lambda s: "plan" if s.get("pending_gaps") and
+        s["round"] < s["context"]["max_research_rounds"] else "freeze_pack")
+    graph.add_edge("freeze_pack", "draft")
     graph.add_edge("load_pack", "draft")
     # A wording-only edit cannot silently turn into browsing/new factual work.
     graph.add_conditional_edges("draft", lambda s: END if not s["draft_error"] else (

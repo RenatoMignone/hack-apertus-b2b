@@ -95,3 +95,15 @@ coordinated contract change; omission must not be replaced by invented metadata.
 HTTP PDF remains the reviewed server artifact; browser PDF/PPTX are explicit demo
 features. Connected PPTX requires a new supported format plus the same immutable
 review/export gates, not client generation from an unapproved projection.
+
+## 19 October additive backend fields
+
+Run status includes `failure_detail` with safe `failed_stage`, `model_task` and
+`validation_issues` (schema field/type only). Provider bodies/prompts/credentials
+are omitted. Existing generic error handling remains compatible.
+
+The existing `trace` now uses code-owned `pack.coverage.search_trace` for new
+results: original input → actual query → exact canonical supporting evidence.
+These are retrieval paths, not invented ontology concepts or calibrated weights.
+Older packs without recorded paths retain their empty/unavailable trace. Wording
+edits reuse the original pack/trace. Frontend source files were not changed.
