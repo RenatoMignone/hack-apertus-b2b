@@ -37,7 +37,7 @@ export default function CaseDataControls({ detail, busy, onBusy, onChange, onSta
     if (currency && !/^[A-Z]{3}$/.test(currency)) { setError('Enter an explicit three-letter currency code.'); return; }
     const values: BusinessContext = { planned_jobs: jobs ? Number(jobs) : null,
       investment_amount: amount || null, investment_currency: currency || null, timeline: timeline.trim() || null };
-    void perform(() => api.setBusinessContext!(detail.case.id, values, onStage, detail.revision));
+    void perform(() => api.setBusinessContext!(detail.case.id, values, (stage) => { if (alive.current) onStage(stage); }, detail.revision));
   };
   return <details className="my-4 rounded-xl border border-line bg-white p-4">
     <summary className="cursor-pointer text-sm font-medium">Company plans and case comparison</summary>

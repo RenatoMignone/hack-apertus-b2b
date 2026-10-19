@@ -71,6 +71,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
         const response = await fetcher(base + url, { method, headers, credentials: 'omit',
           redirect: 'error', cache: 'no-store', signal: controller.signal,
           body: body === undefined ? undefined : JSON.stringify(body) });
+        signal?.throwIfAborted();
         if (!response.ok) {
           const payload = await response.json().catch(() => ({}));
           throw new ApiError(response.status, payload.error?.code ?? 'service_unavailable');
@@ -204,6 +205,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     },
     async sendMessage(caseId, text, onStage, kind = 'focus', signal) {
       const detail = await requireCase(caseId);
+      signal?.throwIfAborted();
       if (detail.currentRun?.status === 'waiting_for_input') throw new Error('Answer the clarification question before sending a new request.');
       const started = await request<Accepted>(`${path(caseId)}/messages`, 'POST', {
         text, kind, expected_revision: detail.revision });
@@ -212,6 +214,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     },
     async answerFollowUp(caseId, turnId, answer, onStage, signal) {
       const detail = await requireCase(caseId);
+      signal?.throwIfAborted();
       const question = detail.turns.find((turn) => turn.id === turnId)?.followUp;
       if (!detail.currentRun || !question) throw new Error('This clarification is no longer available.');
       const accepted = await request<Accepted>(`${path(caseId)}/runs/${detail.currentRun.run_id}/answers`, 'POST', {

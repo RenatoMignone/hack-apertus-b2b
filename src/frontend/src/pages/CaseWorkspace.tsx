@@ -223,8 +223,9 @@ export default function CaseWorkspace() {
   const highlight = useCallback((ids: string[]) => {
     if (!ids.length) return;
     setFlash(new Set(ids));
-    setTimeout(() => document.getElementById(`reason-${ids[0]}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
-    setTimeout(() => setFlash(new Set()), 3300);
+    const current = scope.current.capture();
+    setTimeout(() => { if (current()) document.getElementById(`reason-${ids[0]}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
+    setTimeout(() => { if (current()) setFlash(new Set()); }, 3300);
   }, []);
 
   const afterAgent = (d: CaseDetail) => {
@@ -239,7 +240,12 @@ export default function CaseWorkspace() {
   if (detail === undefined)
     return (
       <div className="mx-auto max-w-3xl space-y-3 px-6 py-8">
-        {error && <p role="alert" className="text-brand">{error}</p>}
+        {error && <p role="alert" className="text-brand">{error}
+          <button className="ml-3 underline" onClick={() => {
+            const ticket = scope.current.begin(); setError('');
+            void api.getCase(id).then(value => { if (ticket.current()) setDetail(value); })
+              .catch(reason => { if (ticket.current()) setError(reason instanceof Error ? reason.message : 'Cannot load this case.'); });
+          }}>Reconnect to case</button></p>}
         <Skeleton className="h-28" />
         <Skeleton className="h-20" />
         <Skeleton className="h-20" />
@@ -271,16 +277,14 @@ export default function CaseWorkspace() {
     const r = revision?.reasons.find((x) => x.id === reasonId);
     const prev = r?.selection ?? 'none';
     const expected = revision?.resultHash ? { resultId: revision.id, resultHash: revision.resultHash } : undefined;
-    setSelecting(true);
+    setSelecting(true); setError('');
     try {
       const updated = await api.setSelection(detail.case.id, reasonId, s, expected);
       if (!ticket.current()) return;
       setDetail(updated);
       if (s === 'kept') toast('Kept for the pitch');
-      if (s === 'rejected') toast(`Hidden: ${r?.headline ?? 'item'}`, () => api.setSelection(detail.case.id, reasonId, prev, expected).then((value) => {
-        if (ticket.current()) setDetail(value);
-      }));
-    } catch (reason) { if (ticket.current()) { reportApiError(reason); await refreshConflict(reason, ticket.current); } }
+      if (s === 'rejected') toast(`Hidden: ${r?.headline ?? 'item'}`, () => { if (ticket.current() && !busy.current) void select(reasonId, prev); });
+    } catch (reason) { if (ticket.current()) { if (!isStateConflict(reason)) reportApiError(reason); await refreshConflict(reason, ticket.current); } }
     finally { if (ticket.current()) { busy.current = false; setSelecting(false); } }
   };
   const setStatus = (status: CaseStatus) => {
@@ -288,7 +292,7 @@ export default function CaseWorkspace() {
     const ticket = scope.current.begin(); busy.current = true;
     void api.setStatus(detail.case.id, status).then(value => {
       if (ticket.current()) setDetail(value);
-    }).catch(async reason => { if (ticket.current()) { reportApiError(reason); await refreshConflict(reason, ticket.current); } })
+    }).catch(async reason => { if (ticket.current()) { if (!isStateConflict(reason)) reportApiError(reason); await refreshConflict(reason, ticket.current); } })
       .finally(() => { if (ticket.current()) busy.current = false; });
   };
   const kept = revision?.reasons.filter((r) => r.selection === 'kept').length ?? 0;
