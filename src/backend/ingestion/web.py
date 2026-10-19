@@ -14,6 +14,8 @@ from urllib.robotparser import RobotFileParser
 
 from backend.contracts.data import content_hash
 from backend.contracts.pipeline import FetchedSource, canonical_url
+from backend.observability.logging import activity, event
+
 from backend.contracts.services import BudgetExceeded, ServiceUnavailable, WebResearchResult
 from backend.ingestion.normalize import normalize
 
@@ -199,11 +201,11 @@ class PublicWebTools:
             raise BudgetExceeded()
         key = (context.access.principal_id, context.run_id, context.request_id)
         sources, limitations = [], list(self.discovery_limitations.get(key, []))
-        for url in dict.fromkeys(urls):
+        for index, url in enumerate(dict.fromkeys(urls)):
             self._budget(context)
             try:
                 remaining = (context.deadline_at - datetime.now(timezone.utc)).total_seconds()
-                async with asyncio.timeout(max(0.001, remaining)):
+                async with activity("web.page", run_id=context.run_id, attempt=index+1, count=len(urls)), asyncio.timeout(max(0.001, remaining)):
                     sources.append(await asyncio.to_thread(self.fetcher.fetch, canonical_url(url)))
             except ServiceUnavailable:
                 limitations.append("crawl4ai_unavailable")

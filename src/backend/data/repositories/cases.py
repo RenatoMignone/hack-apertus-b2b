@@ -12,8 +12,9 @@ class CaseRepository:
     def __init__(self, engine):
         self.engine = engine
 
-    def _case(self, connection, access, case_id):
-        row = connection.execute(select(tables.cases).where(tables.cases.c.case_id == case_id).with_for_update()).mappings().one()
+    def _case(self, connection, access, case_id, *, lock=True):
+        query = select(tables.cases).where(tables.cases.c.case_id == case_id)
+        row = connection.execute(query.with_for_update() if lock else query).mappings().one()
         if row["owner_id"] != access.principal_id or row["namespace"] != access.namespace:
             raise PermissionError("case access denied")
         return row
@@ -99,9 +100,10 @@ class CaseRepository:
             connection.execute(update(tables.questions).where(tables.questions.c.question_id == question_id).values(status="answered"))
             return run["thread_id"]
 
-    def _run(self, connection, access, run_id):
-        run = connection.execute(select(tables.runs).where(tables.runs.c.run_id == run_id).with_for_update()).mappings().one()
-        case = self._case(connection, access, run["case_id"])
+    def _run(self, connection, access, run_id, *, lock=True):
+        query = select(tables.runs).where(tables.runs.c.run_id == run_id)
+        run = connection.execute(query.with_for_update() if lock else query).mappings().one()
+        case = self._case(connection, access, run["case_id"], lock=lock)
         if case["current_input_id"] != run["input_id"] or run["status"] in {"cancelled", "superseded"}:
             raise ValueError("run has stale input or is cancelled")
         return run

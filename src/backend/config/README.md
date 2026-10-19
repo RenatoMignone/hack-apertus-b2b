@@ -61,3 +61,6 @@ does not filter vector eligibility. Optional flags `CASE_MEMORY_ENABLED` and
 corpus-preparation SQL separately from the research deadline. Existing stricter
 statement timeouts are preserved and command failures roll back. See
 [capture performance](../../../docs/data/CAPTURE_PERFORMANCE.md).
+
+
+Optional `RUNTIME_LOCAL_ACCESS=true` permits tokenless loopback testing with exactly one existing identity binding; shared deployments keep false. CLI rejects non-loopback binding and disables proxy-header trust. See [local access and runtime feedback](../../../docs/team/RUNTIME_FEEDBACK_AND_SEARCH.md).

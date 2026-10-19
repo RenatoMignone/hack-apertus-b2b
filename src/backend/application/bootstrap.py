@@ -9,6 +9,7 @@ from backend.config.runtime import RuntimeSettings
 from backend.config.settings import Settings
 from backend.contracts.services import ServiceUnavailable
 from backend.data.database import check_schema, engine_for
+from backend.observability.logging import event
 
 
 class Registry:
@@ -25,12 +26,13 @@ class Registry:
                 url = os.getenv(binding.database_url_env)
                 if not url:
                     raise ServiceUnavailable()
-                engine = engine_for(url)
+                engine = engine_for(url, runtime=True)
                 try:
                     check_schema(engine)  # never migrate at application startup
                     artifacts = Settings.from_env(database_url=url).artifact_store()
                     services = Services.configured(self.settings, engine, artifacts)
-                except Exception:
+                except Exception as error:
+                    event("runtime.initialization_failed", error_type=type(error).__name__)
                     engine.dispose()
                     raise ServiceUnavailable() from None
                 from backend.observability.tracing import SafeTracer, langfuse_tracer
@@ -40,6 +42,7 @@ class Registry:
                         tracer = langfuse_tracer(self.settings.langfuse_url, self.settings.langfuse_public_key, self.settings.langfuse_secret_key)
                     except Exception:
                         tracer.degraded = True  # a diagnostic outage never blocks business work
+                event("runtime.ready", model=self.settings.llm_name)
                 self.apps[key] = RuntimeApplication(RuntimeStore(engine, self.settings, artifacts), services, tracer=tracer)
             return self.apps[key]
 

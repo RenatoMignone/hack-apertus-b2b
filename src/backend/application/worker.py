@@ -11,6 +11,7 @@ from backend.contracts.pipeline import DraftRevision, ReportEvidencePack
 from backend.contracts.services import (EvidenceRejected, PdfInput, ServiceError, ServiceUnavailable, StaleRevision)
 from backend.workflows.checkpoints import CheckpointPort, async_checkpoint
 from backend.workflows.graph import build_graph
+from backend.observability.logging import activity, context, event
 
 
 class Worker:
@@ -20,7 +21,12 @@ class Worker:
         self.checkpoint_factory, self.tracer = checkpoint_factory, tracer or application.tracer
 
     async def db(self, name, *args, **kwargs):
-        return await asyncio.to_thread(getattr(self.store, name), *args, **kwargs)
+        # Queue polls and routine lease renewals are intentionally quiet. Every
+        # preparation/stage DB call names exactly what a waiting worker is doing.
+        if name in {"claim_job", "heartbeat"}:
+            return await asyncio.to_thread(getattr(self.store, name), *args, **kwargs)
+        async with activity("worker.database", task=name):
+            return await asyncio.to_thread(getattr(self.store, name), *args, **kwargs)
 
     @asynccontextmanager
     async def checkpoints(self, access, run_id):
@@ -65,7 +71,8 @@ class Worker:
             operation = asyncio.create_task(self.perform(access, job))
             heartbeat = asyncio.create_task(self.keep_alive(access, job, operation))
             try:
-                result = await operation
+                async with activity("worker.job", run_id=job["run_id"], stage=job["stage"]):
+                    result = await operation
                 await self.db("finish_job", access, job["attempt_id"], self.worker_id, result)
             except asyncio.CancelledError:
                 if asyncio.current_task().cancelling():
@@ -74,6 +81,8 @@ class Worker:
                     raise
             except Exception as error:
                 code = error.code if isinstance(error, ServiceError) else "service_unavailable"
+                event("worker.error", run_id=job["run_id"], stage=getattr(error, "failed_stage", job["stage"]),
+                      error_type=type(error).__name__, error_code=code)
                 if isinstance(error, ValidationError):
                     code = "invalid_model_output"
                 try:
@@ -98,10 +107,15 @@ class Worker:
                 await self.db("heartbeat", access, job["attempt_id"], self.worker_id)
         except asyncio.CancelledError:
             raise
-        except Exception:
+        except Exception as error:
+            event("worker.heartbeat_failed", run_id=job["run_id"], error_type=type(error).__name__)
             operation.cancel()
 
     async def perform(self, access, job):
+        with context(run_id=job["run_id"]):
+            return await self._perform(access, job)
+
+    async def _perform(self, access, job):
         if job["stage"] == "runtime.export":
             return await self.export(access, job)
         run_id = job["run_id"]
@@ -111,7 +125,8 @@ class Worker:
             graph = build_graph(self.store, self.services.reasoning, self.services.backbone,
                                 self.services.web, saver, self.tracer, memory=self.services.memory)
             config = {**config, "recursion_limit": 120}
-            snapshot = await graph.aget_state(config)
+            async with activity("worker.checkpoint_read", run_id=run_id):
+                snapshot = await graph.aget_state(config)
             if snapshot.values and not snapshot.next:
                 result = snapshot.values
             elif snapshot.values and any(task.interrupts for task in snapshot.tasks):

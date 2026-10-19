@@ -45,3 +45,6 @@ A rejected draft gets at most one wording-only rewrite and a fresh semantic
 assessment against the unchanged pack and its canonical cited passages. A failed
 rewrite remains blocked. Draft-only runs resolve historical support without new
 research. Neither the writer nor operator selection can waive support checks.
+
+
+Execution records actual start/finish progress as diagnostic `runtime.progress.*` stage attempts, exposing concurrent retrieval/web activity without changing committed-output/checkpoint recovery. Console activity logs and waiting heartbeats are safe metadata only.

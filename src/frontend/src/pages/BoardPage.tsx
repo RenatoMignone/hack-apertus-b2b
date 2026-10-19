@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+import { DropdownMenu, IconButton } from '@radix-ui/themes';
 import { Link } from 'react-router-dom';
 import { MoreHorizontal, Search } from 'lucide-react';
 import { api } from '../api';
+import { reportApiError } from '../components/ApiErrors';
 import { useLive } from '../api/useLive';
 import type { CaseOutcome, CaseStatus, CaseSummary } from '../types/contract';
 import { useToast } from '../components/Toast';
@@ -9,61 +11,30 @@ import { CaseFlags, OUTCOME, Skeleton, STATUS, STATUS_ORDER, timeAgo, useTitle }
 
 /** Keyboard- and mouse-friendly alternative to dragging. */
 function CardMenu({ c, onMove }: { c: CaseSummary; onMove: (s: CaseStatus, outcome?: CaseOutcome) => void }) {
-  const [open, setOpen] = useState(false);
-  const box = useRef<HTMLDivElement>(null);
   const toast = useToast();
-
-  useEffect(() => {
-    if (!open) return;
-    const close = (e: MouseEvent) => !box.current?.contains(e.target as Node) && setOpen(false);
-    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
-    document.addEventListener('mousedown', close);
-    document.addEventListener('keydown', esc);
-    return () => {
-      document.removeEventListener('mousedown', close);
-      document.removeEventListener('keydown', esc);
-    };
-  }, [open]);
-
-  const item = 'block w-full rounded-md px-2.5 py-1.5 text-left text-sm hover:bg-canvas';
-  return (
-    <div ref={box} className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        aria-label={`Actions for ${c.companyLabel}`}
-        aria-expanded={open}
-        className="rounded-md p-1 text-muted hover:bg-canvas hover:text-ink"
-      >
-        <MoreHorizontal size={16} />
-      </button>
-      {open && (
-        <div className="absolute right-0 top-7 z-20 w-48 rounded-xl border border-line bg-white p-1 shadow-lg">
-          <div className="px-2.5 pb-1 pt-1.5 text-xs font-medium text-muted">Move to</div>
-          {STATUS_ORDER.filter((s) => s !== c.status && s !== 'closed').map((s) => (
-            <button key={s} className={item} onClick={() => (onMove(s), setOpen(false))}>
-              {STATUS[s].label}
-            </button>
-          ))}
-          {(['visit', 'no_interest'] as CaseOutcome[]).map((o) => (
-            <button key={o} className={item} onClick={() => (onMove('closed', o), setOpen(false))}>
-              Closed · {OUTCOME[o].label.toLowerCase()}
-            </button>
-          ))}
-          <div className="my-1 border-t border-line" />
-          <button
-            className={item}
-            onClick={async () => {
-              await api.setCaseFlags(c.id, { onHold: !c.onHold });
-              toast(c.onHold ? `${c.companyLabel} is active again` : `${c.companyLabel} put on hold`, () => api.setCaseFlags(c.id, { onHold: c.onHold }));
-              setOpen(false);
-            }}
-          >
-            {c.onHold ? 'Take off hold' : 'Put on hold'}
-          </button>
-        </div>
-      )}
-    </div>
-  );
+  const toggleHold = async () => {
+    try {
+      await api.setCaseFlags(c.id, { onHold: !c.onHold });
+      toast(c.onHold ? `${c.companyLabel} is active again` : `${c.companyLabel} put on hold`,
+        () => { void api.setCaseFlags(c.id, { onHold: c.onHold }).catch(reportApiError); });
+    } catch (error) { reportApiError(error); }
+  };
+  return <div className="case-menu">
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger><IconButton variant="ghost" color="gray" aria-label={`Actions for ${c.companyLabel}`}><MoreHorizontal size={18} /></IconButton></DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.Item asChild><Link to={`/cases/${c.id}`}>Open case</Link></DropdownMenu.Item>
+        <DropdownMenu.Separator />
+        <DropdownMenu.Label>Move to</DropdownMenu.Label>
+        {STATUS_ORDER.filter((s) => s !== c.status && s !== 'closed').map((s) =>
+          <DropdownMenu.Item key={s} onSelect={() => onMove(s)}>{STATUS[s].label}</DropdownMenu.Item>)}
+        {(['visit', 'no_interest'] as CaseOutcome[]).map((o) =>
+          <DropdownMenu.Item key={o} onSelect={() => onMove('closed', o)}>Closed · {OUTCOME[o].label.toLowerCase()}</DropdownMenu.Item>)}
+        <DropdownMenu.Separator />
+        <DropdownMenu.Item onSelect={() => { void toggleHold(); }}>{c.onHold ? 'Take off hold' : 'Put on hold'}</DropdownMenu.Item>
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
+  </div>;
 }
 
 export default function BoardPage() {
@@ -76,13 +47,15 @@ export default function BoardPage() {
 
   const move = async (c: CaseSummary, status: CaseStatus, outcome?: CaseOutcome) => {
     if (c.status === status && c.outcome === outcome) return;
+    try {
     const prev = { status: c.status, outcome: c.outcome };
     await api.setStatus(c.id, status);
     if (outcome) await api.setCaseFlags(c.id, { outcome });
     toast(`${c.companyLabel} → ${STATUS[status].label}${outcome ? ` · ${OUTCOME[outcome].label}` : ''}`, async () => {
       await api.setStatus(c.id, prev.status);
-      if (prev.outcome) await api.setCaseFlags(c.id, { outcome: prev.outcome });
+      await api.setCaseFlags(c.id, { outcome: prev.outcome });
     });
+    } catch (error) { reportApiError(error); }
   };
 
   const visible = (cases ?? []).filter((c) => `${c.companyLabel} ${c.oneLineNeed}`.toLowerCase().includes(q.toLowerCase()));
@@ -96,9 +69,9 @@ export default function BoardPage() {
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search cases" aria-label="Search cases" className="w-40 outline-none" />
         </label>
       </div>
-      <p className="px-6 pt-1 text-sm text-muted">Drag a card to another column, or use its ⋯ menu.</p>
+      <p className="px-6 pt-1 text-sm text-muted">Click anywhere on a card to open it. Drag to change status, or use its actions menu.</p>
 
-      <div className="grid min-h-0 flex-1 grid-cols-4 gap-3 overflow-x-auto p-5" style={{ minWidth: 0 }}>
+      <div className="case-board grid min-h-0 flex-1 gap-3 overflow-x-auto p-5" style={{ minWidth: 0 }}>
         {STATUS_ORDER.map((s) => {
           const col = visible.filter((c) => c.status === s);
           return (
@@ -131,12 +104,12 @@ export default function BoardPage() {
                     draggable
                     onDragStart={() => setDragId(c.id)}
                     onDragEnd={() => setDragId(null)}
-                    className={`group rounded-xl border bg-white p-3 shadow-sm transition hover:border-ink/30 ${dragId === c.id ? 'opacity-40' : ''} ${
+                    className={`case-card group transition ${dragId === c.id ? 'opacity-40' : ''} ${
                       c.onHold ? 'border-dashed border-muted/60 bg-canvas' : 'border-line'
                     }`}
                   >
                     <div className="flex items-start gap-2">
-                      <Link to={`/cases/${c.id}`} draggable={false} className="min-w-0 flex-1 font-medium hover:text-brand">
+                      <Link to={`/cases/${c.id}`} draggable={false} className="case-link min-w-0 flex-1 font-semibold hover:text-brand">
                         {c.companyLabel}
                       </Link>
                       <CardMenu c={c} onMove={(st, o) => move(c, st, o)} />

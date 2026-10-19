@@ -41,12 +41,17 @@ def main():
     worker.add_argument("--once", action="store_true")
     sub.add_parser("checkpoints-setup")
     args = parser.parse_args()
+    from backend.observability.logging import configure
+    configure()
     if args.env_file:
         from backend.data.cli import load_environment
         load_environment(args.env_file)
     if args.command == "serve":
+        if RuntimeSettings.from_env().local_access and args.host not in {"127.0.0.1", "::1", "localhost"}:
+            parser.error("RUNTIME_LOCAL_ACCESS requires a loopback --host")
         import uvicorn
-        uvicorn.run("backend.api.app:create_app", factory=True, host=args.host, port=args.port)
+        uvicorn.run("backend.api.app:create_app", factory=True, host=args.host, port=args.port,
+                    log_config=None, proxy_headers=False)
     elif args.command == "worker":
         run_async(work(Registry(), args.once))
     else:

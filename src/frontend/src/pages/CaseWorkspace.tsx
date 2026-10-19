@@ -8,7 +8,7 @@ import EvidenceDrawer from '../components/EvidenceDrawer';
 import ExportModal from '../components/ExportModal';
 import Results from '../components/Results';
 import CaseDataControls from '../components/CaseDataControls';
-import RunStepper from '../components/RunStepper';
+import ResearchProgress from '../components/ResearchProgress';
 import { useToast } from '../components/Toast';
 import { Button, CaseFlags, Skeleton, StatusSelect, useTitle } from '../components/ui';
 import { reportApiError } from '../components/ApiErrors';
@@ -125,7 +125,7 @@ export default function CaseWorkspace() {
   const [drawer, setDrawer] = useState<string | null>(null);
   const [flash, setFlash] = useState<Set<string>>(new Set());
   const [exportOpen, setExportOpen] = useState(false);
-  const [started, setStarted] = useState(false);
+  const started = useRef(false);
   const [viewedRevisionId, setViewedRevisionId] = useState<string>();
   const [selecting, setSelecting] = useState(false);
   const activeCase = useRef(id);
@@ -151,7 +151,7 @@ export default function CaseWorkspace() {
 
   useEffect(() => {
     let alive = true;
-    setStarted(false);
+    started.current = false;
     setViewedRevisionId(undefined);
     setSelecting(false);
     setExportOpen(false);
@@ -165,7 +165,7 @@ export default function CaseWorkspace() {
   }, [id]);
 
   const failed = (reason: unknown) => {
-    if (activeCase.current !== id) return;
+    if (activeCase.current !== id || (reason instanceof DOMException && reason.name === "AbortError")) return;
     setRunning(false);
     setError(reason instanceof Error ? reason.message : 'The request could not be completed.');
     void api.getCase(id).then((value) => { if (activeCase.current === id) setDetail(value); }).catch(reportApiError);
@@ -181,17 +181,19 @@ export default function CaseWorkspace() {
   // A freshly created case runs its first search here.
   useEffect(() => {
     const wantsRun = (location.state as { run?: boolean } | null)?.run;
-    if (!detail || started) return;
+    if (!detail || detail.case.id !== id || started.current) return;
     const active = detail.currentRun && ['queued', 'running'].includes(detail.currentRun.status);
     if (!active && !(wantsRun && !detail.currentRun && !detail.revisions.length)) return;
-    setStarted(true);
+    started.current = true;
+    const controller = new AbortController();
     setRunning(true);
-    api.runCase(detail.case.id, (next) => { if (activeCase.current === id) setStage(next); }).then((d) => {
+    api.runCase(detail.case.id, (next) => { if (activeCase.current === id) setStage(next); }, controller.signal).then((d) => {
       if (activeCase.current !== id) return;
       setDetail(d);
       setRunning(false);
     }).catch(failed);
-  }, [detail, location.state, started]);
+    return () => { controller.abort(); };
+  }, [detail?.case.id, location.state, id]);
 
   const revision = useMemo(
     () => detail?.revisions.find((r) => r.id === (viewedRevisionId ?? detail.currentRevisionId)),
@@ -329,15 +331,14 @@ export default function CaseWorkspace() {
           <div className="mx-auto max-w-3xl px-6 pb-16 pt-4">
             <CaseDataControls key={`${detail.case.id}:${detail.inputId}`} detail={detail}
               busy={running || selecting || awaitingAnswers || historical} onBusy={setRunning} onChange={setDetail} onStage={setStage} />
+            {running && revision && <div className="mb-6"><ResearchProgress caseId={id} stage={stage} /></div>}
             {revision && <JumpBar revision={revision} />}
             {!revision && running && (
-              <div className="mx-auto mt-10 max-w-xs rounded-2xl border border-line bg-white p-6">
-                <RunStepper stage={stage} />
-              </div>
+              <div className="mx-auto mt-8 max-w-xl"><ResearchProgress caseId={id} stage={stage} /></div>
             )}
             {!revision && !running && (
               <p className="mt-10 text-center text-sm text-muted">
-                No brief yet for this case. <Link to="/cases/new" className="font-medium text-brand">Start a new case</Link>
+                No brief yet for this case. {!awaitingAnswers && <button onClick={retry} className="font-medium text-brand">Start / resume research</button>}
               </p>
             )}
             {revision && (

@@ -6,6 +6,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ValidationError
 
+from backend.observability.logging import activity, event
+
 from backend.contracts.services import BudgetExceeded, InvalidModelOutput, ServiceError
 
 
@@ -33,12 +35,22 @@ class Execution:
         inputs = encoded(inputs)
         _, cached = await asyncio.to_thread(self.store.stage_output, self.context.access, self.context.run_id, name, inputs)
         if cached is not None:
+            event("stage.reused", run_id=self.context.run_id, case_id=self.context.case_id, stage=name)
             return cached["value"]
         self.remaining()
         started = datetime.now(timezone.utc)
+        progress = hasattr(self.store, "start_activity")
+        if progress:
+            try:
+                await asyncio.to_thread(self.store.start_activity, self.context.access, self.context.run_id, name)
+            except Exception:
+                progress = False
+                event("stage.progress_unavailable", run_id=self.context.run_id, stage=name)
+        succeeded = False
         try:
-            async with asyncio.timeout(self.remaining()):
+            async with activity("stage", run_id=self.context.run_id, case_id=self.context.case_id, stage=name), asyncio.timeout(self.remaining()):
                 value = encoded(await task())
+                succeeded = True
         except TimeoutError:
             raise BudgetExceeded() from None
         except ValidationError:
@@ -48,6 +60,12 @@ class Execution:
         except ServiceError as error:
             error.failed_stage = name
             raise
+        finally:
+            if progress:
+                try:
+                    await asyncio.to_thread(self.store.finish_activity, self.context.access, self.context.run_id, name, failed=not succeeded)
+                except Exception:
+                    event("stage.progress_unavailable", run_id=self.context.run_id, stage=name)
         result = await asyncio.to_thread(self.store.commit_stage, self.context.access, self.context.run_id,
                                         name, inputs, {"value": value})
         if self.tracer:

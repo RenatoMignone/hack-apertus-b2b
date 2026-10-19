@@ -18,6 +18,7 @@ from backend.data.repositories.cases import CaseRepository
 from backend.data.repositories.corpus import CorpusRepository
 from backend.data.repositories.research import ResearchRepository
 from backend.data.retrieval.graph import RelationshipExpansion
+from backend.observability.logging import activity
 
 
 class BackboneRepository:
@@ -384,13 +385,12 @@ class PostgresBackbone:
     async def _call(self, function, *args):
         try:
             context = next((value for value in args if hasattr(value, "deadline_at")), None)
-            if context:
-                remaining = (context.deadline_at - datetime.now(timezone.utc)).total_seconds()
-                if remaining <= 0:
-                    raise BudgetExceeded()
-                async with asyncio.timeout(remaining):
-                    return await asyncio.to_thread(partial(function, *args))
-            return await asyncio.to_thread(partial(function, *args))
+            remaining = (context.deadline_at - datetime.now(timezone.utc)).total_seconds() if context else None
+            if remaining is not None and remaining <= 0:
+                raise BudgetExceeded()
+            run_id = context.run_id if context else next((value.run_id for value in args if hasattr(value, 'run_id')), None)
+            async with activity("backbone", stage=function.__name__, run_id=run_id), asyncio.timeout(remaining):
+                return await asyncio.to_thread(partial(function, *args))
         except TimeoutError as error:
             raise BudgetExceeded() from error
         except (PermissionError, NoResultFound) as error:

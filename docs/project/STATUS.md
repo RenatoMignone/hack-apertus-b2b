@@ -1,5 +1,19 @@
 # Current development status
 
+**19 October · runtime feedback integration:** `feat/my-desk` (including `ui-polish`)
+merged into main. Radix controls, immediate preparation view, parallel progress,
+case reopening and adaptive polling are implemented. Timestamped stage/model/search
+logs replace repetitive successful polling logs. Optional local loopback access
+avoids token entry while retaining the server identity. Source head is 0012;
+shared 0011 was verified read-only. 284 isolated backend and 24 frontend tests pass.
+Follow-up investigation cleared obsolete suspended local processes holding case
+locks; runtime-only bounded lock/idle waits, batched board summaries and batched
+corpus-alias duplicate checks are added.
+Lease renewal no longer waits for the case write lock. The preferred dark
+quick-start panel is restored; no additional redesign was performed. Changes
+remain local/unpublished; API/worker restart activates the latest safeguards.
+[Changes, limits and required maintainer rollout](../team/RUNTIME_FEEDBACK_AND_SEARCH.md).
+
 **Local performance patch — 19 October:** source 0011 removes the quadratic
 live-capture newest-version sort. A 120,004-chunk synthetic capture completed in
 7.206 s versus the old query exceeding 30 s; 273 tests passed. Shared migration

@@ -63,8 +63,7 @@ class RuntimeApplication:
         return formats
 
     async def list_cases(self, access, *, limit=50, offset=0):
-        data = await self.execute("case_rows", access, limit=limit, offset=offset)
-        return [case_view(row, [])["case"] for row in data]
+        return await self.execute("case_summaries", access, limit=limit, offset=offset)
 
     async def evidence(self, access, case_id, run_id, evidence_id, pack_id=None):
         await self.execute("run_view", access, case_id, run_id)

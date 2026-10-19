@@ -1,3 +1,5 @@
+import { Button as RadixButton, Card } from '@radix-ui/themes';
+import { beginCase } from '../api/pendingCase';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowUp, Lock } from 'lucide-react';
@@ -35,8 +37,8 @@ export default function NewCasePage() {
     if (!text.trim() || busy) return;
     setBusy(true);
     try {
-      const c = await api.createCase(text.trim());
-      navigate(`/cases/${c.case.id}`, { state: { run: true } });
+      const requestId = beginCase(text.trim(), (prompt) => api.createCase(prompt));
+      navigate(`/cases/starting/${requestId}`);
     } catch (error) { reportApiError(error); }
     finally { setBusy(false); }
   };
@@ -46,7 +48,8 @@ export default function NewCasePage() {
       <div className="w-full max-w-2xl">
         <h1 className="text-center text-3xl font-semibold tracking-tight">Tell me about the company</h1>
 
-        <div className="mt-8 rounded-2xl border border-line bg-white p-3 shadow-sm focus-within:border-ink/40">
+        <p className="mt-3 text-center text-muted">Describe their work, what they need and what they want to do in Bern.</p>
+        <Card size="3" className="mt-8 focus-within:border-ink/40">
           <textarea
             ref={box}
             autoFocus
@@ -62,20 +65,19 @@ export default function NewCasePage() {
             placeholder="What they do, what they need, keywords, any Bern groups you suspect…"
             className="w-full resize-none bg-transparent px-2 py-1 text-[15px] leading-relaxed outline-none placeholder:text-muted/60"
           />
-          <div className="flex items-center gap-3 px-2 pt-1">
-            <span className="flex items-center gap-1.5 text-xs text-muted">
-              <Lock size={13} aria-hidden /> Public information only. No confidential documents.
+          <div className="flex flex-wrap items-center gap-3 px-2 pt-1">
+            <span className="flex w-full items-start gap-1.5 text-xs text-muted sm:w-auto sm:items-center">
+              <Lock size={13} className="shrink-0" aria-hidden /> Public information only. No confidential documents.
             </span>
             <span className="ml-auto hidden text-xs text-muted sm:inline">Ctrl + Enter</span>
-            <button
+            <RadixButton
               onClick={submit}
               disabled={!text.trim() || busy}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-40"
             >
-              {busy ? 'Starting…' : 'Search'} <ArrowUp size={15} aria-hidden />
-            </button>
+              {busy ? 'Starting…' : 'Start research'} <ArrowUp size={15} aria-hidden />
+            </RadixButton>
           </div>
-        </div>
+        </Card>
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
           <span className="text-sm text-muted">Try an example:</span>

@@ -21,3 +21,6 @@ automatic external LangSmith tracing; a trace outage does not change a case resu
 focused read path, outputs and acceptance checks. [Active questions](../../../docs/project/OPEN_QUESTIONS.md)
 own unresolved inputs. Implement scoped behavior against agreed contracts and
 fixtures; coordinate shared schema/config changes. Leave `src/frontend/` untouched.
+
+
+The runtime CLI now installs timestamped safe console logs for API/worker progress, model requests/usage, retrieval and web phases. Successful repetitive status polling is filtered. `logging.py` owns the allowlisted metadata, async ten-second activity heartbeat and console formatting; payloads/secrets remain excluded. See [runtime feedback](../../../docs/team/RUNTIME_FEEDBACK_AND_SEARCH.md).

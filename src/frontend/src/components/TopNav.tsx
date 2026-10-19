@@ -1,3 +1,4 @@
+import { Button as RadixButton, TabNav, Badge } from '@radix-ui/themes';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Columns3, Info, LayoutGrid, Plus } from 'lucide-react';
@@ -30,7 +31,7 @@ function DemoMenu() {
         aria-expanded={open}
         className="flex items-center gap-1 rounded-full border border-warn/40 px-2.5 py-1 text-xs font-medium text-warn hover:bg-warn-soft"
       >
-        <Info size={13} /> Demo
+        <Info size={13} /><span className="hidden sm:inline">Demo</span>
       </button>
       {open && (
         <div className="absolute right-0 top-9 z-50 w-64 rounded-xl border border-line bg-white p-3 text-sm shadow-lg">
@@ -64,35 +65,18 @@ export default function TopNav() {
   ];
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-3 border-b border-line bg-white px-4 lg:gap-6 lg:px-5">
+    <header className="flex h-[72px] shrink-0 items-center gap-2 border-b border-line bg-white px-3 sm:gap-5 sm:px-5 lg:gap-9 lg:px-8">
       <Link to="/" aria-label="My desk" className="shrink-0">
-        <img src={logo} alt="Bern Economic Development Agency" className="h-7 w-auto lg:h-8" />
+        <img src={logo} alt="Bern Economic Development Agency" className="h-6 w-auto sm:h-7 lg:h-8" />
       </Link>
-      <nav aria-label="Main" className="flex min-w-0 items-center gap-1">
-        {tabs.map(({ to, label, Icon, active }) => (
-          <Link
-            key={to}
-            to={to}
-            title={label}
-            aria-label={label}
-            aria-current={active ? 'page' : undefined}
-            className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-sm ${
-              active ? 'bg-canvas font-medium text-ink' : 'text-muted hover:bg-canvas hover:text-ink'
-            }`}
-          >
-            <Icon size={16} aria-hidden />
-            <span className="hidden md:inline">{label}</span>
-          </Link>
-        ))}
-      </nav>
+      <TabNav.Root aria-label="Main" className="self-stretch flex items-center">
+        {tabs.map(({ to, label, Icon, active }) => <TabNav.Link key={to} asChild active={active}>
+          <Link to={to} aria-label={label}><span className="inline-flex items-center gap-2"><Icon size={16} aria-hidden /><span className="hidden sm:inline">{label}</span></span></Link>
+        </TabNav.Link>)}
+      </TabNav.Root>
       <div className="ml-auto flex shrink-0 items-center gap-2">
-        {apiMode === 'mock' ? <DemoMenu /> : <span className="text-xs text-muted">Connected</span>}
-        <Link
-          to="/cases/new"
-          className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-dark"
-        >
-          <Plus size={16} aria-hidden /> <span className="hidden sm:inline">New case</span>
-        </Link>
+        {apiMode === 'mock' ? <DemoMenu /> : <Badge color="teal" variant="soft" className="hidden sm:inline-flex">Workspace connected</Badge>}
+        <RadixButton asChild><Link to="/cases/new" aria-label="New case"><Plus size={16} aria-hidden /><span className="hidden sm:inline">New case</span></Link></RadixButton>
       </div>
     </header>
   );

@@ -1,3 +1,4 @@
+import { Button as RadixButton, Select, Badge } from '@radix-ui/themes';
 import { useEffect, type ReactNode } from 'react';
 import type { CaseOutcome, CaseStatus, Institution } from '../types/contract';
 
@@ -44,31 +45,17 @@ export const INSTITUTION: Record<Institution, { label: string; short: string; do
 };
 
 export function StatusBadge({ status, caret }: { status: CaseStatus; caret?: boolean }) {
-  return (
-    <span className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS[status].cls}`}>
-      {STATUS[status].label}
-      {caret && ' ▾'}
-    </span>
-  );
+  return <Badge size="2" variant="soft" color={status === 'researching' ? 'blue' : status === 'in_review' ? 'amber' : status === 'pitch_sent' ? 'teal' : 'gray'}>
+    {STATUS[status].label}{caret && ' ▾'}
+  </Badge>;
 }
 
 /** A status pill that is also a native select. */
 export function StatusSelect({ status, onChange }: { status: CaseStatus; onChange: (s: CaseStatus) => void }) {
-  return (
-    <label className="relative inline-block cursor-pointer">
-      <StatusBadge status={status} caret />
-      <select
-        aria-label="Status"
-        value={status}
-        onChange={(e) => onChange(e.target.value as CaseStatus)}
-        className="absolute inset-0 cursor-pointer opacity-0"
-      >
-        {STATUS_ORDER.map((s) => (
-          <option key={s} value={s}>{STATUS[s].label}</option>
-        ))}
-      </select>
-    </label>
-  );
+  return <Select.Root value={status} onValueChange={(value) => onChange(value as CaseStatus)}>
+    <Select.Trigger aria-label="Status" variant="soft" />
+    <Select.Content>{STATUS_ORDER.map((s) => <Select.Item key={s} value={s}>{STATUS[s].label}</Select.Item>)}</Select.Content>
+  </Select.Root>;
 }
 
 export function Button({
@@ -84,17 +71,10 @@ export function Button({
   disabled?: boolean;
   type?: 'button' | 'submit';
 }) {
-  const v = variant === 'primary' ? 'bg-brand text-white hover:bg-brand-dark border-transparent' : 'bg-white text-ink border-line hover:bg-canvas';
-  return (
-    <button
-      type={type}
-      disabled={disabled}
-      onClick={onClick}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${v}`}
-    >
-      {children}
-    </button>
-  );
+  return <RadixButton type={type} disabled={disabled} onClick={onClick}
+    variant={variant === 'primary' ? 'solid' : 'surface'} color={variant === 'primary' ? 'red' : 'gray'}>
+    {children}
+  </RadixButton>;
 }
 
 export function timeAgo(iso: string) {

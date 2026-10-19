@@ -35,6 +35,13 @@ private stage/command reads; 0007 persists independent UI flags/action notes.
 Runtime integration tests live in `tests/runtime/`; follow the current module
 assignment for changes and preserve other contributors' work.
 
+Case lists use batched summary reads; detail/report reads retain full integrity
+validation. Runtime DB connections bound lock waits to five seconds and idle
+transactions to sixty seconds (or stricter existing policies), without changing
+ingestion/migration connections. Worker preparation logs name the actual DB task.
+Stop services with Ctrl+C; Ctrl+Z leaves them suspended with connections alive.
+See the [incident and rollout](../../../docs/team/RUNTIME_FEEDBACK_AND_SEARCH.md).
+
 ## Parallel feature routing
 
 [Module handoffs](../../../docs/plans/MODULE_HANDOFFS.md) lists this module's

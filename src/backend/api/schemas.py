@@ -226,6 +226,7 @@ class RunView(BaseModel):
     status: Literal["queued", "running", "waiting_for_input", "succeeded", "failed", "cancelled", "superseded"]
     stage: Literal["interpreting", "searching", "validating", "drafting", "done"] | None = None
     step: str | None = None
+    activity: list[dict] = Field(default_factory=list)
     error_code: str | None = None
     failure_detail: dict = Field(default_factory=dict)
     result_id: UUID | None = None

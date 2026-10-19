@@ -23,6 +23,7 @@ class IdentityBinding:
 @dataclass(frozen=True)
 class RuntimeSettings:
     mode: str = "connected"
+    local_access: bool = False
     bindings: tuple[IdentityBinding, ...] = field(default=(), repr=False)
     default_profile_id: UUID | None = None
     corpus_mode: str = "published"
@@ -74,6 +75,8 @@ class RuntimeSettings:
     case_memory_min_score: float = 50
 
     def __post_init__(self):
+        if self.local_access and len(self.bindings) != 1:
+            raise ValueError("Local access requires exactly one server-controlled identity binding")
         if not 1 <= self.capture_timeout_seconds <= 120:
             raise ValueError("RUNTIME_CAPTURE_TIMEOUT_SECONDS must be 1–120")
         if self.corpus_mode not in {"live", "published"}:
@@ -115,6 +118,7 @@ class RuntimeSettings:
             token_sha256=item["token_sha256"], database_url_env=item.get("database_url_env", "DATABASE_URL"))
             for item in json.loads(os.getenv("RUNTIME_AUTH_BINDINGS", "[]")))
         return cls(mode=os.getenv("DEPLOYMENT_MODE", "connected"), bindings=bindings,
+            local_access=os.getenv("RUNTIME_LOCAL_ACCESS", "false").lower() in {"1", "true", "yes"},
             default_profile_id=UUID(os.environ["RUNTIME_PROFILE_ID"]) if os.getenv("RUNTIME_PROFILE_ID") else None,
             corpus_mode=os.getenv("RUNTIME_CORPUS_MODE", "published"),
             live_taxonomy_version_id=UUID(os.environ["RUNTIME_LIVE_TAXONOMY_ID"]) if os.getenv("RUNTIME_LIVE_TAXONOMY_ID") else None,

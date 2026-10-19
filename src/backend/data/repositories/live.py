@@ -2,6 +2,7 @@
 from pathlib import Path
 import logging
 from time import monotonic
+from backend.observability.logging import event
 from sqlalchemy.exc import DBAPIError
 
 from sqlalchemy import select, text
@@ -19,6 +20,7 @@ def capture_live_corpus(connection, settings, case_id, profile_id):
         Path(settings.embedding_configuration).read_text(encoding="utf-8-sig"))
     model.require_resolved()
     started = monotonic()
+    event("capture.started", case_id=case_id)
     timeout = connection.execute(text("SELECT current_setting('statement_timeout') AS previous, "
         "setting::int AS milliseconds FROM pg_settings WHERE name='statement_timeout'")).mappings().one()
     milliseconds = min(timeout['milliseconds'] or settings.capture_timeout_seconds * 1000,
@@ -37,5 +39,5 @@ def capture_live_corpus(connection, settings, case_id, profile_id):
         raise
     # On an error PostgreSQL aborts the transaction and rolls back SET LOCAL too.
     connection.execute(text("SELECT set_config('statement_timeout',:value,true)"), {'value':timeout['previous']})
-    logging.getLogger(__name__).info('live_capture_completed elapsed_seconds=%.3f', monotonic()-started)
+    event('capture.completed', case_id=case_id, elapsed_ms=round((monotonic()-started)*1000))
     return connection.execute(select(*snapshot_metadata()).where(t.snapshots.c.snapshot_id == snapshot_id)).mappings().one()

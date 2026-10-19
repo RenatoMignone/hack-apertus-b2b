@@ -4,6 +4,7 @@ import { ToastProvider } from './components/Toast';
 import BoardPage from './pages/BoardPage';
 import DeskPage from './pages/DeskPage';
 import NewCasePage from './pages/NewCasePage';
+import StartingCasePage from './pages/StartingCasePage';
 import CaseWorkspace from './pages/CaseWorkspace';
 import ConnectionGate from './components/ConnectionGate';
 import ApiErrors from './components/ApiErrors';
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/" element={<DeskPage />} />
             <Route path="/cases" element={<BoardPage />} />
             <Route path="/cases/new" element={<NewCasePage />} />
+            <Route path="/cases/starting/:requestId" element={<StartingCasePage />} />
             <Route path="/cases/:id" element={<CaseWorkspace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

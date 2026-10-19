@@ -1,3 +1,5 @@
+import { Card as Surface, Button as RadixButton } from '@radix-ui/themes';
+import { beginCase } from '../api/pendingCase';
 import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, ArrowUp, Columns3, ListChecks, Lock } from 'lucide-react';
@@ -13,7 +15,7 @@ import type { CaseDetail, CaseSummary } from '../types/contract';
 
 function Card({ icon, title, count, children, footer }: { icon: ReactNode; title: string; count?: number; children: ReactNode; footer: ReactNode }) {
   return (
-    <section className="flex flex-col rounded-2xl border border-line bg-white p-5">
+    <Surface size="4" className="flex flex-col">
       <header className="mb-4 flex items-center gap-2.5">
         <span className="rounded-lg bg-canvas p-1.5 text-muted" aria-hidden>{icon}</span>
         <h2 className="font-semibold">{title}</h2>
@@ -21,7 +23,7 @@ function Card({ icon, title, count, children, footer }: { icon: ReactNode; title
       </header>
       <div className="flex-1">{children}</div>
       <footer className="mt-4 flex items-center justify-between text-sm text-muted">{footer}</footer>
-    </section>
+    </Surface>
   );
 }
 
@@ -47,6 +49,14 @@ export function nextSteps(cases: CaseSummary[], details: CaseDetail[]): Step[] {
     }
     const d = detail.get(c.id);
     if (!d) continue;
+    if (d.currentRun && ["queued", "running"].includes(d.currentRun.status)) {
+      step("View research progress", 2);
+      continue;
+    }
+    if (d.currentRun?.status === "failed") {
+      step("Retry interrupted research", 1);
+      continue;
+    }
     // Same rule as the case page: the backend's run state, or an open demo question.
     const waiting = d.currentRun?.status === 'waiting_for_input' ||
       (apiMode === 'mock' && d.turns.some((t) => t.followUp && !t.followUp.answer));
@@ -66,8 +76,9 @@ async function loadDesk() {
   const cases = (await api.listCases()).sort(byRecent);
   // Details only for open cases still in research or review, newest first.
   const open = cases.filter((c) => isOpen(c) && c.status !== 'pitch_sent').slice(0, 8);
-  const details = (await Promise.all(open.map((c) => api.getCase(c.id)))).filter((d): d is CaseDetail => d !== null);
-  return { cases, steps: nextSteps(cases, details) };
+  const loaded = await Promise.allSettled(open.map((c) => api.getCase(c.id)));
+  const details = loaded.flatMap((item) => item.status === "fulfilled" && item.value ? [item.value] : []);
+  return { cases, steps: nextSteps(cases, details), unavailable: loaded.filter((item) => item.status === "rejected").length };
 }
 
 function QuickStart() {
@@ -79,16 +90,16 @@ function QuickStart() {
     if (!text.trim() || busy) return;
     setBusy(true);
     try {
-      const c = await api.createCase(text.trim());
-      navigate(`/cases/${c.case.id}`, { state: { run: true } });
+      const requestId = beginCase(text.trim(), (prompt) => api.createCase(prompt));
+      navigate(`/cases/starting/${requestId}`);
     } catch (error) { reportApiError(error); }
     finally { setBusy(false); }
   };
 
   return (
-    <div className="mb-5 rounded-2xl bg-ink px-6 py-5 text-white">
-      <div className="text-lg font-semibold">Start a new case</div>
-      <div className="mt-3 rounded-xl bg-white p-2 text-ink">
+    <div className="mb-7 rounded-2xl bg-ink px-7 py-6 text-white">
+      <div className="text-xl font-semibold tracking-tight">Start with a company</div>
+      <div className="mt-4 rounded-xl bg-white p-3 text-ink">
         <textarea
           aria-label="Company description"
           disabled={busy}
@@ -102,21 +113,20 @@ function QuickStart() {
           placeholder="Describe a company in your own words: what they do, what they need…"
           className="w-full resize-none bg-transparent px-2 py-1 text-[15px] leading-relaxed outline-none placeholder:text-muted/60"
         />
-        <div className="flex items-center gap-3 px-2">
-          <span className="flex items-center gap-1.5 text-xs text-muted">
-            <Lock size={13} aria-hidden /> Public information only. No confidential documents.
+        <div className="flex flex-wrap items-center gap-3 px-2">
+          <span className="flex w-full items-start gap-1.5 text-xs text-muted sm:w-auto sm:items-center">
+            <Lock size={13} className="shrink-0" aria-hidden /> Public information only. No confidential documents.
           </span>
           <span className="ml-auto hidden text-xs text-muted sm:inline">Ctrl + Enter</span>
-          <button
+          <RadixButton
             onClick={submit}
             disabled={!text.trim() || busy}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-40"
           >
-            {busy ? 'Starting…' : 'Start'} <ArrowUp size={15} aria-hidden />
-          </button>
+            {busy ? 'Starting…' : 'Start research'} <ArrowUp size={15} aria-hidden />
+          </RadixButton>
         </div>
       </div>
-      <Link to="/cases/new" className="mt-2 inline-block text-sm text-white/70 hover:text-white">
+      <Link to="/cases/new" className="mt-3 inline-block text-sm text-white/70 hover:text-white">
         More room and examples →
       </Link>
     </div>
@@ -133,11 +143,12 @@ export default function DeskPage() {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="mx-auto max-w-5xl px-6 py-8">
-        <h1 className="mb-5 text-2xl font-semibold tracking-tight">{greeting()}</h1>
+      <div className="mx-auto max-w-6xl px-6 py-9 lg:px-10">
+        <div className="mb-8"><p className="mb-2 text-sm text-muted">Research &amp; Expertise Navigator</p><h1 className="text-3xl font-semibold tracking-tight">{greeting()}</h1><p className="mt-2 text-muted">Turn company needs into a source-backed case for Bern.</p></div>
 
         <QuickStart />
 
+        {!!desk?.unavailable && <p role="status" className="mb-4 text-sm text-warn">Some case details could not be loaded. Open the case directly to retry.</p>}
         <div className="grid gap-5 md:grid-cols-2">
           <Card
             icon={<Columns3 size={16} />}

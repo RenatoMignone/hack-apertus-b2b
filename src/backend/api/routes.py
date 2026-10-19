@@ -16,6 +16,7 @@ async def capabilities(request: Request, who: Actor = Depends(actor)):
     formats = await who.application.export_formats()
     return {"schema_version": "1", "service_contract_version": "1", "deployment_mode": settings.mode,
         "formats": formats, "frontend_transport": "polling",
+        "access_mode": "local" if settings.local_access else "bearer",
         "reasoning_configured": bool(settings.reasoning_factory), "backbone_configured": bool(settings.backbone_factory),
         "web_configured": settings.mode == "connected" and bool(settings.web_factory)}
 
@@ -46,8 +47,18 @@ async def start_run(case_id: UUID, body: s.StartRun, request: Request, who: Acto
 
 
 @router.get("/cases/{case_id}/runs/{run_id}", response_model=s.RunView, response_model_exclude_none=True)
-async def run(case_id: UUID, run_id: UUID, who: Actor = Depends(actor)):
-    return await who.application.execute("run_view", who.access, case_id, run_id)
+async def run(case_id: UUID, run_id: UUID, request: Request, who: Actor = Depends(actor)):
+    result = await who.application.execute("run_view", who.access, case_id, run_id)
+    from backend.observability.logging import event
+    cache = request.app.state.progress_signatures
+    signature = (result['status'], result.get('step'), tuple(a['step'] for a in result.get('activity', [])))
+    if cache.get(run_id) != signature:
+        cache[run_id] = signature
+        if len(cache) > 1024:
+            cache.pop(next(iter(cache)))
+        event('progress.changed', run_id=run_id, case_id=case_id, status=result['status'],
+              stage=result.get('step'), count=len(result.get('activity', [])))
+    return result
 
 
 @router.post("/cases/{case_id}/messages", status_code=202)

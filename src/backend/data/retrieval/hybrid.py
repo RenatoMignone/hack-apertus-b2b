@@ -9,6 +9,7 @@ from backend.contracts.data import EvidenceHit, QueryPlan, SearchResult, validat
 from backend.contracts.services import ServiceUnavailable
 from backend.data import schema as tables
 from backend.data.database import transaction
+from backend.observability.logging import timed, event
 
 
 def fuse(lexical: dict, vector: dict, limit=30):
@@ -32,7 +33,7 @@ ELIGIBLE = """
     WHERE s.snapshot_id=:snapshot AND s.namespace=:namespace
       AND (s.status='published' OR (s.status='live' AND EXISTS (
         SELECT 1 FROM cases.runs r WHERE r.run_id=:run AND r.snapshot_id=s.snapshot_id
-          AND r.case_id::text=s.manifest->>'runtime_case_id')))
+          AND r.case_id=:case)))
       AND ops.can_access(c.scope_id) AND v.status='accepted'
       AND (:all_languages OR c.language IN :languages)
       AND (:all_documents OR d.document_id NOT IN :excluded)
@@ -78,14 +79,19 @@ class HybridSearch:
                       "all_documents": not plan.excluded_document_ids, "excluded": plan.excluded_document_ids or [UUID(int=0)],
                       "all_families": not plan.source_family_ids, "families": plan.source_family_ids or [UUID(int=0)]}
         with transaction(self.engine, access) as connection:
+            connection.execute(text("SELECT set_config('statement_timeout', "
+                "least(coalesce(nullif(setting::int,0),30000),30000)::text,true) "
+                "FROM pg_settings WHERE name='statement_timeout'"))
             pin = connection.execute(select(*snapshot_metadata(), tables.embedding_configs.c.config_hash,
                 tables.embedding_configs.c.dimension).select_from(tables.snapshots.join(tables.builds).join(
                     tables.embedding_configs)).where(tables.snapshots.c.snapshot_id == plan.snapshot_id,
                     tables.snapshots.c.namespace == access.namespace,
                     tables.snapshots.c.status.in_(["published", "live"]))).mappings().one()
+            parameters["case"] = plan.case_id or UUID(int=0)
             if pin["status"] == "live":
                 run = connection.execute(select(tables.runs.c.case_id).where(
                     tables.runs.c.run_id == plan.run_id, tables.runs.c.snapshot_id == plan.snapshot_id)).scalar_one_or_none()
+                parameters["case"] = run
                 if run is None or str(run) != pin["runtime_case_id"]:
                     raise PermissionError("live retrieval requires its owning case run")
             if (pin["profile_id"] != plan.profile_id or pin["taxonomy_version_id"] != plan.taxonomy_version_id
@@ -97,22 +103,44 @@ class HybridSearch:
             vectors = [None] * len(queries)
         else:
             batch = getattr(self.embedder, 'embed_queries', None)
-            encoded = batch(queries) if callable(batch) else [self.embedder.embed_query(query) for query in queries]
+            with timed("embedding", run_id=plan.run_id, query_count=len(queries)):
+                encoded = batch(queries) if callable(batch) else [self.embedder.embed_query(query) for query in queries]
             if len(encoded) != len(queries):
                 raise ValueError('embedding batch must cover every query exactly')
             vectors = [validate_vector(value, pin['dimension']) for value in encoded]
         lexical, vector, rows_by_id, query_matches = {}, {}, {}, {}
         with transaction(self.engine, access) as connection:
-            for query, query_vector in zip(queries, vectors, strict=True):
-                lexical_rows = [] if self.strategy == 'dense' else connection.execute(query_statement("""
-                    SELECT c.chunk_id, max(ts_rank_cd(p.terms, websearch_to_tsquery(CAST(p.language_config AS regconfig),:query))) AS score
-                """ + ELIGIBLE.replace("WHERE s.snapshot_id", "JOIN retrieval.search_documents p ON p.chunk_id=c.chunk_id AND p.search_config_hash=b.search_config_hash WHERE s.snapshot_id") + """
-                    AND p.terms @@ websearch_to_tsquery(CAST(p.language_config AS regconfig),:query)
-                    GROUP BY c.chunk_id ORDER BY score DESC,c.chunk_id LIMIT 30
-                """), {**parameters, "query": query}).mappings().all()
-                vector_rows = [] if self.strategy == 'lexical' else connection.execute(query_statement("SELECT c.chunk_id, e.vector <=> CAST(:vector AS vector) AS score " +
-                    ELIGIBLE + " ORDER BY score,c.chunk_id LIMIT 30"),
-                    {**parameters, "vector": "[" + ",".join(str(value) for value in query_vector) + "]"}).mappings().all()
+            connection.execute(text("SELECT set_config('statement_timeout', "
+                "least(coalesce(nullif(setting::int,0),30000),30000)::text,true) "
+                "FROM pg_settings WHERE name='statement_timeout'"))
+            # Constant regconfig avoids per-row query parsing and provides a fixed
+            # GIN scan key where caller RLS and the planner permit it. Do not
+            # assume a production index scan without checking EXPLAIN.
+            from backend.data.repositories.corpus import LANGUAGE_CONFIGS
+            configs = sorted({'simple', *LANGUAGE_CONFIGS.values()})
+            lexical_candidates = " UNION ALL ".join(
+                "SELECT p.chunk_id, ts_rank_cd(p.terms,websearch_to_tsquery('" + config + "',:query)) AS score "
+                "FROM retrieval.search_documents p WHERE p.language_config='" + config + "' "
+                "AND p.search_config_hash=:search_hash AND p.terms @@ websearch_to_tsquery('" + config + "',:query)"
+                for config in configs)
+            search_hash = connection.execute(select(tables.builds.c.search_config_hash).where(
+                tables.builds.c.build_id == plan.build_id)).scalar_one()
+            parameters['search_hash'] = search_hash
+            for index, (query, query_vector) in enumerate(zip(queries, vectors, strict=True)):
+                with timed('retrieval.lexical', run_id=plan.run_id, attempt=index+1):
+                    lexical_rows = [] if self.strategy == 'dense' else connection.execute(query_statement(
+                        "WITH matches AS MATERIALIZED (" + lexical_candidates + ") "
+                        "SELECT c.chunk_id,max(m.score) AS score " + ELIGIBLE.replace(
+                            "WHERE s.snapshot_id", "JOIN matches m ON m.chunk_id=c.chunk_id WHERE s.snapshot_id") +
+                        " GROUP BY c.chunk_id ORDER BY score DESC,c.chunk_id LIMIT 30"),
+                        {**parameters, "query": query}).mappings().all()
+                with timed('retrieval.vector', run_id=plan.run_id, attempt=index+1):
+                    vector_rows = [] if self.strategy == 'lexical' else connection.execute(query_statement(
+                        "SELECT c.chunk_id, e.vector <=> CAST(:vector AS vector) AS score " + ELIGIBLE +
+                        " ORDER BY score,c.chunk_id LIMIT 30"),
+                        {**parameters, "vector": "[" + ",".join(str(value) for value in query_vector) + "]"}).mappings().all()
+                event('retrieval.candidates', run_id=plan.run_id, attempt=index+1,
+                      candidate_count=len(lexical_rows)+len(vector_rows))
                 for branch, rows in ((lexical, lexical_rows), (vector, vector_rows)):
                     for rank, row in enumerate(rows, start=1):
                         query_matches.setdefault(row["chunk_id"], set()).add(query)
@@ -152,7 +180,8 @@ class HybridSearch:
         reranker = self.reranker if self.strategy == 'reranked' else None
         try:
             if reranker and passages and hasattr(reranker, "score_with_details"):
-                details = reranker.score_with_details(plan.original_request, passages)
+                with timed("reranking", run_id=plan.run_id, candidate_count=len(passages)):
+                    details = reranker.score_with_details(plan.original_request, passages)
                 reranked = [row["score"] for row in details]
             else:
                 reranked = reranker.score(plan.original_request, passages) if reranker and passages else None

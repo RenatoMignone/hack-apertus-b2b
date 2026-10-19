@@ -195,6 +195,8 @@ export interface CaseRun {
   input_id: string;
   status: 'queued' | 'running' | 'waiting_for_input' | 'succeeded' | 'failed' | 'cancelled' | 'superseded';
   stage?: RunStage;
+  step?: string;
+  activity?: { step: string; started_at: string }[];
   error_code?: string;
   pack_id?: string;
   failure_detail?: { failed_stage?: string; model_task?: string; validation_issues?: { field: string; type: string }[] };

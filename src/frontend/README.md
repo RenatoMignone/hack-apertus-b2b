@@ -44,3 +44,6 @@ Case comparison requires a real permitted case and exact reviewed report; no dem
 case is automatically indexed. Institution labels outside the pilot use a neutral
 badge. See [rich outputs](../../docs/data/RICH_OUTPUTS.md) and
 [own-case memory](../../docs/data/CASE_MEMORY.md).
+
+
+19 October integration: `feat/my-desk` includes the latest `ui-polish`. Official Radix Themes supplies common controls, menus, status selects, navigation and export dialogs; Tailwind owns layout. Local testing auto-connects when the backend enables loopback-only `RUNTIME_LOCAL_ACCESS`; shared servers retain bearer access. Creation immediately opens a preparation route (prompt remains memory-only); active case polling backs off and stops when leaving. See [runtime feedback/acceptance](../../docs/team/RUNTIME_FEEDBACK_AND_SEARCH.md).

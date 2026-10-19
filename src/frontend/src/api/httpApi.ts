@@ -1,3 +1,4 @@
+import { nextPollDelay, publishProgress } from './progress.ts';
 import type { NavigatorApi } from './index';
 import type { ActionItem, BriefRevision, CaseDetail, CaseRun, CaseSummary, RunStage } from '../types/contract';
 
@@ -53,8 +54,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     // Server-returned paths stay on the configured API origin, including downloads.
     if (!url.startsWith('/api/v1/') || url.includes('://') || url.includes('\\')) throw new Error('Invalid API path.');
     const credential = token();
-    if (!credential) throw new ApiError(401, 'authentication_required');
-    const headers: Record<string, string> = { Authorization: `Bearer ${credential}` };
+    const headers: Record<string, string> = credential ? { Authorization: `Bearer ${credential}` } : {};
     if (method !== 'GET') headers['Idempotency-Key'] = crypto.randomUUID();
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     // Retry transport failures once with the SAME idempotency key; never retry a conflict.
@@ -81,7 +81,8 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     throw new Error('Cannot reach the backend.');
   }
 
-  async function getCase(id: string): Promise<CaseDetail | null> {
+  const detailRequests = new Map<string, Promise<CaseDetail | null>>();
+  async function loadCase(id: string): Promise<CaseDetail | null> {
     try {
       const detail = await request<CaseDetail>(path(id));
       lastOpened = id;
@@ -91,14 +92,28 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
       throw error;
     }
   }
+  function getCase(id: string): Promise<CaseDetail | null> {
+    const existing = detailRequests.get(id);
+    if (existing) return existing;
+    const promise = loadCase(id).finally(() => { detailRequests.delete(id); });
+    detailRequests.set(id, promise);
+    return promise;
+  }
   async function requireCase(id: string) {
     const detail = await getCase(id);
     if (!detail || detail.revision === undefined || !detail.inputId) throw new Error('Case is unavailable.');
     return detail;
   }
-  async function poll(caseId: string, url: string, onStage: (stage: RunStage) => void) {
+  async function poll(caseId: string, url: string, onStage: (stage: RunStage) => void, signal?: AbortSignal) {
+    let last = "", unchanged = 0;
     for (let n = 0; n < maxPolls; n++) {
+      signal?.throwIfAborted();
       const run = await request<CaseRun>(url);
+      signal?.throwIfAborted();
+      publishProgress(caseId, run);
+      const signature = JSON.stringify([run.status, run.stage, run.step, run.activity]);
+      unchanged = signature === last ? unchanged + 1 : 0;
+      last = signature;
       if (run.stage) onStage(run.stage);
       if (run.status === 'succeeded' || run.status === 'waiting_for_input') {
         onStage('done'); emit();
@@ -108,7 +123,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
         emit();
         throw new ApiError(409, run.error_code ?? 'conflict');
       }
-      await pause(pollInterval);
+      await pause(nextPollDelay(pollInterval, unchanged));
     }
     throw new Error('Research is still running. Reopen this case to resume progress updates.');
   }
@@ -133,11 +148,11 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
       const created = await request<Accepted>('/api/v1/cases', 'POST', { prompt, run: true });
       emit(); return requireCase(created.case_id);
     },
-    async runCase(caseId, onStage) {
+    async runCase(caseId, onStage, signal) {
       const detail = await requireCase(caseId);
       const run = detail.currentRun;
       if (run && ['queued', 'running', 'waiting_for_input'].includes(run.status)) {
-        return poll(caseId, `${path(caseId)}/runs/${run.run_id}`, onStage);
+        return poll(caseId, `${path(caseId)}/runs/${run.run_id}`, onStage, signal);
       }
       if (run?.status === 'failed' && run.pack_id && run.input_id === detail.inputId) {
         const started = await request<Accepted>(`${path(caseId)}/reports`, 'POST', {
@@ -145,11 +160,11 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
           instruction: 'Create a concise cited draft from the existing evidence pack. Preserve caveats and avoid unsupported implications.',
         });
         if (!started.status_url) throw new Error('The server did not return a report run.');
-        return poll(caseId, started.status_url, onStage);
+        return poll(caseId, started.status_url, onStage, signal);
       }
       const started = await request<Accepted>(`${path(caseId)}/runs`, 'POST', { input_id: detail.inputId });
       if (!started.status_url) throw new Error('The server did not return a run.');
-      return poll(caseId, started.status_url, onStage);
+      return poll(caseId, started.status_url, onStage, signal);
     },
     async sendMessage(caseId, text, onStage, kind = 'focus') {
       const detail = await requireCase(caseId);

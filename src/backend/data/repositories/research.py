@@ -41,17 +41,18 @@ class ResearchRepository:
         """Check every visible document/alias in the pinned snapshot, not retrieval hits."""
         target = canonical_url(url)
         with transaction(self.engine, access) as connection:
-            run = self.cases._run(connection, access, run_id)
+            run = self.cases._run(connection, access, run_id, lock=False)
             return self._corpus_duplicate(connection, run, target)
 
     def _corpus_duplicate(self, connection, run, target):
         rows = connection.execute(select(t.documents.c.document_id, t.documents.c.canonical_url,
-            t.versions.c.document_version_id, t.versions.c.scope_id).select_from(t.documents.join(t.versions).join(t.snapshot_documents)).where(
-            t.snapshot_documents.c.snapshot_id == run["snapshot_id"])).mappings().all()
+            t.versions.c.document_version_id, t.versions.c.scope_id,
+            t.aliases.c.url.label('alias_url')).select_from(t.documents.join(t.versions).join(t.snapshot_documents)
+            .outerjoin(t.aliases, t.aliases.c.document_id == t.documents.c.document_id)).where(
+            t.snapshot_documents.c.snapshot_id == run["snapshot_id"])
+            .order_by(t.documents.c.document_id, t.versions.c.document_version_id, t.aliases.c.url)).mappings().all()
         for row in rows:
-            aliases = connection.execute(select(t.aliases.c.url).where(
-                t.aliases.c.document_id == row["document_id"])).scalars()
-            if any(canonical_url(value) == target for value in [row["canonical_url"], *aliases]):
+            if any(canonical_url(value) == target for value in [row["canonical_url"], row['alias_url']] if value):
                 require_scope(connection, row["scope_id"])
                 return row["document_version_id"]
         return None

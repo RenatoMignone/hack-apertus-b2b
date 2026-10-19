@@ -2,6 +2,8 @@
 import asyncio
 import hashlib
 import secrets
+from ipaddress import ip_address
+from urllib.parse import urlsplit
 from dataclasses import dataclass
 
 from fastapi import Depends, HTTPException, Request
@@ -19,6 +21,21 @@ class Actor:
 
 
 async def actor(request: Request, credentials: HTTPAuthorizationCredentials | None = Depends(bearer)):
+    registry = request.app.state.registry
+    if credentials is None and registry.settings.local_access:
+        local = {"127.0.0.1", "localhost", "::1"}
+        try:
+            allowed = (ip_address(request.client.host).is_loopback
+                and urlsplit("http://" + request.headers.get("host", "")).hostname in local
+                and not any(h in request.headers for h in ("forwarded", "x-forwarded-for", "x-forwarded-host"))
+                and (not request.headers.get("origin") or urlsplit(request.headers["origin"]).hostname in local))
+        except (ValueError, AttributeError):
+            allowed = False
+        if not allowed:
+            raise HTTPException(status_code=403, detail="Local access requires a loopback connection")
+        binding = registry.settings.bindings[0]
+        app = await asyncio.to_thread(registry.application, binding)
+        return Actor(access=binding.access, application=app)
     if credentials is None or len(request.headers.getlist("authorization")) != 1:
         raise HTTPException(status_code=401, detail="Authentication required", headers={"WWW-Authenticate": "Bearer"})
     digest = hashlib.sha256(credentials.credentials.encode()).hexdigest()

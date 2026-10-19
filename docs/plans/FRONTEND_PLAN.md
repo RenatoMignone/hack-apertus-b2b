@@ -80,3 +80,12 @@ profile plus real providers is required for live acceptance.
 Demo mode seeds a hero case for the pitch: GlucoWave is not on the board at start and
 is created live from the *Glucose sensor* example, written in lay terms, then refined
 through a follow-up answer and an exclusion. Run sheet: [DEMO_SCRIPT.md](../project/DEMO_SCRIPT.md).
+
+## 19 October feedback refresh
+
+The merged My desk workflow now uses Radix Themes controls with the existing
+Tailwind layouts and Bern branding. Preparation opens immediately before the
+server responds; source capture remains the existing server command. Reopening
+cases observes their durable run, with parallel stage activities and elapsed time.
+Local loopback testing can auto-connect without token entry. Shared authentication
+and exact review/export gates remain. [Acceptance and rollout](../team/RUNTIME_FEEDBACK_AND_SEARCH.md).

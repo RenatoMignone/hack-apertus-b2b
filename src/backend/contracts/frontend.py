@@ -35,6 +35,20 @@ def evidence_view(record, number):
             "reviewStatus": record.review_status}
 
 
+def case_summary(case, interpretation, *, updated_at=None, kept_count=0):
+    """Shared lightweight board projection; no report bodies or evidence reads."""
+    status = {"ready_for_review": "in_review", "draft": "researching", "on_hold": "researching",
+        "closed_visit": "closed", "closed_no_interest": "closed"}.get(case["status"], case["status"])
+    if status not in {"researching", "in_review", "pitch_sent", "closed"}:
+        status = "researching"
+    return {"id": str(case["case_id"]), "companyLabel": interpretation.get("company_name") or "New case",
+        "oneLineNeed": interpretation.get("company_summary") or "Research pending", "status": status,
+        "onHold": case.get("on_hold", False) or case["status"] == "on_hold",
+        "outcome": case.get("outcome") or (case["status"][7:] if case["status"].startswith("closed_") else None),
+        "createdAt": case["created_at"].isoformat(),
+        "updatedAt": (updated_at or case["created_at"]).isoformat(), "keptCount": kept_count}
+
+
 def case_view(data, evidence):
     """Project actual stored records onto CaseDetail, retaining review hash extensions."""
     from backend.contracts.pipeline import DraftRevision, ReportEvidencePack
@@ -72,17 +86,9 @@ def case_view(data, evidence):
                 "limitations": public_limitations(pack.gaps), "resultKind": {"complete": "ok", "partial": "partial", "no_match": "no_match"}[pack.outcome]},
             "emptyMessage": "No supported match in the available sources" if pack.outcome == "no_match" else None,
             "resultHash": row["result_hash"], "packId": str(row["pack_id"]), "packHash": pack_row["pack_hash"]})
-    status = {"ready_for_review": "in_review", "draft": "researching", "on_hold": "researching",
-        "closed_visit": "closed", "closed_no_interest": "closed"}.get(case["status"], case["status"])
-    if status not in {"researching", "in_review", "pitch_sent", "closed"}:
-        status = "researching"
-    summary = {"id": str(case["case_id"]), "companyLabel": interpretation.get("company_name") or "New case",
-        "oneLineNeed": interpretation.get("company_summary") or "Research pending", "status": status,
-        "onHold": case.get("on_hold", False) or case["status"] == "on_hold",
-        "outcome": case.get("outcome") or (case["status"][7:] if case["status"].startswith("closed_") else None),
-        "createdAt": case["created_at"].isoformat(),
-        "updatedAt": (data["results"][-1]["created_at"] if data["results"] else case["created_at"]).isoformat(),
-        "keptCount": sum(value == "kept" for key, value in choices.items() if current and key.startswith(current + ":"))}
+    summary = case_summary(case, interpretation,
+        updated_at=data["results"][-1]["created_at"] if data["results"] else None,
+        kept_count=sum(value == "kept" for key, value in choices.items() if current and key.startswith(current + ":")))
     turns = [{"id": str(turn["turn_id"]), "role": "operator" if turn["role"] == "user" else "agent",
               "text": turn["message"], "createdAt": turn["created_at"].isoformat()} for turn in data["turns"]]
     # Questions have their own durable IDs; they are not invented assistant messages.

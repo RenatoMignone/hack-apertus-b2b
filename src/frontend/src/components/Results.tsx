@@ -293,7 +293,7 @@ export default function Results({
       {revision.company && (
         <div className="rounded-2xl border border-line bg-white p-5">
           <div className="flex items-baseline gap-2">
-            <h1 className="text-xl font-semibold tracking-tight">{companyLabel}</h1>
+            <h2 className="text-xl font-semibold tracking-tight">{companyLabel}</h2>
             <span className="text-xs text-muted">from your message</span>
           </div>
           <p className="mt-1 text-[15px]">{revision.company.summary}</p>

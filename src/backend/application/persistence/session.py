@@ -30,14 +30,14 @@ class Session:
         engine = BoundEngine(connection)
         return CaseRepository(engine), DraftRepository(engine), EvidenceRepository(engine), JobRepository(engine)
 
-    def case(self, connection, access, case_id):
-        return self.repositories(connection)[0]._case(connection, access, case_id)
+    def case(self, connection, access, case_id, *, lock=True):
+        return self.repositories(connection)[0]._case(connection, access, case_id, lock=lock)
 
-    def run(self, connection, access, run_id, *, active=False):
+    def run(self, connection, access, run_id, *, active=False, lock=True):
         from sqlalchemy import select
         from backend.data import schema as t
         row = connection.execute(select(t.runs).where(t.runs.c.run_id == run_id)).mappings().one()
-        case = self.case(connection, access, row["case_id"])
+        case = self.case(connection, access, row["case_id"], lock=lock)
         if active and (case["current_input_id"] != row["input_id"] or row["status"] in {"cancelled", "superseded"}):
             from backend.contracts.services import StaleRevision
             raise StaleRevision()

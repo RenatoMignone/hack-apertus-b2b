@@ -473,3 +473,15 @@ moves to `/cases`. The desk has a quick-start text box, an *All cases* card and 
 open agent question, unreviewed items, a brief ready to export, an outcome to
 record), with no new API. D16's reasons still hold for the rest: no *Action items*
 page and no colleague, meeting or outreach tracking (E16, E17).
+
+### 19 October 2026 — runtime feedback and UI integration
+
+User authorized merging `feat/my-desk`/`ui-polish` and improving frontend/backend
+on main. Use official Radix Themes for shared controls; keep Tailwind layout and
+Bern branding. Show immediate preparation, actual concurrent durable activities
+and bounded adaptive polling. Local testing may use explicit loopback-only
+single-identity access, preserving server-side principal/RLS; shared deployments
+retain bearer mode. Timestamped allowlisted operational logs exclude payloads.
+Migration 0012 optimizes existing membership policy evaluation without adding
+application schema fields. Shared rollout/real-provider timings remain owner
+acceptance. [Implementation and verification](../team/RUNTIME_FEEDBACK_AND_SEARCH.md).

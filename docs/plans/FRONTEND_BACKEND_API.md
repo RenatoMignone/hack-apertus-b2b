@@ -159,3 +159,12 @@ Case detail adds `businessContextAvailable`, `businessContext`, `memory` and
 manual updates from an unseen revision. Current report company facts include
 explicitly attributed frozen plans, not model-extracted business data. Export
 uses format-specific MIME/filename and the same exact review gates as PDF.
+
+## 19 October runtime feedback extension
+
+Run status adds `activity: [{step, started_at}]` for concurrent actual stages.
+`step` prefers active work, falling back to last committed stage. Terminal runs
+return no active entries. Browser polling backs off unchanged state, stops on
+workspace departure, and reattaches on reopening. Capabilities adds `access_mode`
+(`local` or `bearer`); local mode is explicit, loopback-only and still bound to
+one server principal. See [runtime feedback](../team/RUNTIME_FEEDBACK_AND_SEARCH.md).

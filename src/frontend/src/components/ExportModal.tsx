@@ -1,3 +1,4 @@
+import { Dialog, IconButton } from '@radix-ui/themes';
 import { useState } from 'react';
 import { FileText, Presentation, X } from 'lucide-react';
 import type { BriefRevision, CaseDetail } from '../types/contract';
@@ -71,13 +72,13 @@ export default function ExportModal({ detail, revision, onClose }: { detail: Cas
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/30 p-4" onClick={onClose}>
-      <div role="dialog" aria-label="Export" className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+    <Dialog.Root open onOpenChange={(open) => { if (!open && !busy) onClose(); }}>
+      <Dialog.Content maxWidth="480px" aria-describedby={undefined} onEscapeKeyDown={(event) => { if (busy) event.preventDefault(); }} onPointerDownOutside={(event) => { if (busy) event.preventDefault(); }}>
         <div className="flex items-center">
-          <h2 className="font-semibold">Export for {detail.case.companyLabel}</h2>
-          <button onClick={onClose} className="ml-auto rounded-md p-1 text-muted hover:bg-canvas" aria-label="Close">
+          <Dialog.Title className="mb-0">Export for {detail.case.companyLabel}</Dialog.Title>
+          <IconButton variant="ghost" color="gray" disabled={busy !== null} onClick={onClose} className="ml-auto" aria-label="Close">
             <X size={18} />
-          </button>
+          </IconButton>
         </div>
 
         {kept.length ? (
@@ -102,7 +103,7 @@ export default function ExportModal({ detail, revision, onClose }: { detail: Cas
           {option('pdf', FileText, 'PDF brief', 'Short company-facing brief with the agency logo and a source appendix.')}
           {(apiMode === 'mock' || formats.includes('pptx')) && option('pptx', Presentation, 'PowerPoint (agency template)', apiMode === 'mock' ? 'Editable demo slides.' : 'Reviewed content and source passages in editable agency slides.')}
         </div>
-      </div>
-    </div>
+      </Dialog.Content>
+    </Dialog.Root>
   );
 }

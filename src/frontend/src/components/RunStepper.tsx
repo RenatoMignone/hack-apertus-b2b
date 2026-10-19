@@ -3,7 +3,7 @@ import type { RunStage } from '../types/contract';
 
 const STEPS: { key: RunStage; label: string }[] = [
   { key: 'interpreting', label: 'Reading' },
-  { key: 'searching', label: 'Searching UniBE · ARTORG · DCB' },
+  { key: 'searching', label: 'Searching sources' },
   { key: 'validating', label: 'Checking sources' },
   { key: 'drafting', label: 'Writing' },
 ];

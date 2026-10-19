@@ -41,8 +41,9 @@ never overwrite another agent's work or independently rename shared fields.
 
 ## Current implementation and model configuration
 
-- Source head `0011_capture_performance` optimizes live capture and retrieval;
-  shared head was last verified at 0010. Read the [performance specification](docs/data/CAPTURE_PERFORMANCE.md)
+- Source head `0012_membership_lookup` adds efficient RLS membership lookup;
+  shared head was last verified at 0011. Read the [runtime feedback/search handoff](docs/team/RUNTIME_FEEDBACK_AND_SEARCH.md)
+  for rollout, safe logging, local tokenless testing and the merged Radix frontend. Read the [performance specification](docs/data/CAPTURE_PERFORMANCE.md)
   and [maintainer handoff](docs/team/CAPTURE_PERFORMANCE_HANDOFF.md) before rollout.
   Never migrate the shared host implicitly or discard evidence checks for speed.
 

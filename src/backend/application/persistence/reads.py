@@ -2,7 +2,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from backend.data.snapshot_projection import snapshot_metadata
 from backend.contracts.data import configuration_hash
@@ -12,16 +12,42 @@ from backend.data.database import require_scope
 
 
 class Reads:
+    def case_summaries(self, access, *, limit=50, offset=0):
+        from backend.contracts.frontend import case_summary
+        with self.session(access) as c:
+            cases = list(c.execute(select(t.cases).where(t.cases.c.owner_id == access.principal_id,
+                t.cases.c.namespace == access.namespace).order_by(t.cases.c.created_at, t.cases.c.case_id)
+                .limit(limit).offset(offset)).mappings())
+            if not cases:
+                return []
+            ids = [case['case_id'] for case in cases]
+            # Four batched reads regardless of page size. Board loading must not
+            # deserialize/validate every historical report and source citation.
+            interpretations = {}
+            for row in c.execute(select(t.runs.c.case_id, t.interpretations.c.payload)
+                    .select_from(t.interpretations.join(t.runs).join(t.cases))
+                    .where(t.runs.c.case_id.in_(ids), t.runs.c.input_id == t.cases.c.current_input_id)
+                    .order_by(t.interpretations.c.created_at, t.interpretations.c.interpretation_id)).mappings():
+                interpretations[row['case_id']] = row['payload']
+            updated = dict(c.execute(select(t.results.c.case_id, func.max(t.results.c.created_at))
+                .where(t.results.c.case_id.in_(ids)).group_by(t.results.c.case_id)).all())
+            kept = dict(c.execute(select(t.reasons.c.result_id, func.count())
+                .select_from(t.reasons.join(t.reason_selections))
+                .where(t.reasons.c.result_id.in_([case['current_result_id'] for case in cases if case['current_result_id']]),
+                    t.reason_selections.c.selection == 'kept').group_by(t.reasons.c.result_id)).all())
+            return [case_summary(case, interpretations.get(case['case_id'], {}),
+                updated_at=updated.get(case['case_id']), kept_count=kept.get(case['current_result_id'], 0)) for case in cases]
+
     def current_run(self, access, case_id):
         with self.session(access) as c:
-            case = self.case(c, access, case_id)
+            case = self.case(c, access, case_id, lock=False)
             return c.execute(select(t.runs.c.run_id).where(t.runs.c.case_id == case_id,
                 t.runs.c.input_id == case["current_input_id"]).order_by(
                 t.runs.c.created_at.desc(), t.runs.c.run_id.desc()).limit(1)).scalar_one_or_none()
 
     def context(self, access, run_id):
         with self.session(access) as c:
-            run = self.run(c, access, run_id)
+            run = self.run(c, access, run_id, lock=False)
             pin = c.execute(select(*snapshot_metadata(), t.embedding_configs.c.config_hash).select_from(
                 t.snapshots.join(t.builds).join(t.embedding_configs)).where(
                 t.snapshots.c.snapshot_id == run["snapshot_id"])).mappings().one()
@@ -36,7 +62,7 @@ class Reads:
     def initial_state(self, access, run_id):
         context = self.context(access, run_id)
         with self.session(access) as c:
-            run = self.run(c, access, run_id, active=True)
+            run = self.run(c, access, run_id, active=True, lock=False)
             message = c.execute(select(t.inputs.c.message).where(t.inputs.c.input_id == run["input_id"])).scalar_one()
             cfg = run["configuration"]
             return {"context": context.model_dump(mode="json"), "message": message,
@@ -46,12 +72,17 @@ class Reads:
 
     def run_view(self, access, case_id, run_id):
         with self.session(access) as c:
-            run = self.run(c, access, run_id)
+            run = self.run(c, access, run_id, lock=False)
             if run["case_id"] != case_id:
                 raise PermissionError()
             questions = c.execute(select(t.questions).where(t.questions.c.run_id == run_id).order_by(
                 t.questions.c.created_at, t.questions.c.question_id)).mappings().all()
-            step = run["last_successful_stage"] or ""
+            activity = [{"step": row["stage"].removeprefix("runtime.progress."),
+                         "started_at": row["created_at"].isoformat()} for row in c.execute(
+                select(t.attempts.c.stage, t.attempts.c.created_at).where(t.attempts.c.run_id == run_id,
+                    t.attempts.c.stage.startswith("runtime.progress."), t.attempts.c.status == "running")
+                .order_by(t.attempts.c.created_at)).mappings()] if run["status"] == "running" else []
+            step = activity[0]["step"] if activity else run["last_successful_stage"] or ""
             stage = ("done" if run["status"] == "completed" else "drafting" if step.startswith("draft") else
                 "validating" if step.startswith(("extract", "persist_extraction", "evidence", "assess", "propose_pack", "pack")) else
                 "searching" if step.startswith(("replan", "retrieve", "discover", "fetch", "register", "merge")) else
@@ -67,7 +98,7 @@ class Reads:
             return {"schema_version": "1", "case_id": str(case_id), "run_id": str(run_id), "input_id": str(run["input_id"]),
                 "snapshot_id": str(run["snapshot_id"]), "state": run["status"],
                 "status": {"needs_clarification": "waiting_for_input", "completed": "succeeded"}.get(run["status"], run["status"]),
-                "stage": stage, "step": step or None, "error_code": run["failure_reason"],
+                "stage": stage, "step": step or None, "activity": activity, "error_code": run["failure_reason"],
                 "failure_detail": {k: detail[k] for k in ("failed_stage", "model_task", "validation_issues") if k in detail},
                 "result_id": result.get("result_id") if result else None,
                 "pack_id": str(pack["pack_id"]) if pack else run["configuration"].get("reuse_pack_id"),
@@ -78,7 +109,7 @@ class Reads:
 
     def answers(self, access, run_id):
         with self.session(access) as c:
-            self.run(c, access, run_id, active=True)
+            self.run(c, access, run_id, active=True, lock=False)
             return [dict(row) for row in c.execute(select(t.questions.c.question_id, t.questions.c.reason,
                 t.turns.c.message).select_from(t.questions.join(t.answers).join(t.turns)).where(
                 t.questions.c.run_id == run_id).order_by(t.questions.c.created_at, t.questions.c.question_id)).mappings()]
@@ -86,13 +117,13 @@ class Reads:
     def pack(self, access, pack_id):
         with self.session(access) as c:
             record = c.execute(select(t.packs).where(t.packs.c.pack_id == pack_id)).mappings().one()
-            self.run(c, access, record["run_id"])
+            self.run(c, access, record["run_id"], lock=False)
             self.repositories(c)[0]._validate_pack(c, pack_id)
             return dict(record)
 
     def validate_evidence(self, access, run_id, records):
         with self.session(access) as c:
-            run = self.run(c, access, run_id, active=True)
+            run = self.run(c, access, run_id, active=True, lock=False)
             for record in records:
                 row = c.execute(select(t.spans, t.versions.c.body_hash, t.versions.c.body_text,
                     t.scopes.c.kind, t.scopes.c.case_id, t.documents.c.canonical_url, t.versions.c.title, t.versions.c.language).select_from(t.spans.join(t.versions).join(t.documents).join(t.scopes,
@@ -116,7 +147,7 @@ class Reads:
     def case_rows(self, access, case_id=None, *, limit=None, offset=0):
         with self.session(access) as c:
             if case_id:
-                self.case(c, access, case_id)
+                self.case(c, access, case_id, lock=False)
             query = select(t.cases).where(t.cases.c.owner_id == access.principal_id, t.cases.c.namespace == access.namespace)
             if case_id:
                 query = query.where(t.cases.c.case_id == case_id)
@@ -145,7 +176,8 @@ class Reads:
                         t.answers.c.turn_id == t.turns.c.turn_id).where(
                         t.answers.c.question_id == question["question_id"])).scalar_one_or_none()
                 interpretations = [row for row in c.execute(select(t.interpretations.c.payload).join(t.runs).where(
-                    t.runs.c.case_id == case["case_id"], t.runs.c.input_id == case["current_input_id"])).scalars()]
+                    t.runs.c.case_id == case["case_id"], t.runs.c.input_id == case["current_input_id"])
+                    .order_by(t.interpretations.c.created_at, t.interpretations.c.interpretation_id)).scalars()]
                 claim_types = {str(row["claim_id"]): row["entity_type"] for row in c.execute(
                     select(t.claims.c.claim_id, t.entities.c.entity_type).join(t.entities,
                         t.entities.c.entity_id == t.claims.c.subject_id).join(t.pack_claims).where(
@@ -156,7 +188,7 @@ class Reads:
 
     def run_content(self, access, case_id, run_id):
         with self.session(access) as c:
-            run = self.run(c, access, run_id)
+            run = self.run(c, access, run_id, lock=False)
             if run["case_id"] != case_id:
                 raise PermissionError()
             record = c.execute(select(t.packs).where(t.packs.c.run_id == run_id).order_by(
@@ -172,7 +204,7 @@ class Reads:
     def execution_configuration(self, access, run_id):
         from backend.contracts.services import ServiceUnavailable
         with self.session(access) as c:
-            run = self.run(c, access, run_id, active=True)
+            run = self.run(c, access, run_id, active=True, lock=False)
             cfg = run["configuration"]
             if (cfg["mode"] != self.settings.mode or cfg["model"] != self.settings.llm_name
                     or cfg["model_endpoint"] != self.settings.llm_base_url):
@@ -181,5 +213,5 @@ class Reads:
 
     def checkpoint_configuration(self, access, run_id):
         with self.session(access) as c:
-            run = self.run(c, access, run_id, active=True)
+            run = self.run(c, access, run_id, active=True, lock=False)
             return {"configurable": {"thread_id": str(run["thread_id"]), "checkpoint_ns": ""}}

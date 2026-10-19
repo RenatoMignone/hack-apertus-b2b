@@ -21,7 +21,7 @@ Langfuse retain their own migration tools and framework-owned tables.
 
 ## U8 persistence implementation
 
-U8 adds interpretations, case web research, supported claim assessments, case manifests, typed packs, draft reasons, editorial selections and PDF export lineage. Current source head is `0011_capture_performance` (including restricted case-scope/runtime
+U8 adds interpretations, case web research, supported claim assessments, case manifests, typed packs, draft reasons, editorial selections and PDF export lineage. Current source head is `0012_membership_lookup` (including restricted case-scope/runtime
 RLS and independent UI flags/action notes). Use focused case repositories; populated retired workflow tables are owner-only history outside the application schema.
 
 ## Parallel feature routing
@@ -45,3 +45,13 @@ in [capture performance](../../../docs/data/CAPTURE_PERFORMANCE.md). Shared 0010
 remains compatible; startup never applies the function migration. Snapshot
 authorization/context reads must use the small projection rather than fetching
 whole membership manifests.
+
+Migration 0012 optimizes snapshot-membership RLS without changing tables or grants. Shared host rollout remains maintainer-owned; see [runtime feedback](../../../docs/team/RUNTIME_FEEDBACK_AND_SEARCH.md).
+
+## Runtime connection safeguards
+
+`engine_for(..., runtime=True)` is used only by API/worker composition. It caps
+lock waits at five seconds and idle-in-transaction at sixty seconds, preserving
+stricter server policy. Ingestion/migrations retain their own connection settings.
+Pure source duplicate checks use one document/alias query and do not take case
+write locks; source registration still authorizes/locks its active run.

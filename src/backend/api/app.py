@@ -18,6 +18,7 @@ def create_app(registry=None):
         registry.close()
     app = FastAPI(title="Bern Research & Expertise Navigator", version="1.0.0", lifespan=lifespan)
     app.state.registry = registry
+    app.state.progress_signatures = {}
     install_errors(app)
     app.include_router(router)
     @app.get("/healthz")
