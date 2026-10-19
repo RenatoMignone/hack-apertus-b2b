@@ -75,3 +75,7 @@ ports. Confidential company documents remain outside allowed intake.
 focused read path, outputs and acceptance checks. [Active questions](../../../docs/project/OPEN_QUESTIONS.md)
 own unresolved inputs. Implement scoped behavior against agreed contracts and
 fixtures; coordinate shared schema/config changes. Leave `src/frontend/` untouched.
+
+`review_cli.py` exports candidates or dry-runs explicit reviewer decisions/tags;
+`--apply` requires the corpus writer and never publishes. Immutable claims gain
+reviewed successor records. See [curation workflow](../../../docs/data/CORPUS_REVIEW.md).

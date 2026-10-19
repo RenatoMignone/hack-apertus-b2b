@@ -8,8 +8,8 @@ comes first; agency-wide sharing is deferred. Confidential documents remain out.
 | # | Delivery | State |
 | --- | --- | --- |
 | 1 | Retrieval-quality evaluation and performance measurements | Complete; focused tests + live read-only smoke passed |
-| 2 | Source validation/tagging tooling on isolated data | In progress |
-| 3 | Own-case similarity | Queued |
+| 2 | Source validation/tagging tooling on isolated data | Complete; 12 focused tests passed |
+| 3 | Own-case similarity | In progress |
 | 4 | Domain-independent configuration | Queued |
 | 5 | Local DB/web and actual checkpoint restart tests | Queued |
 | 6 | Reviewed PPTX and richer attributed case/output fields | Queued |
@@ -29,3 +29,13 @@ and RRF 19.29 s. An earlier hosted-encoder request failed transiently; the compl
 repeat passed all three. These single-query timings are not statistical benchmarks.
 No independently reviewed gold entities exist in the candidate suite, so no recall
 score is claimed. Measurements/URLs/IDs stay in ignored local output.
+
+## Checkpoint 2
+
+[Corpus curation](../data/CORPUS_REVIEW.md) is explicit/dry-run-first, with canonical
+source/hash checks, semantic-review attestation, accepted identity gates, immutable
+claim successors, audit provenance, exact topic support and idempotency. Twelve
+curation/ingestion tests passed on disposable data. No shared corpus was modified.
+
+Point 6 decision: the user selected **manual entry only for v1** for planned jobs,
+investment/currency and timeline. No automatic model extraction of business figures.
