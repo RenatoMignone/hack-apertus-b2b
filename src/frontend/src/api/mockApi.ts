@@ -10,7 +10,7 @@ const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 
 // Demo state survives reloads via localStorage (per browser only). Evidence is
 // static and re-attached on load rather than stored.
-const KEY = 'bern-navigator-demo-v7';
+const KEY = 'bern-navigator-demo-v8';
 type Saved = { cases: Omit<CaseDetail, 'evidence'>[] };
 
 function loadSaved(): Saved | null {
@@ -110,7 +110,7 @@ function seededFor(prompt: string): { rev: BriefRevision; topic: 'glucose' | 'in
 }
 
 function companyFrom(prompt: string) {
-  // "GlucoWave makes …" → "GlucoWave"; otherwise the first words of the message.
+  // "HelioSense is …" → "HelioSense"; otherwise the first words of the message.
   const named = prompt.match(/^\s*([A-Z][\w&'’-]*(?:\s[A-Z][\w&'’-]*){0,2})\s(?:makes|builds|develops|is|wants|needs|sells|produces)\b/);
   if (named) return named[1];
   const words = prompt.split(/[,.(\n]/)[0].trim().split(/\s+/);
@@ -166,7 +166,7 @@ export const mockApi: NavigatorApi = {
       });
     } else if (topic === 'glucose') {
       const people = rev.reasons.filter((r) => r.category === 'people').length;
-      say(c, `First draft: ${people} people and ${rev.reasons.length - people} groups, projects and services across UniBE, ARTORG and DCB. Your menstrual-cycle lead checks out. One question: ${HERO_FOLLOW_UP.question}`, {
+      say(c, `First draft: ${people} people and ${rev.reasons.length - people} groups, projects and services across UniBE, ARTORG and DCB. One question: ${HERO_FOLLOW_UP.question}`, {
         revisionId: rev.id,
         followUp: { id: uid('f'), ...HERO_FOLLOW_UP },
       });

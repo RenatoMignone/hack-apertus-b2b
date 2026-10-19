@@ -11,7 +11,7 @@ import { reportApiError } from '../components/ApiErrors';
 // The first example is the demo's hero case: written in everyday words, so the
 // "How I searched" Sankey shows the bridge to scientific terms.
 const EXAMPLES: { label: string; text: string }[] = [
-  { label: 'Glucose sensor', text: HERO_PROMPT },
+  { label: 'HelioSense (wearable)', text: HERO_PROMPT },
   {
     label: 'Insulin pump',
     text: 'European insulin pump maker wants to add closed-loop automated insulin delivery and is looking at Bern for R&D.',
@@ -74,8 +74,13 @@ export default function NewCasePage() {
               onClick={submit}
               disabled={!text.trim() || busy}
             >
+<<<<<<< HEAD
               {busy ? 'Starting…' : 'Start research'} <ArrowUp size={15} aria-hidden />
             </RadixButton>
+=======
+              {busy ? 'Starting…' : 'Start'} <ArrowUp size={15} aria-hidden />
+            </button>
+>>>>>>> origin/feat/my-desk
           </div>
         </Card>
 

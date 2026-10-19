@@ -98,7 +98,7 @@ export default function ExportModal({ detail, revision, onClose }: { detail: Cas
         )}
 
         <div className="mt-4 space-y-2">
-          {unreviewed > 0 && <p className="text-sm text-muted">Review all {unreviewed} remaining item(s) before exporting.</p>}
+          {unreviewed > 0 && <p className="text-sm text-muted">Keep or hide the {unreviewed} remaining item{unreviewed === 1 ? '' : 's'} before exporting.</p>}
           {!pdfAvailable && <p className="text-sm text-muted">PDF export is unavailable on the connected server.</p>}
           {option('pdf', FileText, 'PDF brief', 'Short company-facing brief with the agency logo and a source appendix.')}
           {(apiMode === 'mock' || formats.includes('pptx')) && option('pptx', Presentation, 'PowerPoint (agency template)', apiMode === 'mock' ? 'Editable demo slides.' : 'Reviewed content and source passages in editable agency slides.')}

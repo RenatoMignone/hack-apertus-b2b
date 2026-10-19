@@ -71,7 +71,11 @@ export default function BoardPage() {
       </div>
       <p className="px-6 pt-1 text-sm text-muted">Click anywhere on a card to open it. Drag to change status, or use its actions menu.</p>
 
+<<<<<<< HEAD
       <div className="case-board grid min-h-0 flex-1 gap-3 overflow-x-auto p-5" style={{ minWidth: 0 }}>
+=======
+      <div className="grid min-h-0 flex-1 grid-cols-[repeat(4,minmax(200px,1fr))] gap-3 overflow-x-auto p-5" style={{ minWidth: 0 }}>
+>>>>>>> origin/feat/my-desk
         {STATUS_ORDER.map((s) => {
           const col = visible.filter((c) => c.status === s);
           return (

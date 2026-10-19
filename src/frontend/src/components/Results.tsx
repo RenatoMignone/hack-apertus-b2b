@@ -119,6 +119,10 @@ function ReasonCard({
     .slice(-2)
     .join('');
   const profileUrl = person ? evidence[person.evidenceIds[0]]?.url : undefined;
+  const personInstitution = person ? person.institutionLabel ?? INSTITUTION[person.institution].short : '';
+  // Skip what the breadcrumb already says: "DCB · DCB professorship", or a unit named twice.
+  const unitPath = r.entries.find((e) => e.unitPath?.length)?.unitPath;
+  const entriesRepeatPath = r.entries.length === 1 && unitPath?.[unitPath.length - 1] === r.entries[0].name;
 
   if (r.selection === 'rejected') {
     return (
@@ -165,7 +169,7 @@ function ReasonCard({
           </div>
           {person?.role && (
             <div className="text-sm">
-              <span className="text-muted">{person.institutionLabel ?? INSTITUTION[person.institution].short} · </span>
+              {!person.role.includes(personInstitution) && <span className="text-muted">{personInstitution} · </span>}
               {person.role}
             </div>
           )}
@@ -186,7 +190,7 @@ function ReasonCard({
                 Source page <ExternalLink size={13} />
               </a>
             )
-          ) : (
+          ) : !entriesRepeatPath && (
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
               {r.entries.map((e) => (
                 <span key={e.id} className="flex items-center gap-1.5">
@@ -215,8 +219,8 @@ function ReasonCard({
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
-            aria-label={open ? 'Hide sources' : 'Show sources'}
-            title={open ? 'Hide sources' : 'Show sources'}
+            aria-label={open ? 'Close sources' : 'Show sources'}
+            title={open ? 'Close sources' : 'Show sources'}
             className="ml-0.5 rounded-md p-1 text-muted hover:bg-canvas hover:text-ink"
           >
             <ChevronDown size={16} className={`transition ${open ? 'rotate-180' : ''}`} />
@@ -354,7 +358,7 @@ export default function Results({
       {(openQuestions.length > 0 || introductions.length > 0 || coverage.limitations.length > 0) && (
         <section id="sec-next" className="scroll-mt-16 rounded-xl border border-line bg-white p-4">
           <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold tracking-tight">
-            <HelpCircle size={17} className="text-muted" aria-hidden /> Next steps
+            <HelpCircle size={17} className="text-muted" aria-hidden /> Follow-up
           </h2>
           <div className="grid gap-4 text-sm sm:grid-cols-2">
             {openQuestions.length > 0 && (
@@ -398,12 +402,12 @@ export default function Results({
                 <div className="w-28 shrink-0">
                   <div className="text-lg font-semibold tabular-nums">{s.score}/100</div>
                   <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-canvas">
-                    <div className="h-full rounded-full bg-ink" style={{ width: `${s.score}/100` }} />
+                    <div className="h-full rounded-full bg-ink" style={{ width: `${s.score}%` }} />
                   </div>
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="font-medium">{s.companyLabel}</div>
-                  {s.indexedAt && <p className="text-xs text-muted">Indexed {new Date(s.indexedAt).toLocaleDateString()} · Needs similarity, not success probability</p>}
+                  {s.indexedAt && <p className="text-xs text-muted">Indexed {new Date(s.indexedAt).toLocaleDateString()}</p>}
                   {!!s.differences?.length && <p className="text-xs text-muted">Current needs not listed verbatim: {s.differences.join('; ')}</p>}
                   <div className="mt-1 flex flex-wrap gap-1">
                     {s.shared.map((x) => (

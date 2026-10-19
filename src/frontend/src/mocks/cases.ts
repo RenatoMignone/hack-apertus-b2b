@@ -29,19 +29,20 @@ export function pruneTrace(trace: SearchTrace, evidenceIds: Set<string>): Search
 export const reasonEvidence = (reasons: Reason[]) =>
   new Set(reasons.flatMap((r) => [...r.line.evidenceIds, ...r.entries.flatMap((e) => e.evidenceIds)]));
 
-// ---------- Hero case: wearable glucose sensor ----------
-// Not on the board at start: the presenter creates it live from the composer's
-// "Glucose sensor" example (see docs/project/DEMO_SCRIPT.md). The prompt uses
-// everyday words ("blood-sugar patch") so the search trace shows the bridge to
-// scientific terms such as continuous glucose monitoring.
+// ---------- Hero case: HelioSense, wearable glucose sensor ----------
+// Fictional company from the demo fixture (HelioSense case brief). Not on the board
+// at start: the presenter creates it live from the composer's "HelioSense" example
+// (see docs/project/DEMO_SCRIPT.md). The prompt uses everyday words ("measures
+// blood sugar continuously") so the search trace shows the bridge to scientific
+// terms such as continuous glucose monitoring.
 
 export const HERO_PROMPT =
-  'GlucoWave makes a blood-sugar patch: a needle-free wearable that tracks glucose all day. They need partners for ' +
-  'clinical studies and for the app’s algorithms, and are considering a Swiss R&D site. Most early users are women; ' +
-  'I think DCB looked at diabetes and the menstrual cycle.';
+  'HelioSense is a fictional early-stage Swiss medtech building a wearable that measures blood sugar continuously, ' +
+  'without finger pricks. No validated prototype or clinical data yet. They want an early, non-clinical R&D partner in Bern ' +
+  'for the sensor, for making sense of the readings and for device testing, and want to know what clinical research access exists for later.';
 
 /** The agent's one clarification question for the hero case. */
-export const HERO_FOLLOW_UP = { question: 'Study partner, R&D site, or both?', choices: ['Study partner', 'R&D site', 'Both'] };
+export const HERO_FOLLOW_UP = { question: 'Early R&D only, or clinical studies later too?', choices: ['Early R&D only', 'Clinical studies later too'] };
 
 // Unit paths, expertise and missing fields only restate what the captured pages
 // say; anything a page does not state is listed in missingFields.
@@ -54,7 +55,7 @@ const reasonsA: Reason[] = [
     id: 'pA-witthauer',
     category: 'people',
     headline: 'Prof. Dr. Lilian Witthauer',
-    line: { text: 'Holds DCB’s sensor-technology professorship, the core of a glucose-sensor company.', evidenceIds: ['ev-dcb-profs-a'] },
+    line: { text: 'Holds DCB’s sensor-technology professorship, the core of HelioSense’s wearable.', evidenceIds: ['ev-dcb-profs-a'] },
     entries: [{ id: 'eA-witt', name: 'Prof. Dr. Lilian Witthauer', role: 'DCB professorship · Sensortechnologie', institution: 'DCB', unitPath: [...DCB_PATH, 'DCB professorships'], expertise: ['Sensor technology'], evidenceIds: ['ev-dcb-profs-a'] }],
     missingFields: ['Contact details', 'Projects'],
     kind: 'direct',
@@ -64,7 +65,7 @@ const reasonsA: Reason[] = [
     id: 'pA-koch',
     category: 'people',
     headline: 'Prof. Dr. Lisa Koch',
-    line: { text: 'Holds DCB’s data-science and machine-learning professorship, relevant to the sensor algorithms.', evidenceIds: ['ev-dcb-profs-a'] },
+    line: { text: 'Holds DCB’s data-science and machine-learning professorship, relevant to making sense of the sensor readings.', evidenceIds: ['ev-dcb-profs-a'] },
     entries: [{ id: 'eA-koch', name: 'Prof. Dr. Lisa Koch', role: 'DCB professorship · Data Science und Machine Learning', institution: 'DCB', unitPath: [...DCB_PATH, 'DCB professorships'], expertise: ['Data science', 'Machine learning'], evidenceIds: ['ev-dcb-profs-a'] }],
     missingFields: ['Contact details', 'Projects'],
     kind: 'direct',
@@ -121,14 +122,13 @@ const reasonsA: Reason[] = [
     selection: 'none',
   },
   {
-    id: 'rA-women',
+    id: 'rA-moonwalk',
     category: 'projects',
-    headline: 'Research on diabetes in women',
-    line: { text: 'DCB studied how the menstrual cycle relates to insulin needs.', evidenceIds: ['ev-dcb-menstrual'] },
-    entries: [{ id: 'eA-cycle', name: 'Menstrual Cycle Study', institution: 'DCB', unitPath: [...DCB_PATH, 'Projects'], expertise: ['Diabetes in women', 'Insulin needs'], evidenceIds: ['ev-dcb-menstrual'] }],
-    missingFields: ['Project lead'],
+    headline: 'Glucose data combined with wearable motion data',
+    line: { text: 'DCB studies how glucose values relate to motion patterns during sleep.', evidenceIds: ['ev-dcb-moonwalk'] },
+    entries: [{ id: 'eA-moon', name: 'Moonwalk Project', institution: 'DCB', unitPath: [...DCB_PATH, 'Projects'], expertise: ['Glucose values', 'Motion patterns'], evidenceIds: ['ev-dcb-moonwalk'] }],
+    missingFields: ['Project lead', 'Status and results'],
     kind: 'direct',
-    fromLead: true,
     selection: 'none',
   },
   {
@@ -144,7 +144,7 @@ const reasonsA: Reason[] = [
   {
     id: 'iA-clinical',
     category: 'infrastructure',
-    headline: 'Access to clinical research facilities',
+    headline: 'Access to clinical research facilities, for later',
     line: { text: 'DCB states it provides access to clinical research facilities for diabetes technology.', evidenceIds: ['ev-dcb-clinical'] },
     entries: [{ id: 'eA-clin', name: 'DCB clinical research access', institution: 'DCB', unitPath: DCB_PATH, expertise: ['Clinical research'], evidenceIds: ['ev-dcb-clinical'] }],
     missingFields: ['Access conditions for companies', 'Costs'],
@@ -175,11 +175,10 @@ const reasonsA: Reason[] = [
 
 const traceA: SearchTrace = {
   inputs: [
-    { id: 'in-sensor', label: 'blood-sugar patch' },
-    { id: 'in-needle', label: 'needle-free' },
-    { id: 'in-algo', label: 'app’s algorithms' },
-    { id: 'in-clinical', label: 'clinical studies' },
-    { id: 'in-women', label: 'women' },
+    { id: 'in-sensor', label: 'measures blood sugar continuously' },
+    { id: 'in-needle', label: 'without finger pricks' },
+    { id: 'in-algo', label: 'making sense of the readings' },
+    { id: 'in-clinical', label: 'device testing' },
   ],
   terms: [
     { id: 't-cgm', label: 'continuous glucose monitoring' },
@@ -187,16 +186,16 @@ const traceA: SearchTrace = {
     { id: 't-biomarker', label: 'digital biomarkers' },
     { id: 't-personal', label: 'personalised diabetes care' },
     { id: 't-validation', label: 'clinical validation' },
-    { id: 't-cycle', label: 'menstrual cycle & diabetes' },
+    { id: 't-wearable', label: 'wearable sensor data' },
   ],
   links: [
     { source: 'in-sensor', target: 't-cgm', value: 2 },
-    { source: 'in-sensor', target: 't-biomarker', value: 1 },
+    { source: 'in-sensor', target: 't-wearable', value: 1 },
     { source: 'in-needle', target: 't-noninv', value: 2 },
     { source: 'in-algo', target: 't-personal', value: 2 },
+    { source: 'in-algo', target: 't-wearable', value: 1 },
     { source: 'in-clinical', target: 't-validation', value: 2 },
     { source: 'in-clinical', target: 't-biomarker', value: 1 },
-    { source: 'in-women', target: 't-cycle', value: 1 },
     { source: 't-cgm', target: 'ev-dcb-spn005', value: 1 },
     { source: 't-cgm', target: 'ev-dcb-porphyrin', value: 1 },
     { source: 't-noninv', target: 'ev-dcb-spn005', value: 1 },
@@ -206,7 +205,7 @@ const traceA: SearchTrace = {
     { source: 't-personal', target: 'ev-adaptive-proactive', value: 1 },
     { source: 't-validation', target: 'ev-gocarb-trial', value: 1 },
     { source: 't-validation', target: 'ev-bally-aid', value: 1 },
-    { source: 't-cycle', target: 'ev-dcb-menstrual', value: 1 },
+    { source: 't-wearable', target: 'ev-dcb-moonwalk', value: 1 },
     { source: 't-cgm', target: 'ev-dcb-profs-a', value: 1 },
     { source: 't-personal', target: 'ev-aihn-contact', value: 1 },
     { source: 't-validation', target: 'ev-dcb-clinical', value: 1 },
@@ -219,12 +218,12 @@ const traceA: SearchTrace = {
 export const HERO_REVISION: BriefRevision = {
   id: 'revA-1',
   version: 1,
-  createdAt: '2026-10-18T14:05:00Z',
+  createdAt: '2026-10-19T14:05:00Z',
   changeNote: 'First version',
   changedReasonIds: [],
   company: {
-    summary: 'Makes a needle-free wearable glucose sensor (a “blood-sugar patch”) and is considering a Swiss R&D site.',
-    facts: ['Medtech', 'Wearable sensor', 'Users mostly women', 'Wants: clinical + algorithm partners'],
+    summary: 'Fictional early-stage Swiss medtech building a wearable for continuous glucose monitoring without finger pricks.',
+    facts: ['Fictional demo company', 'Medtech', 'Wearable sensor', 'No validated prototype yet', 'Wants: early, non-clinical R&D partner'],
   },
   reasons: reasonsA,
   openQuestions: ['Which sensing method do they use?', HERO_FOLLOW_UP.question],
@@ -234,7 +233,11 @@ export const HERO_REVISION: BriefRevision = {
     { caseId: 'case-d3', companyLabel: 'Diabeto App', score: 44, shared: ['Diabetes', 'Algorithms'], status: 'researching' },
   ],
   trace: traceA,
-  coverage: coverage('partial', ['Waiting for your answer in the chat.', 'Contact details: public profile pages only.']),
+  coverage: coverage('partial', [
+    'Waiting for your answer in the chat.',
+    'Contact details: public profile pages only.',
+    'HelioSense is a fictional scenario; only the Bern facts come from public pages.',
+  ]),
 };
 
 // ---------- Case B: insulin delivery, follow-up pending ----------

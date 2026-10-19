@@ -49,6 +49,10 @@ body {
   outline-offset: 2px;
   border-radius: 6px;
 }
+/* Text boxes show focus on their own border; a red ring would read as an error. */
+textarea:focus-visible {
+  outline: none;
+}
 
 /* Temporary highlight when the agent changes a section. */
 @keyframes changed-flash {

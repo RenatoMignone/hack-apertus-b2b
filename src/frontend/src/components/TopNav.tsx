@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Columns3, Info, LayoutGrid, Plus } from 'lucide-react';
 import { api, apiMode } from '../api';
-import logo from '../assets/logo.png';
 import { useToast } from './Toast';
 
 function DemoMenu() {
@@ -67,7 +66,16 @@ export default function TopNav() {
   return (
     <header className="flex h-[72px] shrink-0 items-center gap-2 border-b border-line bg-white px-3 sm:gap-5 sm:px-5 lg:gap-9 lg:px-8">
       <Link to="/" aria-label="My desk" className="shrink-0">
+<<<<<<< HEAD
         <img src={logo} alt="Bern Economic Development Agency" className="h-6 w-auto sm:h-7 lg:h-8" />
+=======
+        <svg viewBox="0 0 400 190" role="img" aria-label="B2B" className="h-10 w-auto lg:h-11">
+          <polyline points="0,150 80,150 175,55 220,100 265,55 310,100 375,22" fill="none"
+            stroke="var(--color-brand)" strokeWidth="16" strokeLinejoin="miter" />
+          <polygon points="398,2 352,10 386,44" fill="var(--color-brand)" />
+          <text x="130" y="185" fontSize="96" fontWeight="800" fill="currentColor" letterSpacing="-2">B2B</text>
+        </svg>
+>>>>>>> origin/feat/my-desk
       </Link>
       <TabNav.Root aria-label="Main" className="self-stretch flex items-center">
         {tabs.map(({ to, label, Icon, active }) => <TabNav.Link key={to} asChild active={active}>

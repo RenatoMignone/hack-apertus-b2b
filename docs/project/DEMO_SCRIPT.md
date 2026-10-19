@@ -17,9 +17,15 @@ why Bern fits: people, groups, projects and services from **UniBE, ARTORG and DC
 They refine it in plain language, keep what is relevant and export a company-facing
 brief. Nothing is invented: missing information is shown as missing.
 
-**Hero company:** GlucoWave (synthetic), maker of a needle-free "blood-sugar
-patch". Every Bern entity shown comes from a public page captured on 18 Oct 2026
-([evidence.ts](../../src/frontend/src/mocks/evidence.ts)).
+**Hero company:** HelioSense (fictional), an early-stage Swiss medtech building a
+wearable that measures blood sugar continuously without finger pricks. It wants an
+early, non-clinical R&D partner and to know about clinical research access for
+later. The scenario comes from the team's HelioSense demo fixture (case brief,
+query variants, run checklist; 19 Oct 2026), which was built for the live backend.
+The mock hero is a scripted version of it. Every Bern entity shown comes from a
+public page captured on 18 Oct 2026
+([evidence.ts](../../src/frontend/src/mocks/evidence.ts)). It replaces the earlier
+GlucoWave hero.
 
 ## What runs where (say it honestly)
 
@@ -47,7 +53,7 @@ sources. Not connected to the live agent yet."
 
 The mock agent recognises fixed patterns, not free language. On stage:
 
-- Start the hero with the **Glucose sensor** example button. Do not retype it.
+- Start the hero with the **HelioSense (wearable)** example button. Do not retype it.
 - In chat, type exactly the scripted lines below. Other phrases may get
   "Brief unchanged".
 - Do not let judges type freely in the mock. A plain "diabetes" query, or an
@@ -60,18 +66,18 @@ The mock agent recognises fixed patterns, not free language. On stage:
 | # | Do | Say (short) | What it proves |
 | --- | --- | --- | --- |
 | 0 | **My desk** (`/`): point at *Next steps* (Pumpline's open question, outcomes to record). Click **My cases**: the board, In review empty | "Our user is a business developer. About 300 company cases a year. Her desk shows what's waiting on her; this is her board." | Case workflow fits their process (E06) |
-| 1 | **New case** → **Glucose sensor** example. Point at the lock note. → **Ctrl+Enter** | "She types what she knows, in everyday words: a blood-sugar patch. Public information only; confidential business plans never go in." | One natural-language input (R01); confidentiality boundary (R12, E03, E28) |
+| 1 | **New case** → **HelioSense (wearable)** example. Point at the lock note. → **Ctrl+Enter** | "She types what she knows, in everyday words: a wearable that measures blood sugar continuously. Public information only; confidential business plans never go in." | One natural-language input (R01); confidentiality boundary (R12, E03, E28) |
 | 2 | Run stages play (interpreting → searching → validating → drafting) | "It interprets, searches the three institutions, checks every claim against its source, then drafts." | Pipeline steps; validation before output (R06) |
 | 3 | Results appear. Point at the company card, then *Why Bern* with the three institution dots | "Four people and eight groups, projects and services, across UniBE, ARTORG and DCB." | All three sources as one ecosystem (R03) |
 | 4 | **People:** Lilian Witthauer card. Point at the role, the unit breadcrumb, *Not stated in sources: Contact details* and *Source page* | "Roles exactly as the page states them. What the page does not say, we say is missing; we don't guess." | Structured fields where sources give them; no invention (R06, R07) |
-| 5 | Scroll to **Projects:** *Research on diabetes in women*, **Your lead ✓**. Click citation chip `[10]` → evidence drawer with the highlighted quote → **Esc** | "Her hunch about DCB was right, and here is the exact sentence on DCB's page that proves it." | Traceable claim to a public URL (R06, E12, E15) |
+| 5 | Scroll to **Projects:** *Needle-free glucose monitoring is already researched here*. Click its citation chip → evidence drawer with the highlighted quote → **Esc** | "DCB already runs a pilot on needle-free monitoring, and here is the exact sentence on DCB's page that says so." | Traceable claim to a public URL (R06, E12, E15) |
 | 6 | **Ideas to explore:** *Idea · to validate* card | "Ideas are labelled as ideas: an adjacent possibility, not a claim that it fits." | Evidence vs adjacent application (E10) |
-| 7 | **How I searched** (expand). Hover *blood-sugar patch* | "She said blood-sugar patch. It searched continuous glucose monitoring and non-invasive monitoring: the vocabulary she doesn't have." | Lay-term → scientific bridge (R05, E08, E27) |
-| 8 | Chat: the agent asked *Study partner, R&D site, or both?* → click **Both** | "When something matters, it asks instead of assuming." → v2 adds DCB's 61-researcher network, highlighted | Clarification + versioned revision (E29) |
+| 7 | **How I searched** (expand). Hover *measures blood sugar continuously* | "She never wrote 'continuous glucose monitoring'. It translated her words into the terms researchers use, and *without finger pricks* became non-invasive monitoring." | Lay-term → scientific bridge (R05, E08, E27) |
+| 8 | Chat: the agent asked *Early R&D only, or clinical studies later too?* → click **Clinical studies later too** | "When something matters, it asks instead of assuming." → v2 adds DCB's 61-researcher network, highlighted | Clarification + versioned revision (E29) |
 | 9 | Chat, type: `Drop the nutrition study, they don't care about meals` → Enter | "She pushes back in plain words." → v3, GoCARB removed. Open the version menu: v1, v2, v3 | Natural-language refinement with history (E29) |
-| 10 | **✓ Keep** Witthauer, Bally, *Needle-free glucose monitoring*, *Research on diabetes in women*, *Access to clinical research facilities*. **Hide** the other 7 (export stays locked until every item is kept or hidden) | "She decides what goes to the company; the tool doesn't. Nothing leaves without her review." | Human relevance judgement and review gate (E04, E14) |
+| 10 | **✓ Keep** Witthauer, Bally, *Needle-free glucose monitoring*, *Glucose data combined with wearable motion data*, *Access to clinical research facilities, for later*. **Hide** the rest (export stays locked until every item is kept or hidden) | "She decides what goes to the company; the tool doesn't. Nothing leaves without her review." | Human relevance judgement and review gate (E04, E14) |
 | 11 | **Export (5)** → show the dialog → **PDF brief** (or **PowerPoint**) and open the file | "A short company-facing brief in the agency's template, every claim with its source in the appendix. Nothing leaves the laptop." | Teaser for the CEO (E13); offline export |
-| 12 | **My cases** tab (`/cases`): GlucoWave in *In review* → ⋯ → move to **Pitch sent**. Optional: **My desk** now lists *Record the outcome · GlucoWave* | "And back on her board." | End-to-end workflow |
+| 12 | **My cases** tab (`/cases`): HelioSense in *In review* → ⋯ → move to **Pitch sent**. Optional: **My desk** now lists *Record the outcome · HelioSense* | "And back on her board." | End-to-end workflow |
 
 ### Contrast cases (15–20 s, after step 12)
 
@@ -101,7 +107,7 @@ not (see "What runs where").
 - "It found …" about recall or accuracy: no retrieval quality has been measured.
 - "Runs fully air-gapped": not tested.
 - "The expert is available / will meet you": the brief only lists possible introductions.
-- "Real company": GlucoWave and every other company on the board are synthetic.
+- "Real company": HelioSense and every other company on the board are fictional.
 
 ## Prepared answers
 
@@ -121,5 +127,5 @@ not (see "What runs where").
   `HERO_FOLLOW_UP` in [cases.ts](../../src/frontend/src/mocks/cases.ts). The hero is
   **not** on the board at start; the presenter creates it in step 1.
 - Mock behaviour (routing, follow-up, exclusion): [mockApi.ts](../../src/frontend/src/api/mockApi.ts).
-- Demo state is per browser (`localStorage` key `bern-navigator-demo-v7`).
+- Demo state is per browser (`localStorage` key `bern-navigator-demo-v8`).
   **Reset demo data** restores the seed.

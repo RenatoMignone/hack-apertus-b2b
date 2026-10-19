@@ -35,7 +35,8 @@ adjacent ideas. Cards show citations and optional source-backed role, hierarchy,
 expertise and missing-field labels. The new optional fields are populated in demo
 fixtures; the current backend does not yet supply all of them. Never infer missing
 metadata in the browser. Introduction suggestions do not confirm availability.
-Next steps include questions and material coverage limitations even without a
+The case page's *Follow-up* block (named apart from the desk's *Next steps*)
+includes questions and material coverage limitations even without a
 named introduction. Source badges distinguish new case-local web evidence.
 The Sankey uses recorded query/evidence links only; missing lineage is unavailable.
 Narrow screens show a text/source fallback. No-match caveats remain visible.
