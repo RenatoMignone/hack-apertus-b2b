@@ -16,6 +16,10 @@ type Accepted = { case_id: string; input_id: string; run_id?: string; status_url
 type Operation = { status: string; download_url?: string; error_code?: string };
 
 
+export class ConnectionError extends Error {
+  constructor() { super("Connection interrupted. Submitted work may still be running. Reconnect to check its status."); }
+}
+
 export class ApiError extends Error {
   status: number;
   code: string;
@@ -66,7 +70,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
         return (blob ? await response.blob() : await response.json()) as T;
       } catch (error) {
         if (error instanceof ApiError) throw error;
-        if (attempt) throw new Error('Cannot reach the backend. Check your connection and reload; submitted work may still be running.');
+        if (attempt) throw new ConnectionError();
         await pause(300);
       } finally { clearTimeout(timeout); }
     }
@@ -96,11 +100,21 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     if (!detail || detail.revision === undefined || !detail.inputId) throw new Error('Case is unavailable.');
     return detail;
   }
+  async function observe<T>(url: string): Promise<T> {
+    for (let attempt = 0; ; attempt++) {
+      try { return await request<T>(url); }
+      catch (error) {
+        const transient = error instanceof ConnectionError || error instanceof ApiError && [502, 503, 504].includes(error.status);
+        if (!transient || attempt >= 3) throw error;
+        await pause(nextPollDelay(pollInterval, attempt));
+      }
+    }
+  }
   async function poll(caseId: string, url: string, onStage: (stage: RunStage) => void, signal?: AbortSignal) {
     let last = "", unchanged = 0;
     for (let n = 0; n < maxPolls; n++) {
       signal?.throwIfAborted();
-      const run = await request<CaseRun>(url);
+      const run = await observe<CaseRun>(url);
       signal?.throwIfAborted();
       publishProgress(caseId, run);
       const signature = JSON.stringify([run.status, run.stage, run.step, run.activity]);

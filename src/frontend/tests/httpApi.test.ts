@@ -198,3 +198,30 @@ test('manual plans cannot overwrite an unseen input revision', async () => {
   await assert.rejects(api.setBusinessContext!('case',{planned_jobs:5},()=>{},3),ApiError);
   assert.equal(calls.filter((c) => c.method !== 'GET').length,0);
 });
+
+
+test('interrupted status observation resumes existing run without writes', async () => {
+  let reads = 0;
+  const { api, calls } = harness((url) => {
+    if (url.endsWith('/runs/run')) {
+      if (++reads <= 2) throw new TypeError('offline');
+      return { status: 'succeeded', stage: 'done' };
+    }
+    return detail();
+  });
+  await api.runCase('case', () => {});
+  assert.equal(reads, 3);
+  assert.equal(calls.filter(c => c.method !== 'GET').length, 0);
+});
+
+test('authentication stops observation immediately; unavailable reads have a bound', async () => {
+  for (const status of [401, 503]) {
+    let reads = 0;
+    const { api } = harness(url => {
+      if (url.endsWith('/runs/run')) { reads++; return Response.json({error:{code:'service_unavailable'}}, {status}); }
+      return detail();
+    });
+    await assert.rejects(api.runCase('case', () => {}), ApiError);
+    assert.equal(reads, status === 401 ? 1 : 4);
+  }
+});
