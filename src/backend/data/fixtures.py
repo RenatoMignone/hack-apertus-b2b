@@ -24,7 +24,7 @@ class FixtureEmbedder:
         return [1.0, 0.1, 0.1] if glucose else [0.1, 1.0, 0.1]
 
 
-def load_fixture(engine, artifacts, *, namespace=None):
+def load_fixture(engine, artifacts, *, namespace=None, named_sources=False):
     namespace = namespace or "fixture_" + uuid4().hex[:12]
     if not namespace.startswith(("test", "fixture")):
         raise ValueError("synthetic fixtures require a test/fixture namespace")
@@ -37,7 +37,7 @@ def load_fixture(engine, artifacts, *, namespace=None):
         connection.execute(insert(tables.scope_grants).values(principal_id=principal_id, scope_id=scope_id, can_write=True))
         connection.execute(insert(tables.profiles).values(profile_id=profile_id, namespace=namespace, name="synthetic",
             version="1", schema_version="1.0", config_hash=configuration_hash({"fixture": 1}),
-            configuration={"required_source_families": ["UniBE", "ARTORG", "DCB"], "synthetic": True}))
+            configuration={"required_source_families": ["ARTORG"] if named_sources else ["UniBE", "ARTORG", "DCB"], "synthetic": True}))
         connection.execute(insert(tables.taxonomies).values(taxonomy_version_id=taxonomy_id, name=namespace,
             version="1", artifact_hash=configuration_hash({"taxonomy": "fixture"})))
     access = AccessContext(principal_id=principal_id, namespace=namespace)
@@ -49,6 +49,11 @@ def load_fixture(engine, artifacts, *, namespace=None):
                ("ARTORG", "de", "Synthetisches Beispiel: Glukose Sensoren und digitale Medizin."),
                ("DCB", "fr", "Exemple synthétique : glycémie et technologies du diabète."),
                ("DCB", "it", "Esempio sintetico: glicemia e tecnologie del diabete.")]
+    if named_sources:
+        entries = [("ARTORG", "en", "In this fictional test corpus, B2B Sensor Laboratory develops glucose biosensors "
+            "and evaluates prototype sensor signals. B2B Sensor Laboratory is a fictional research unit, "
+            "not a real institution. Clinical approval, facility availability and willingness to collaborate "
+            "are not established. This passage supplies no expertise in satellite propulsion.")]
     for family, language, body in entries:
         source_id = uuid4()
         with engine.begin() as connection:

@@ -38,6 +38,7 @@ class CaseState(TypedDict, total=False):
     web_query: str
     search_observations: list[dict]
     round_started_at: str
+    reuse_prepared_evidence: bool
 
 
 def build_graph(store, reasoning, backbone, web, checkpointer, tracer=None, *, memory=None):
@@ -59,7 +60,8 @@ def build_graph(store, reasoning, backbone, web, checkpointer, tracer=None, *, m
     graph.add_conditional_edges("plan", lambda s: ("reject_draft" if s.get("draft_error") else "freeze_pack")
         if s.get("research_exhausted") else ["retrieve", "web_search"])
     graph.add_edge(["retrieve", "web_search"], "merge")
-    graph.add_edge("merge", "extract")
+    graph.add_conditional_edges("merge", lambda s: (
+        "reject_draft" if s.get("pack_id") else "freeze_pack") if s.get("reuse_prepared_evidence") else "extract")
     graph.add_edge("extract", "persist_candidates")
     graph.add_edge("persist_candidates", "assess")
     graph.add_edge("assess", "propose_pack")

@@ -205,3 +205,33 @@ users can run `make all` from root for background API/worker/frontend/search,
 `make worker`, `make frontend`, `make docker` targets for logs. `make help` lists
 boundaries. Make does not provision PostgreSQL/MinIO or establish SSH.
 See [local setup](../data/LIVE_SETUP.md).
+
+## Optional: actual Apertus with isolated fictional evidence
+
+The synthetic server can opt into actual configured Apertus while retaining
+fictional source records and synthetic 3-dimensional embeddings. This exercises
+model integration; it does not establish real-corpus research quality. Requires
+the Python setup above and an explicitly disposable `NAVIGATOR_TEST_ADMIN_DSN`.
+Never use the shared host's administrator DSN.
+
+```bash
+python -m backend.tests.runtime.smoke --port 8012 \
+  --real-model-env .env --postgres-checkpoints --rich-outputs \
+  --receipt .local/reliability/model.jsonl
+```
+
+In another terminal:
+
+```bash
+python -m backend.tests.runtime.acceptance --output .local/reliability/acceptance
+```
+
+This creates new match, clarification and no-match cases, checks review/export
+and stale-download gates, and saves fictional PDFs and HTTP receipts privately.
+A failed expectation produces a nonzero exit; it never substitutes scripted
+model verdicts. Model receipts contain task timing and token counts, not prompts,
+credentials or response bodies. Checkpoint setup and schema migrations affect
+only the newly created disposable database, which is removed on normal shutdown.
+Use the synthetic test token from the server output in the HTTP frontend; set
+`VITE_API_BASE_URL=http://127.0.0.1:8012` and restart Vite. `--clarify` is reserved
+for scripted mode and cannot be combined with the actual model option.

@@ -1,4 +1,4 @@
-"""Explicit local browser smoke server. Disposable DB; synthetic model/embedding only.
+"""Explicit local browser smoke server. Disposable DB; synthetic sources/embeddings.
 
 PYTHONPATH=src NAVIGATOR_TEST_ADMIN_DSN=postgresql://TEST_ADMIN@localhost:PORT/postgres \
   python -m backend.tests.runtime.smoke
@@ -6,6 +6,7 @@ PYTHONPATH=src NAVIGATOR_TEST_ADMIN_DSN=postgresql://TEST_ADMIN@localhost:PORT/p
 import asyncio
 import argparse
 import json
+import os
 import sys
 from contextlib import asynccontextmanager
 import hashlib
@@ -38,11 +39,14 @@ from backend.tests.runtime.test_integrated_lanes import synthetic_transport
 from backend.tests.run import require_test_admin_dsn
 
 
-async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=False, rich_outputs=False):
+async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=False, rich_outputs=False, model_settings=None, checkpoint_url=None, receipt=None):
     token = "synthetic-browser-smoke"
     binding = IdentityBinding(token_sha256=hashlib.sha256(token.encode()).hexdigest(),
         principal_id=principal, namespace=fixture["namespace"])
-    settings = RuntimeSettings(mode="offline", llm_base_url="http://llm:8080/v1", bindings=(binding,),
+    settings = RuntimeSettings(mode="connected" if model_settings else "offline",
+        llm_name=model_settings.model_name if model_settings else "apertus-v1-5-8b",
+        llm_base_url=model_settings.base_url if model_settings else "http://llm:8080/v1",
+        langgraph_database_url=checkpoint_url, bindings=(binding,),
         default_profile_id=UUID(fixture["profile_id"]), cors_origins=("http://127.0.0.1:5173", "http://localhost:5173",
             "http://127.0.0.1:5174", "http://localhost:5174"),
         rich_outputs_enabled=rich_outputs, case_memory_enabled=rich_outputs,
@@ -59,9 +63,22 @@ async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=Fal
             result['choices'][0]['message']['content'] = json.dumps(content)
             return httpx.Response(200, json=result)
         return response
-    services = Services(reasoning=create_reasoning_services(ModelSettings(base_url=settings.llm_base_url, local=True),
-        transport=httpx.MockTransport(transport)),
+    services = Services(reasoning=create_reasoning_services(
+        model_settings or ModelSettings(base_url=settings.llm_base_url, local=True),
+        transport=None if model_settings else httpx.MockTransport(transport), receipt=receipt),
         backbone=create_backbone(engine, artifacts, FixtureEmbedder()), pdf=create_pdf_renderer())
+    if model_settings:
+        from backend.models.reasoning.client import StructuredTasks
+        class FictionalCorpusTasks(StructuredTasks):
+            async def run(self, task, instruction, payload, schema, context, **kwargs):
+                return await super().run(task,
+                    "CLOSED-WORLD FICTIONAL EVALUATION: supplied source passages are fictional test data. "
+                    "Assess their explicit capabilities within that fictional corpus, never as real-world "
+                    "Bern expertise. Preserve fictional qualification in extracted statements and report "
+                    "wording. Missing independent real-world verification is not missing textual support "
+                    "inside this exercise. Unsupported claims, approval and willingness still fail. "
+                    + instruction, payload, schema, context, **kwargs)
+        services.reasoning.tasks = FictionalCorpusTasks(services.reasoning.tasks.model, receipt=receipt)
     if rich_outputs:
         from backend.application.case_memory import CaseMemory
         from backend.reports.rendering.pptx import TemplatePptxRenderer
@@ -72,7 +89,7 @@ async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=Fal
     @asynccontextmanager
     async def checkpoints(access, run_id):
         yield saver, {"configurable": {"thread_id": str(run_id)}}
-    worker = Worker(application, checkpoint_factory=checkpoints)
+    worker = Worker(application, checkpoint_factory=None if checkpoint_url else checkpoints)
     class Registry:
         def __init__(self):
             self.settings = settings
@@ -87,7 +104,9 @@ async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=Fal
             await worker.run_once(binding.access)
             await asyncio.sleep(0.1)
     task = asyncio.create_task(work())
-    print("LOCAL SYNTHETIC SMOKE ONLY. Access token: synthetic-browser-smoke", flush=True)
+    print("LOCAL SYNTHETIC SOURCES/EMBEDDINGS. Model: " + ("actual Apertus" if model_settings else "scripted fixture") +
+          "; checkpoints: " + ("PostgreSQL" if checkpoint_url else "memory") +
+          ". Access token: synthetic-browser-smoke", flush=True)
     try:
         await uvicorn.Server(uvicorn.Config(create_app(Registry()), host="127.0.0.1", port=port)).serve()
     finally:
@@ -96,11 +115,30 @@ async def serve(engine, artifacts, fixture, principal, *, port=8000, clarify=Fal
 
 
 def main(argv=()):
+    from backend.observability.logging import configure
+    configure()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--port', type=int, default=8000)
     parser.add_argument('--clarify', action='store_true', help='Exercise a free-text blocking clarification before research.')
     parser.add_argument('--rich-outputs', action='store_true', help='Exercise optional plans/PPTX controls; keep fictional cases out of comparison history.')
+    parser.add_argument('--real-model-env', type=Path, help='Opt in to actual configured Apertus with synthetic public-safe inputs only.')
+    parser.add_argument('--postgres-checkpoints', action='store_true', help='Set up checkpoints ONLY inside the newly created disposable database.')
+    parser.add_argument('--receipt', type=Path, help='JSONL model timings/token counts; no prompts or responses.')
     args = parser.parse_args(argv)
+    if args.real_model_env and args.clarify:
+        parser.error('--clarify forces scripted questions and cannot accompany --real-model-env')
+    model_settings = None
+    if args.real_model_env:
+        from backend.data.cli import load_environment
+        load_environment(args.real_model_env)
+        model_settings = ModelSettings(base_url=os.environ['LLM_BASE_URL'],
+            model_name=os.environ['LLM_NAME'], api_key=os.environ['LLM_API_KEY'])
+    def receipt(value):
+        if args.receipt:
+            args.receipt.parent.mkdir(parents=True, exist_ok=True)
+            with args.receipt.open('a') as stream:
+                stream.write(json.dumps(value) + '\n')
+
     admin_dsn = require_test_admin_dsn()
     name, role = "navigator_browser_" + uuid4().hex, "browser_" + uuid4().hex[:12]
     with psycopg.connect(admin_dsn, autocommit=True) as c:
@@ -112,13 +150,19 @@ def main(argv=()):
         migrate(database)
         with TemporaryDirectory(prefix="navigator-browser-") as folder:
             artifacts = FilesystemArtifactStore(Path(folder))
-            fixture = load_fixture(database, artifacts)
+            fixture = load_fixture(database, artifacts, named_sources=bool(model_settings))
             principal, password = provision_principal(database, role, fixture["namespace"])
             provisioned = True
             grant_scope(database, principal, UUID(fixture["scope_id"]))
             application_engine = engine_for(database.url.set(username=role, password=password).render_as_string(hide_password=False))
+            checkpoint_url = None
+            if args.postgres_checkpoints:
+                from backend.workflows.checkpoints import CheckpointPort
+                checkpoint_url = database.url.render_as_string(hide_password=False).replace('postgresql+psycopg://', 'postgresql://')
+                CheckpointPort(database, checkpoint_url).setup()
             try:
-                asyncio.run(serve(application_engine, artifacts, fixture, principal, port=args.port, clarify=args.clarify, rich_outputs=args.rich_outputs))
+                asyncio.run(serve(application_engine, artifacts, fixture, principal, port=args.port, clarify=args.clarify, rich_outputs=args.rich_outputs, model_settings=model_settings,
+                    checkpoint_url=checkpoint_url, receipt=receipt))
             except KeyboardInterrupt:
                 pass
     finally:

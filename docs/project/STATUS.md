@@ -71,3 +71,19 @@ testing; a fresh latest-code case through report/review/PDF is not yet certified
 Restart API/worker/frontend after source updates and test a new case. UI hot-reload
 invalidation during the My desk merge was observed and its mixed helper export
 removed; it was separate from durable backend execution.
+
+## Isolated pipeline reliability acceptance
+
+The reliability pass passed **304 disposable-backend tests**, **26 frontend tests**,
+TypeScript and production build. Continuous actual-Apertus 70B runs with fictional
+sources, synthetic embeddings and local PostgreSQL checkpoints passed match,
+clarification/resume and no-match scenarios. Match and clarification each produced
+two assessed reasons and a reviewed PDF; wording revisions invalidated old downloads.
+This establishes isolated orchestration/model integration, not shared-host retrieval
+performance or real expertise quality. See the [receipt](PIPELINE_RELIABILITY.md).
+
+Interpretation now uses pinned domain codes in its private schema and targeted
+clarification repair. Draft assessment requires complete reason/caveat findings;
+code derives its verdict. Follow-up research with identical passages/entity context
+reuses assessed work with unresolved gaps; unchanged evidence after a draft failure
+stops rather than regenerating repeatedly. Restart API/worker after updating.

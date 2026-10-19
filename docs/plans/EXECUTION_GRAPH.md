@@ -27,7 +27,8 @@ flowchart TB
     PLAN --> WEB
     DBSEARCH --> MERGE
     WEB --> MERGE
-    MERGE --> VALID
+    MERGE -->|"initial or changed evidence"| VALID
+    MERGE -->|"unchanged follow-up: reuse assessed work and retain gaps"| PACK
     VALID -->|"supported claims or explicit no-match / partial"| PACK
     VALID -->|"bounded evidence gap"| PLAN
     PACK --> DRAFT --> REVIEW
