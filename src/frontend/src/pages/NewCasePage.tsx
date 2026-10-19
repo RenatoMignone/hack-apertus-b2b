@@ -72,7 +72,7 @@ export default function NewCasePage() {
               disabled={!text.trim() || busy}
               className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-40"
             >
-              {busy ? 'Starting…' : 'Search'} <ArrowUp size={15} aria-hidden />
+              {busy ? 'Starting…' : 'Start'} <ArrowUp size={15} aria-hidden />
             </button>
           </div>
         </div>

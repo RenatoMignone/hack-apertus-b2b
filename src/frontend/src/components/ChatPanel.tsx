@@ -19,7 +19,7 @@ function ClarificationAnswer({ turn, running, onAnswer }: {
     <label className="block text-xs text-muted">Your answer
       <textarea aria-label={`Answer: ${turn.followUp.question}`} value={answer} disabled={running}
         maxLength={10000} onChange={(event) => setAnswer(event.target.value)} rows={2}
-        className="mt-1 w-full rounded-lg border border-line p-2 text-sm text-ink" />
+        className="mt-1 w-full rounded-lg border border-line p-2 text-sm text-ink focus:border-ink/40" />
     </label>
     <button type="submit" disabled={running || !answer.trim()}
       className="rounded-lg bg-brand px-3 py-1.5 text-sm text-white disabled:opacity-40">Submit answer</button>

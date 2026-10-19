@@ -89,7 +89,7 @@ function JumpBar({ revision }: { revision: BriefRevision }) {
     has('projects') && ['projects', 'Projects'],
     has('infrastructure') && ['infrastructure', 'Infrastructure'],
     has('ideas') && ['ideas', 'Ideas'],
-    (revision.openQuestions.length > 0 || revision.coverage.limitations.length > 0 || has('people')) && ['next', 'Next steps'],
+    (revision.openQuestions.length > 0 || revision.coverage.limitations.length > 0 || has('people')) && ['next', 'Follow-up'],
     (revision.similarCases?.length ?? 0) > 0 && ['similar', 'Similar cases'],
     revision.reasons.length > 0 && ['search', 'How I searched'],
   ].filter(Boolean) as [string, string][];
@@ -305,7 +305,7 @@ export default function CaseWorkspace() {
             {detail.revisions.length > 1 && (
               <VersionMenu detail={detail} current={revision} onPick={setViewedRevisionId} />
             )}
-            <span title={kept ? undefined : 'Keep at least one item (✓ Keep) to export it'}>
+            <span title={kept ? undefined : 'Keep or hide every item, keeping at least one, to export'}>
               <Button variant="primary" disabled={historical || running || selecting} onClick={() => setExportOpen(true)}>
                 <Download size={15} aria-hidden /> Export{kept ? ` (${kept})` : ''}
               </Button>

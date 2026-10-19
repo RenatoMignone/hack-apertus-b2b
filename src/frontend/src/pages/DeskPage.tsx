@@ -191,7 +191,7 @@ export default function DeskPage() {
             count={steps?.length}
             footer={
               <>
-                <span className="text-xs">{openCount} open case{openCount === 1 ? '' : 's'}</span>
+                <span className="text-xs">{cases && `${openCount} open case${openCount === 1 ? '' : 's'}`}</span>
                 <Link to="/cases" className="font-medium hover:text-ink">Open board →</Link>
               </>
             }
