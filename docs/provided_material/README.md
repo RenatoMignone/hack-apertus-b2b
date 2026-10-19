@@ -82,9 +82,9 @@ Do not reuse them for unrelated projects or assume broader redistribution rights
 
 SHA-256: `FDE725FE9D25F858003DA6256F89F6420CE23C4BEB3B6C230764507EC87BDFB9`.
 
-## Inputs still absent
+## Use in the application
 
-This directory currently contains no example company needs, independently
-reviewed expected experts/units, previous-case corpus, taxonomy, inference access
-details or deployment/hardware specification. The workbook is not an evaluation
-dataset, and the presentation is not a historical company case.
+The workbook seeds controlled public-source discovery; it is not source evidence.
+The slide template and English logo are challenge-only output assets. Preserve
+original bytes. [Rich outputs](../data/RICH_OUTPUTS.md) describes backend template
+rendering; [delivery](../judges/DELIVERY.md) covers final submission artifacts.

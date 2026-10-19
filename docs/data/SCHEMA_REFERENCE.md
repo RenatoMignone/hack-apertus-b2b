@@ -4,7 +4,7 @@ Generated from `src/backend/data/schema.py`; migration head **`0012_membership_l
 Do not edit by hand. Regenerate with `PYTHONPATH=src python -m backend.data.schema_docs`.
 
 **65 application tables.** Read [schema decisions](RELATIONAL_SCHEMA.md) and
-[ingestion/retrieval handoff](INGESTION_RETRIEVAL_HANDOFF.md) for meanings and write order.
+[ingestion specification](ingestion/INGESTION_SPEC.md) for meanings and write order.
 Only these tables are supported for new queries. `alembic_version` is migration-owned;
 optional `legacy` history is maintainer-only. Framework tables live outside this database.
 

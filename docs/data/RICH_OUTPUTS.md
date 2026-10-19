@@ -1,10 +1,8 @@
 # Manual company plans and reviewed PowerPoint
 
-19 October 2026. Backend and HTTP frontend are implemented. Optional activation
-requires maintainer migration `0010_rich_outputs` and
-`RUNTIME_RICH_OUTPUTS_ENABLED=true`; source still supports the shared 0008 core
-with new features disabled. [Eric's activation prompt](../team/OPTIONAL_FEATURE_ACTIVATION.md)
-separates code delivery from host changes.
+Optional manual plans and reviewed PPTX require migration `0010_rich_outputs`,
+`RUNTIME_RICH_OUTPUTS_ENABLED=true` and supplied template assets. Capability
+responses determine browser availability; code presence alone is not activation.
 
 ## Manual data, v1
 

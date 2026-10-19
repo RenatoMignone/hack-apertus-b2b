@@ -4,7 +4,7 @@
 - **Event:** Hack Apertus, on-site Liebefeld
 - **Team:** Stregoni — Renato Mignone, Elia Innocenti, Eric Ruiz Giménez, Mohamed Kechiche
 - **Demo:** Pending video URL; [reproducible walkthrough](docs/judges/DEMO.md)
-- **Status:** Delivery draft, 19 October 2026; source baseline `072f099`, with local work in progress
+- **Status:** Delivery draft, 19 October 2026; integrated main, with final artifacts/acceptance tracked in the delivery checklist
 
 ## 1. Summary
 
@@ -147,8 +147,8 @@ navigator-runtime --env-file .env serve --host 127.0.0.1 --port 8000
 ```
 
 In a separate terminal with the same environment run
-`navigator-runtime --env-file .env worker`. Start Vite in HTTP mode and connect
-with the privately provisioned operator token. Follow the walkthrough through
+`navigator-runtime --env-file .env worker`. Start Vite in HTTP mode; shared access uses the privately provisioned operator
+token, while configured single-identity loopback testing auto-connects. Follow the walkthrough through
 source inspection, review and PDF download. Startup does not migrate, populate
 data or download weights. A clean clone is not a pre-provisioned live installation.
 
@@ -174,6 +174,6 @@ Repository code uses [Apache-2.0](LICENSE); third-party material keeps its right
 3. [Processing and evidence gates](docs/plans/REPORT_PROCESSING_BOUNDARIES.md).
 4. [Apertus configuration](docs/data/INFERENCE_CONFIGURATION.md).
 5. [Embedding protocol and pins](docs/data/HOSTED_EMBEDDINGS.md).
-6. [Recorded live partial report and PDF](docs/team/BACKEND_RESEARCH_COMPLETION.md#completed-live-acceptance--19-october-2026).
+6. [Recorded live partial report and PDF](docs/project/STATUS.md).
 7. [Capture-performance evidence](docs/data/CAPTURE_PERFORMANCE.md).
 8. [Evaluation method](docs/challenge/EVALUATION.md).

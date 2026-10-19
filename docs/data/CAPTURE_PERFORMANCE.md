@@ -1,93 +1,53 @@
-# Live capture and retrieval performance
+# Capture and retrieval performance
 
-19 October 2026. Source revision `0011_capture_performance`; the shared host was
-last measured at `0010_rich_outputs`. Apply the maintainer migration before
-claiming the capture speedup on that host. Frontend and ingestion source data are
-unchanged. [Maintainer handoff](../team/CAPTURE_PERFORMANCE_HANDOFF.md).
+## Implemented safeguards
 
-## Observed bottleneck
+- Migration **0011** replaces the quadratic newest-version live-capture sort with
+  a bounded compatible projection. Authorization/source/artifact readiness remain.
+- Migration **0012** changes four membership RLS policies to use an uncorrelated
+  eligible-snapshot lookup; table structure and grants are unchanged.
+- Snapshot authorization reads use small metadata projections instead of full
+  membership manifests. Lexical SQL uses constant language-specific query objects.
+- Case summaries are batched projections. Corpus duplicate detection reads documents
+  and aliases in one join rather than issuing one alias query per document.
+- Pure reads/lease renewal avoid long case-write locks. Runtime connections cap
+  lock waits at five seconds and idle-in-transaction at sixty, retaining stricter
+  settings. Write authorization and worker identity checks remain active.
+- `RUNTIME_CAPTURE_TIMEOUT_SECONDS` defaults to 30 (range 1–120), independently
+  bounding preparation. Retrieval SQL is bounded and preserves stricter timeouts.
 
-Case creation waits for `ops.capture_live_corpus` before creating a queued run.
-Two own `dev_ren` requests were observed running for several minutes without lock
-blockers; one showed temporary-file I/O. They were cancelled explicitly under the
-same login, rolling back their uncommitted cases/captures. No ingestion or other
-user's query was cancelled.
+## Recorded measurements
 
-An isolated nested execution plan reproduced the issue: a ready-membership CTE
-estimated one row but produced 20,004. The newest-version DISTINCT/sort subplan
-ran 20,004 times, with about four million rejected join pairs. Most elapsed time
-was eligibility selection, not snapshot insertion, SSH or model inference.
-The initial typed-row rewrite alone did not improve the benchmark; the final
-window-selection change removes that repeated-sort plan.
+| Environment / phase | Observation | Scope |
+| --- | --- | --- |
+| Disposable 120,004-chunk fixture | New capture 7.206 s; prior query exceeded 30 s | Synthetic 3d vectors, not production latency |
+| Disposable 20,004-chunk fixture | 30-hit retrieval 1.871 s | Synthetic controlled dataset |
+| Connected run before rollout | Capture 28.546 s; six sequential lexical/dense query pairs 120.296 s | Single observed slow run, not hardware diagnosis |
+| Same run | Six batched query embeddings 1.368 s; 10 page attempts 14.683 s | Actual phase logs; some fetches failed |
+| Same run | Source registration cancelled after 192.488 s | Incomplete operation, not successful latency |
+| Read-only optimized corpus duplicate lookup | 2.857 s, no duplicate found | One probe; not end-to-end acceptance |
+| Read-only batched list | Eight case summaries 0.854 s | One probe; cache/load unspecified |
 
-## Changes
+Suspended local processes were also observed holding case locks; terminating the
+owned obsolete processes released those locks. This is distinct from corpus size,
+query cost and provider latency. Baseline runtime tests are in
+[verification](../judges/VERIFICATION.md).
 
-- `live_capture_fast.sql`: authorize public scopes and check source/artifact
-  eligibility before processing their chunks; retain exact text, compatible
-  vector, lexical projection and evidence checks. Choose the newest **ready**
-  version with one `dense_rank` window instead of the self-join. Retain latest
-  eligible embedding selection and every eligible chunk, not a top-N cutoff.
-- Use typed, indexed transaction-local membership instead of repeatedly parsing a
-  huge JSON intermediate. Preserve the manifest fields, immutable memberships,
-  supported claims/entities, grants, revocation checks and own-case boundaries.
-  Temporary tables are dropped on success/transaction completion; an existing
-  caller-created table with the reserved name fails closed. No persistent new
-  application tables or shared readiness cache are introduced.
-- `snapshot_projection.py`: authorization/context reads return small metadata
-  plus the server-extracted owning-case ID, not entire per-chunk manifests.
-- Hybrid retrieval reads ranked passage metadata and citation IDs in two bounded
-  queries instead of per-hit round trips. Recheck distinct selected scopes after
-  reranking; rank/fusion/overlap rules and exact cosine search are unchanged.
-- An optional `embed_queries` capability batches query variants. Local/HF adapters
-  keep identical query templates, input-token checks and vector validation; other
-  embedders retain the serial port fallback. Up to six variants fit one bounded
-  HF request instead of six individual requests. No hidden model fallback/cache.
-- `RUNTIME_CAPTURE_TIMEOUT_SECONDS=30` bounds corpus preparation separately from
-  the worker's research deadline. A stricter caller timeout wins. Successful calls
-  restore the previous setting; failure rolls back the whole command and local
-  setting. Capture timeout/completion logs contain elapsed time, not prompts,
-  credentials or source text. Slow preparation returns unavailable, not an empty
-  or silently truncated corpus.
+## Maintainer rollout and measurement
 
-## Measurements and limits
+Source head is `0012_membership_lookup`; verify the host revision rather than
+assuming source availability means deployment. With approved maintenance access,
+back up and apply forward migrations using the [deployment runbook](DEPLOYMENT.md).
+Do not run shared-host destructive tests, disable RLS or relabel vectors.
 
-All old/new comparisons below used **isolated PostgreSQL 17/pgvector**, synthetic
-public text and 3-dimensional fixture vectors, not the shared corpus or 768d
-production vectors. Case/capture changes were rolled back between measurements.
+Compare restricted-identity plans before/after: lexical, dense and membership
+checks; inspect estimates, filters, loops, buffers, spills, locks and candidate
+counts. Use bounded `EXPLAIN (ANALYZE, BUFFERS)` only on approved read queries.
+Record user role/profile/capture, corpus size, hardware/load, cache and model pins.
+Use evidence-based index/statistics changes; coordinate any new migration number.
 
-| Fixture | Original | Optimized | Verification |
-| --- | --- | --- | --- |
-| 20,004 chunks, diagnostic profiling enabled | About 18 s | 1.025 s | Identical chunk/embedding membership hash; newest-version sort runs once |
-| 120,004 chunks, profiling disabled | Exceeded the 30 s limit | 7.206 s | All 120,004 eligible chunks captured; old full-size equality not measured because it timed out |
-
-These are single-run engineering measurements, not production latency guarantees,
-quality scores or a hardware benchmark. The full regression suite passed **273
-tests**; one existing pytest loop-policy deprecation warning remains. Coverage
-includes unchanged old/new membership with accepted claims, newer incomplete
-versions, stable previous captures, foreign-user denial, temp-name collision,
-statement-timeout rollback/restoration, identical batched/serial ranking and real
-reviewed PDF/PPTX flows using synthetic providers. No frontend code changed.
-
-Reproduce on an explicitly isolated local disposable test cluster, never the shared
-SSH tunnel or deployment credentials:
-
-```bash
-NAVIGATOR_TEST_ADMIN_DSN='<disposable-local-admin-DSN>' \
-  .venv/bin/python -m backend.tests.runtime.benchmark_capture --documents 1200
-```
-
-`--profile` additionally requires `pg_stat_statements` preloaded with nested
-tracking (`pg_stat_statements.track=all`) in that isolated server; it loads
-`auto_explain` in the benchmark connection and saves synthetic plans under ignored
-`.local/capture-performance/`. It never loads deployment `.env`. The tool creates
-and removes only its uniquely named synthetic benchmark database. It refuses the
-standard shared-tunnel port and non-loopback addresses.
-
-An independent live HF batch probe also passed: two permitted synthetic queries
-returned two valid 768d vectors in 1.184 seconds through the configured adapter.
-No real case or corpus was modified by that probe.
-
-Remaining acceptance: Eric applies 0011, then measure real case-creation latency
-with ingestion active, run actual DB/web/Keera extraction through review/export,
-and inspect plan/scaling on production dimensions and hardware. Inference latency,
-source fetch failures and relevance still require independent measurement.
+Measure preparation, encoding, lexical/dense, reranking, expansion, registration,
+model tasks and finalization separately, then repeat a fresh case → review → PDF.
+A faster fixture or higher timeout does not establish acceptable live performance.
+Use the existing performance tests under `src/backend/tests/` with an explicitly
+disposable test DSN; never supply the shared deployment DSN to fixture benchmarks.

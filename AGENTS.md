@@ -1,143 +1,58 @@
-# Agent entry point
+# B to Bern: agent entry point
 
-Active repository: **hack-apertus-submission**, Bern Economic Development Agency
-Research & Expertise Navigator. Preserve the hackathon submission template.
-Work here; the sibling `hack-apertus-liebefeld` is historical and must not change.
+Work in `hack-apertus-submission`. Preserve the root submission layout, original
+partner materials and transcripts. Leave the historical sibling repository unchanged.
 
-## Integrated baseline
+## Read only what the task needs
 
-The three backend lanes and `ui-polish` are integrated. Read the
-[current status](docs/project/STATUS.md), then the
-[integration handoff](docs/team/INTEGRATION.md) before starting new work. Create
-fresh feature branches from current `main`; completed lane prompts/handoffs
-are historical ownership records, not a ban on separately authorized integration.
+Start at [documentation](docs/README.md). The current implementation is described
+by [architecture](docs/plans/ARCHITECTURE.md) and the
+[execution graph](docs/plans/EXECUTION_GRAPH.md). [Delivery status](docs/project/STATUS.md)
+separates implemented capabilities, measured verification and outstanding acceptance.
 
-## Team coordination
-
-The original lane plan and prompts in `docs/team/` are historical. They no longer
-freeze shared docs/config or assign engineer A permanent exclusive authority.
-Use the [team index](docs/team/README.md), current module boundaries and one
-assigned integrator for shared changes. Start fresh branches from updated `main`.
-
-## Start a feature task
-
-1. Read [module handoffs](docs/plans/MODULE_HANDOFFS.md) and select the row matching
-   the user's feature. It gives the write boundary, focused docs and interfaces.
-2. Read the compact [execution graph](docs/plans/EXECUTION_GRAPH.md) and
-   [processing contract](docs/plans/REPORT_PROCESSING_BOUNDARIES.md), then the
-   row's focused owner documents and nearest source README. Load only relevant context.
-3. Inspect actual contracts/code and working-tree changes before editing. Preserve
-   other contributors' work. Use injected adapters and explicit fixtures for
-   missing dependencies; document needed shared-contract changes.
-4. Check the [active open questions](docs/project/OPEN_QUESTIONS.md). Separate a
-   real blocker from an unrelated open item; do useful independent work.
-
-**Frontend is owned by another teammate. Backend/docs tasks must not modify
-`src/frontend/`, including its types and README.** Read it to understand the
-consumer; put proposed interface changes in the HTTP handoff for its owner.
-Use separate branches/worktrees for parallel features when practical. Coordinate
-shared contracts/migration numbers/configuration through one assigned integrator;
-never overwrite another agent's work or independently rename shared fields.
-
-## Current implementation and model configuration
-
-- Source head `0012_membership_lookup` adds efficient RLS membership lookup;
-  shared head was last verified at 0011. Read the [runtime feedback/search handoff](docs/team/RUNTIME_FEEDBACK_AND_SEARCH.md)
-  for rollout, safe logging, local tokenless testing and the merged Radix frontend. Read the [performance specification](docs/data/CAPTURE_PERFORMANCE.md)
-  and [maintainer handoff](docs/team/CAPTURE_PERFORMANCE_HANDOFF.md) before rollout.
-  Never migrate the shared host implicitly or discard evidence checks for speed.
-
-- React/Vite defaults to authenticated HTTP, with explicit mock demo mode. Python
-  contracts, FastAPI, durable LangGraph, A/B/C adapters, semantic task stages,
-  PDF rendering and PostgreSQL persistence through `0008_live_corpus` are
-  implemented. Final schema fields are authoritative;
-  read [data handoff](docs/data/INGESTION_RETRIEVAL_HANDOFF.md) before ingestion or
-  retrieval work and use the generated [field reference](docs/data/SCHEMA_REFERENCE.md).
-  Synthetic integration checks are not a quality/model benchmark.
-- Cross-lane execution is tested with synthetic model responses/embeddings and
-  real disposable PostgreSQL. Eric reports shared head 0008 and narrow per-user runtime bindings.
-  [Live corpus mode](docs/data/LIVE_CORPUS_RUNTIME.md) captures ready authorized
-  evidence per case during ingestion; publication is optional for this development
-  mode. A live DB/provider partial report and reviewed PDF passed on Elia; combined DB/web
-  quality and target-host restart/resume remain acceptance steps.
-- Connected inference: CSCS via Keera, `https://gateway.keera.ch/api/v1`, connected examples now select
-  `apertus-v1-5-70b` explicitly (user configuration; no automatic fallback). Four supplied aliases and tool/thinking rules are in
-  [inference configuration](docs/data/INFERENCE_CONFIGURATION.md). Authenticated synthetic Keera probes passed; broader quality, current key validity
-  and quotas remain unverified for deployment. Results are in B's handoff. Use root [.env.example](.env.example); no real secrets in git.
-- Connected embeddings: Eric's HF endpoint, pinned EmbeddingGemma 2 revision,
-  shared ingestion/query adapter and local tokenizer; [configuration and live
-  verification](docs/data/HOSTED_EMBEDDINGS.md). Local assets remain the offline
-  option. Protocol/parity checks passed; retrieval quality remains unmeasured.
-  The backend provisions a compact multilingual CPU reranker;
-  [setup and measured limits](docs/data/RERANKING.md). Each model uses its own compatible tokenizer.
-- Pilot: Bern diabetes technology, covering UniBE, ARTORG and DCB as one ecosystem.
-  Development host is shared Windows/WSL2/Docker with individual SSH tunnels;
-  running end-to-end connected/offline deployments have not been established.
-- Optional public research now defaults to a private keyless SearXNG sidecar
-  (DuckDuckGo/Yahoo) and controlled Crawl4AI conversion in a separate venv. Follow
-  [web setup](docs/data/WEB_RESEARCH.md); never combine crawler/backend locks,
-  bypass CAPTCHA or treat search snippets as evidence. Browser/Brave API adapters
-  are explicit alternatives; SearXNG can still encounter upstream failures.
-
-## Focused router
-
-| Task | Owning context |
+| Task | Read |
 | --- | --- |
-| Assign independent module work | [Module map and example prompt](docs/plans/MODULE_HANDOFFS.md), [source ownership](docs/plans/SOURCE_STRUCTURE.md) |
-| HTTP/application/frontend handoff | [API handoff](docs/plans/FRONTEND_BACKEND_API.md), [frontend behavior](docs/plans/FRONTEND_PLAN.md) |
-| Graph, interpretation, evidence or drafting | [Processing](docs/plans/REPORT_PROCESSING_BOUNDARIES.md), [operations](docs/plans/OPERATIONS_PLAN.md), [pack authority](docs/plans/ARCHITECTURE.md#evidence-pack-the-report-generation-gate) |
-| Apertus calls, tool routing, keys | [Inference configuration](docs/data/INFERENCE_CONFIGURATION.md), [model/build contracts](docs/data/BUILD_AND_OPERATIONS.md) |
-| Populate corpus or implement hybrid retrieval | [Data handoff](docs/data/INGESTION_RETRIEVAL_HANDOFF.md), [final schema](docs/data/RELATIONAL_SCHEMA.md), [exact fields](docs/data/SCHEMA_REFERENCE.md) |
-| Embeddings, hybrid search, reranking | [Embedding deployment](docs/data/EMBEDDING_DEPLOYMENT.md), [retrieval](docs/data/RETRIEVAL_SPEC.md), [model/build contracts](docs/data/BUILD_AND_OPERATIONS.md) |
-| Web research, scraping, citations | [Web research](docs/data/WEB_RESEARCH.md), [provenance](docs/data/DATA_AND_PROVENANCE.md), [ingestion §7](docs/plans/INGESTION_PLAN.md#7-shared-contract-v1--owned-here-consumed-by-phase-2) |
-| Persistence, migrations or case history | [Data router](docs/data/DATA_LAYER.md), [schema](docs/data/RELATIONAL_SCHEMA.md), [case additions](docs/data/CASE_PIPELINE_STORAGE.md), [lineage](docs/data/CASE_STATE_AND_LINEAGE.md) |
-| Runtime operations, checkpoints, tracing | [Deployment](docs/data/DEPLOYMENT.md), [observability](docs/data/OBSERVABILITY.md) |
-| Review/export and branding | [Output content](docs/plans/OUTPUT_REPORT_STRUCTURE.md), [case additions](docs/data/CASE_PIPELINE_STORAGE.md), [supplied assets](docs/provided_material/README.md) |
-| Product/pilot/evaluation | [Requirements](docs/challenge/PRODUCT_REQUIREMENTS.md), [pilot](docs/challenge/PILOT_SCOPE.md), [evaluation](docs/challenge/EVALUATION.md) |
-| Challenge/workshop/source evidence | [Brief](docs/challenge/CHALLENGE_BRIEF.md), [recording findings](docs/recordings/RECORDING_INSIGHTS.md), [sources](docs/project/SOURCES.md) |
-| Unknowns, decisions or submission | [Active questions](docs/project/OPEN_QUESTIONS.md), [decision history](docs/project/DECISIONS_AND_OPEN_QUESTIONS.md), [event/submission](docs/project/EVENT_AND_SUBMISSION.md) |
-| Live demo, pitch video or walkthrough | [Demo script](docs/project/DEMO_SCRIPT.md), [walkthrough playbook](docs/project/DEMO_WALKTHROUGH_PLAYBOOK.md) |
+| Product or jury review | [Judge guide](docs/judges/README.md), [report](technical_report.md) |
+| Setup, credentials, startup | [Local runbook](docs/data/LIVE_SETUP.md), [deployment](docs/data/DEPLOYMENT.md), [.env.example](.env.example), [Makefile](Makefile) |
+| Module implementation | [Module map](docs/plans/MODULE_HANDOFFS.md), nearest source README |
+| HTTP / frontend | [HTTP contract](docs/plans/FRONTEND_BACKEND_API.md), [UI behavior](docs/plans/FRONTEND_PLAN.md) |
+| LangGraph / recovery / budgets | [Operations](docs/plans/OPERATIONS_PLAN.md), [service ports](docs/plans/SERVICE_CONTRACTS.md) |
+| Evidence / report / review | [Processing boundaries](docs/plans/REPORT_PROCESSING_BOUNDARIES.md), [output](docs/plans/OUTPUT_REPORT_STRUCTURE.md) |
+| Ingestion / taxonomy | [Ingestion](docs/data/ingestion/INGESTION_SPEC.md), [profiles](docs/data/DOMAIN_PROFILES.md), [review](docs/data/CORPUS_REVIEW.md) |
+| SQL / retrieval | [Data layer](docs/data/DATA_LAYER.md), [schema](docs/data/RELATIONAL_SCHEMA.md), [generated columns](docs/data/SCHEMA_REFERENCE.md), [retrieval](docs/data/RETRIEVAL_SPEC.md) |
+| Models / tools | [Apertus](docs/data/INFERENCE_CONFIGURATION.md), [embeddings](docs/data/HOSTED_EMBEDDINGS.md), [reranking](docs/data/RERANKING.md), [web](docs/data/WEB_RESEARCH.md) |
+| Tests / quality | [Verification](docs/judges/VERIFICATION.md), [evaluation](docs/challenge/EVALUATION.md) |
 
-## Invariants across features
+## Implementation rules
 
-- Preserve root `README.md`, `technical_report.md`, `LICENSE`, `src/` and report
-  target-architecture requirements. Working context belongs in `docs/`, code in
-  `src/`. Retain `LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY`; credentials stay backend-only.
-- Operator reads confidential company plans/one-pagers outside the app and types
-  permitted context. Confidential uploads to **any** model, including local, are
-  forbidden under the current boundary. Public research PDFs are separate.
-- Full intent, negation, attributed operator context and uncertainty survive
-  interpretation. Taxonomy is versioned, multi-label and allows unknowns. Topic
-  labels/keyword hits cannot prefilter away otherwise eligible vector matches.
-- Public factual assertions resolve to exact source passages; semantic support
-  must be assessed separately from rank or valid JSON. Never invent people,
-  roles, projects, contacts, clinical suitability or willingness to collaborate.
-- New web evidence stays flagged and case-scoped; prefer pinned corpus versions
-  for duplicate URLs. A supported claim does not certify its source. No automatic
-  shared-corpus updates from user edits, reports or case-time research.
-- Query only final application tables; never build features on `legacy` or the
-  frozen migration baseline. Update schema docs/migrations together for changes.
-- Freeze supported `ReportEvidencePack` before drafting. Reason keep/reject is
-  editorial, not truth approval. All cards reviewed plus one kept gates export;
-  result/support/selection hashes bind approval. PDF first; editable PPTX later.
-- All agentic execution uses LangGraph/LangChain. Database evidence is authoritative;
-  checkpoints resume work and masked local Langfuse traces diagnose it. Neither
-  is a fact store. Tracing failure must not block a case.
-- External independent infrastructure only; no cantonal internal network access.
-  Keera/hosted embedding requires connected mode. Offline needs packaged local
-  inference/assets and disabled web tools, not a hidden hosted fallback.
-- Preserve source rights, supplied templates/logo and transcripts. Use branding
-  only for this challenge; do not automatically publish raw recordings/data.
-  English is baseline; DE/FR/IT quality and historical-case scores need evidence.
-
-## Keep context usable
-
-Update the focused owner document and local README when a feature changes. Keep
-this file a router. Record decisions with date/provenance in the history and
-resolve entries in the active register; distinguish requirement, decision,
-recommendation, measured result and unknown. Do not claim tests or services not
-actually run. Check links, contract consistency and protected materials.
-
-Commit/push only when the current user request authorizes it; do not migrate the
-shared host implicitly. The discussion transcript is tracked following explicit
-user publication authorization; preserve its contents.
+- Inspect the working tree and actual contracts before edits. Preserve others'
+  work; coordinate shared contracts, migration numbers and frontend changes with
+  the active task owner. Module boundaries describe responsibilities, not permanent
+  engineer ownership. Use focused files and acyclic imports.
+- `contracts/` owns typed interfaces; `data/schema.py` and forward migrations own
+  database structure; `/openapi.json` owns HTTP fields. Never infer fields from
+  retired plans or use `legacy` / migration-baseline tables in application code.
+- Keep SQL in data adapters, authorization/transactions in application services,
+  agentic coordination in LangGraph/LangChain, model semantics in injected services
+  and rendering deterministic. Frozen `ReportEvidencePack` is the drafting gate.
+- Public facts require exact authorized passages plus semantic support assessment.
+  Similarity, reranking, valid JSON and editorial keep decisions cannot establish
+  truth. Missing roles/contacts stay unknown; adjacent matches retain caveats.
+- Preserve full intent, negation and uncertainty. Taxonomy guides interpretation;
+  topic/keyword hits cannot exclude otherwise eligible vector matches.
+- Web findings stay flagged and case-scoped; canonical duplicates prefer pinned
+  corpus versions. User edits/reports never automatically publish shared knowledge.
+- Confidential plans stay outside the application and every model. Operator input
+  is attributed context. Keep credentials and case data out of git, logs and
+  `VITE_*`; retain `LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY`.
+- Shared servers use bearer bindings. Optional tokenless access is loopback-only
+  with one existing identity. Never weaken RLS or migrate the shared host implicitly.
+- All cards reviewed, at least one kept and exact result/selection/support hashes
+  gate export. Wording edits reuse evidence; focus/identity edits research anew.
+- Hosted providers/web require connected mode. Offline requires packaged local
+  assets and disabled egress; the connected development path proves no air-gap.
+- Run relevant checks. Full database tests require an explicitly disposable
+  `NAVIGATOR_TEST_ADMIN_DSN`; never use shared infrastructure. Do not claim live
+  quality, deployment or tests not actually verified.
+- Update focused docs and the nearest README when behavior changes. Keep this
+  file a router. Commit/push only within the user's authorization.

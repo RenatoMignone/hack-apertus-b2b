@@ -1,26 +1,11 @@
-# Final application schema
+# Application schema
 
-**18 October 2026 · Contract v1 finalized at 0005; source head `0010_rich_outputs`; shared host last verified at 0008.**
-This is the schema for the agreed case → research → evidence pack → draft →
-reason review → PDF pipeline. The executable table definitions are
-[`schema.py`](../../src/backend/data/schema.py); the generated
-[field reference](SCHEMA_REFERENCE.md) lists every actual column, FK, default,
-check and index. Future agents must use those definitions rather than infer
-columns from older planning text. Schema changes require a forward migration,
-updated reference and focused integration checks.
-
-One PostgreSQL `navigator` database has five application schemas. LangGraph and
-Langfuse own separate databases and migrations. Do not create a database per
-institution, entity type, case or taxonomy topic.
-
-Migration 0008 adds case-owned immutable `live` snapshots/builds. New runs may
-capture ready public chunks while ingestion continues, without publication or an
-active pointer. `navigator_runtime` reads public scopes and writes owned case
-evidence/reports. See [live runtime](LIVE_CORPUS_RUNTIME.md); source head does not
-itself confirm deployment on a particular host.
-
-Optional [case memory](CASE_MEMORY.md) (0009) and [manual plans/PPTX](RICH_OUTPUTS.md)
-(0010) are disabled until maintainer activation. Core 0008 compatibility is explicit.
+Current executable definitions are [`data/schema.py`](../../src/backend/data/schema.py).
+The generated [field reference](SCHEMA_REFERENCE.md) owns exact columns, constraints,
+foreign keys and indexes. Source migration head is `0012_membership_lookup`;
+installed-host rollout is verified independently. Forward migrations and reference
+updates accompany schema changes. One application PostgreSQL database uses five
+schemas; framework checkpoints/tracing have separate databases and migrations.
 
 ## Tables retained and why
 
@@ -37,8 +22,7 @@ Optional [case memory](CASE_MEMORY.md) (0009) and [manual plans/PPTX](RICH_OUTPU
 | Editorial/output | `cases.reason_selections`, `reviews`, `exports`, `action_items` | Keep/reject/none per card, exact approval hashes, output artifacts and follow-up questions |
 | Access/build/execution | `ops.principals`, `scope_grants`, `model_configurations`, `ingest_jobs`, `stage_attempts`, `publication_checks`, `outbox`; `corpus.scopes` | Existing isolation/revocation, model/build identity, restart-safe work and publication checks |
 
-These **63 tables** include small association tables; they are not 63 separate
-services. Scope, version and support links remain relational because retrieval,
+These tables include small association tables; they form one application schema. Scope, version and support links remain relational because retrieval,
 case isolation and traceability depend on them. Not every import populates every
 table: identifier/derivation/concept-assignment rows exist only when known.
 There is no requirement to manufacture missing data to complete a row.
@@ -120,34 +104,18 @@ identity); graph checkpoints hold resumable state, Langfuse holds masked diagnos
   Repositories additionally validate pack hashes and semantic-assessment records;
   raw SQL writes do not replace those checks.
 
-## Additions after contract v1
 
-- `0006_runtime_access`: owner-checked case-scope provisioning and restrictive
-  run/command RLS; application workers retain ordinary credentials.
-- `0007_frontend_lifecycle`: independent case `on_hold` / closed `outcome` and
-  action-item `answer`; migrates former combined statuses.
+## Optional additions and upgrades
 
-New installations and upgrades target **head**, currently 0007, rather than
-stopping at 0005. See [live setup](LIVE_SETUP.md) for the coordinated rollout.
-Neither integration nor this documentation audit migrated Eric's host.
+`cases.memory_profiles` (0009) stores explicitly opted-in own-case comparison
+profiles. `cases.business_contexts` (0010) stores immutable attributed manual plans;
+exports support reviewed PDF/PPTX. See [memory](CASE_MEMORY.md) and
+[rich outputs](RICH_OUTPUTS.md). Migration 0008 supplies case-owned live captures;
+0011/0012 optimize capture and membership policies without replacing that model.
 
-## Removed structures and upgrade behavior
-
-Migration 0005 retires `cases.query_plans`, `retrieval_rounds`, `retrieval_hits`,
-`matches`, `match_support`, `selections`, and `ops.frontier`. These had no active
-repository consumer or duplicated the agreed pack/reason workflow. A crawler queue
-is not part of the current ingestion contract; add one later only for an implemented need.
-It also removes the two redundant chunk encoding columns.
-
-Fresh databases contain only the final application tables. Upgrades preserve
-populated retired tables in owner-only `legacy`, and preserve any nonredundant
-old chunk values in `legacy.chunk_encoding`. No application repository or future
-feature should query that archive. Empty retired tables are dropped when there
-is no historical data. Existing conflicting duplicate aliases/manifest items or
-invalid types make constraint installation fail transactionally; resolve them
-explicitly, never silently delete facts. Back up before a shared-host migration.
-Historical migrations use frozen baseline metadata and their original security
-installer under `data/migrations/`, so future schema edits cannot
-silently change older migration behavior. Destructive downgrades remain disabled.
-
-Start the data teammate at [ingestion/retrieval handoff](INGESTION_RETRIEVAL_HANDOFF.md).
+The retired query-plan/retrieval-hit/match/selection/frontier tables are not runtime
+interfaces. Populated historical records remain owner-only under `legacy` on
+upgrade; no application feature reads that archive. Historical migrations use
+frozen baseline metadata. New features use current contracts and tables; never
+recreate duplicate stores from old planning documents. Back up and coordinate
+maintainer migrations using [deployment](DEPLOYMENT.md).

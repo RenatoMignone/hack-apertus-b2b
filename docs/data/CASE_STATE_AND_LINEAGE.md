@@ -1,116 +1,39 @@
-# Case persistence, checkpoints and output lineage
+# Case persistence and lineage
 
-**18 October 2026 · Case persistence and durable workflow integrated; live pilot validation pending.**
-Read [data layer](DATA_LAYER.md), [schema](RELATIONAL_SCHEMA.md), and
-[Phase 2](../plans/OPERATIONS_PLAN.md) for workflow semantics. PostgreSQL owns
-business records; the LangGraph PostgreSQL saver owns resumable graph state.
-Langfuse observations are linked diagnostics, not recoverable business state.
+The `cases` schema is business authority; LangGraph checkpoints resume execution
+and Langfuse traces diagnose it. Neither framework store is the source of facts.
 
-## Application records in `navigator.cases`
-
-| Table | Key fields / relationships |
+| Record group | Responsibility |
 | --- | --- |
-| `cases` | Case ID, owner ID, namespace, status/revision, independent on_hold/outcome, current input/result pointers |
-| `input_revisions` | Immutable input ID, case ID, parent ID, permitted full message/context, creation time |
-| `dialogue_turns` | Turn/case ID, role, message, optional input ID, timestamp; role text is not public evidence |
-| `runs` | Run ID, case/input/snapshot IDs, pinned configuration JSON, status, thread/trace IDs, last stage/failure |
-| `questions`, `answers` | Question ID, target revision/field, required flag, reason/status, answer turn ID; stale answers cannot overwrite newer intent |
-| `interpretations` | Run → structured `CaseInterpretation`; input/taxonomy pins resolve through the run |
-| `claim_assessments` | Run/claim → exact assessed statement/support, outcome and validator |
-| `case_evidence_manifests`, `case_evidence_items` | Immutable manifest ID/hash and parent/case IDs; items reference scoped evidence IDs; new discoveries create a new manifest |
-| `evidence_packs`, `pack_items` | Pack ID, run/manifest/input IDs, accepted facts/matches/derivations/gaps, literal support and hash; frozen before writing |
-| `result_revisions`, `draft_reasons`, `reason_claims` | Immutable draft/result, exact reason content/support and claim links |
-| `reason_selections`, `reviews` | Per-card editorial selection and immutable approval of exact result/selection hashes |
-| `exports` | Export ID, result/review/artifact IDs, template/renderer versions, selection hash, format and status |
+| Cases, inputs, dialogue | Owner/namespace, lifecycle, immutable permitted context and chat revisions |
+| Runs, interpretations, questions/answers | Pinned research identity/configuration, durable clarification and execution status |
+| Web research and manifests | Discovery outcomes, flagged case sources and sealed exact evidence membership |
+| Assessments and evidence packs | Exact statement/support decisions, supported claims and frozen pack hash |
+| Results, reasons and reason claims | Draft revisions and explicit claim/evidence relationships |
+| Selections, reviews and exports | Editorial decisions, exact approval hashes, artifact identity and operation status |
+| Action items | Operator follow-up questions/notes; no automatic outbound communication |
 
-Use explicit association tables for pack-to-claims/evidence and reason-to-claim
-joins; validated JSON payloads may carry structured need/argument details. The
-same evidence contracts apply to public and case-private documents. A pack may
-use only the pinned shared snapshot plus the run's eligible case manifest.
+`input_revisions` and report revisions are immutable. Focus/identity edits create
+new inputs and supersede active old runs. Formatting edits reuse an eligible pack.
+Case board status is independent of run state; on-hold/outcome are lifecycle fields.
+Historical reports remain readable but cannot silently replace current intent.
 
-The [final schema](RELATIONAL_SCHEMA.md) and [field reference](SCHEMA_REFERENCE.md)
-supersede older conceptual field lists. Run pins include `snapshot_id` and
-`configuration`; profile/taxonomy/build resolve through that snapshot. There are
-no separate run columns for every model/prompt setting. Query plans and round
-hits are serialized in `ops.stage_attempts.outputs`; pack payloads own matches.
-No application query reads the retired legacy tables.
+Every run pins a snapshot/build, taxonomy/profile, embedding configuration and
+applicable model/prompt versions. New local evidence and extracted proposals stay
+in owned case scope. Corpus mirrors retain original source/snapshot/evidence IDs
+as derivation lineage. Literal slices must satisfy exact body offsets/hashes.
 
-## Durable execution
+Application writes use expected revisions and transaction locks. Idempotency keys
+bind command/body; queue leases bind worker and expiry. Pure reads/lease renewal
+avoid the long mutation lock. Stage outputs commit before reuse; diagnostic progress
+records do not authorize skipping stages. See [runtime operations](../plans/OPERATIONS_PLAN.md).
 
-```text
-draft → intake_validated → interpreting → researching_company
-      → retrieving → validating → evidence_pack_ready
-      → drafting → ready_for_review → export_ready → exported
-```
+All reason cards reviewed plus at least one kept permits an accepted review bound
+to exact result and selection hashes. Export rechecks current revision, approval,
+claim/support access, renderer/template versions and artifact hashes; download
+revalidates eligibility. A later edit or revoked source can invalidate access.
+PDF input resolves claim IDs through canonical evidence links, never title guesses.
 
-Active stages can become `needs_clarification`, `partial`, `failed` or `cancelled`.
-Keep the last successful stage and explicit failure reason. Partial evidence can
-produce a partial pack/result; it is not silently promoted to complete coverage.
-
-Create a server-controlled UUID thread ID for each run, scoped to its authorized
-case. Persist the run/thread relationship; subsequent clarification resumes that
-thread with the targeted answer. A changed intent after completion creates a new
-run/revision, with references to reusable evidence. Do not reuse one global thread
-for unrelated companies or trust a client-supplied thread ID as authorization.
-
-Use LangGraph's PostgreSQL saver and its migrations in the separate `langgraph`
-database. Checkpoints hold execution state, references, versions and pending
-questions; avoid serializing entire corpora or raw files into every checkpoint.
-Relevant permitted dialogue may still appear there, so apply case retention and
-access controls. Do not hand-edit framework checkpoint tables.
-
-## Writes, retries and concurrency
-
-1. In a `navigator` transaction, validate owner/revision, persist the run's stage
-   result and enqueue any durable follow-up work. Use unique idempotency keys
-   such as `(run_id, stage, input_hash, config_hash)`.
-2. Record artifact references only after bytes are durably stored and verified.
-   External fetch/model calls execute outside long-running SQL transactions.
-3. Advance the graph/checkpoint after committing business state. On resume,
-   reconcile the stage key and reuse already committed outputs.
-4. No distributed transaction is assumed across application DB, saver, artifact
-   store or Langfuse. A crash between commits must be recoverable without duplicate
-   facts/exports. A trace delivery failure never invalidates accepted evidence.
-
-Use optimistic revision checks for edits and current-result pointer updates.
-Concurrent exports bind to their explicit reviewed revision, not an unversioned
-`latest`. Lease/lock jobs to prevent duplicate active workers; stale leases expire
-under a documented recovery policy. Cancellation stops new work, preserves
-completed evidence and prevents late responses from replacing a newer revision.
-
-## Revision and publication rules
-
-| Edit/event | Reuse | Recompute or invalidate |
-| --- | --- | --- |
-| Shorten/reword/change layout | Accepted evidence pack | New draft validation, review and affected exports |
-| Change need, priorities or exclusion | Unaffected company/source facts | Query plan, matches, pack and dependent result/export |
-| Correct company identity | Compatible public evidence only | Identity-dependent facts, matches and conclusions |
-| New corpus snapshot | Existing run stays pinned | New run uses new snapshot; never silently refresh a completed answer |
-| Source permission revoked | Only still-authorized material | Block dependent evidence reads; retire/invalidate affected exports and caches |
-
-Reviewed case records can explicitly enter [own-case memory](CASE_MEMORY.md);
-agency-wide publication remains a separate future authorization/data operation. Do not publish cases, learn
-from user corrections, update taxonomy or embed generated reports automatically.
-No agency-wide historical dataset is supplied. Unknown outcomes remain unknown.
-Manual business plans bind to input revisions and frozen pack/review hashes;
-see [rich outputs](RICH_OUTPUTS.md).
-
-## Required integration checks
-
-- Restart after a committed stage but before checkpoint save; reuse the output.
-- Resume a question in the right case/revision; reject stale/unauthorized replies.
-- Isolate two concurrent cases and scopes in queries, checkpoints and caches.
-- Reword a report without repeating retrieval; refocus it with new bounded retrieval.
-- Trace the exact reviewed pack/result/template to an export and its citations.
-- Revoke supporting evidence and block dependent reads even for an old snapshot.
-
-These behaviors have synthetic runtime/repository coverage; see the
-[integration test scope](../team/INTEGRATION.md). Real provider quality, target-host
-restarts and full retention/deletion propagation still require deployment checks.
-
-## U8 case pipeline extension
-
-[Case pipeline storage](CASE_PIPELINE_STORAGE.md) owns the new tables, manifest
-eligibility, supported-claim assessments and reason-level selection/review hashes.
-Populated retired match selections remain in the maintainer-only archive. New accepted reviews/exports require
-the v2 reason workflow; rejection is editorial and does not retract a claim.
+Optional [case memory](CASE_MEMORY.md) and [manual plans/PPTX](RICH_OUTPUTS.md)
+have their own tables and explicit activation. Exact columns and constraints are
+in the generated [schema reference](SCHEMA_REFERENCE.md).

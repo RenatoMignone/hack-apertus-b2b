@@ -1,6 +1,6 @@
 # Research & Expertise Navigator — supplied challenge brief
 
-**Sources B1 and N1:** initial challenge text and the complete Notion page text
+**Supplied requirements, not an implementation-status page. Sources B1 and N1:** initial challenge text and the complete Notion page text
 pasted by the user on 18 October 2026. N1 confirms the initial requirements and
 adds the supporting filenames and challenge-only branding restriction; see the
 [dated source snapshot](../sources/NOTION_CHALLENGE_2026-10-18.md). This is a
@@ -107,7 +107,7 @@ Every result must remain connected to its source and verifiable.
 Challenge evaluation dimensions: **purposeful use of AI; technical rigour;
 value, cost and scalability; sovereign deployability; implementation feasibility**.
 The local submission template additionally lists **pitch and presentation** for
-the main jury; see [EVENT_AND_SUBMISSION.md](../project/EVENT_AND_SUBMISSION.md).
+the main jury; see [EVENT_AND_SUBMISSION.md](../judges/DELIVERY.md).
 
 ## 5. Ethics, legal and publication requirements
 

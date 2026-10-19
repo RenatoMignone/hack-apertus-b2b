@@ -1,112 +1,58 @@
-# Verification, evidence and limitations
+# Verification and acceptance
 
-**Snapshot: 19 October 2026; source baseline `072f099`.**
-The records below are existing engineering receipts, not tests rerun by writing
-these docs. Working-tree ingestion/runtime changes are not automatically part
-of this source baseline. Final release checks must identify their exact commit.
+**19 October 2026.** Counts below are dated receipts with defined scope, not a
+claim that every live feature/provider has passed on the final deployment.
 
-**Later integration, 19 October:** runtime changes `88f5b75` passed 284 backend
-tests on disposable PostgreSQL/pgvector and 24 frontend tests plus production
-build. They include case/lease lock fixes, batched case/source-alias reads, safe
-logging, actual progress, local loopback access and merged My desk functionality.
-The [runtime receipt](../team/RUNTIME_FEEDBACK_AND_SEARCH.md) distinguishes these
-checks from real-provider quality. Source migration head is 0012; the shared host
-was last verified at 0011 and requires maintainer rollout. No new live full-report
-acceptance is claimed by this integration.
+| Evidence | Result | What it establishes |
+| --- | --- | --- |
+| Integrated runtime `88f5b75`, disposable PostgreSQL/pgvector | 284 backend tests passed | Schema/RLS, actual module composition, queue/recovery contracts, evidence/review/export gates and regressions |
+| Same baseline frontend | 24 tests, typecheck and production build passed | HTTP interaction and UI/export policy; not model quality |
+| Recorded real-provider case | Five partial cards, 26 caveats; one kept ARTORG capability; 66,979-byte reviewed PDF | Narrow live path using Keera 70B, HF vectors, local reranker, authorized corpus, PostgreSQL checkpoints and MinIO; web was not configured |
+| Encoder protocol probe | Finite 768d vectors, local/remote token parity and identical-input parity | Configuration/protocol compatibility, not semantic relevance |
+| Synthetic capture fixture | 120,004 chunks in 7.206 s; prior query >30 s | Controlled capture regression; synthetic 3d vectors, not production SLA |
+| Optional output fixtures | Reviewed PDF/PPTX, stale-review checks and own-case eligibility | Isolated implementation behavior; not deployment activation |
 
-## Recorded evidence
+The latest My desk merge additionally passes 24 frontend tests and production
+build. The documentation refresh does not rerun real-provider cases or shared
+migrations. [Performance](../data/CAPTURE_PERFORMANCE.md) separates measured phase
+cost from pending host rollout. Source head 0012 does not prove host revision.
 
-- **Integrated application:** the [integration handoff](../team/INTEGRATION.md)
-  records restricted-role API, real backend modules, synthetic providers, review
-  gates, browser flows and actual PDF generation. Counts in older sections refer
-  to earlier commits.
-- **Optional features:** [completion roadmap](../team/COMPLETION_ROADMAP.md) and
-  [rich-output verification](../data/RICH_OUTPUTS.md) record isolated tests and
-  browser/PPTX checks. The [status page](../project/STATUS.md) records 267 backend
-  and 20 frontend tests/build at that checkpoint. These do not prove live feature
-  activation or quality.
-- **Performance baseline:** [capture specification](../data/CAPTURE_PERFORMANCE.md)
-  records 273 regression tests with disposable PostgreSQL and synthetic providers,
-  and a single 120,004-chunk fixture capture in 7.206 seconds; the old query
-  exceeded 30 seconds. That measurement used 3-dimensional synthetic vectors and
-  is not a production latency guarantee. Later host receipts in the same file,
-  where present, have their own scope and rollout status.
-- **Actual providers:** the [live acceptance receipt](../team/BACKEND_RESEARCH_COMPLETION.md#completed-live-acceptance--19-october-2026)
-  records Keera 70B, HF embeddings, local reranker, authorized live corpus,
-  PostgreSQL checkpoints and MinIO. It produced five partial-report cards and 26
-  caveats. All cards were reviewed; one ARTORG capability was kept and downloaded
-  as a 66,979-byte PDF. No web service was configured for that run. Earlier context
-  failures and unsupported wording were blocked before the successful retry.
-- **Encoder protocol:** [HF verification](../data/HOSTED_EMBEDDINGS.md) records
-  finite 768d vectors, pinned tokenizer and query/document protocol checks.
-  This verifies compatibility, not retrieval relevance.
-- **Deployment:** [migration status](../team/MIGRATION_STATUS.md) and
-  [runtime checklist](../team/RUNTIME_CHECKLIST.md) are dated host records.
-  Schema activation, process restart and completed live acceptance are distinct.
-  Neither a configured flag nor a reachable capability endpoint proves every
-  provider, permission and optional output works.
+## Reproduce checks
 
-## What is not established
+After [installation](QUICKSTART.md), from root:
 
-The challenge's **at least 80% of expected experts/units in the top 10** is a
-target, not a result. No independently judged Recall@10 or semantic-support
-percentage is reported. Candidate evaluation queries are not gold labels.
-Synthetic fixtures cannot establish model accuracy, multilingual quality,
-fair discoverability or named-expert coverage.
-
-Combined real database/web provenance and deduplication acceptance, broader
-source coverage, resource/cost measurements and controlled target-host
-restart/resume remain open. A live partial PDF is not evidence of air-gapped
-operation or Swiss sovereignty. Exact quotations plus model assessment reduce
-risk but cannot guarantee that every implication is supported or a source is
-trustworthy.
-
-## Reproduce engineering checks
-
-After the [backend installation](QUICKSTART.md#2-local-synthetic-api-and-worker),
-run from root with the virtualenv active:
-
-```text
-python -m pytest src/backend/tests -m "not integration" -q
+```bash
+.venv/bin/python -m pytest src/backend/tests -m "not integration" -q
+.venv/bin/python -m backend.data.schema_docs --check
+(cd src/frontend && npm test && npm run build)
 ```
 
-For full tests, explicitly set `NAVIGATOR_TEST_ADMIN_DSN` to a disposable local
-PostgreSQL/pgvector cluster and run:
+Full database tests require an explicitly disposable `NAVIGATOR_TEST_ADMIN_DSN`
+with pgvector and required test-role setup; they create/drop test databases:
 
-```text
-python -m backend.tests.run
+```bash
+.venv/bin/python -m backend.tests.run
 ```
 
-That command requires the explicit DSN; it does not derive admin credentials
-from deployment config. Tests create/drop databases and require
-`navigator_app NOLOGIN`. Never point them at the shared host. Without a test DSN,
-ordinary pytest skips database tests; skipped tests are not passes.
+Never use shared ingestion/deployment infrastructure. Ordinary pytest without a
+test DSN skips DB checks; skips are not passes. The [synthetic harness](QUICKSTART.md)
+uses actual application code with explicit fixture providers and memory checkpoints;
+it does not establish deployed saver recovery.
 
-In `src/frontend`:
+## Research quality and deployment
 
-```text
-npm ci
-npm test
-npm run build
-```
+The challenge's **80% of expected experts/units in the top 10** remains an unmeasured
+target. Candidate queries have no gold labels. Independently review expected typed
+entities and actual passages before computing intent-balanced Recall@10; compare
+lexical/dense/RRF/reranked variants under identical pins.
+[Evaluation](../challenge/EVALUATION.md) defines support, completeness, ambiguity,
+negative cases, fairness/coverage and latency checks separately.
 
-The [quickstart's synthetic harness](QUICKSTART.md#2-local-synthetic-api-and-worker)
-exercises API/worker and export with fixture models. It does not use durable
-PostgreSQL checkpoints. Real recovery acceptance must use the deployed worker
-and saver.
+Combined real DB/web provenance, broader person/facility coverage, controlled
+latency/cost, multilingual quality, load, target-host restart/resume and independent
+offline deployment remain acceptance work. A source quotation and a model verdict
+cannot guarantee every implication; human review remains necessary.
 
-## Evaluate research quality separately
-
-Use the [evaluation protocol](../challenge/EVALUATION.md) and
-[candidate queries](../evaluation/PILOT_QUERIES.json). Independently review
-expected experts/units before calculating intent-balanced Recall@10. Compare
-lexical, dense, fused and reranked results on the same pins. Audit each public
-assertion against its actual passage, and measure missing fields, direct/adjacent
-fit, source coverage and latency separately. Do not treat rank, valid JSON or
-editorial keep decisions as factual gold labels.
-
-A release receipt should record commit, platform, model/tokenizer/configuration
-pins, corpus capture or release, query/label version, enabled features, passed/
-failed/skipped checks, observed failures and the reviewed export outcome.
-Private cases, credentials and copyrighted source artifacts stay out of that
-public receipt.
+For release record commit/platform, corpus/profile/taxonomy/encoder/reranker/task
+pins, enabled flags, passed/failed/skipped checks, actual output and limitations.
+Keep case content, provider secrets and copyrighted source artifacts private.

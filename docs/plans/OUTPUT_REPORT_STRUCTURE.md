@@ -1,62 +1,26 @@
-# Bern opportunity brief — Proposed output structure
+# Bern opportunity brief
 
-**Status:** supporting content design, aligned with the paired implementation
-plans. The [visual pipeline](../architecture.html) and
-[architecture contract](ARCHITECTURE.md) define preparation of the evidence pack.
-Current intake is manually typed permitted keywords/context; confidential PDFs
-remain outside the app pending separately authorized future handling.
-The agent accepts user refocusing/edit instructions and asks targeted
-follow-up questions; revisions retain citations and regenerate affected exports.
-The supplied template and logo are challenge-only assets.
+The browser draft and reviewed export help an agency operator explain why a
+company should explore Bern. The audience is company decision-makers.
 
-**The main output should be a company-specific “Bern opportunity brief”: help her understand the company’s needs, identify relevant Bern capabilities, and select credible arguments for a pitch.** Understanding the company is the starting point; connecting it to Bern’s ecosystem is the workshop’s central objective.
+| Content | Evidence rule |
+| --- | --- |
+| Company summary and objectives | Attributed permitted operator context; uncertainty preserved |
+| Relevant people, units and affiliations | Source-supported identity/role; missing fields explicitly unknown |
+| Expertise, projects, infrastructure and services | Exact claim → passage → URL links |
+| Why this capability fits | Short company-specific explanation; direct versus adjacent fit distinguished |
+| Gaps and next steps | Coverage limits, unresolved questions and unconfirmed availability |
+| Sources | Literal passages, original URLs and known dates beside relevant assertions |
+| Optional plans | Explicitly confirmed manual jobs/investment/timeline; attributed plans |
 
-The immediate pitch audience is primarily the company’s CEO/C-level decision-makers considering a visit or establishment in Bern.
+`DraftRevision` and reason-card contracts define exact fields. Sections are content
+categories, not mandatory pages or a license to invent missing information. Short,
+useful reasons take priority over bare link lists and unsupported scores.
 
-### Proposed first output structure
-
-| Section | What goes inside | Priority |
-|---|---|---|
-| **1. Executive summary** | What the company does, what it wants, and the **2–3 strongest evidenced reasons to explore Bern**. State major uncertainties. | Core |
-| **2. Company snapshot and needs** | Brief description; products/services; medical field; expansion and R&D objectives; capabilities sought. Include supplied headcount, turnover or timeline only when available and suitable for use. Separate explicit needs from inferred opportunities. | Core |
-| **3. Relevant Bern expertise and capabilities** | Ranked matches: researchers, groups, institutions, projects, technologies, infrastructure and services. Explain what each does and why it matters to this company. | **Main section** |
-| **4. Related projects and transferable technologies** | Concrete research or development examples relevant to the company’s problem. Distinguish a direct fit from a **possible adjacent application** requiring expert validation. | Core |
-| **5. Pitch-ready arguments** | Short reusable statements linking a company need → a Bern capability → its potential business value, with evidence attached. | Core |
-| **6. Gaps and next steps** | Missing company information, weak evidence, questions to clarify, and potential introductions for the agency to pursue. Expert availability remains unconfirmed. | Core |
-| **7. Sources and coverage** | Direct supporting links, source dates where available, institutions searched and coverage limitations. Put citations beside claims as well. | Core |
-| **8. Economic contribution** | Supplied investment, planned jobs, timing and potential local activities. Show assumptions separately from company commitments. | Optional |
-| **9. Comparable company cases** | Relevant prior cases, similarities, differences and documented outcomes—**only if an authorized, usable case dataset becomes available**. | Optional own-case v1; agency-wide dataset later |
-
-### What each match should contain
-
-A compact, repeatable card:
-
-- **Who/what:** person or unit, role and affiliation.
-- **Capability:** expertise, project, infrastructure or service.
-- **Company relevance:** the specific need it could address.
-- **Fit:** direct / adjacent / exploratory, with a short explanation.
-- **Evidence:** supporting links and any limitations.
-
-This covers the written challenge’s required fields. A numerical matching score is optional; initially, **explained fit labels are more useful than an unsupported “87% match.”** Keep relevance separate from strength of evidence. [Challenge brief, §4](../challenge/CHALLENGE_BRIEF.md).
-
-### How to handle your additional ideas
-
-| Idea | Recommendation |
-|---|---|
-| **Previous companies and outcomes** | Useful later, but the workshop supplied no historical case database. Similarity must not imply the new company will achieve the same outcome. |
-| **Metrics, charts and plots** | Include only when they communicate real supplied data: planned hiring over time, investment phases or development milestones. Label actuals, company plans and assumptions distinctly. |
-| **Economic impact** | Start with **planned direct contribution**, such as jobs and investment. Broader GDP, tax or indirect-job estimates need a separate evidenced methodology; they should not be LLM guesses. |
-| **PowerPoint generation** | Make it a second output generated from her reviewed selections. The LLM can draft content; a slide-generation component applies the template. The partner template has now been supplied and structurally inspected; use it with the English logo and validate generated slides. |
-| **Incoming emails and internal notes** | Use a human-prepared, non-confidential summary for this prototype. Internal company records are beyond the confirmed public-source scope; confidential business plans must stay out of every model. |
-
-### Where the workshop says to focus
-
-The stakeholder emphasized **short explanations, useful scientific connections, source links and human selection**. She explicitly wanted more than bare links, accepted honest no-match results, and described an outgoing teaser of **five to ten pages maximum**. Historical-case scoring and economic-impact modelling were not established priorities. [Workshop findings E09–E16](../recordings/RECORDING_INSIGHTS.md).
-
-**U8 current delivery order:** expose a concise cited draft for reason-card review,
-then export a PDF containing kept reasons, supporting company context, sources
-and material caveats. Sections 1–7 are content categories, not seven mandatory
-pages or extra unreviewed assertions. All reasons must be reviewed and at least
-one kept. Optional reviewed PowerPoint now uses the supplied template; see [rich outputs](../data/RICH_OUTPUTS.md).
-Manual plans are attributed context; no economic forecast is inferred. Own-case
-similarity is available in draft view after explicit eligibility, not in PDF/PPTX.
+Every card is marked kept or rejected before export, with at least one kept.
+Rejection is an editorial decision. The application approves exact result and
+selection hashes; PDF includes kept reasons, supporting context, citations and
+material caveats. PPTX applies the supplied partner template when enabled.
+Own-case comparison stays internal draft context, outside exported factual claims.
+See [optional outputs](../data/RICH_OUTPUTS.md) and
+[processing](REPORT_PROCESSING_BOUNDARIES.md).

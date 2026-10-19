@@ -1,6 +1,6 @@
 # Own-case similarity v1
 
-19 October 2026. Optional backend feature; shared-host activation is Eric's task.
+Optional backend feature; activation requires maintainer-provisioned schema and assets.
 Core schema 0008 works with `CASE_MEMORY_ENABLED=false`. Maintainer migration
 `0009_case_memory` adds immutable `cases.memory_profiles` and owner RLS. After
 migration, configure the same pinned encoder used by this installation and set
@@ -48,6 +48,6 @@ does not prevent a supported core report.
 
 Verification: disposable PostgreSQL migration/schema, reviewed opt-in, vector reuse,
 owner rejection, frozen matching, revocation and existing PDF pipeline tests.
-No shared migration, indexing or grant was performed. The old catalog
+The old catalog
 `search_cases` port remains reserved for an agency-wide published dataset; the
 own-case service is a separate private opt-in feature.

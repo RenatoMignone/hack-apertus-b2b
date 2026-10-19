@@ -7,7 +7,7 @@ inspect all three; exact results depend on evidence, configuration and mode.
 
 ## Walk through a case
 
-1. Open the case board. In mock mode choose a seeded glucose-sensor case for a
+1. Open the case board. In mock mode use the HelioSense glucose-sensor scenario for a
    repeatable tour. In HTTP mode choose **New case** and enter a fictional,
    permitted request such as:
 
@@ -20,7 +20,7 @@ inspect all three; exact results depend on evidence, configuration and mode.
    The built-in **Glucose sensor** example is also available. Its operator lead
    about DCB is a hypothesis to verify, not a fact to repeat without evidence.
 
-2. Select **Search** and inspect progress. If blocking clarification appears,
+2. Select **Start research** and inspect progress. If blocking clarification appears,
    answer it in the chat. State missing intent explicitly; do not supply guessed
    public research facts as if they came from the company.
 3. Read the reason cards, result categories, direct/adjacent labels and coverage

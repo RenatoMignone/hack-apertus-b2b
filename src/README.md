@@ -1,22 +1,11 @@
 # Application source
 
-**B to Bern (B2B), Team Stregoni.** For judge-facing installation and usage,
-follow the [quickstart](../docs/judges/QUICKSTART.md) and
-[product walkthrough](../docs/judges/DEMO.md). These distinguish the credential-free
-seeded UI, synthetic backend and provisioned live application.
+B to Bern has an independent [React frontend](frontend/README.md) and modular
+[Python backend](backend/README.md), communicating through versioned HTTP.
+API and durable worker are separate processes. Use the [module map](../docs/plans/MODULE_HANDOFFS.md)
+and [source structure](../docs/plans/SOURCE_STRUCTURE.md) for implementation.
 
-**Backend and HTTP frontend integrated; shared real-corpus rollout pending.**
-
-- [frontend/](frontend/README.md): React/Vite browser client over authenticated HTTP; explicit mock demo mode.
-- [backend/](backend/README.md): HTTP server and separated backend components.
-
-Read the [source structure](../docs/plans/SOURCE_STRUCTURE.md),
-[frontend/backend handoff](../docs/plans/FRONTEND_BACKEND_API.md) and
-[processing boundaries](../docs/plans/REPORT_PROCESSING_BOUNDARIES.md).
-The root submission layout is preserved. [Current status](../docs/project/STATUS.md)
-and [live setup](../docs/data/LIVE_SETUP.md) distinguish tested synthetic integration
-from real corpus/model deployment. Run the data layer using the
-[deployment guide](../docs/data/DEPLOYMENT.md).
-
-For independent feature work, follow the [module handoffs](../docs/plans/MODULE_HANDOFFS.md).
-The frontend is separately owned; backend tasks must leave it unchanged.
+[Quickstart](../docs/judges/QUICKSTART.md) distinguishes scripted UI, synthetic
+backend and provisioned live research. [Local setup](../docs/data/LIVE_SETUP.md)
+documents Make commands, dependencies and private settings. [Status](../docs/project/STATUS.md)
+and [verification](../docs/judges/VERIFICATION.md) define acceptance scope.

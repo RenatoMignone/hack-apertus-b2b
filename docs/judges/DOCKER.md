@@ -71,7 +71,7 @@ navigator --env-file src/backend/deploy/.env checkpoint-setup
 On PowerShell, use `.\.venv\Scripts\navigator.exe` if the environment is not
 activated. These are explicit owner operations for a new stack. For shared-host
 upgrades, coordinate the documented backup/window and inspect
-[migration receipts](../team/MIGRATION_STATUS.md); never run them implicitly.
+[migration receipts](../data/LIVE_SETUP.md); never run them implicitly.
 Changing env-file passwords does not rotate existing database credentials.
 
 This creates schema and checkpoint tables, **not a usable institutional corpus**.
@@ -110,7 +110,7 @@ Provision the pinned tokenizer and verified configuration from
 [hosted embedding setup](../data/HOSTED_EMBEDDINGS.md). The encoder configuration
 must match the indexed vectors. Startup never downloads these assets or builds
 the corpus. Corpus preparation follows the
-[ingestion handoff](../data/INGESTION_RETRIEVAL_HANDOFF.md).
+[ingestion handoff](../data/ingestion/INGESTION_SPEC.md).
 A public, redistributable ready-to-use corpus bundle has not been packaged here.
 
 ## 4. Run API/worker on the host
@@ -211,3 +211,10 @@ volumes; do not use `down -v` or global prune commands on a shared installation.
 Follow [backup/restore](../data/DEPLOYMENT.md#backup-and-restore) for maintainer
 operations. Neither Compose configuration nor connected model access establishes
 air-gapped or sovereign deployment.
+
+## Host-process development shortcuts
+
+With data services already provisioned, the root Makefile starts local SearXNG,
+API, worker and frontend. It does not duplicate the shared database stack.
+See [local services](../data/LIVE_SETUP.md). Framework/runtime readiness and a
+fresh case/review/export remain separate from Compose health.

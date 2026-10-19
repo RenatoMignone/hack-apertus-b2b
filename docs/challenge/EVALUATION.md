@@ -1,8 +1,8 @@
 # Evaluation plan and evidence requirements
 
-**Status: pilot-quality protocol remains to run; synthetic engineering checks and limited model probes are recorded.**
+Quality protocol: reviewed pilot labels and scored research-quality results remain pending. Engineering checks are summarized in [verification](../judges/VERIFICATION.md).
 
-**18 October decision:** the user delegated aggregation/entity counting. Use
+Use
 intent-balanced macro Recall@10 >= 0.80 for the English positive-query suite as
 the internal primary gate, with unique typed person/unit IDs in one shared top
 ten. Average frozen wording variants within each intent, then average intents;
@@ -119,7 +119,7 @@ this local scoring-scale statement. Stage-specific details remain unverified.
 | Technical rigour | Reproducible working pipeline, pilot metrics, evidence audit and known failures | Synthetic cross-module tests/browser-to-PDF passed; real pilot metrics pending |
 | Value, cost & scalability | Operator benefit, measured/estimated costs with assumptions, coverage/extension behavior | Stakeholder need and workflow implemented; operator benefit/cost measurements pending |
 | Sovereign deployability | Selected target, full dependency map and verified operation for claimed mode | Air-gapped primary design proposed; no deployment tested |
-| Implementation feasibility | Run instructions, data/rights boundary, maintenance and partner handoff requirements | Local synthetic integration demonstrated; shared real-provider deployment pending |
+| Implementation feasibility | Run instructions, data/rights boundary, maintenance and partner handoff requirements | Synthetic integration and a narrow real-provider partial PDF recorded; full target-host acceptance pending |
 | Pitch & presentation | Clear, truthful working demo and coherent report/video within actual limits | Not produced |
 
 Do not fabricate internal judge scores or imply that documentation proves a
@@ -147,7 +147,7 @@ Additional user design gates, not new organizer metrics:
 [Architecture/dependency inventory](../plans/ARCHITECTURE.md#target-architecture-mandatory).
 Synthetic integration verifies manual intake, revised inputs and pack → reviewed
 PDF lineage. Broader second-domain, full deletion/retention and disconnected
-cold-start checks are not established. See [verification scope](../team/INTEGRATION.md).
+cold-start checks are not established. See [verification scope](../project/STATUS.md).
 
 ## Data-layer implementation checks
 
@@ -176,4 +176,4 @@ reranking on an existing owned capture. [Candidate queries](../evaluation/PILOT_
 are unjudged; no expected experts are invented. Add independent reviewed labels
 to unlock the existing intent-balanced Recall@10 metric. The CLI records pins,
 ranked source/entity references, failures and repeated timing separately.
-[Checkpoint evidence](../team/COMPLETION_ROADMAP.md) records the actual smoke run.
+Measured engineering scope is in [verification](../judges/VERIFICATION.md).

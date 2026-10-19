@@ -1,5 +1,9 @@
 # Findings from the recorded discussions
 
+This is timestamped requirements evidence. Technical implementation is described
+in the [current architecture](../plans/ARCHITECTURE.md), not by historical
+workshop suggestions. Original transcripts remain unchanged.
+
 **Reviewed: all five supplied transcripts, 18 October 2026.** These are
 timestamped paraphrases, not audio-verified quotations. The [inventory](README.md)
 defines T01–T05 and speaker caveats. Each entry separates what was said from

@@ -1,15 +1,15 @@
 # Optional runtime container wiring
 
-For Mac preparation, run `python -m backend.deploy.check_runtime --env-file .env`
+For local preparation, run `python -m backend.deploy.check_runtime --env-file .env`
 from repo root in the backend virtualenv. It checks configuration and local assets
 without network access; `--network` adds read-only DB/checkpoint/S3 probes after
 the SSH tunnel is open. It does not migrate, start a worker, write objects or call
 models. Missing checks return exit code 1; exception details/secrets are omitted.
-See the [live setup checkpoint](../../../docs/data/LIVE_SETUP.md#5-connect-and-verify)
+See the [live setup checkpoint](../../../docs/data/LIVE_SETUP.md#readiness)
 for remaining access inputs and the limits of these probes.
 
 API and durable worker also run with the Python commands in the
-[runtime handoff](../../../docs/team/runtime/HANDOFF.md). The existing data/
+[runtime handoff](../../../docs/project/STATUS.md). The existing data/
 LangGraph/Langfuse stack stays independently owned and is not started by runtime.
 
 `Dockerfile.runtime` copies backend source/dependencies and the supplied unchanged
@@ -47,11 +47,10 @@ explicitly with the checkpoint owner before starting the worker.
 
 For isolated local runs use a unique Compose project name and remove only that
 project's resources. Do not run broad prune/stop commands or remove shared data
-volumes. Container configuration is supplied for integration; no image was built,
-registered or deployed in this task. Offline deployment additionally requires
+volumes. Container configuration is supplied for integration; image build/deployment must be verified on the target. Offline deployment additionally requires
 local model/adapters/assets and host-enforced network isolation.
 
 For Windows-mounted shell entrypoints, root `.gitattributes` now enforces LF.
-Existing host checkouts may need a one-time rewrite; [host instructions](../../../docs/data/WINDOWS_SHELL_FIX.md)
+Existing host checkouts may need a one-time rewrite; [host instructions](../../../docs/data/DEPLOYMENT.md)
 explain when the temporary migration override can be retired. Hosted embeddings
 need the supplemental lock plus tokenizer/config mounts; they remain connected-only.

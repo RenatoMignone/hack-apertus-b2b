@@ -1,49 +1,34 @@
-# Frontend workspace
+# B2B frontend
 
-Browser UI (React/TypeScript/Tailwind), connected to the authenticated HTTP API by
-default. Requires Node **22.18+**. Screens are described in
-[FRONTEND_PLAN.md](../../docs/plans/FRONTEND_PLAN.md); current deployment gates are
-in the [integration handoff](../../docs/team/INTEGRATION.md).
+React/TypeScript, Vite, Tailwind and Radix Themes. Requires Node 22.18+.
 
-```text
+```bash
 npm ci
-npm run dev     # http://localhost:5173
+npm run dev
 npm test
 npm run build
 ```
 
-Start API and worker using the [backend README](../backend/README.md). The Vite
-development proxy sends `/api` to localhost:8000. For separate hosting set public
-`VITE_API_BASE_URL` and exact backend CORS origins; production can reverse-proxy
-`/api` to the backend. Static preview needs this proxy or an explicit API origin.
-Enter an operator bearer token at Connect. It stays in memory, so reload requires
-reconnecting; server jobs continue independently and active run polling resumes.
-Do not put tokens, model keys or database credentials in `VITE_*` or git.
+HTTP is default; Vite proxies `/api` to localhost:8000. Start API and worker using
+[root Make commands](../../docs/data/LIVE_SETUP.md). Separate hosting needs an
+explicit public `VITE_API_BASE_URL` / exact CORS or a reverse proxy. Never put
+provider/DB/operator secrets in `VITE_*`.
 
-`NavigatorApi` is implemented by `api/httpApi.ts`: real run polling, durable
-clarifications, exact report/selection hashes, authenticated PDF/PPTX download when provisioned,
-persisted hold/outcome flags and action notes. Chat explicitly selects new focus/research or rewriting the existing report.
-Blocking clarification supports free text and server choices; it resumes the same
-run. Failed drafting retries the existing frozen pack instead of retrieving again. Source badges
-distinguish new web research; absent lineage is explicitly unavailable.
+Shared access keeps the operator bearer token in memory; reload reconnects while
+server jobs continue. Configured loopback access auto-connects. `NavigatorApi`
+implements polling, clarification, revision/selection hashes and authorized export.
+Creation opens immediate preparation; case reopening observes the durable run.
 
-For the original seeded demo only, set `VITE_API_MODE=mock` in an ignored
-`.env.local` and restart Vite. Its browser PDF/PowerPoint exports and localStorage are demo-only. The board is
-home; the standalone desk/action screens were removed. All cards must be reviewed
-and at least one kept for export. HTTP mode uses server-authorized exports;
-optional PPTX, manual company plans and own-case comparison require backend activation. Hierarchy/expertise/missing-field displays are optional and are not yet fully
-populated by the backend. Facilities/services use their actual entity categories.
-History browsing is read-only; selection/export applies only to the current report.
-No-match results retain their caveats. The connection checks API compatibility and
-server export formats; unavailable features stay hidden.
-An HTTP failure never switches to mocks. The connection token and live case
-content are never saved by the frontend to localStorage.
+`VITE_API_MODE=mock` explicitly selects the scripted HelioSense tour and browser-
+local demo state/exports. Restart Vite when changing mode. HTTP failures never
+switch to mocks; live tokens/case content do not enter localStorage.
 
-Manual plans use explicit operator confirmation and start a new input/review cycle.
-Case comparison requires a real permitted case and exact reviewed report; no demo
-case is automatically indexed. Institution labels outside the pilot use a neutral
-badge. See [rich outputs](../../docs/data/RICH_OUTPUTS.md) and
-[own-case memory](../../docs/data/CASE_MEMORY.md).
+My desk, board and workspace support source inspection, chat modes, history and
+review. All cards reviewed plus one kept gates export. Connected PDF/PPTX uses
+backend review/operation/download; optional formats/plans/memory are capability-
+gated. Historical reports are read-only. Missing metadata remains unknown.
 
-
-19 October integration: `feat/my-desk` includes the latest `ui-polish`. Official Radix Themes supplies common controls, menus, status selects, navigation and export dialogs; Tailwind owns layout. Local testing auto-connects when the backend enables loopback-only `RUNTIME_LOCAL_ACCESS`; shared servers retain bearer access. Creation immediately opens a preparation route (prompt remains memory-only); active case polling backs off and stops when leaving. See [runtime feedback/acceptance](../../docs/team/RUNTIME_FEEDBACK_AND_SEARCH.md).
+Read [screens](../../docs/plans/FRONTEND_PLAN.md),
+[HTTP](../../docs/plans/FRONTEND_BACKEND_API.md) and
+[walkthrough](../../docs/judges/DEMO.md). Coordinate consumer/interface edits with
+the backend; tests/build verify interaction contracts, not live research quality.

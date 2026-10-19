@@ -1,6 +1,6 @@
 # Domain-independent profiles
 
-19 October 2026. The orchestration, evidence assessment and draft/export pipeline
+The orchestration, evidence assessment and draft/export pipeline
 use generic contracts. Medtech is the default vocabulary, not a hardcoded enum
 on company fields or draft institutions. `CompanyField` remains a compatibility
 constant for old callers; new processing fields accept profile-defined codes.
@@ -22,8 +22,7 @@ IDs, independent review, versioning and unknown/unmapped terms.
 Onboarding another domain requires authorized sources, a reviewed taxonomy and
 new profile/snapshot (or explicit live capture), then compatible embedding/index
 builds. A different encoder requires re-embedding and rebuilding; labels alone do
-not make an existing RAG corpus cover a new subject. No shared data is changed by
-this feature. Default pilot configuration remains backward compatible.
+not make an existing RAG corpus cover a new subject. Default pilot configuration remains backward compatible.
 
 Current HTTP badges remain UniBE/ARTORG/DCB/Other for frontend compatibility;
 unknown institutions project to Other with the exact `institutionLabel` retained.

@@ -1,8 +1,10 @@
-# Retrieval
+# Hybrid retrieval adapters
 
-Read-only strategy comparisons are available through `python -m backend.evaluation`.
-Explicit lexical/dense/RRF modes do not call the reranker; lexical does not encode queries.
-Default production behavior remains fused retrieval plus its configured reranker.
+Search the same authorized snapshot through independent lexical and vector
+branches, fuse unique ranks with RRF, optionally rerank and expand bounded
+supported context. Record actual query/evidence lineage and limitations.
+Taxonomy keywords never exclude otherwise eligible dense matches.
 
-
-Full-text search uses constant language-specific tsqueries to avoid per-row parsing and enable GIN lookup where planner/RLS permit it and preserves max rank across ingestion projections. Membership RLS is optimized by migration 0012, preserving visible snapshots/owner/grants. SQL statements are bounded to 30 seconds. See [runtime feedback and rollout](../../../../docs/team/RUNTIME_FEEDBACK_AND_SEARCH.md).
+Read the [focused specification](../../../../docs/data/RETRIEVAL_SPEC.md) and [module map](../../../../docs/plans/MODULE_HANDOFFS.md).
+Coordinate shared DTO/schema/configuration changes with their consumers and run
+relevant boundary checks against isolated infrastructure.

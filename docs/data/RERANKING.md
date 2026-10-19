@@ -1,6 +1,6 @@
 # Local reranking
 
-19 October 2026. Implemented on `codex/backend-research-completion`.
+Pinned optional cross-encoder, provisioned explicitly for CPU inference.
 
 The first provisioned CPU option is
 [cross-encoder/mmarco-mMiniLMv2-L12-H384-v1](https://huggingface.co/cross-encoder/mmarco-mMiniLMv2-L12-H384-v1),

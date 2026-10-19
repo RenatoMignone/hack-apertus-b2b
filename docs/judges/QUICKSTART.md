@@ -136,9 +136,8 @@ The maintainer supplies:
 Use root [.env.example](../../.env.example) as the settings inventory. Follow
 [HF setup](../data/HOSTED_EMBEDDINGS.md),
 [inference setup](../data/INFERENCE_CONFIGURATION.md) and
-[live provisioning](../data/LIVE_SETUP.md). Older runbook head numbers are dated:
-confirm the selected host's revision with the maintainer and
-[migration receipts](../team/MIGRATION_STATUS.md). Do not migrate the shared host
+[live provisioning](../data/LIVE_SETUP.md). Source head is 0012; confirm the installed host revision with its maintainer
+using the [deployment guide](../data/DEPLOYMENT.md). Do not migrate the shared host
 during a judge walkthrough.
 
 After the core install above, activate the environment in every backend terminal.
@@ -170,12 +169,12 @@ For single-operator local testing, `RUNTIME_LOCAL_ACCESS=true` may be set in the
 private backend env with exactly one existing identity binding. Bind the API to
 loopback; the frontend then auto-connects without token entry. Role, namespace
 and source/case access checks remain. Keep this flag false for shared deployments.
-See [local access and service restart guidance](../team/RUNTIME_FEEDBACK_AND_SEARCH.md).
+See [local access and service restart guidance](../plans/OPERATIONS_PLAN.md).
 
 Startup does not migrate, download weights, populate the corpus or configure
 checkpoint tables. Optional web uses [SearXNG/Crawl4AI](../data/WEB_RESEARCH.md);
 optional reranking needs [assets](../data/RERANKING.md). PPTX/manual plans and
-case memory need [activation](../team/OPTIONAL_FEATURE_ACTIVATION.md).
+case memory need [activation](../data/LIVE_SETUP.md).
 Only use formats the backend advertises.
 
 ## Troubleshooting
@@ -197,3 +196,12 @@ Only use formats the backend advertises.
 
 For help, record mode, commit, failed stage and safe error code. Keep tokens,
 private env files, full case prompts and source artifacts out of public issues.
+
+## Local service shortcuts
+
+After provisioning dependencies/private `src/backend/deploy/.env`, Linux/macOS
+users can run `make all` from root for background API/worker/frontend/search,
+`make destroy` to stop Make-managed services, or individual `make server`,
+`make worker`, `make frontend`, `make docker` targets for logs. `make help` lists
+boundaries. Make does not provision PostgreSQL/MinIO or establish SSH.
+See [local setup](../data/LIVE_SETUP.md).

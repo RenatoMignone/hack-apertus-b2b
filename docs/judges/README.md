@@ -1,50 +1,26 @@
-# Welcome to B to Bern (B2B)
+# Review B to Bern
 
-**Team Stregoni:** Renato Mignone, Elia Innocenti, Eric Ruiz Giménez,
-Mohamed Kechiche.
+**B to Bern (B2B), Team Stregoni.** Renato Mignone, Elia Innocenti,
+Eric Ruiz Giménez and Mohamed Kechiche.
 
-B2B helps a Bern economic-development operator answer: **“Which research
-capabilities in Bern could help this company, and what evidence supports that?”**
-It translates everyday needs into queries, finds public evidence across
-institutional sources, and drafts reasons the operator can inspect, select and
-export. The pilot concerns diabetes technology across UniBE, ARTORG and Diabetes
-Center Berne. A result may be a unit, person, project, facility or service
-when supported; missing contacts and roles are never guessed.
+B2B helps Bern economic-development staff answer: **Which research capabilities
+could help this company, and what evidence supports the match?** The pilot spans
+UniBE, ARTORG and Diabetes Center Berne, focusing on diabetes technology.
 
-## Choose your review path
+1. [Run](QUICKSTART.md): choose scripted UI, synthetic backend or provisioned live
+   research. [Docker](DOCKER.md) explains service provisioning.
+2. [Walk through a case](DEMO.md): inspect a reason, its passage and source, review
+   every card and export kept findings.
+3. [Understand the architecture](ARCHITECTURE.md): typed services, hybrid search,
+   frozen evidence and human review. Read the [technical report](../../technical_report.md).
+4. [Assess verification](VERIFICATION.md): tests and the recorded partial live PDF
+   are separate from unmeasured research-quality targets.
 
-1. **Try the product:** [quickstart](QUICKSTART.md), then [walkthrough](DEMO.md).
-   For Compose-based data services and optional containers, use [Docker setup](DOCKER.md).
-   The seeded UI needs no credentials and is explicitly scripted. The guide also
-   covers the synthetic backend and provisioned live research.
-2. **Understand the implementation:** [architecture](ARCHITECTURE.md), then the
-   root [technical report](../../technical_report.md).
-3. **Assess the evidence:** [verification and limitations](VERIFICATION.md) links
-   measured receipts and separates tests from model-quality evaluation.
+The application makes direct/adjacent fit, source status and missing information
+visible. A unit can be useful without an invented contact person. The operator's
+keep/reject decision is editorial; it cannot establish factual truth.
 
-## What to look for
-
-Follow one company need through a result's reason and exact source quotation.
-Inspect whether the statement follows from the passage, whether it is a direct
-or adjacent match, and what remains unknown. Review every reason, keep at least
-one and export. Change the focus and compare with read-only history.
-Partial/no-match output is honest when available evidence cannot support more.
-
-The intended value is a shorter route from scattered public pages to an
-inspectable brief. Time saved, cost per case and retrieval quality have not yet
-been established by a controlled study.
-
-## Delivery status
-
-Prepared on 19 October 2026 from source baseline `072f099`. Real-provider partial
-report/PDF evidence is recorded; it is not a production or sovereign-deployment
-certification. [Delivery checklist](DELIVERY.md) tracks release pins, video, PDF
-and final acceptance. Internal handoffs are dated engineering records; start
-here for the judge-facing route and consult linked receipts for precise scope.
-
-The [submission audit](SUBMISSION_AUDIT.md) lists missing artifacts, release
-integration, deployment prerequisites and remaining validation work.
-
-Some screens and internal identifiers still use “Bern Navigator” or
-“Research & Expertise Navigator”; these refer to B2B. The name does not rename
-Python packages, DB schemas or environment variables.
+The [delivery checklist](DELIVERY.md) records final artifact/access requirements;
+[current status](../project/STATUS.md) distinguishes implemented features from
+host migration, real-corpus quality and deployment acceptance. Connected provider
+operation does not demonstrate the selected offline target.

@@ -18,7 +18,7 @@ def render():
         f"Generated from `src/backend/data/schema.py`; migration head **`{SCHEMA_REVISION}`**.",
         "Do not edit by hand. Regenerate with `PYTHONPATH=src python -m backend.data.schema_docs`.", "",
         f"**{len(metadata.tables)} application tables.** Read [schema decisions](RELATIONAL_SCHEMA.md) and",
-        "[ingestion/retrieval handoff](INGESTION_RETRIEVAL_HANDOFF.md) for meanings and write order.",
+        "[ingestion specification](ingestion/INGESTION_SPEC.md) for meanings and write order.",
         "Only these tables are supported for new queries. `alembic_version` is migration-owned;",
         "optional `legacy` history is maintainer-only. Framework tables live outside this database.", "",
         "UUIDs are supplied by the application. Timestamps are UTC. JSON payload contracts and",

@@ -50,7 +50,7 @@ claim is rejected. Entity status can advance while its identity remains unchange
 Tags resolve existing reviewed concepts and exact source passages; topic budgets
 are bounded, and no vocabulary branch is invented.
 
-This does not publish or rebuild snapshots, edit documents, merge identities or
-accept an entire extraction batch automatically. Eric coordinates real-corpus
-application and subsequent capture/publication. Test fixtures alone are not a
-review of his 6,069 pending claims. No shared-host command was applied here.
+Review does not publish or rebuild snapshots, edit source documents or merge
+identities. The corpus owner coordinates apply and subsequent capture/publication.
+Runtime credentials do not gain corpus-writer privileges. Test fixtures do not
+constitute review of actual corpus claims.

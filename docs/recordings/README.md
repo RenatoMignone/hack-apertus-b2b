@@ -20,7 +20,7 @@ mid-pitch; T02/T04 end mid-conversation. Do not infer missing statements.
 
 ## How to use the evidence
 
-Read [../RECORDING_INSIGHTS.md](RECORDING_INSIGHTS.md) for extracted evidence
+Read [Timestamped insights](RECORDING_INSIGHTS.md) for extracted evidence
 entries E01–E30. Cite an ID and time range, for example `T03 13:30–14:47`.
 Speaker labels restart in each file. The apparent partner representative is
 Speaker 0 in T01/T03/T04 and Speaker 1 in T02, based on their statements, **not
@@ -33,7 +33,7 @@ technical fact. Exclude other-track dataset requirements from this project.
 
 These recordings are working context, not research-source evidence for a search
 result. Their presence does not establish consent to publish or redistribute
-recordings/transcripts. No publication or upload was performed in this pass.
+recordings/transcripts. The discussion transcript is tracked following the user's explicit publication instruction; do not infer broader redistribution rights.
 
 ## Original SHA-256 checksums
 
@@ -52,3 +52,10 @@ attachments and copied byte-for-byte to the stable descriptive path above.
 Its recording date is not independently established by that new filename.
 Speaker 0 appears to be the stakeholder; names/authority remain unverified.
 It is context evidence only and must not enter the public research corpus.
+
+## Architecture discussion
+
+[data-discussion.ogg.txt](data-discussion.ogg.txt) records the team discussion of
+classification, taxonomy, retrieval and data architecture. It is preserved working
+context, not a current specification. Follow [architecture](../plans/ARCHITECTURE.md)
+and [retrieval](../data/RETRIEVAL_SPEC.md) for adopted behavior.

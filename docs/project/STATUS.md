@@ -1,114 +1,44 @@
-# Current development status
+# Delivery status
 
-**19 October · runtime feedback integration:** `feat/my-desk` (including `ui-polish`)
-merged into main. Radix controls, immediate preparation view, parallel progress,
-case reopening and adaptive polling are implemented. Timestamped stage/model/search
-logs replace repetitive successful polling logs. Optional local loopback access
-avoids token entry while retaining the server identity. Source head is 0012;
-shared 0011 was verified read-only. 284 isolated backend and 24 frontend tests pass.
-Follow-up investigation cleared obsolete suspended local processes holding case
-locks; runtime-only bounded lock/idle waits, batched board summaries and batched
-corpus-alias duplicate checks are added.
-Lease renewal no longer waits for the case write lock. The preferred dark
-quick-start panel is restored; no additional redesign was performed. Changes
-are integrated on main (`88f5b75`); API/worker restart activates the latest safeguards.
-The judge-documentation branch is merged with its historical test receipts
-preserved and the current integration checks added. Shared migration remains pending.
-[Changes, limits and required maintainer rollout](../team/RUNTIME_FEEDBACK_AND_SEARCH.md).
+**19 October 2026.** This is the single summary of implementation and acceptance.
+Code availability, database rollout and real research quality are distinct.
 
-**Local performance patch — 19 October:** source 0011 removes the quadratic
-live-capture newest-version sort. A 120,004-chunk synthetic capture completed in
-7.206 s versus the old query exceeding 30 s; 273 tests passed. Shared migration
-is pending with Eric. [Measured scope and rollout](../data/CAPTURE_PERFORMANCE.md).
+| Area | Current state |
+| --- | --- |
+| Product | My desk, board, cases/chat, real progress, citations, revision history and review/export; B2B branding and HelioSense mock tour integrated |
+| Backend | FastAPI, separate durable LangGraph worker, typed services, authorization/idempotency, frozen packs and assessed drafts |
+| Search | Independent full-text/pgvector branches, RRF, optional pinned CPU reranker, observed query/evidence lineage and bounded gap-driven follow-up |
+| Providers | Explicit Apertus v1.5 70B connected setting; shared compatible HF EmbeddingGemma 2 protocol; optional private SearXNG/Crawl4AI web research |
+| Data | Immutable source versions, authorized taxonomy/corpus, live case captures and published releases; ongoing ingestion determines actual coverage |
+| Output | Reviewed PDF; optional manual company plans, reviewed PPTX and opt-in own-case similarity implemented behind capability/configuration gates |
+| Operations | Readiness checks, safe timestamped logs, progress projection, lock/lease safeguards and root Make service launcher |
+| Source schema | `0012_membership_lookup`; shared host last independently observed at 0011. Maintainer rollout is ongoing; verify installed revision before acceptance |
 
-19 October 2026 shared-host update: the confirmed application pause, validated
-backup and maintainer migration advanced `navigator` from 0008 to
-**0010_rich_outputs**. A repeated migration was a no-op; existing source, document,
-version, claim and artifact IDs were preserved. Owner RLS/narrow privileges and
-the 768-dimension memory index were checked. **21 focused isolated Windows checks
-passed** after making the subprocess recovery harness portable. See the measured
-[migration receipt](../team/MIGRATION_STATUS.md#shared-host-activation--19-october-2026-0744-madrid).
+## Verification available
 
-Both developer identities pass host-side read-only network readiness and
-authenticated ASGI capability/existing-case controls with prepared optional
-settings. Their private helpers preserve all personal credentials/bindings and
-select the unchanged supplied PPTX template. **Peer-side env application,
-API/worker/frontend restarts and real operator PDF/PPTX/history acceptance remain
-pending.** No shared case was automatically indexed. Ingestion/enrichment and
-the storage watchdog remain independent. Older shared-head/pending-migration
-statements below describe the pre-activation state.
+The integrated runtime baseline `88f5b75` passed **284 backend tests** against
+disposable PostgreSQL/pgvector and **24 frontend tests**, TypeScript and production
+build. A separately recorded live run used Keera 70B, HF encoding, local reranking,
+authorized corpus, PostgreSQL checkpoints and MinIO: five partial-report cards,
+26 caveats, one kept ARTORG capability and a 66,979-byte PDF. Web research was not
+configured in that live acceptance. Later UI/documentation integration needs its
+own recorded checks; earlier test counts are not automatically attributed to it.
+See [verification](../judges/VERIFICATION.md).
 
-19 October 2026. The backend research completion and frontend integration audit
-are integrated into main. See the [backend acceptance](../team/BACKEND_RESEARCH_COMPLETION.md),
-[frontend audit](../team/FRONTEND_RUNTIME_AUDIT.md) and
-[current checklist](../team/RUNTIME_CHECKLIST.md). The [ordered completion roadmap](../team/COMPLETION_ROADMAP.md) adds retrieval
-evaluation, curation tools, own-case memory, domain profiles, process recovery,
-manual plans and reviewed PPTX, with connected frontend controls. Optional source
-head is `0010_rich_outputs`; shared host last verified at 0008.
-[Eric must activate the optional features](../team/OPTIONAL_FEATURE_ACTIVATION.md);
-flags remain false until migration/assets are ready. Earlier handoffs are dated
-measurements, not the current backlog.
+## Remaining acceptance and delivery
 
-| Area | Implemented / measured | Still needed |
-| --- | --- | --- |
-| Backend | Authenticated API, durable LangGraph, interpretation/extraction/support/fit, frozen packs, checked drafting and reviewed PDF | Better named-expert/facility coverage, quality and latency evaluation |
-| Corpus | Shared schema `0008_live_corpus`; immutable ready-evidence capture while ingestion continues | Coverage and source-context quality; publication is optional for live development |
-| Inference | Actual Keera 70B interpretation, extraction, assessment and partial report passed; bounded context and same-pack rewrite | Representative quality, sustained quotas and resource budgets |
-| Research | Independent lexical/vector + RRF, bounded novel gap queries, retained evidence/claims and exact source-context expansion | Combined real DB/web deduplication/provenance acceptance |
-| Reranking | Pinned multilingual CPU model, integrity manifest, exact windows; actual 30-hit retrieval probe passed | Human-reviewed RRF/reranker quality and controlled latency comparison; other-host packaging |
-| Search lineage | Actual query → canonical evidence paths stored in pack; browser diagram/text fallback verified synthetically | Real-corpus UI review; no invented ontology mappings |
-| Frontend | HTTP, clarification/retry/rewrite/history, source quotes, exact PDF/PPTX review/export, optional manual plans and own-case opt-in | Optional feature activation; richer evidence-backed hierarchy/expertise metadata |
-| Access | Elia’s pinned key-only SSH, DB binding/schema, checkpoints, separate MinIO credentials and source-artifact hash pass | Server SSH policy and direct checkpoint row-isolation review |
-| Operations / target | Local API/worker, readiness and actual reviewed PDF pass; automated recovery tests | Controlled target-host restart/resume, supervision, retention/restore and demonstrated required deployment target |
+- Confirm maintainer migration rollout and measure capture/retrieval/registration
+  latency on the current host; repeat a fresh live case through review/export.
+- Validate combined database/web provenance and deduplication on actual providers.
+- Build reviewed expected experts/units and measure Recall@10, support quality,
+  source-family coverage, reranker value and representative latency/cost.
+- Verify optional exports/history on the intended deployment and controlled worker
+  restart/resume with deployed checkpoints; review checkpoint credential isolation.
+- Package and demonstrate the selected offline target, or explicitly qualify the
+  connected demonstration. Current development proves no air-gap or Swiss residency.
+- Produce final report PDF, accessible video/demo handoff and release/submission
+  confirmation; use the [delivery checklist](../judges/DELIVERY.md).
 
-## Measured verification
-
-**243 backend tests passed**, including all disposable PostgreSQL tests; **15
-frontend tests passed**, TypeScript and production build passed. Browser smoke on
-isolated storage/synthetic providers verified intake, free-text clarification,
-cited results, quotes without entry metadata, blocked unreviewed export, kept
-selection, exact-hash review and downloaded backend PDF. Explicit formatting reused
-the exact frozen pack. Viewing v1 left v2 active and disabled historical mutations.
-Build warnings concern optional demo export bundle size, not failed checks.
-
-The real Mac API/worker used Eric’s authorized live corpus, HF embeddings, local
-reranker, Keera 70B, PostgreSQL checkpoints and separate MinIO credentials. An
-initial context failure and unsupported wording were blocked and fixed. A later
-same-pack drafting retry produced five partial cards with coverage caveats. All
-were reviewed; one source-verified ARTORG capability was kept and downloaded as a
-**66,979-byte PDF**. This is a partial acceptance result, not an expert-search or
-reranking quality benchmark. No web service was configured on this Mac.
-
-Private settings, credentials, weights and diagnostic artifacts stay ignored.
-No shared migration, grant, ingestion or source-artifact change was performed.
-Checkpoint logins still share rows; separate usernames do not establish isolation.
-
-## Next actions
-
-1. Teammates fast-forward main, preserve private settings and restart API/worker.
-   Renato repeats the fictional Helvetic case with his configured web services.
-2. Review named experts/facilities, direct versus adjacent relevance, exact source
-   support and combined DB/web deduplication. Improve coverage without inventing data.
-3. Repeat the verified disposable subprocess crash/resume on the selected deployment host.
-4. Build reviewed evaluation cases; measure recall, factual support, reranking
-   relevance and latency. Synthetic engineering checks are not gold labels.
-5. Choose and demonstrate the required target architecture. Connected Keera/HF
-   development does not establish air-gapped or Swiss sovereign operation.
-
-Keep docs/team for current integration evidence and historical ownership records.
-Start fresh feature branches from updated main; do not reset completed lanes.
-
-## Optional completion release
-
-Own-case comparison uses explicitly eligible reviewed non-synthetic cases only;
-no automatic agency library, pitch learning or success probabilities. Domain
-vocabularies come from pinned profile configuration. Curation is dry-run-first,
-with immutable reviewed claim successors and audit provenance. Candidate evaluation
-labels remain unreviewed, so no Recall@10/quality score is claimed. Manual plans
-are operator inputs, not model estimates or economic impact. New features are
-covered by isolated tests/browser verification; no shared corpus/migration changed.
-
-Final verification: **267 backend tests passed** with disposable PostgreSQL;
-**20 frontend transport/policy tests passed**, and the frontend production build
-passed. Focused final capability/history/manual-output checks also passed.
-Provider quality, human labels and shared feature activation are not implied.
+No fixed source count, current provider availability or completed migration is
+inferred from configuration. Readiness is a configuration/access check, not proof
+of all permissions, corpus completeness or report quality.

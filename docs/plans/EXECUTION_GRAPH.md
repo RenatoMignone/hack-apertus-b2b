@@ -1,7 +1,5 @@
 ```mermaid
 flowchart TB
-  %% Implemented graph; see team/INTEGRATION.md for tested scope and live deployment gates.
-  %% Frontend is separately owned; backend agents must not edit it.
   USER["Operator: permitted company context and Bern objectives"]
   UI["Frontend: cases, progress, cited reasons, chat, review and export"]
   USER <--> UI
