@@ -79,3 +79,11 @@ reason-kind instructions are explicit, and stage timeouts retain their failed-st
 identity. Tests confirm report-only recovery reuses the saved pack without new
 retrieval. A real operator retry through reviewed export remains unverified.
 
+
+Latest evidence-quality correction: **336 disposable-backend tests passed**.
+Extraction distributes its unchanged six-batch budget across documents, pairs
+retrieval passages with literal identity context, and scopes missing-detail gaps
+to the assessed subset. Model-only support/claim aliases resolve to exact supplied
+IDs before canonical validation. Fit instructions assess needs independently;
+coverage and safe logs distinguish supported facts from matched capabilities.
+A new live HelioSense case remains necessary to verify output quality.

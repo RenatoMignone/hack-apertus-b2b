@@ -33,7 +33,7 @@ class Decisions(BaseModel):
 class Opportunity(BaseModel):
     model_config = ConfigDict(extra="forbid")
     need_index: int = Field(ge=0)
-    claim_ids: list[UUID] = Field(min_length=1)
+    claim_ids: list[str] = Field(min_length=1)
     rationale: str = Field(min_length=1)
     potential_benefit: str = Field(min_length=1)
     kind: str = Field(pattern="^(direct|adjacent)$")
@@ -150,8 +150,13 @@ class ApertusReasoningServices:
         if not evidence:
             return ExtractionBatch(gaps=["No source passages are available for extraction.",
                                          *research.limitations])
+        from backend.evidence.extraction_response import ExtractionResponse, canonical_batch
+        references = {f"S{i+1}": eid for i, eid in enumerate(evidence)}
+        references.update({str(eid): eid for eid in evidence})
+        support_keys = {eid: f"S{i+1}" for i, eid in enumerate(evidence)}
         existing = {str(e.get("entity_id", e.get("id"))) for e in research.existing_entities}
-        def check(batch):
+        def check(response):
+            batch = canonical_batch(response, references)
             if len(batch.entities) > 8 or len(batch.claims) > 12:
                 raise ValueError("A source batch permits at most eight entities and twelve claims")
             for item in [*batch.entities, *batch.claims]:
@@ -163,7 +168,7 @@ class ApertusReasoningServices:
                 if not any(entity.display_label.casefold() in evidence[eid].literal_text.casefold()
                            for eid in entity.evidence_ids):
                     raise ValueError("Delete entities whose display_label does not occur in cited literal_text and delete claims referring to them. Empty entities/claims is valid. Do not copy institution names from title or background knowledge; use an exact source abbreviation only if present")
-        return await self.tasks.run("extract", "Extract at most EIGHT entities and TWELVE atomic factual "
+        response = await self.tasks.run("extract", "Extract at most EIGHT entities and TWELVE atomic factual "
             "claims and entities from supplied literal passages. Use local keys such as e1/c1; "
             "never invent canonical UUIDs. Entity display labels must occur in cited passages. "
             "Do NOT copy institution names from the operator's request or a page title unless "
@@ -175,10 +180,14 @@ class ApertusReasoningServices:
             "For a technology/capability use typed_literal={type:string,value:actual source wording}; "
             "do not invent a project/facility entity to represent a technology. Format-only example: "
             '{"entities":[{"key":"e1","entity_type":"unit","display_label":"EXACT SOURCE LABEL",'
-            '"evidence_ids":["SUPPLIED EVIDENCE UUID"]}],"claims":[{"key":"c1","subject_key":"e1",'
+            '"evidence_ids":["S1"]}],"claims":[{"key":"c1","subject_key":"e1",'
             '"predicate":"capability","typed_literal":{"type":"string","value":"SOURCE CAPABILITY"},'
-            '"statement":"SUPPORTED STATEMENT","evidence_ids":["SUPPLIED EVIDENCE UUID"]}],"gaps":[]}. '
-            "Cite only supplied evidence IDs. Existing entity IDs only from existing_entities. "
+            '"statement":"SUPPORTED STATEMENT","evidence_ids":["S1"]}],"gaps":[]}. '
+            "Cite only supplied S1, S2 support references in evidence_ids. Never invent UUIDs. "
+            "Entity fields are key, entity_type, display_label, evidence_ids and optional existing_entity_id; "
+            "do not add role, affiliation, expertise or description fields: express these as claims. "
+            "Missing details in this batch are batch-local observations, never claims about all sources. "
+            "Existing entity IDs only from existing_entities. "
             "An explicitly stated general capability is worth extracting even when no product "
             "model, clinical trial, partner or technology detail is named. Do not omit an explicit "
             "unit and its capability merely because those optional details are missing. "
@@ -192,10 +201,11 @@ class ApertusReasoningServices:
             "Extraction does not establish fit to every company need; the separate fit assessment "
             "decides relevance. Never add those missing specifics to the claim.",
             {"context": {"needs": interpretation.needs, "constraints": interpretation.constraints},
-             "evidence": [{"evidence_id": str(e.evidence_id), "title": e.title,
+             "evidence": [{"evidence_id": support_keys[e.evidence_id], "title": e.title,
                            "language": e.language, "heading_path": e.heading_path, "literal_text": e.literal_text}
                           for e in evidence.values()],
-             "existing_entities": research.existing_entities}, ExtractionBatch, context, check=check)
+             "existing_entities": research.existing_entities}, ExtractionResponse, context, check=check)
+        return canonical_batch(response, references)
 
     async def assess(self, claims: PersistedClaims, evidence: list[EvidenceRecord],
                      context: RunContext) -> EvidenceAssessment:
@@ -262,18 +272,28 @@ class ApertusReasoningServices:
                 gaps.append(f"Claim {claim.claim_id} lacks complete supported assessment/evidence.")
         if not accepted:
             gaps.append("No supported match was established in the supplied research scope.")
+        supported_count = len(accepted)
         matches, arguments = [], []
         if accepted:
-            accepted_ids = {c.claim_id for c in accepted}
+            references = {f"C{i+1}": c.claim_id for i, c in enumerate(accepted)}
+            references.update({str(c.claim_id): c.claim_id for c in accepted})
+            support_keys = {c.claim_id: f"C{i+1}" for i, c in enumerate(accepted)}
             fit_support = {key for claim in accepted for key in claim.evidence_ids}
             def check_fit(value):
                 for match in value.matches:
-                    if (match.need_index >= len(interpretation.needs)
-                            or not set(match.claim_ids) <= accepted_ids
-                            or (match.kind == "adjacent" and not match.prerequisites)):
-                        raise ValueError()
+                    if match.need_index >= len(interpretation.needs):
+                        raise ValueError(f"need_index must be zero-based and less than {len(interpretation.needs)}")
+                    if not set(match.claim_ids) <= references.keys():
+                        raise ValueError("claim_ids must use supplied C1, C2 claim references, never evidence IDs")
+                    if match.kind == "adjacent" and not match.prerequisites:
+                        raise ValueError("Adjacent matches require explicit prerequisites; do not delete a supported partial match to avoid them")
             fit = await self.tasks.run("fit_opportunities", "Assess need-to-capability fit using "
                 "only accepted claims and supplied literal support. Exclude irrelevant claims. "
+                "A capability need can be addressed independently: a match need not satisfy every need. "
+                "Missing named people, device specifications or clinical validation do not erase an "
+                "explicit unit capability. Facilities need not be shared by every requested institution. "
+                "Respect exclusions; retain narrow documented matches and caveat absent details. "
+                "Use the short supplied C1, C2 claim_ids, never evidence IDs. "
                 "For each useful match supply the zero-based need_index and accepted claim_ids, "
                 "a concise rationale and a potential benefit explicitly conditional on its "
                 "prerequisites. Separate direct fit from adjacent transfer; adjacent matches need "
@@ -281,20 +301,29 @@ class ApertusReasoningServices:
                 "clinical/economic effect, partnership or expert availability. Return gaps for "
                 "uncovered needs. Empty matches are valid when no useful fit is supported.",
                 {"interpretation": interpretation.model_dump(mode="json"),
-                 "claims": [c.model_dump(mode="json") for c in accepted],
+                 "need_options": [{"need_index": i, "need": need}
+                                  for i, need in enumerate(interpretation.needs)],
+                 "claims": [{**c.model_dump(mode="json"), "claim_id": support_keys[c.claim_id]} for c in accepted],
                  "evidence": [e.model_dump(mode="json") for key, e in evidence.items() if key in fit_support]},
                 Opportunities, context, check=check_fit)
+            fit = fit.model_copy(update={"matches": [m.model_copy(update={
+                "claim_ids": [str(references[key]) for key in m.claim_ids]}) for m in fit.matches]})
             matches = [m.model_dump(mode="json") for m in fit.matches]
             arguments = [{"need": interpretation.needs[m.need_index],
                 "claim_ids": [str(c) for c in m.claim_ids], "potential_benefit": m.potential_benefit,
                 "kind": m.kind, "prerequisites": m.prerequisites} for m in fit.matches]
-            used = {c for m in fit.matches for c in m.claim_ids}
+            used = {UUID(c) for m in fit.matches for c in m.claim_ids}
             accepted = [c for c in accepted if c.claim_id in used]
-            gaps.extend(fit.gaps)
+            gaps.extend(f"Fit assessment (assessed supported claims only; not a corpus-wide absence): {gap}"
+                        for gap in fit.gaps)
             if not accepted:
-                gaps.append("Supported source facts did not establish a relevant capability match.")
+                gaps.append("Supported source facts were found, but the fit assessment established no match to the requested needs. This does not establish absence of relevant expertise; relevance remains unresolved within the assessed coverage.")
         # Authoritative dates/URLs/source flags are copied from C, never model-made.
-        coverage = {"evidence_ids": [str(e) for e in evidence], "sources": [
+        from backend.observability.logging import event
+        event("fit.supported_claims", run_id=context.run_id, count=supported_count)
+        event("fit.matches", run_id=context.run_id, count=len(matches))
+        coverage = {"fit_assessment": {"supported_claim_count": supported_count,
+                    "matched_claim_count": len(accepted), "match_count": len(matches)}, "evidence_ids": [str(e) for e in evidence], "sources": [
             {"evidence_id": str(e.evidence_id), "url": e.url, "title": e.title,
              "origin": e.origin, "review_status": e.review_status,
              "fetched_at": e.fetched_at.isoformat(),

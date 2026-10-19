@@ -13,23 +13,14 @@ async def extract_batches(extract, interpretation, research, context):
     records = list(unique.values())
     if not records or interpretation.blocking_questions:
         return await extract(interpretation, research, context)
-    # Keep each source's identity/header support beside its retrieved passage.
-    groups = {}
-    for record in records:
-        groups.setdefault(record.document_version_id, []).append(record)
-    records = [record for group in groups.values() for record in sorted(group, key=lambda e: e.char_start)]
-    batches, current, size, gaps = [], [], 0, []
-    for record in records:
-        if len(record.literal_text) > 18000:
-            gaps.append("A source passage exceeds the extraction context budget; it was not assessed.")
-            continue
-        if current and (len(current) == 12 or size + len(record.literal_text) > 18000):
-            batches.append(current)
-            current, size = [], 0
-        current.append(record)
-        size += len(record.literal_text)
-    if current:
-        batches.append(current)
+    from backend.evidence.extraction_selection import select_batches
+    batches, oversized = select_batches(records, research.hits)
+    gaps = (["A source passage exceeds the extraction context budget; it was not assessed."]
+            if oversized else [])
+    from backend.observability.logging import event
+    event("extraction.available_batches", run_id=context.run_id, count=len(batches))
+    event("extraction.selected_documents", run_id=context.run_id,
+          count=len({e.document_version_id for batch in batches[:6] for e in batch}))
     if len(batches) > 6:
         gaps.append("Extraction batch budget reached; remaining passages were not assessed.")
     entities, claims, valid = [], [], 0
@@ -58,6 +49,8 @@ async def extract_batches(extract, interpretation, research, context):
             gaps.append("Extraction entity/claim budget reached; remaining passages were not assessed.")
             break
         if isinstance(answer, InvalidModelOutput):
+            event("extraction.batch_excluded", run_id=context.run_id, attempt=index+1,
+                  error_code="invalid_model_output")
             last_error = answer
             gaps.append("A source batch did not produce valid extraction after repair; its claims were excluded.")
             continue
@@ -75,7 +68,10 @@ async def extract_batches(extract, interpretation, research, context):
         entities.extend(e.model_copy(update={"key": prefix+e.key}) for e in selected)
         claims.extend(c.model_copy(update={"key": prefix+c.key, "subject_key": prefix+c.subject_key,
             "object_key": prefix+c.object_key if c.object_key is not None else None}) for c in kept)
-        gaps.extend(batch.gaps)
+        # A batch cannot establish absence across the entire corpus. Keep its
+        # observation explicitly scoped, even if the model words it globally.
+        gaps.extend(f"Within extraction batch {index+1} only (not a corpus-wide finding): {gap}"
+                    for gap in batch.gaps)
     if not valid and last_error:
         raise last_error
     return ExtractionBatch(entities=entities, claims=claims, gaps=list(dict.fromkeys(gaps)))

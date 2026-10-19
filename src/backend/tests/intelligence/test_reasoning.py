@@ -147,6 +147,10 @@ def test_no_fit_is_honest_no_match(context, interpretation, claim, evidence):
     pack = run(service.propose_pack(interpretation, PersistedClaims(claims=[claim]), assessment(claim),
         ResearchBundle(evidence=[evidence]), context))
     assert not pack.claims and pack.outcome == "no_match"
+    assert pack.coverage["fit_assessment"] == {
+        "supported_claim_count": 1, "matched_claim_count": 0, "match_count": 0}
+    assert any("relevance remains unresolved" in gap for gap in pack.gaps)
+    assert any(gap.startswith("Fit assessment (assessed supported claims only;") for gap in pack.gaps)
 
 
 def test_pack_only_drafting_and_exact_hash_assessment(context, interpretation, claim, pdf_input):
@@ -301,3 +305,41 @@ def test_draft_failure_cannot_be_overridden_by_positive_explanation(context, int
     findings['caveats'][0]['preserved'] = False
     service, _ = services(findings)
     assert run(service.assess_draft(pdf_input.draft, pack, context)).status == 'unsupported'
+
+
+def test_extraction_short_support_references_resolve_exact_ids(context, interpretation, evidence):
+    response = {'entities': [{'key': 'e1', 'entity_type': 'unit', 'display_label': 'Example Laboratory',
+                             'evidence_ids': ['S1']}], 'claims': [], 'gaps': []}
+    service, model = services(response)
+    result = run(service.extract(interpretation, ResearchBundle(evidence=[evidence]), context))
+    assert result.entities[0].evidence_ids == [evidence.evidence_id]
+    assert '"evidence_id":"S1"' in model.calls[0][-1].content
+
+
+def test_extraction_unknown_support_alias_cannot_create_evidence(context, interpretation, evidence):
+    response = {'entities': [{'key': 'e1', 'entity_type': 'unit', 'display_label': 'Example Laboratory',
+                             'evidence_ids': ['S999']}], 'claims': [], 'gaps': []}
+    service, _ = services(response, response)
+    with pytest.raises(InvalidModelOutput):
+        run(service.extract(interpretation, ResearchBundle(evidence=[evidence]), context))
+
+
+def test_fit_short_claim_aliases_resolve_without_weakening_support(context, interpretation, claim, evidence):
+    response = fit(claim)
+    response['matches'][0]['claim_ids'] = ['C1']
+    service, model = services(response)
+    pack = run(service.propose_pack(interpretation, PersistedClaims(claims=[claim]), assessment(claim),
+        ResearchBundle(evidence=[evidence]), context))
+    assert pack.claims == [claim]
+    assert pack.matches[0]['claim_ids'] == [str(claim.claim_id)]
+    assert '"claim_id":"C1"' in model.calls[0][-1].content
+
+
+def test_fit_unknown_claim_alias_is_repaired_with_targeted_diagnostic(context, interpretation, claim, evidence):
+    bad = fit(claim)
+    bad['matches'][0]['claim_ids'] = ['S1']
+    service, model = services(bad, fit(claim))
+    pack = run(service.propose_pack(interpretation, PersistedClaims(claims=[claim]), assessment(claim),
+        ResearchBundle(evidence=[evidence]), context))
+    assert pack.claims == [claim]
+    assert 'never evidence IDs' in model.calls[1][-1].content

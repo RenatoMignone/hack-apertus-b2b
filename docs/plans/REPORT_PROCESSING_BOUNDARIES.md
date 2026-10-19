@@ -18,7 +18,16 @@
 | Export | Authorized review + current revision → PDF / enabled PPTX | Deterministic renderer; access/hash checks before render and download |
 
 Independent extraction batches run at most two model calls concurrently, consumed
-in deterministic source order. Batch, entity/claim and repair limits remain bounded.
+in deterministic document round-robin order. Each document first contributes a
+retrieval-ranked passage and literal identity context; later passages compete in
+subsequent passes. At most six batches, twelve spans / 18,000 characters per batch
+are assessed. Batch, entity/claim and repair limits remain bounded.
+Extraction gaps are explicitly scoped to their batch; fit gaps to assessed claims.
+Neither establishes absence across unassessed sources. Model-only S1/C1 references
+map to supplied canonical evidence/claim IDs before existing validation/persistence.
+Fit can address one need independently; optional missing details do not erase a
+narrow documented capability. Empty fit retains no invented cards and records
+supported/matched claim counts in coverage, with explicit unresolved-fit wording.
 The literal-object schema exposes required `type` / `value` keys explicitly.
 
 Use batched task calls by responsibility (interpret/extract/assess/draft), rather
