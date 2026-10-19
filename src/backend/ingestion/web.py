@@ -7,6 +7,7 @@ import ipaddress
 import socket
 import ssl
 import json
+from threading import Lock
 from time import monotonic
 from urllib.parse import urljoin, urlsplit, urlunsplit
 from urllib.parse import urlencode
@@ -14,7 +15,6 @@ from urllib.robotparser import RobotFileParser
 
 from backend.contracts.data import content_hash
 from backend.contracts.pipeline import FetchedSource, canonical_url
-from backend.observability.logging import activity, event
 
 from backend.contracts.services import BudgetExceeded, ServiceUnavailable, WebResearchResult
 from backend.ingestion.normalize import normalize
@@ -40,6 +40,9 @@ class SafeHTTP:
         self.max_redirects, self.allowed_hosts, self.resolver = max_redirects, set(allowed_hosts), resolver
         self.min_interval = min_interval
         self.last_request = {}
+        # Fixed-size stripes serialize requests to the same host even across
+        # redirects and concurrent case fetches. No unbounded lock registry.
+        self.request_locks = tuple(Lock() for _ in range(64))
 
     def target(self, url):
         normalized = canonical_url(url)
@@ -53,6 +56,16 @@ class SafeHTTP:
         return normalized, parts, addresses[0][4][0]
 
     def _request(self, url, deadline):
+        host = urlsplit(canonical_url(url)).hostname
+        lock = self.request_locks[hash(host) % len(self.request_locks)]
+        if not lock.acquire(timeout=max(0, deadline - monotonic())):
+            raise TimeoutError("network politeness deadline exceeded")
+        try:
+            return self._serialized_request(url, deadline)
+        finally:
+            lock.release()
+
+    def _serialized_request(self, url, deadline):
         normalized, parts, address = self.target(url)
         remaining = deadline - monotonic()
         if remaining <= 0:
@@ -131,6 +144,7 @@ class Crawl4AIFetcher:
         self.transport = transport
         self.python_executable = python_executable
         self.observations = OrderedDict()
+        self.observations_lock = Lock()
 
     def fetch(self, url):
         observation = self.transport.fetch(url)
@@ -145,9 +159,10 @@ class Crawl4AIFetcher:
         source = FetchedSource(title=document.title, url=observation.requested_url, canonical_url=observation.final_url,
             content=body, content_hash=content_hash(body.encode()), fetched_at=observation.fetched_at,
             published_at=document.published_at)
-        self.observations[(source.canonical_url, source.content_hash)] = observation
-        while len(self.observations) > 64:
-            self.observations.popitem(last=False)
+        with self.observations_lock:
+            self.observations[(source.canonical_url, source.content_hash)] = observation
+            while len(self.observations) > 64:
+                self.observations.popitem(last=False)
         return source
 
 
@@ -200,17 +215,9 @@ class PublicWebTools:
         if len(urls) > self.max_pages:
             raise BudgetExceeded()
         key = (context.access.principal_id, context.run_id, context.request_id)
-        sources, limitations = [], list(self.discovery_limitations.get(key, []))
-        for index, url in enumerate(dict.fromkeys(urls)):
-            self._budget(context)
-            try:
-                remaining = (context.deadline_at - datetime.now(timezone.utc)).total_seconds()
-                async with activity("web.page", run_id=context.run_id, attempt=index+1, count=len(urls)), asyncio.timeout(max(0.001, remaining)):
-                    sources.append(await asyncio.to_thread(self.fetcher.fetch, canonical_url(url)))
-            except ServiceUnavailable:
-                limitations.append("crawl4ai_unavailable")
-            except (ValueError, OSError, TimeoutError, UnicodeError):
-                limitations.append("source_fetch_failed_or_policy_denied")
+        from backend.ingestion.page_fetch import fetch_pages
+        sources, failures = await fetch_pages(self.fetcher, list(dict.fromkeys(urls)), context, self._budget)
+        limitations = [*self.discovery_limitations.get(key, []), *failures]
         return WebResearchResult(status="completed" if sources else "unavailable" if "crawl4ai_unavailable" in limitations else "failed",
             sources=sources, limitations=list(dict.fromkeys(limitations)))
 

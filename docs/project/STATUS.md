@@ -45,7 +45,8 @@ of all permissions, corpus completeness or report quality.
 
 ## Latest runtime corrections
 
-297 disposable-backend tests pass, including real SQL timeout/savepoint recovery;
+303 disposable-backend tests pass, including real SQL timeout/savepoint recovery
+and bounded concurrent page fetching;
 the last frontend verification passed 24 tests/build. The original long
 HelioSense request passed live interpretation after excluding nonliteral optional
 lead annotations. Registration now bounds large source span sets before the
@@ -58,6 +59,11 @@ Default runtime search now preserves a surviving authorized branch when the othe
 hits its SQL statement timeout, carrying an explicit coverage limitation into the
 pack. Both timing out still fails, and explicit evaluation strategies never degrade.
 This bounds the failure impact; it does not establish faster shared-host SQL.
+
+Web fetch/conversion now overlaps up to three pages while preserving per-host HTTP
+spacing, exact source policy checks, discovery order and shared tool budgets. Tests
+verify concurrency, failure accounting and queued-task cancellation; actual live
+latency and combined report acceptance still require measurement.
 
 The developer-created acceptance cases were cancelled to free the queue for manual
 testing; a fresh latest-code case through report/review/PDF is not yet certified.

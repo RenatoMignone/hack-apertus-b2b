@@ -61,6 +61,12 @@ visible. Offline mode forbids it.
 Default: ten page attempts per round, eleven total tool operations per run
 (discovery plus attempted pages). Follow-up rounds share that budget; failed fetches
 consume it. Ten is a bounded model/context choice, not a search-engine limit.
+Page fetch/conversion runs at most three tasks concurrently per fetch invocation;
+results retain discovery order. The HTTP transport serializes actual requests to
+each host (including redirect/robots targets), preserving the configured request
+spacing. Each admitted page consumes the existing shared run budget, including
+failures; cancellation stops queued tasks. Already-running blocking operations
+remain bounded by their transport/converter timeouts.
 Time, text and model-token limits still apply. The graph finalizes partial supported
 work when resources are insufficient.
 
