@@ -1,5 +1,12 @@
 # Project documentation
 
+**Judges and first-time users:** start with the
+[B to Bern (B2B) guide](judges/README.md) for Team Stregoni's product overview,
+setup, walkthrough, architecture and verification. The root
+[technical report](../technical_report.md) is the delivery draft; the
+[release checklist](judges/DELIVERY.md) tracks unfinished submission artifacts.
+The engineering records below retain their original dates and verification scope.
+
 **18 October 2026 · Backend lanes and HTTP frontend integrated; live deployment pending.**
 Bern Economic Development Agency — Research & Expertise Navigator.
 Current pilot: Bern diabetes technology; the engine must support other domains

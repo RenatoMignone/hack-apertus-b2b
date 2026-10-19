@@ -17,8 +17,10 @@ The following files and directory must keep their names and positions:
 
 Additional working context lives in `docs/`; this pass adds a root `AGENTS.md`
 router without moving or renaming the template. M2 itself points to `docs/` for
-architecture diagrams. The root placeholders remain unchanged until the team
-has actual project details and evidence to report.
+architecture diagrams. The root README and technical report are now populated
+with B to Bern (B2B), Team Stregoni and dated implementation evidence. The report
+remains a delivery draft; see the [judge guide](../judges/README.md) and
+[release checklist](../judges/DELIVERY.md). No final PDF or submission is implied.
 
 M1 requires the repository to originate from the template, become public for
 submission, and run end-to-end when judges try it. Local files do not prove the

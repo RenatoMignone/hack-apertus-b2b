@@ -7,7 +7,7 @@ and [open questions](../project/OPEN_QUESTIONS.md).
 
 | Document | Use now |
 | --- | --- |
-| [Eric runtime performance prompt](prompts/07_SHARED_RUNTIME_PERFORMANCE.md) | Migration 0012 transfer/rollout, restricted-role plans and measured capture/search performance; unpublished local fixes remain Renato-owned |
+| [Eric runtime performance prompt](prompts/07_SHARED_RUNTIME_PERFORMANCE.md) | Migration 0012 rollout, restricted-role plans and measured capture/search performance; runtime integration fixes remain Renato-owned |
 | [Research completion branch](BACKEND_RESEARCH_COMPLETION.md) | Activity-label fix, gap queries, reranking, recorded lineage and current acceptance limits |
 | [Current backend checklist](RUNTIME_CHECKLIST.md) | Current 14-area readiness and remaining live/output gaps |
 | [INTEGRATION.md](INTEGRATION.md) | Current merged baseline, reviewed tips, fixes and dated verification |

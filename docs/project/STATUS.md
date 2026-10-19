@@ -11,7 +11,9 @@ locks; runtime-only bounded lock/idle waits, batched board summaries and batched
 corpus-alias duplicate checks are added.
 Lease renewal no longer waits for the case write lock. The preferred dark
 quick-start panel is restored; no additional redesign was performed. Changes
-remain local/unpublished; API/worker restart activates the latest safeguards.
+are integrated on main (`88f5b75`); API/worker restart activates the latest safeguards.
+The judge-documentation branch is merged with its historical test receipts
+preserved and the current integration checks added. Shared migration remains pending.
 [Changes, limits and required maintainer rollout](../team/RUNTIME_FEEDBACK_AND_SEARCH.md).
 
 **Local performance patch — 19 October:** source 0011 removes the quadratic

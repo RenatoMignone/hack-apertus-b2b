@@ -12,14 +12,14 @@ Renato owns current API/worker/lease, source-registration, model-adapter and
 frontend integration changes. Do not independently rewrite those files or the
 frontend. Coordinate any needed new migration number with Renato before writing it.
 
-**Renato's changes are currently local, not pushed.** Fetching main alone does
-not supply migration 0012. Obtain the exact reviewed migration file or the
-migration-only `.local/runtime-handoff/0012_membership_lookup.patch` from Renato
-through the team's existing transfer channel. Preserve local changes and apply
-with `git apply --check` before `git apply` on an appropriate checkout. If 0012
-already exists with different contents, stop and reconcile the collision; never
-overwrite or stamp a revision. Do not apply the patch if main already contains
-the identical file. Shared host was last verified at `0011_capture_performance`.
+Runtime integration commit **88f5b75** includes migration 0012 and the application
+fixes. Fetch main and merge/fast-forward it while preserving your ongoing ingestion
+work and private env. Verify that your checkout contains that commit and the
+migration before rollout; do not assume an older main has them. If a different
+0012 exists locally, reconcile the collision with Renato; never overwrite or
+stamp a revision. A migration-only patch was also prepared for private transfer,
+but do not apply it when the same file is already in your updated checkout.
+Shared host was last verified at `0011_capture_performance`.
 
 ## Observed problem
 

@@ -180,8 +180,9 @@ Renato's ignored private env has this flag enabled; teammates choose their own m
 
 ## Eric's rollout
 
-1. Preserve ingestion work/private configuration. Changes are local and unpublished
-   at the user's request; pull integrated `main` only after publication is authorized.
+1. Preserve ingestion work/private configuration and update from integrated
+   `main`, including runtime commit `88f5b75`. The user authorized publication
+   after this integration and verification; confirm the commit is in your checkout.
 2. Coordinate a brief pause of application submissions and use the approved
    maintainer command: `navigator --env-file PRIVATE_MAINTAINER_ENV db-migrate`.
    Confirm `0012_membership_lookup`; lock wait remains three seconds. Do not widen
@@ -197,8 +198,9 @@ Full copyable maintainer task: [Eric's runtime performance prompt](prompts/07_SH
 Remote refs were fetched twice during this follow-up: `origin/main` remained
 072f099, `feat/my-desk` 065bf28 and `ui-polish` f690464 were already ancestors of
 local main. No new UI commits needed merging. The only newly discovered branch,
-`codex/b2b-delivery-docs` f53c4bc, edits judge/root submission documents and was
-left separate from this functionality task. Existing local changes were preserved.
+`codex/b2b-delivery-docs` f53c4bc, edits judge/root submission documents. The user's
+subsequent instruction to merge everything authorized integrating that branch too;
+both desk and B2B decisions were retained as D28/D29. Existing work was preserved.
 
 ### Final browser checks
 

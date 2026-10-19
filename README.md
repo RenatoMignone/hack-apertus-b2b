@@ -1,22 +1,50 @@
-# Hack Apertus Liebefeld — `challenge name`, `team name`
+# B to Bern (B2B) — Research & Expertise Navigator
 
-Template repository for [Hack Apertus](https://hackapertus.ch/) submissions.
-Every project keeps the same layout, so organizers and judges find the same
-things in the same place.
+B2B helps Bern economic-development staff turn a company's research needs into
+source-backed reasons to explore Bern. Describe the company in ordinary language,
+inspect relevant expertise, units and infrastructure, then keep the strongest
+matches and export a reviewed “Why Bern?” brief.
 
-There are 3 challenges to pick from:
-1. Bern Economic Development Agency: Research & Expertise Navigator
-2. OpenParlData: Topic classification for Swiss parliaments with Apertus
-3. University of Bern: Deciphering Archives with Apertus
+Built for the **Bern Economic Development Agency** challenge at
+[Hack Apertus](https://hackapertus.ch/). The pilot connects public research from
+the University of Bern, ARTORG and Diabetes Center Berne, focusing on diabetes
+technology. Apertus v1.5 interprets intent, prepares and assesses evidence, and
+drafts cited reasons. Staff inspect the sources and decide what to include.
 
-`One paragraph describing the challenge.`
+**Team Stregoni:** Renato Mignone, Elia Innocenti, Eric Ruiz Giménez,
+Mohamed Kechiche.
+
+**Judges: [start here](docs/judges/README.md).**
+
+- [Run the demo or connected application](docs/judges/QUICKSTART.md)
+- [Follow the product walkthrough](docs/judges/DEMO.md)
+- [Understand the architecture](docs/judges/ARCHITECTURE.md)
+- [Inspect verification and limitations](docs/judges/VERIFICATION.md)
+- [Read the technical report](technical_report.md)
+
+**Delivery snapshot — 19 October 2026:** authenticated HTTP application,
+LangGraph worker, hybrid retrieval, source inspection and reviewed PDF export are
+implemented. A real-provider partial report and PDF are recorded; broad retrieval
+quality and the proposed air-gapped target are not certified. A seeded UI demo runs
+without credentials; real research requires provisioned services and corpus access.
+PowerPoint, manual plans and own-case comparison require explicit backend activation.
+Demo URL, final report PDF and independent live access remain delivery items in the
+[release checklist](docs/judges/DELIVERY.md).
 
 Submissions must use the v1.5 Apertus model family.
 The submission must comply with the [HackApertus T&C](https://hackapertus.ch/terms-and-conditions).
 
 ## 🎯 The Challenge
 
-`Fill in the title of the challenge you picked and link the Notion challenge page (URL)`
+**Bern Economic Development Agency — Research & Expertise Navigator.**
+Research information is scattered across institutional websites and uses specialist
+terminology. B2B bridges everyday needs and scientific language while keeping public
+factual statements attached to exact source passages.
+
+The [challenge page](https://hackapertus.notion.site/bern-economic-development-agency)
+and [supplied challenge snapshot](docs/challenge/CHALLENGE_BRIEF.md) define the
+requirements. The challenge's 80% top-10 recall target is an evaluation goal,
+not a measured B2B result.
 
 ## 🔧 Resources & Tools
 
@@ -88,7 +116,21 @@ Each dimension is scored from 0 to 5.
 
 ## Getting started
 
-1. Click **Use this template** to create your own repository.
+For a credential-free UI tour, install Node 22.18+. From the repository root,
+use PowerShell:
+
+```powershell
+cd src/frontend
+npm ci
+$env:VITE_API_MODE = 'mock'
+npm run dev -- --host 127.0.0.1
+```
+
+Open the local URL Vite prints (normally `http://127.0.0.1:5173`). The
+[quickstart](docs/judges/QUICKSTART.md#1-seeded-ui-demo-no-services-or-credentials)
+provides Bash commands and mode-switching instructions. This is scripted sample content, not live Apertus
+research. For the default authenticated HTTP mode and local synthetic backend,
+follow the same quickstart. Never put credentials in `VITE_*` variables.
 
 ## License
 

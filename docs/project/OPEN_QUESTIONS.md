@@ -67,7 +67,7 @@ records the evidence; real corpus retrieval quality remains unmeasured.
 | O24 / Q09 | Additional Bern organizations/people/companies and confirmed locality | Add evidence-backed entities within selected scope; membership is not proof of local presence |
 | O25 / Q10 | Source/recording redistribution rights and exact Open Commons terms | Keep supplied materials/transcripts intact; avoid automatic publication; challenge-only branding |
 | O26 / Q11,Q12 | Current submission package, report reference count, live pitch/Q&A and cutoff | Confirm current organizer instructions; historical deadlines/video limits are not live-pitch requirements |
-| O27 / Q13 | Final team/project name, submission account, remote ancestry/visibility | Use actual team choices; preserve submission template; no publish/push without authorization |
+| O27 / Q13 | Submission account and remote ancestry/visibility | Product B to Bern (B2B), team Stregoni and four member credits confirmed by the user on 19 October 2026; see D29. Preserve submission layout; no publish/push without authorization |
 
 Update this register when a question is resolved, with date, source, selected
 behavior, affected interfaces and verification. Keep unmeasured recommendations
