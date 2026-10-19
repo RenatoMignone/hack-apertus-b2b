@@ -74,13 +74,8 @@ export default function NewCasePage() {
               onClick={submit}
               disabled={!text.trim() || busy}
             >
-<<<<<<< HEAD
               {busy ? 'Starting…' : 'Start research'} <ArrowUp size={15} aria-hidden />
             </RadixButton>
-=======
-              {busy ? 'Starting…' : 'Start'} <ArrowUp size={15} aria-hidden />
-            </button>
->>>>>>> origin/feat/my-desk
           </div>
         </Card>
 
