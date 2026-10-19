@@ -1,7 +1,7 @@
 {
   "date": "2026-10-19",
   "baseline_revision": "bb82e1b",
-  "code_revision": "pending commit",
+  "code_revision": "4ded62c7e6db62c02c77ea341083865d71919541",
   "migration": {
     "applied": "0013_retrieval_scope_sets",
     "previous": "0012_membership_lookup",
@@ -27,14 +27,23 @@
     "session_user": "dev_ren",
     "namespace": "artorg_trial_20261018",
     "rolsuper": false,
-    "rolbypassrls": false
+    "rolbypassrls": false,
+    "principal_id": "802d003e-1585-4e74-8262-50703a36887f"
   },
   "snapshot_chunks": 144268,
   "conditions": {
     "cache": "not flushed; repeated runs and separate EXPLAIN reruns warm caches",
     "load": "shared Windows/WSL2 Docker host; ingestion continued; no isolation guarantee",
     "embedding": "same cached real HF EmbeddingGemma2 768d vectors; no provider time in SQL figures",
-    "ranking": "exact cosine; no ANN, reranker, Apertus or web calls"
+    "ranking": "exact cosine; no ANN, reranker, Apertus or web calls",
+    "later_windows_host_sample": {
+      "during": "integrated regression, not SQL measurements",
+      "cpu_percent": 18,
+      "physical_ram_total_kib": 16608960,
+      "physical_ram_free_kib": 910816,
+      "disk_queue": 0,
+      "formatted_disk_latency": "rounded zero; not a useful fine latency estimate"
+    }
   },
   "baseline": [
     {
@@ -170,7 +179,7 @@
     "equal": true
   },
   "full_adapter": {
-    "seconds": 6.9291,
+    "seconds": 6.8117,
     "queries": 6,
     "hits": 30,
     "timeout_limitations": false,
@@ -185,8 +194,12 @@
     "wrong_namespace_denied": true
   },
   "regression": {
-    "backend_tests": "303 passed in177.51s before integrating latest main; final integrated rerun pending",
-    "database": "disposable only; never navigator"
+    "backend_tests": 310,
+    "passed": true,
+    "seconds": 157.63,
+    "warnings": "one existing pytest-asyncio event_loop_policy deprecation",
+    "database": "uniquely created disposable PostgreSQL/pgvector only; never navigator",
+    "schema_reference_check": true
   },
   "limitations": [
     "Original unfactored eligibility EXPLAIN still times out at30s even after policy migration; runtime restructuring is required.",
@@ -1299,6 +1312,105 @@
           }
         ]
       }
+    },
+    "after-lexical-matching-plan.json": {
+      "Execution Time": 1189.687,
+      "Planning Time": 4.801,
+      "Plan": {
+        "Node Type": "Nested Loop",
+        "Plan Rows": 4,
+        "Actual Rows": 32,
+        "Actual Loops": 1,
+        "Actual Total Time": 1189.634,
+        "Shared Hit Blocks": 6110,
+        "Shared Read Blocks": 22216,
+        "Local Hit Blocks": 91,
+        "Local Read Blocks": 37,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Seq Scan",
+            "Relation Name": "search_documents",
+            "Plan Rows": 4,
+            "Actual Rows": 32,
+            "Actual Loops": 1,
+            "Actual Total Time": 1189.19,
+            "Shared Hit Blocks": 6110,
+            "Shared Read Blocks": 22216,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Rows Removed by Filter": 291112,
+            "Plans": [
+              {
+                "Node Type": "Seq Scan",
+                "Relation Name": "chunks",
+                "Plan Rows": 73705,
+                "Actual Rows": 147326,
+                "Actual Loops": 1,
+                "Actual Total Time": 39.877,
+                "Shared Hit Blocks": 1478,
+                "Shared Read Blocks": 5744,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Rows Removed by Filter": 0,
+                "Plans": [
+                  {
+                    "Node Type": "ProjectSet",
+                    "Plan Rows": 100,
+                    "Actual Rows": 2,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 0.284,
+                    "Shared Hit Blocks": 7,
+                    "Shared Read Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Result",
+                        "Plan Rows": 1,
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Actual Total Time": 0.001,
+                        "Shared Hit Blocks": 0,
+                        "Shared Read Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0,
+                        "Plans": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Node Type": "Index Only Scan",
+            "Relation Name": "navigator_retrieval_eligible",
+            "Index Name": "navigator_retrieval_eligible_chunk_id_idx",
+            "Plan Rows": 1,
+            "Actual Rows": 1,
+            "Actual Loops": 32,
+            "Actual Total Time": 0.011,
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Local Hit Blocks": 91,
+            "Local Read Blocks": 37,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": []
+          }
+        ]
+      }
     }
-  }
+  },
+  "integrated_revision": "3f2fd5591b18d6840cc8cab0966b2949fe7ec798"
 }

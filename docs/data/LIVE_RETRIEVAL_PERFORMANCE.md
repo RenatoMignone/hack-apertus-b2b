@@ -3,8 +3,8 @@
 The failing capture now completes six-input SQL retrieval in **6.04–7.43 seconds**
 in three final measurements, with exact dense ranking. Both original branches
 previously exceeded their 30-second statement timeout, including with one input.
-The complete RRF adapter returned 30 hydrated, evidence-linked hits in **6.93 s**
-(another run: 9.54 s), without timeout limitations. These measurements exclude
+The complete RRF adapter returned 30 hydrated, evidence-linked hits in **6.81 s**
+after integrating newer main (earlier runs: 6.93/9.54 s), without timeout limitations. These measurements exclude
 cached query encoding and optional reranking, and do not certify a complete report.
 
 [Machine-readable acceptance receipt and sanitized plan trees](../evaluation/retrieval-performance-20261019.json)
@@ -32,6 +32,11 @@ excluded. Source code and schema changes must both be deployed for these results
   7.67 GiB. A 1.24-second diskstats sample observed five completed I/Os averaging
   about 5 ms; this small sample cannot establish general disk performance.
   Host/ingestion contention is possible, not proven absent or the primary cause.
+- A later native Windows sample during regression testing reported 18% CPU,
+  0.87 GiB free physical RAM out of 15.84 GiB and disk queue zero. CIM's formatted
+  disk-second counters rounded to zero and provide no useful fine latency estimate.
+  This is not simultaneous with the final SQL samples; host memory pressure is a
+  remaining source of variability, not grounds to declare the host unloaded.
 
 The same private credentials used a local `127.0.0.1:5432` route on the DB host;
 Renato's usual tunnel configuration remains unchanged. Apertus and web were not
@@ -123,7 +128,7 @@ foreign-principal spoofing is denied and wrong-namespace access returns nothing.
 No foreign-owner case currently exists on the live DB, so live cross-owner case
 probing is unavailable; that negative case is exercised on disposable DBs.
 Regression tests never target `navigator` and no broad privilege was granted.
-Final regression: **303 backend tests passed** in 177.51 s on disposable
+Final integrated regression: **310 backend tests passed** in 157.63 s on disposable
 PostgreSQL/pgvector. One existing pytest-asyncio deprecation warning remains.
 
 ## Deployment and Renato restart

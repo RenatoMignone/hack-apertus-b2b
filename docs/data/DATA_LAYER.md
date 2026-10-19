@@ -29,4 +29,6 @@ stay owned by the case; publication is an explicit corpus-owner operation.
 Full-text and vector retrieval operate independently over the same authorized
 membership. Graph expansion uses supported entity relationships in relational
 claims. The model supplies no SQL. Current source migration is
-`0012_membership_lookup`; installed-host revision must be checked independently.
+`0013_retrieval_scope_sets`; installed-host revision must be checked independently.
+Shared-host 0013 rollout and restricted-role retrieval measurements are recorded in
+[live retrieval performance](LIVE_RETRIEVAL_PERFORMANCE.md).

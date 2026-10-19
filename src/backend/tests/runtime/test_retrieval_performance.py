@@ -131,5 +131,3 @@ def test_reserved_relation_collision_is_not_reused(live_users):
             with c.begin_nested():
                 HybridSearch(BoundEngine(c), FixtureEmbedder()).search(access, plan)
         assert c.execute(text("SELECT count(*) FROM pg_temp.navigator_retrieval_members")).scalar_one() == 0
-
-
