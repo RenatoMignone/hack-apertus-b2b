@@ -43,6 +43,14 @@ class ReportRequest(Input):
     instruction: str = Field(default="Create a concise cited draft", min_length=1, max_length=10_000)
 
 
+class MemoryRequest(Input):
+    expected_revision: int = Field(ge=0)
+    expected_result_hash: str | None = Field(default=None, pattern=r'^[a-f0-9]{64}$')
+    eligible: bool
+    synthetic: bool = True
+    permitted_context_confirmed: bool = False
+
+
 class SetSelection(Input):
     selection: Selection
     expected_result_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
@@ -184,6 +192,7 @@ class CaseDetail(BaseModel):
     inputId: str
     selectionHash: str | None = None
     currentRun: dict | None = None
+    memory: dict = Field(default_factory=dict)
 
 
 class Accepted(BaseModel):

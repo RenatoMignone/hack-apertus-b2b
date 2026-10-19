@@ -109,7 +109,7 @@ class Worker:
         await self.db("mark_run", access, run_id, "running")
         async with self.checkpoints(access, run_id) as (saver, config):
             graph = build_graph(self.store, self.services.reasoning, self.services.backbone,
-                                self.services.web, saver, self.tracer)
+                                self.services.web, saver, self.tracer, memory=self.services.memory)
             config = {**config, "recursion_limit": 120}
             snapshot = await graph.aget_state(config)
             if snapshot.values and not snapshot.next:

@@ -4,12 +4,12 @@ See docs/data/SCHEMA_REFERENCE.md for the generated field inventory and
 INGESTION_RETRIEVAL_HANDOFF.md for the supported write/search path.
 """
 from sqlalchemy import (Boolean, CheckConstraint, Column, DateTime, ForeignKey, ForeignKeyConstraint,
-                        Index, Integer, MetaData, Table, Text, UniqueConstraint, text)
+                        Index, Integer, MetaData, Table, Text, UniqueConstraint, text, cast)
 from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 from pgvector.sqlalchemy import Vector
 
 
-SCHEMA_REVISION = "0008_live_corpus"
+SCHEMA_REVISION = "0009_case_memory"
 
 metadata = MetaData(naming_convention={"ix": "ix_%(table_name)s_%(column_0_name)s",
                                       "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -54,6 +54,17 @@ cases = table("cases", "cases", "case_id", uid("owner_id", "ops.principals.princ
                                    deferrable=True, initially="DEFERRED", use_alter=True),
               ForeignKeyConstraint(["current_result_id"], ["cases.result_revisions.result_id"], name="current_result_fk",
                                    deferrable=True, initially="DEFERRED", use_alter=True))
+case_memory = table('cases', 'memory_profiles', 'memory_id', uid('case_id', 'cases.cases.case_id'),
+    uid('input_id', 'cases.input_revisions.input_id'), uid('result_id', 'cases.result_revisions.result_id'),
+    uid('owner_id', 'ops.principals.principal_id'), value('namespace'), value('projection_hash'),
+    value('embedding_config_hash'), value('dimension', Integer), value('embedding', Vector()), payload(),
+    value('enabled', Boolean, default=text('true')),
+    CheckConstraint('dimension > 0 AND vector_dims(embedding)=dimension', name='memory_dimension_matches'),
+    UniqueConstraint('case_id', 'input_id', 'projection_hash', 'embedding_config_hash'))
+Index('ix_memory_owner_config', case_memory.c.owner_id, case_memory.c.namespace, case_memory.c.embedding_config_hash)
+Index('ix_memory_vector_768', cast(case_memory.c.embedding, Vector(768)).label('embedding'),
+    postgresql_using='hnsw', postgresql_ops={'embedding': 'vector_cosine_ops'},
+    postgresql_where=case_memory.c.dimension == 768)
 scopes = table("corpus", "scopes", "scope_id", value("kind"),
                uid("case_id", "cases.cases.case_id", nullable=True), value("access_policy_id"),
                value("revoked", Boolean, default=text("false")),

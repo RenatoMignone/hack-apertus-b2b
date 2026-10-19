@@ -22,8 +22,9 @@ def load_factory(spec, *, settings, engine, artifacts):
 
 
 class Services:
-    def __init__(self, *, reasoning, backbone, web=None, pdf=None):
+    def __init__(self, *, reasoning, backbone, web=None, pdf=None, memory=None):
         self.reasoning, self.backbone, self.web, self.pdf = reasoning, backbone, web, pdf or Unavailable()
+        self.memory = memory
 
     @classmethod
     def configured(cls, settings, engine, artifacts):
@@ -34,4 +35,10 @@ class Services:
             pdf=adapter(settings.pdf_factory))
         from backend.application.factories import connect_observations
         connect_observations(services.backbone, services.web)
+        if settings.case_memory_enabled:
+            from backend.application.case_memory import CaseMemory
+            from backend.application.factories import ConfiguredEmbedding
+            from backend.application.persistence.store import RuntimeStore
+            services.memory = CaseMemory(RuntimeStore(engine, settings, artifacts), ConfiguredEmbedding(settings),
+                minimum_score=settings.case_memory_min_score)
         return services

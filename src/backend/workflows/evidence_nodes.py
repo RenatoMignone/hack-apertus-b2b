@@ -107,6 +107,15 @@ class PipelineNodes(ResearchNodes):
     async def freeze_pack(self, state):
         execution = self.execution(state)
         pack = ReportEvidencePack.model_validate(state["pack"])
+        if self.memory:
+            from backend.contracts.services import ServiceUnavailable
+            try:
+                matches = await execution.call('similar_cases', {'input_id': str(execution.context.input_id)},
+                    lambda: self.memory.search(execution.context.access, execution.context.case_id, pack.interpretation))
+                pack = pack.model_copy(update={'coverage': {**pack.coverage, 'similar_cases': matches}})
+            except ServiceUnavailable:
+                pack = pack.model_copy(update={'gaps': [*pack.gaps, 'case_memory_unavailable'],
+                    'outcome': 'partial' if pack.claims else 'no_match'})
         assessment = EvidenceAssessment.model_validate(state["assessment"])
         from backend.workflows.lineage import search_trace
         research = ResearchBundle.model_validate(state["research"])

@@ -30,6 +30,16 @@ class RuntimeApplication:
                 # Read access/hash checked by repositories above; source projections come from C.
                 evidence.update({record.evidence_id: record for record in records})
         projected = case_view(data, list(sorted(evidence.values(), key=lambda record: str(record.evidence_id))))
+        if self.services.memory:
+            identities = {match['memoryId'] for revision in projected['revisions'] for match in revision['similarCases']}
+            visible = await asyncio.to_thread(self.services.memory.visible_ids, access, identities)
+            for revision in projected['revisions']:
+                revision['similarCases'] = [match for match in revision['similarCases'] if match.get('memoryId') in visible]
+            projected['memory'] = await asyncio.to_thread(self.services.memory.state, access, case_id)
+        else:
+            for revision in projected['revisions']:
+                revision['similarCases'] = []
+            projected['memory'] = {'available': False, 'eligible': False}
         current = data["case"]["current_result_id"]
         if current:
             projected["selectionHash"] = await self.execute("selection_state", access, case_id, current)

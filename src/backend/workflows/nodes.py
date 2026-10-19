@@ -13,8 +13,9 @@ from backend.workflows.research import merged, public_query, research_tools
 
 
 class ResearchNodes:
-    def __init__(self, store, reasoning, backbone, web, tracer=None):
+    def __init__(self, store, reasoning, backbone, web, tracer=None, *, memory=None):
         self.store, self.reasoning, self.backbone, self.web, self.tracer = store, reasoning, backbone, web, tracer
+        self.memory = memory
 
     def execution(self, state):
         return Execution(self.store, RunContext.model_validate(state["context"]), self.tracer)

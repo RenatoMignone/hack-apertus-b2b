@@ -40,8 +40,8 @@ class CaseState(TypedDict, total=False):
     round_started_at: str
 
 
-def build_graph(store, reasoning, backbone, web, checkpointer, tracer=None):
-    nodes = PipelineNodes(store, reasoning, backbone, web, tracer)
+def build_graph(store, reasoning, backbone, web, checkpointer, tracer=None, *, memory=None):
+    nodes = PipelineNodes(store, reasoning, backbone, web, tracer, memory=memory)
     graph = StateGraph(CaseState)
     policy = RetryPolicy(initial_interval=.2, max_interval=1, max_attempts=2, retry_on=ServiceUnavailable)
     mapping = {"interpret": nodes.interpret, "ask_clarification": nodes.questions, "clarify": nodes.clarify,

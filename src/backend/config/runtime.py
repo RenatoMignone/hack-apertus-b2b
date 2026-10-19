@@ -67,10 +67,14 @@ class RuntimeSettings:
     web_browser_executable: str = ""
     web_browser_timeout_seconds: int = 25
     web_crawl4ai_python: str = ""
+    case_memory_enabled: bool = False
+    case_memory_min_score: float = 50
 
     def __post_init__(self):
         if self.corpus_mode not in {"live", "published"}:
             raise ValueError("RUNTIME_CORPUS_MODE must be live or published")
+        if not 0 <= self.case_memory_min_score <= 100:
+            raise ValueError('case memory minimum similarity must be 0–100')
         if self.mode not in {"connected", "offline"} or not 1 <= self.max_research_rounds <= 3:
             raise ValueError("invalid deployment mode or research budget")
         if not 1 <= self.deadline_seconds <= 3600 or not 0 <= self.max_tool_calls <= 30:
@@ -142,4 +146,6 @@ class RuntimeSettings:
             web_search_engines=tuple(n.strip() for n in os.getenv("WEB_SEARCH_ENGINES", "duckduckgo,yahoo").split(",") if n.strip()),
             web_browser_executable=os.getenv("WEB_BROWSER_EXECUTABLE", ""),
             web_browser_timeout_seconds=int(os.getenv("WEB_BROWSER_TIMEOUT_SECONDS", "25")),
-            web_crawl4ai_python=os.getenv("WEB_CRAWL4AI_PYTHON", ""))
+            web_crawl4ai_python=os.getenv("WEB_CRAWL4AI_PYTHON", ""),
+            case_memory_enabled=os.getenv('CASE_MEMORY_ENABLED', '').lower() in {'1', 'true', 'yes'},
+            case_memory_min_score=float(os.getenv('CASE_MEMORY_MIN_SCORE', '50')))

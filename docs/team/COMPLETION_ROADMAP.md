@@ -9,7 +9,7 @@ comes first; agency-wide sharing is deferred. Confidential documents remain out.
 | --- | --- | --- |
 | 1 | Retrieval-quality evaluation and performance measurements | Complete; focused tests + live read-only smoke passed |
 | 2 | Source validation/tagging tooling on isolated data | Complete; 12 focused tests passed |
-| 3 | Own-case similarity | In progress |
+| 3 | Own-case similarity | Complete backend; optional migration/activation pending |
 | 4 | Domain-independent configuration | Queued |
 | 5 | Local DB/web and actual checkpoint restart tests | Queued |
 | 6 | Reviewed PPTX and richer attributed case/output fields | Queued |
@@ -39,3 +39,10 @@ curation/ingestion tests passed on disposable data. No shared corpus was modifie
 
 Point 6 decision: the user selected **manual entry only for v1** for planned jobs,
 investment/currency and timeline. No automatic model extraction of business figures.
+
+## Checkpoint 3
+
+[Own-case memory](../data/CASE_MEMORY.md) adds explicit reviewed opt-in, immutable
+versioned profiles, owner/configuration filters, indexed cosine shortlisting and
+frozen matches. Frontend controls are handed off to its owner. Shared schema 0008
+remains supported with the feature disabled; Eric must apply 0009 before activation.

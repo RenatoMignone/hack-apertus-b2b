@@ -43,11 +43,14 @@ def migrate(engine) -> None:
             connection.commit()
 
 
-def check_schema(engine) -> None:
+def check_schema(engine, *, require_latest=False) -> None:
     expected = ScriptDirectory.from_config(migration_config()).get_current_head()
     with engine.connect() as connection:
         actual = MigrationContext.configure(connection).get_current_revision()
-    if actual != expected:
+    # Only explicitly additive optional releases may coexist with the proven
+    # core baseline. Feature services separately require their own tables.
+    compatible = {'0008_live_corpus', '0009_case_memory'}
+    if actual != expected and (require_latest or actual not in compatible or expected not in compatible):
         raise RuntimeError(f"schema revision {actual!r} is incompatible; maintainer must migrate to {expected}")
 
 

@@ -4,7 +4,8 @@
 Additive [integration changes](../team/INTEGRATION.md) advance head to
 `0007_frontend_lifecycle`: 0006 adds restricted case-scope provisioning/private
 runtime RLS, and 0007 adds independent case hold/outcome fields and action notes.
-Historical migrations stay frozen; the shared host has not been migrated here.
+Optional [own-case memory](CASE_MEMORY.md) adds head `0009_case_memory`; shared
+0008 remains supported while disabled. Historical migrations stay frozen; the shared host has not been migrated here.
 One `navigator` database retains `corpus`, `taxonomy`, `retrieval`, `cases`, `ops`.
 LangGraph and Langfuse retain their own databases/stores. No three application
 DBs or cross-database foreign keys are introduced.

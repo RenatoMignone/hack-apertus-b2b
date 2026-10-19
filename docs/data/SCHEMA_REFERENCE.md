@@ -1,9 +1,9 @@
 # Exact application schema reference
 
-Generated from `src/backend/data/schema.py`; migration head **`0008_live_corpus`**.
+Generated from `src/backend/data/schema.py`; migration head **`0009_case_memory`**.
 Do not edit by hand. Regenerate with `PYTHONPATH=src python -m backend.data.schema_docs`.
 
-**63 application tables.** Read [schema decisions](RELATIONAL_SCHEMA.md) and
+**64 application tables.** Read [schema decisions](RELATIONAL_SCHEMA.md) and
 [ingestion/retrieval handoff](INGESTION_RETRIEVAL_HANDOFF.md) for meanings and write order.
 Only these tables are supported for new queries. `alembic_version` is migration-owned;
 optional `legacy` history is maintainer-only. Framework tables live outside this database.
@@ -785,6 +785,35 @@ Primary key: `interpretation_id`.
 
 - Unique: `run_id`.
 - Index: `run_id`.
+
+### `cases.memory_profiles`
+
+| Column | Type | Required | Default | References |
+| --- | --- | --- | --- | --- |
+| `memory_id` | `UUID` | yes | `—` | — |
+| `created_at` | `TIMESTAMP WITH TIME ZONE` | yes | `now()` | — |
+| `case_id` | `UUID` | yes | `—` | cases.cases.case_id |
+| `input_id` | `UUID` | yes | `—` | cases.input_revisions.input_id |
+| `result_id` | `UUID` | yes | `—` | cases.result_revisions.result_id |
+| `owner_id` | `UUID` | yes | `—` | ops.principals.principal_id |
+| `namespace` | `TEXT` | yes | `—` | — |
+| `projection_hash` | `TEXT` | yes | `—` | — |
+| `embedding_config_hash` | `TEXT` | yes | `—` | — |
+| `dimension` | `INTEGER` | yes | `—` | — |
+| `embedding` | `VECTOR` | yes | `—` | — |
+| `payload` | `JSONB` | yes | `'{}'::jsonb` | — |
+| `enabled` | `BOOLEAN` | yes | `true` | — |
+
+Primary key: `memory_id`.
+
+- Check: `dimension > 0 AND vector_dims(embedding)=dimension`.
+- Unique: `case_id, input_id, projection_hash, embedding_config_hash`.
+- Index: `case_id`.
+- Index: `input_id`.
+- Index: `owner_id`.
+- Index: `result_id`.
+- Index: `owner_id, namespace, embedding_config_hash`.
+- Index: `embedding` where `cases.memory_profiles.dimension = :dimension_1`.
 
 ### `cases.pack_claims`
 

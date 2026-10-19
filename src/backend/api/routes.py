@@ -83,6 +83,14 @@ async def create_report(case_id: UUID, body: s.ReportRequest, request: Request, 
     return await who.application.execute("report", who.access, key, case_id, body.model_dump(mode="json"), request.state.request_id)
 
 
+@router.post('/cases/{case_id}/memory')
+async def case_memory(case_id: UUID, body: s.MemoryRequest, who: Actor = Depends(actor), key=Depends(idempotency_key)):
+    from backend.contracts.services import ServiceUnavailable
+    if not who.application.services.memory:
+        raise ServiceUnavailable()
+    return await who.application.services.memory.set(who.access, case_id, key, body.model_dump(mode='json'))
+
+
 @router.get("/cases/{case_id}/runs/{run_id}/matches")
 async def matches(case_id: UUID, run_id: UUID, who: Actor = Depends(actor)):
     return await who.application.execute("run_content", who.access, case_id, run_id)

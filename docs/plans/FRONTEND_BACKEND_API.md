@@ -127,3 +127,13 @@ Selection/export still bind the current result hash and reviewed selection hash.
 Cards resolve sources from both line and entry citations, including empty entries.
 No-match coverage/gaps remain visible. `facility`/`service` subjects map to the
 additive `infrastructure` reason category. Optional structured fields stay absent.
+
+## Optional own-case memory — backend addition, 19 October 2026
+
+See [API, eligibility and score semantics](../data/CASE_MEMORY.md). The backend
+returns `memory.available/eligible` and existing `revisions[].similarCases`.
+Frontend owner: offer an explicit permitted/non-synthetic opt-in only after exact
+review, call POST `/cases/{id}/memory` with the documented attestations/revision/
+result hash, and allow opt-out. Hide controls when unavailable. Display score as
+an uncalibrated similarity index out of 100, not a percentage probability; show
+index date/differences. New fields are additive; no frontend files were changed.
