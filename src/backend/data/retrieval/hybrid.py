@@ -109,6 +109,7 @@ class HybridSearch:
                 raise ValueError('embedding batch must cover every query exactly')
             vectors = [validate_vector(value, pin['dimension']) for value in encoded]
         lexical, vector, rows_by_id, query_matches = {}, {}, {}, {}
+        branch_limitations = []
         with transaction(self.engine, access) as connection:
             connection.execute(text("SELECT set_config('statement_timeout', "
                 "least(coalesce(nullif(setting::int,0),30000),30000)::text,true) "
@@ -121,12 +122,26 @@ class HybridSearch:
             from backend.data.retrieval import batched
             parameters['search_hash'] = connection.execute(select(tables.builds.c.search_config_hash).where(
                 tables.builds.c.build_id == plan.build_id)).scalar_one()
-            with timed('retrieval.lexical', run_id=plan.run_id, query_count=len(queries)):
-                lexical_rows = [] if self.strategy == 'dense' else batched.lexical(
-                    connection, ELIGIBLE, parameters, queries, configs)
-            with timed('retrieval.vector', run_id=plan.run_id, query_count=len(queries)):
-                vector_rows = [] if self.strategy == 'lexical' else batched.dense(
-                    connection, ELIGIBLE, parameters, vectors)
+            from backend.data.retrieval.branches import run_branch
+            lexical_rows, vector_rows = [], []
+            operations = []
+            if self.strategy != 'dense':
+                operations.append(('lexical', lambda: batched.lexical(
+                    connection, ELIGIBLE, parameters, queries, configs)))
+            if self.strategy != 'lexical':
+                operations.append(('vector', lambda: batched.dense(
+                    connection, ELIGIBLE, parameters, vectors)))
+            for name, operation in operations:
+                rows, limitation = run_branch(connection, name, operation,
+                    allow_partial=self.default_strategy, run_id=plan.run_id, query_count=len(queries))
+                if name == 'lexical':
+                    lexical_rows = rows
+                else:
+                    vector_rows = rows
+                if limitation:
+                    branch_limitations.append(limitation)
+            if len(branch_limitations) == len(operations):
+                raise ServiceUnavailable()
             for index, query in enumerate(queries):
                 for branch, all_rows in ((lexical, lexical_rows), (vector, vector_rows)):
                     rows = [row for row in all_rows if row['idx'] == index]
@@ -197,6 +212,6 @@ class HybridSearch:
             from backend.data.database import require_scope
             for scope_id in {row["scope_id"] for row in rows_by_id.values()}:
                 require_scope(connection, scope_id)
-        return SearchResult(hits=hits, limitations=["scores_are_not_confidence"]
+        return SearchResult(hits=hits, limitations=["scores_are_not_confidence", *branch_limitations]
             + (["live_corpus_incomplete_coverage"] if pin["status"] == "live" else [])
             + (["reranker_unavailable"] if (self.default_strategy or self.strategy == 'reranked') and reranked is None else []))

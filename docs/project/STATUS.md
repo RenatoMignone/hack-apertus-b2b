@@ -45,13 +45,19 @@ of all permissions, corpus completeness or report quality.
 
 ## Latest runtime corrections
 
-289 disposable-backend tests and 24 frontend tests/build pass. The original long
+297 disposable-backend tests pass, including real SQL timeout/savepoint recovery;
+the last frontend verification passed 24 tests/build. The original long
 HelioSense request passed live interpretation after excluding nonliteral optional
 lead annotations. Registration now bounds large source span sets before the
 100-record reader, with explicit omissions; it passed that stage on live data.
 Search variants share authorized branch projections, literal validation is batched,
 metadata reuse is request-local, and extraction runs two independent batches at
 once. No scope/support checks are waived. Shared revision 0012 was read-only verified.
+
+Default runtime search now preserves a surviving authorized branch when the other
+hits its SQL statement timeout, carrying an explicit coverage limitation into the
+pack. Both timing out still fails, and explicit evaluation strategies never degrade.
+This bounds the failure impact; it does not establish faster shared-host SQL.
 
 The developer-created acceptance cases were cancelled to free the queue for manual
 testing; a fresh latest-code case through report/review/PDF is not yet certified.

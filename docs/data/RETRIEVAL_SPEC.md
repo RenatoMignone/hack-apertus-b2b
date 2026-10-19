@@ -27,6 +27,15 @@ rebuilding a query per row. Dense search uses pgvector cosine distance; only
 compatible vectors are comparable. An ANN index must preserve eligible recall
 under filtering; never widen authorization to fill candidates.
 
+Each SQL branch runs inside a savepoint with a statement timeout capped at
+30 seconds (a stricter role timeout is preserved). In the default runtime strategy,
+a PostgreSQL statement timeout rolls back only that branch; the other branch can
+still return authorized results. `lexical_search_timeout` or
+`vector_search_timeout` is carried into research limitations and pack gaps, even
+if the surviving branch finds nothing. Both branches timing out is a service
+failure. Other SQL errors still fail. Explicit evaluation strategies fail on any
+branch timeout, so benchmark results never silently measure a different strategy.
+
 For each chunk, fuse its best rank within each branch:
 
 ```text
