@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, Download, MessageSquare } from 'lucide-react';
 import { api, apiMode } from '../api';
 import type { BriefRevision, CaseDetail, CaseStatus, RunStage, Selection } from '../types/contract';
-import ChatPanel from '../components/ChatPanel';
+import ChatPanel, { type Suggestion } from '../components/ChatPanel';
 import EvidenceDrawer from '../components/EvidenceDrawer';
 import ExportModal from '../components/ExportModal';
 import Results from '../components/Results';
@@ -95,7 +95,7 @@ function JumpBar({ revision }: { revision: BriefRevision }) {
   ].filter(Boolean) as [string, string][];
   if (links.length < 2) return null;
   return (
-    <nav aria-label="Sections" className="sticky top-0 z-10 -mx-6 mb-4 flex gap-1.5 overflow-x-auto border-b border-line bg-canvas/95 px-6 py-2 backdrop-blur">
+    <nav aria-label="Sections" className="no-scrollbar fade-right sticky top-0 z-10 -mx-6 mb-4 flex gap-1.5 overflow-x-auto border-b border-line bg-canvas/95 px-6 py-2 backdrop-blur">
       {links.map(([id, label]) => (
         <a key={id} href={`#sec-${id}`} className="shrink-0 rounded-full bg-white px-3 py-1 text-sm text-muted ring-1 ring-line hover:text-ink">
           {label}
@@ -105,12 +105,12 @@ function JumpBar({ revision }: { revision: BriefRevision }) {
   );
 }
 
-/** Chat shortcuts that match this case instead of fixed strings. */
-function suggestionsFor(revision?: BriefRevision): string[] {
-  if (!revision?.reasons.length) return ['Explain simpler'];
+/** Up to three chat shortcuts for this case: a short label, the full instruction sent. */
+function suggestionsFor(revision?: BriefRevision): Suggestion[] {
+  const s = (label: string, text = label) => ({ label, text });
+  if (!revision?.reasons.length) return [s('Explain simpler')];
   const idea = revision.reasons.find((r) => r.category === 'ideas')?.entries[0]?.name;
-  const group = revision.reasons.find((r) => r.category === 'groups')?.entries[0]?.name;
-  return ['Make it shorter', idea && `Exclude ${idea}`, group && `Focus on ${group}`, 'Can we contact them?'].filter(Boolean) as string[];
+  return [s('Make it shorter'), ...(idea ? [s('Drop the idea', `Exclude ${idea}`)] : []), s('Can we contact them?')];
 }
 
 export default function CaseWorkspace() {
