@@ -1,7 +1,7 @@
 import type { CaseDetail } from '../types/contract';
 
 const messages: Record<string, string> = {
-  authentication_required: 'Your access token was rejected. Disconnect and reconnect with a valid token.',
+  authentication_required: 'Your access token was rejected. Reconnect with a valid token.',
   service_unavailable: 'A required backend service is unavailable. Check the worker and server configuration.',
   storage_unavailable: 'The database or artifact store is unavailable.',
   stale_revision: 'This case changed. Reload it before trying again.',
@@ -12,7 +12,7 @@ const messages: Record<string, string> = {
 };
 
 export function failureMessage(code?: string): string {
-  return code && messages[code] || 'The request could not be completed. Please try again.';
+  return code && Object.prototype.hasOwnProperty.call(messages, code) ? messages[code] : 'The request could not be completed. Please try again.';
 }
 
 export function canReusePack(detail: Pick<CaseDetail, 'currentRun' | 'inputId'>): boolean {

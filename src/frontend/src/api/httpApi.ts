@@ -1,3 +1,4 @@
+import { rejectAccess } from './session.ts';
 import { publishObservation } from './observation.ts';
 import { canReusePack, failureMessage } from './recovery.ts';
 import { nextPollDelay, publishProgress } from './progress.ts';
@@ -24,10 +25,15 @@ export class ConnectionError extends Error {
 export class ApiError extends Error {
   status: number;
   code: string;
-  constructor(status: number, code: string) {
-    super(failureMessage(code));
+  retryable?: boolean;
+  requestId?: string;
+  constructor(status: number, code: string, metadata: {retryable?: unknown; requestId?: unknown} = {}) {
+    const safeCode = typeof code === 'string' && /^[a-z][a-z0-9_]{0,79}$/.test(code) ? code : 'service_unavailable';
+    super(failureMessage(safeCode));
     this.status = status;
-    this.code = code;
+    this.code = safeCode;
+    this.retryable = typeof metadata.retryable === 'boolean' ? metadata.retryable : undefined;
+    this.requestId = typeof metadata.requestId === 'string' && /^[a-zA-Z0-9_-]{1,100}$/.test(metadata.requestId) ? metadata.requestId : undefined;
   }
 }
 
@@ -72,11 +78,18 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
           redirect: 'error', cache: 'no-store', signal: controller.signal,
           body: body === undefined ? undefined : JSON.stringify(body) });
         signal?.throwIfAborted();
+        if (credential !== token()) throw new ApiError(401, 'authentication_required');
         if (!response.ok) {
           const payload = await response.json().catch(() => ({}));
-          throw new ApiError(response.status, payload.error?.code ?? 'service_unavailable');
+          if (response.status === 401) rejectAccess();
+          throw new ApiError(response.status, payload.error?.code ?? 'service_unavailable', {
+            retryable:payload.error?.retryable, requestId:payload.request_id ?? response.headers.get('X-Request-ID'),
+          });
         }
-        return (blob ? await response.blob() : await response.json()) as T;
+        const value = (blob ? await response.blob() : await response.json()) as T;
+        signal?.throwIfAborted();
+        if (credential !== token()) throw new ApiError(401, 'authentication_required');
+        return value;
       } catch (error) {
         signal?.throwIfAborted();
         if (error instanceof ApiError) throw error;
@@ -87,10 +100,12 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     throw new Error('Cannot reach the backend.');
   }
 
+  let detailCredential = token();
   const detailRequests = new Map<string, Promise<CaseDetail | null>>();
   async function loadCase(id: string): Promise<CaseDetail | null> {
     try {
       const detail = await request<CaseDetail>(path(id));
+      publishObservation(id, 'connected');
       lastOpened = id;
       return detail;
     } catch (error) {
@@ -99,9 +114,10 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
     }
   }
   function getCase(id: string): Promise<CaseDetail | null> {
+    if (detailCredential !== token()) { detailRequests.clear(); detailCredential = token(); }
     const existing = detailRequests.get(id);
     if (existing) return existing;
-    const promise = loadCase(id).finally(() => { detailRequests.delete(id); });
+    const promise = loadCase(id).finally(() => { if (detailRequests.get(id) === promise) detailRequests.delete(id); });
     detailRequests.set(id, promise);
     return promise;
   }
@@ -130,7 +146,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
         return value;
       }
       catch (error) {
-        const transient = error instanceof ConnectionError || error instanceof ApiError && [502, 503, 504].includes(error.status);
+        const transient = error instanceof ConnectionError || error instanceof ApiError && [502, 503, 504].includes(error.status) && error.retryable !== false;
         if (signal?.aborted) throw error;
         if (caseId) publishObservation(caseId, error instanceof ApiError && error.status === 401
           ? 'authentication_required' : transient && attempt < 3 ? 'reconnecting' : 'disconnected');
@@ -281,6 +297,7 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
       if (existing) return existing;
       const pending = pendingExports.get(key) ?? {reviewKey:crypto.randomUUID(), exportKey:crypto.randomUUID()};
       pendingExports.set(key, pending);
+      const dropPending = () => { if (pendingExports.get(key) === pending) pendingExports.delete(key); };
       const task = (async () => {
         try {
           if (!pending.reviewId) {
@@ -297,26 +314,26 @@ export function createHttpApi({ baseUrl = '', token, fetcher = fetch,
             pending.url = queued.status_url;
           }
           for (let n = 0; n < maxPolls; n++) {
-            const operation = await observe<Operation>(pending.url, undefined, caseId);
+            const operation = await observe<Operation>(pending.url, undefined, `${caseId}:export`);
             if (operation.status === 'failed') {
-              pendingExports.delete(key);
+              dropPending();
               throw new ApiError(409, operation.error_code ?? 'service_unavailable');
             }
             if (operation.status === 'committed' && operation.download_url) {
-              const blob = await observe<Blob>(operation.download_url, undefined, caseId, true);
+              const blob = await observe<Blob>(operation.download_url, undefined, `${caseId}:export`, true);
               const mime = format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
               if (!blob.type.startsWith(mime)) throw new Error('The server returned an unexpected export format.');
-              pendingExports.delete(key);
+              dropPending();
               return {filename:`bern-report-${result.id}.${format}`, blob};
             }
             await pause(pollInterval);
           }
           throw new Error('Report rendering is still pending. Retry export to reconnect to the accepted operation.');
         } catch (error) {
-          if (error instanceof ApiError && [404,409,422].includes(error.status)) pendingExports.delete(key);
+          if (error instanceof ApiError && [404,409,422].includes(error.status)) dropPending();
           throw error;
         }
-      })().finally(() => { exporting.delete(key); });
+      })().finally(() => { if (exporting.get(key) === task) exporting.delete(key); });
       exporting.set(key, task);
       return task;
     },

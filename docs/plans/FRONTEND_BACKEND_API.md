@@ -66,3 +66,18 @@ Errors contain a safe stable code, message, retryable flag and request ID.
 401 reconnects; 404 conceals foreign resources; 409 reloads stale state; 422 is
 validation; 413 is size; 502 invalid model output; 503 unavailable infrastructure.
 A failed service is not no-match. Never expose raw SQL/provider bodies to users.
+
+
+## Browser recovery
+
+Observation reads use bounded transient retries and stop on navigation or rejected
+credentials. A reconnect reloads run state; completed work is returned directly.
+Case/session operation guards discard obsolete responses. State conflicts reload
+current data without replaying selections or edits. Typed chat/answers remain in
+memory through reconnect; full reload restores saved server state only.
+
+Export retries reuse the accepted operation or uncertain submission key within the
+current authenticated session and exact hashes. This reference is memory-only;
+a full reload may require a new render. Server review and download authorization
+remain mandatory. Safe retryability/request IDs reach diagnostics; raw error
+messages/details are not rendered. See the [acceptance receipt](../project/FRONTEND_RECOVERY.md).

@@ -1,3 +1,5 @@
+import { sessionVersion, subscribeSession } from '../api/session';
+import { ApiError } from '../api/httpApi';
 import { observationStatus, subscribeObservation } from '../api/observation';
 import { OperationScope } from '../api/operationScope';
 import { failureMessage, isStateConflict, recoveryAction } from '../api/recovery';
@@ -124,6 +126,9 @@ export default function CaseWorkspace() {
   const [detail, setDetail] = useState<CaseDetail | null | undefined>(undefined);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState('');
+  const [chatDraft, setChatDraft] = useState('');
+  const [answerDrafts, setAnswerDrafts] = useState<Record<string,string>>({});
+  useEffect(() => { setChatDraft(''); setAnswerDrafts({}); }, [id]);
   const [stage, setStage] = useState<RunStage>('interpreting');
   const [drawer, setDrawer] = useState<string | null>(null);
   const [flash, setFlash] = useState<Set<string>>(new Set());
@@ -131,6 +136,7 @@ export default function CaseWorkspace() {
   const started = useRef(false);
   const [viewedRevisionId, setViewedRevisionId] = useState<string>();
   const [selecting, setSelecting] = useState(false);
+  const session = useSyncExternalStore(subscribeSession, sessionVersion);
   const connection = useSyncExternalStore(subscribeObservation, () => observationStatus(id));
   const scope = useRef(new OperationScope(id));
   scope.current.reset(id);
@@ -170,7 +176,7 @@ export default function CaseWorkspace() {
       if (ticket.current()) setError(reason instanceof Error ? reason.message : 'Cannot load this case.');
     });
     return () => { scope.current.stop(); busy.current = false; };
-  }, [id]);
+  }, [id, session]);
 
   const refreshConflict = async (reason: unknown, current = scope.current.capture()) => {
     if (!isStateConflict(reason)) return;
@@ -187,6 +193,8 @@ export default function CaseWorkspace() {
     busy.current = false;
     setRunning(false);
     setError(reason instanceof Error ? reason.message : 'The request could not be completed.');
+    if (reason instanceof ApiError && !isStateConflict(reason)) reportApiError(reason);
+    if (reason instanceof ApiError && reason.status === 401) return;
     if (isStateConflict(reason)) { void refreshConflict(reason, current); return; }
     void api.getCase(id).then((value) => { if (current()) setDetail(value); }).catch((error) => { if (current()) reportApiError(error); });
   };
@@ -212,7 +220,7 @@ export default function CaseWorkspace() {
       if (!ticket.current()) return;
       busy.current = false; setDetail(d); setRunning(false);
     }).catch((reason) => { if (ticket.current()) failed(reason, ticket.current); });
-    return () => { scope.current.stop(); };
+    return () => { ticket.cancel(); };
   }, [detail?.case.id, location.state, id]);
 
   const revision = useMemo(
@@ -312,6 +320,8 @@ export default function CaseWorkspace() {
 
   const chat = (
     <ChatPanel key={id}
+      draft={chatDraft} onDraftChange={setChatDraft} answerDrafts={answerDrafts}
+      onAnswerDraft={(turnId,value) => setAnswerDrafts(previous => ({...previous,[turnId]:value}))}
       turns={detail.turns}
       running={locked}
       awaitingAnswers={awaitingAnswers}

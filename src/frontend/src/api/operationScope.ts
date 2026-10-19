@@ -13,6 +13,7 @@ export class OperationScope {
     this.stop();
     const generation = this.generation;
     const controller = this.controller = new AbortController();
-    return { signal: controller.signal, current: () => generation === this.generation && !controller.signal.aborted };
+    const current = () => generation === this.generation && !controller.signal.aborted;
+    return {signal:controller.signal, current, cancel:() => { if (current()) this.stop(); }};
   }
 }

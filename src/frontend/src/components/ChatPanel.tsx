@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { ArrowUp, PanelRightClose } from 'lucide-react';
 import type { DialogueTurn, RunStage } from '../types/contract';
 import RunStepper from './RunStepper';
@@ -20,10 +20,13 @@ function OperatorBubble({ text }: { text: string }) {
   );
 }
 
-function ClarificationAnswer({ turn, running, onAnswer }: {
+function ClarificationAnswer({ turn, running, onAnswer, draft, onDraft }: {
   turn: DialogueTurn; running: boolean; onAnswer: (turnId: string, answer: string) => void;
+  draft?: string; onDraft?: (value:string) => void;
 }) {
-  const [answer, setAnswer] = useState('');
+  const [localAnswer, setLocalAnswer] = useState('');
+  const answer = draft ?? localAnswer;
+  const setAnswer = onDraft ?? setLocalAnswer;
   if (!turn.followUp || turn.followUp.answer) return null;
   return <form className="space-y-2" onSubmit={(event) => {
     event.preventDefault();
@@ -54,6 +57,7 @@ export default function ChatPanel({
   awaitingAnswers = false,
   questionIds,
   canRewrite = false,
+  draft, onDraftChange, answerDrafts, onAnswerDraft,
 }: {
   turns: DialogueTurn[];
   running: boolean;
@@ -65,8 +69,12 @@ export default function ChatPanel({
   awaitingAnswers?: boolean;
   questionIds?: string[];
   canRewrite?: boolean;
+  draft?: string; onDraftChange?: Dispatch<SetStateAction<string>>;
+  answerDrafts?: Record<string,string>; onAnswerDraft?: (id:string,value:string) => void;
 }) {
-  const [text, setText] = useState('');
+  const [localText, setLocalText] = useState('');
+  const text = draft ?? localText;
+  const setText = onDraftChange ?? setLocalText;
   const [kind, setKind] = useState<'focus' | 'formatting'>('focus');
   const end = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLTextAreaElement>(null);
@@ -110,7 +118,7 @@ export default function ChatPanel({
             <div key={t.id} className="mr-8 space-y-2">
               <div className="rounded-2xl rounded-bl-sm bg-canvas px-3.5 py-2 text-sm leading-relaxed">{t.text}</div>
               {t.followUp?.answer && <p className="text-sm text-muted">Your answer: {t.followUp.answer}</p>}
-              {awaitingAnswers && (!questionIds || questionIds.includes(t.followUp?.id ?? '')) && <ClarificationAnswer turn={t} running={running} onAnswer={onAnswer} />}
+              {awaitingAnswers && (!questionIds || questionIds.includes(t.followUp?.id ?? '')) && <ClarificationAnswer turn={t} running={running} onAnswer={onAnswer} draft={answerDrafts?.[t.id]} onDraft={onAnswerDraft ? value => onAnswerDraft(t.id,value) : undefined} />}
             </div>
           ),
         )}

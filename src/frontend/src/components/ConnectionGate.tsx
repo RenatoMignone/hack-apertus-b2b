@@ -1,10 +1,13 @@
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Callout, Card, Spinner, TextField } from '@radix-ui/themes';
 import { apiBaseUrl, apiMode } from '../api';
-import { accessToken, setAccessToken, setCapabilities } from '../api/session';
+import { accessToken, setAccessToken, setCapabilities, authenticationRequired, subscribeSession } from '../api/session';
 import { Button } from './ui';
 
 export default function ConnectionGate({ children }: { children: ReactNode }) {
+  const needsAuth = useSyncExternalStore(subscribeSession, authenticationRequired);
+  const workspace = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (workspace.current) workspace.current.inert = needsAuth; }, [needsAuth]);
   const [connected, setConnected] = useState(false);
   const [checking, setChecking] = useState(apiMode !== 'mock');
   const [value, setValue] = useState('');
@@ -30,7 +33,7 @@ export default function ConnectionGate({ children }: { children: ReactNode }) {
       .finally(() => { if (alive) setChecking(false); });
     return () => { alive = false; clearTimeout(timeout); controller.abort(); };
   }, []);
-  if (apiMode === 'mock' || connected) return children;
+  if (apiMode === 'mock') return children;
   const connect = async () => {
     if (busy) return;
     setBusy(true); setError('');
@@ -41,7 +44,7 @@ export default function ConnectionGate({ children }: { children: ReactNode }) {
     } catch (reason) { setError(reason instanceof Error ? reason.message : 'Cannot reach the backend.'); }
     finally { setBusy(false); }
   };
-  return <main className="flex min-h-full items-center justify-center bg-canvas p-6">
+  const form = <main className="flex min-h-full items-center justify-center bg-canvas p-6">
     <Card size="4" className="w-full max-w-md">
       <h1 className="text-2xl font-semibold tracking-tight">Bern Navigator</h1>
       {checking ? <div role="status" className="mt-5 flex items-center gap-3 text-muted"><Spinner /> Connecting to your workspace…</div> :
@@ -54,4 +57,9 @@ export default function ConnectionGate({ children }: { children: ReactNode }) {
       </form>}
     </Card>
   </main>;
+  if (!connected) return form;
+  return <>
+    <div ref={workspace} className="h-full" aria-hidden={needsAuth || undefined}>{children}</div>
+    {needsAuth && <div role="dialog" aria-modal="true" aria-label="Reconnect workspace" className="fixed inset-0 z-[80] overflow-auto bg-canvas">{form}</div>}
+  </>;
 }

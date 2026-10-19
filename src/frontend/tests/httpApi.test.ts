@@ -285,3 +285,32 @@ test('uncertain export submission reuses its key across an explicit reconnect', 
   const keys = calls.filter(c => c.url.endsWith('/exports')).map(c => c.headers.get('Idempotency-Key'));
   assert.equal(keys.length,3); assert.equal(new Set(keys).size,1);
 });
+
+test('safe error metadata is preserved but provider bodies are never surfaced', async () => {
+  const {api}=harness(()=>Response.json({request_id:'req_123',error:{code:'storage_unavailable',retryable:true,
+    message:'PRIVATE provider body',details:[{secret:'never surface'}]}},{status:503}));
+  await assert.rejects(api.getCase('case'),(error:unknown)=>{
+    assert.ok(error instanceof ApiError); assert.equal(error.requestId,'req_123');
+    assert.equal(error.retryable,true);assert.equal(error.status,503);assert.equal(error.code,'storage_unavailable');
+    assert.doesNotMatch(error.message,/PRIVATE|secret/);return true;
+  });
+  const unsafe=new ApiError(503,'unknown',{requestId:'token=secret\nprovider',retryable:'true'});
+  assert.equal(unsafe.requestId,undefined);assert.equal(unsafe.retryable,undefined);
+});
+
+test('explicit nonretryable status reads stop rather than concealing the failure',async()=>{
+  let reads=0;const {api}=harness(url=>url.endsWith('/runs/run')
+    ? (++reads,Response.json({error:{code:'service_unavailable',retryable:false}},{status:503})) : detail());
+  await assert.rejects(api.runCase('case',()=>{}));assert.equal(reads,1);
+});
+
+test('a new authenticated session never coalesces an older pending detail read',async()=>{
+  let token='first', release!:(r:Response)=>void, reads=0;
+  const api=createHttpApi({token:()=>token,fetcher:async()=>{
+    if(++reads===1)return new Promise(resolve=>{release=resolve;});
+    return Response.json(detail());
+  }});
+  const old=api.getCase('case');const rejected=assert.rejects(old,ApiError);
+  token='second';await api.getCase('case');release(Response.json(detail()));await rejected;
+  assert.equal(reads,2);
+});

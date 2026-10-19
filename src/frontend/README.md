@@ -36,3 +36,19 @@ the backend; tests/build verify interaction contracts, not live research quality
 Failed-case messages persist through reload from the existing run error code.
 Retry labels and transport share the same predicate: only a failed run with a
 pack for the current input regenerates a report; other retries research again.
+
+
+Recovery distinguishes disconnected observation from failed server work. Status
+reads have bounded backoff; authentication failures stop observation and open a
+reconnect overlay. Navigation stops observation without cancelling server jobs.
+Late responses cannot overwrite newer case/session state. Revision conflicts
+reload state without replaying writes; chat/answer drafts remain memory-only.
+
+Export retries retain accepted operations and submission keys within the current
+session and exact reviewed hashes. A full reload loses that operation reference;
+all server review/download checks still apply. Safe request IDs are copyable,
+including errors displayed within the export dialog.
+
+`npm test` runs transport/helper tests and React interaction tests. The test-only
+browser proxy, reproduction commands and measured results are in the
+[recovery receipt](../../docs/project/FRONTEND_RECOVERY.md).

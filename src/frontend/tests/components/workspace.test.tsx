@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { Theme } from '@radix-ui/themes';
 import CaseWorkspace from '../../src/pages/CaseWorkspace';
 import ChatPanel from '../../src/components/ChatPanel';
+import { setAccessToken } from '../../src/api/session';
 import { ApiError } from '../../src/api/httpApi';
 import type { CaseDetail } from '../../src/types/contract';
 
@@ -108,4 +109,44 @@ it('a late selection response cannot replace a different case', async () => {
   fireEvent.click(screen.getByText('Other case'));await screen.findByRole('heading',{name:'Fictional b'});
   await act(async()=>selection.resolve(detail('a')));
   expect(screen.queryByRole('heading',{name:'Fictional a'})).toBeNull();
+});
+
+it('closing and reopening chat retains unsent instructions in memory',async()=>{
+  mount();const box=await screen.findByRole('textbox',{name:'Message the agent'});
+  fireEvent.change(box,{target:{value:'Do not lose my text'}});
+  fireEvent.click(screen.getByRole('button',{name:'Close chat'}));
+  fireEvent.click(screen.getByRole('button',{name:'Chat with the agent'}));
+  expect((screen.getByRole('textbox',{name:'Message the agent'}) as HTMLTextAreaElement).value).toBe('Do not lose my text');
+});
+
+it('a failed model step keeps the prior report and the submitted instruction',async()=>{
+  mount();const box=await screen.findByRole('textbox',{name:'Message the agent'});
+  const failed=detail();failed.currentRun={...failed.currentRun!,status:'failed',pack_id:'pack',error_code:'invalid_model_output'};
+  api.getCase.mockResolvedValue(failed);api.sendMessage.mockRejectedValue(new ApiError(502,'invalid_model_output'));
+  fireEvent.change(box,{target:{value:'Keep the caveats while rewriting'}});
+  await act(async()=>fireEvent.click(screen.getByRole('button',{name:'Send'})));
+  expect(screen.getByText('Fictional capability')).toBeTruthy();
+  expect((screen.getByRole('textbox',{name:'Message the agent'}) as HTMLTextAreaElement).value).toBe('Keep the caveats while rewriting');
+  expect(screen.getByRole('button',{name:'Retry report from existing evidence'})).toBeTruthy();
+});
+
+it('valid no-match is an outcome, not a backend failure or a retry command',async()=>{
+  const d=detail();d.revisions[0].reasons=[];d.revisions[0].coverage.resultKind='no_match';
+  d.revisions[0].emptyMessage='No supported expertise in this fictional corpus.';api.getCase.mockResolvedValue(d);
+  mount();await screen.findByText('No reliable match');
+  expect(screen.queryByRole('alert')).toBeNull();expect(screen.queryByRole('button',{name:'Retry research'})).toBeNull();
+});
+
+
+it('session reconnect during observation cannot cancel the replacement case load',async()=>{
+  const running=detail();running.currentRun!.status='running';api.getCase.mockResolvedValue(running);
+  const old=deferred<CaseDetail>(), next=deferred<CaseDetail>();
+  api.runCase.mockReturnValueOnce(old.promise).mockReturnValueOnce(next.promise);
+  mount();await waitFor(()=>expect(api.runCase).toHaveBeenCalledTimes(1));
+  act(()=>setAccessToken('reconnected-synthetic'));
+  await waitFor(()=>expect(api.runCase).toHaveBeenCalledTimes(2));
+  await act(async()=>next.resolve(detail()));
+  expect(screen.getByText('Fictional capability')).toBeTruthy();
+  await act(async()=>old.resolve(detail('old')));
+  expect(screen.queryByRole('heading',{name:'Fictional old'})).toBeNull();
 });

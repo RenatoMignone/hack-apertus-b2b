@@ -80,3 +80,13 @@ clarification repair. Draft assessment requires complete reason/caveat findings;
 code derives its verdict. Follow-up research with identical passages/entity context
 reuses assessed work with unresolved gaps; unchanged evidence after a draft failure
 stops rather than regenerating repeatedly. Restart API/worker after updating.
+
+
+## Frontend recovery branch acceptance
+
+`codex/frontend-backend-recovery` is unmerged. Its local checks passed 39 transport/
+helper tests, 18 React interaction tests, TypeScript/build and 304 disposable-backend
+tests. Browser fault injection verified reconnect/conflict/export recovery; a fresh
+actual-Apertus fictional HTTP case passed review/export and stale-download rejection.
+No shared database or public HTTP contract changed. See the
+[recovery receipt](FRONTEND_RECOVERY.md) for scope, limits and reproduction.

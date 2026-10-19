@@ -5,7 +5,7 @@ import type { BriefRevision, CaseDetail } from '../types/contract';
 import { buildExportModel, download, fileSlug, kept as keptOf } from '../export/model';
 import { useToast } from './Toast';
 import { api, apiMode } from '../api';
-import { reportApiError } from './ApiErrors';
+import { ErrorDetails } from './ApiErrors';
 import { assertExportAllowed } from '../export/policy';
 import { serverFormats } from '../api/session';
 
@@ -19,6 +19,7 @@ type Format = 'pdf' | 'pptx';
 export default function ExportModal({ detail, revision, onClose, onConflict }: { detail: CaseDetail; revision: BriefRevision; onClose: () => void; onConflict: (error: unknown) => Promise<void> }) {
   const alive = useRef(true), pending = useRef(false);
   useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
+  const [error, setError] = useState<unknown>();
   const [busy, setBusy] = useState<Format | null>(null);
   const toast = useToast();
   const kept = keptOf(revision);
@@ -28,7 +29,7 @@ export default function ExportModal({ detail, revision, onClose, onConflict }: {
 
   const run = async (format: Format) => {
     if (pending.current) return;
-    pending.current = true; setBusy(format);
+    pending.current = true; setError(undefined); setBusy(format);
     try {
       assertExportAllowed(revision, apiMode, format, formats.filter((f): f is Format => f === 'pdf' || f === 'pptx'));
       if (!alive.current) return;
@@ -56,7 +57,8 @@ export default function ExportModal({ detail, revision, onClose, onConflict }: {
       onClose();
     } catch (e) {
       if (!alive.current) return;
-      if (apiMode === 'http') { reportApiError(e); await onConflict(e); }
+      setError(e);
+      if (apiMode === 'http') { await onConflict(e); }
       else toast('Export failed. Please try again.');
     } finally {
       pending.current = false; if (alive.current) setBusy(null);
@@ -103,6 +105,10 @@ export default function ExportModal({ detail, revision, onClose, onConflict }: {
           <p className="mt-3 rounded-lg bg-warn-soft px-3 py-2 text-sm text-warn">Keep at least one item (✓ Keep) on the case page first.</p>
         )}
 
+        {error !== undefined && <div role="alert" className="mt-4 rounded border border-brand/30 p-3 text-sm">
+          <ErrorDetails error={error} />
+          <p className="mt-2 text-xs text-muted">Retry checks the current review and reconnects to an accepted export when available.</p>
+        </div>}
         <div className="mt-4 space-y-2">
           {unreviewed > 0 && <p className="text-sm text-muted">Keep or hide the {unreviewed} remaining item{unreviewed === 1 ? '' : 's'} before exporting.</p>}
           {!pdfAvailable && <p className="text-sm text-muted">PDF export is unavailable on the connected server.</p>}

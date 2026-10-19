@@ -79,7 +79,7 @@ export default function TopNav() {
         </TabNav.Link>)}
       </TabNav.Root>
       <div className="ml-auto flex shrink-0 items-center gap-2">
-        {apiMode === 'mock' ? <DemoMenu /> : <Badge color="teal" variant="soft" className="hidden sm:inline-flex">Workspace connected</Badge>}
+        {apiMode === 'mock' ? <DemoMenu /> : <Badge color="teal" variant="soft" className="hidden sm:inline-flex">Workspace session</Badge>}
         <RadixButton asChild><Link to="/cases/new" aria-label="New case"><Plus size={16} aria-hidden /><span className="hidden sm:inline">New case</span></Link></RadixButton>
       </div>
     </header>
