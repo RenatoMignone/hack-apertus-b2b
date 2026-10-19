@@ -11,7 +11,7 @@ comes first; agency-wide sharing is deferred. Confidential documents remain out.
 | 2 | Source validation/tagging tooling on isolated data | Complete; 12 focused tests passed |
 | 3 | Own-case similarity | Complete backend; optional migration/activation pending |
 | 4 | Domain-independent configuration | Complete backend; profile onboarding documented |
-| 5 | Local DB/web and actual checkpoint restart tests | Queued |
+| 5 | Local DB/web and actual checkpoint restart tests | Complete isolated acceptance; real deployment acceptance remains |
 | 6 | Reviewed PPTX and richer attributed case/output fields | Queued |
 
 ## Checkpoint 1
@@ -53,3 +53,10 @@ remains supported with the feature disabled; Eric must apply 0009 before activat
 institution vocabulary without changing orchestration. Unknowns and independent
 vector eligibility survive. Synthetic materials-domain service checks passed; new
 corpus/taxonomy/index provisioning remains an explicit owner operation.
+
+## Checkpoint 5
+
+[Local acceptance](LOCAL_ACCEPTANCE.md) covers a killed worker subprocess, real
+PostgreSQL checkpoints and a separate resumed process, plus combined controlled
+public-PDF fetching/DB deduplication and case-local provenance. Synthetic providers
+and disposable DB only; deployment-host and live upstream checks remain distinct.

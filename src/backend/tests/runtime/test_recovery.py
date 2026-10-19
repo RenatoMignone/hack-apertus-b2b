@@ -81,3 +81,54 @@ async def test_model_configuration_cannot_switch_under_a_queued_run(harness):
     view = h.store.run_view(h.access, UUID(case["case_id"]), UUID(case["run_id"]))
     assert view["state"] == "failed" and view["error_code"] == "service_unavailable"
     assert not h.reasoning.calls
+
+
+async def test_killed_process_reuses_committed_extraction_and_postgres_checkpoint(harness, tmp_path):
+    import asyncio
+    import json
+    import sys
+    from sqlalchemy import select, text
+    from backend.data import schema as t
+    h = harness
+    dsn = h.store.engine.url.render_as_string(hide_password=False).replace('postgresql+psycopg://', 'postgresql://')
+    assert h.store.engine.url.database.startswith('navigator_test_')
+    async with AsyncPostgresSaver.from_conn_string(dsn) as saver:
+        await saver.setup()  # only the disposable DB, never shared checkpoint setup
+    calls = tmp_path/'calls.txt'
+    configuration = tmp_path/'worker.json'
+    configuration.write_text(json.dumps({'database': dsn, 'fixture': h.fixture,
+        'artifacts': str(h.store.artifacts.root), 'calls': str(calls)}))
+    configuration.chmod(0o600)
+    created = h.store.create(h.access, 'process-restart', {'prompt': 'Synthetic glucose restart acceptance'}, 'request')
+    run_id = UUID(created['run_id'])
+    async def process(mode):
+        worker = await asyncio.create_subprocess_exec(sys.executable, '-m', 'backend.tests.runtime.process_worker',
+            str(configuration), mode, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        try:
+            stdout, stderr = await asyncio.wait_for(worker.communicate(), timeout=45)
+        except TimeoutError:
+            worker.kill()
+            await worker.wait()
+            raise
+        return worker.returncode, stderr.decode()[-2000:]
+    code, diagnostics = await process('crash')
+    assert code == 70, diagnostics
+    with h.store.engine.begin() as c:
+        assert c.execute(select(t.attempts.c.status).where(t.attempts.c.run_id == run_id,
+            t.attempts.c.stage == 'runtime.node.persist_extraction.1')).scalar_one() == 'committed'
+        claims_before = c.execute(select(t.claims.c.claim_id).join(t.scopes).where(
+            t.scopes.c.case_id == UUID(created['case_id']))).scalars().all()
+        assert len(claims_before) == 1
+        assert c.execute(text('SELECT count(*) FROM public.checkpoints')).scalar_one() > 0
+        # Only this disposable job's lease is expired to make takeover immediate.
+        c.execute(text("UPDATE ops.stage_attempts SET lease_until=now()-interval '1 second' WHERE run_id=:run AND stage='runtime.execute'"), {'run': run_id})
+    code, diagnostics = await process('resume')
+    assert code == 0, diagnostics
+    state = h.store.run_view(h.access, UUID(created['case_id']), run_id)
+    assert state['state'] == 'completed', state
+    assert calls.read_text().splitlines() == ['extract']
+    with h.store.engine.connect() as c:
+        claims_after = c.execute(select(t.claims.c.claim_id).join(t.scopes).where(
+            t.scopes.c.case_id == UUID(created['case_id']))).scalars().all()
+        assert claims_after == claims_before
+        assert len(c.execute(select(t.results).where(t.results.c.case_id == UUID(created['case_id']))).all()) == 1
