@@ -32,3 +32,7 @@ Read [screens](../../docs/plans/FRONTEND_PLAN.md),
 [HTTP](../../docs/plans/FRONTEND_BACKEND_API.md) and
 [walkthrough](../../docs/judges/DEMO.md). Coordinate consumer/interface edits with
 the backend; tests/build verify interaction contracts, not live research quality.
+
+Failed-case messages persist through reload from the existing run error code.
+Retry labels and transport share the same predicate: only a failed run with a
+pack for the current input regenerates a report; other retries research again.
