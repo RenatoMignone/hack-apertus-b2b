@@ -33,4 +33,11 @@ def interpretation_value(value) -> CaseInterpretation:
         body["search_terms"] = list(dict.fromkeys([*body["search_terms"], label]))
         label = "Research request"
     body["activity_label"] = label
+    if (not body["needs"] or not body["bern_intents"] or body["ambiguities"]) and not body["blocking_questions"]:
+        raise ValueError(
+            "blocking_questions: add a targeted question for each material ambiguity in USER intent, "
+            "or the missing capability/Bern objective. Preserve unresolved ambiguities; do not invent "
+            "answers. Example: unspecified device capability -> 'Which technical capability do you "
+            "need in Bern?' Unknown researchers or facility availability belong in research_questions "
+            "and do not block a clear capability/objective request.")
     return CaseInterpretation.model_validate(body)

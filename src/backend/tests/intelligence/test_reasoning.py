@@ -72,8 +72,10 @@ def test_material_ambiguity_requires_question(context, interpretation):
     value = interpretation.model_dump(mode="json")
     value["ambiguities"] = ["Sensor development or clinical validation?"]
     repaired = {**value, "blocking_questions": ["Which capability are you seeking?"]}
-    service, _ = services(value, repaired)
+    service, model = services(value, repaired)
     assert run(service.interpret("Sensors", {}, context)).blocking_questions
+    repair = model.calls[1][-1].content
+    assert "blocking_questions:" in repair and "Preserve unresolved ambiguities" in repair
 
 
 def test_extract_uses_local_keys_and_literal_evidence(context, interpretation, evidence):
