@@ -1,5 +1,22 @@
 # Current development status
 
+19 October 2026 shared-host update: the confirmed application pause, validated
+backup and maintainer migration advanced `navigator` from 0008 to
+**0010_rich_outputs**. A repeated migration was a no-op; existing source, document,
+version, claim and artifact IDs were preserved. Owner RLS/narrow privileges and
+the 768-dimension memory index were checked. **21 focused isolated Windows checks
+passed** after making the subprocess recovery harness portable. See the measured
+[migration receipt](../team/MIGRATION_STATUS.md#shared-host-activation--19-october-2026-0744-madrid).
+
+Both developer identities pass host-side read-only network readiness and
+authenticated ASGI capability/existing-case controls with prepared optional
+settings. Their private helpers preserve all personal credentials/bindings and
+select the unchanged supplied PPTX template. **Peer-side env application,
+API/worker/frontend restarts and real operator PDF/PPTX/history acceptance remain
+pending.** No shared case was automatically indexed. Ingestion/enrichment and
+the storage watchdog remain independent. Older shared-head/pending-migration
+statements below describe the pre-activation state.
+
 19 October 2026. The backend research completion and frontend integration audit
 are integrated into main. See the [backend acceptance](../team/BACKEND_RESEARCH_COMPLETION.md),
 [frontend audit](../team/FRONTEND_RUNTIME_AUDIT.md) and

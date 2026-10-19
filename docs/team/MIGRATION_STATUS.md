@@ -135,6 +135,63 @@ The recorded migration results above retain their original scope.
 
 ## Optional release prepared — 19 October 2026
 
+### Shared-host activation — 19 October 2026, 07:44 Madrid
+
+The operator confirmed Elia's application API/worker pause. Remaining ordinary
+developer database connections were idle with no open transaction; they were
+preserved. The existing `navigator_migrator` identity applied 0009 and 0010 using
+the normal application `db-migrate` command against `navigator`, then repeated
+it successfully as a no-op. LangGraph and infrastructure services were unchanged.
+
+A fresh custom-format backup contains 561,838,357 bytes. SHA256:
+`1bb10c9571d4ed86bbebdde675b15378068b85fa77fefc6bdd29a6ac3ddc1b14`.
+Archive listing was validated; a full restore of this archive was not rehearsed.
+The private operator receipt retains its location. Recovery requires restoring
+that archive with `pg_restore` into a separately provisioned database and checking
+it before an explicit cutover, never dropping the live ingestion database.
+Feature rollback means disabling the two optional flags, not schema downgrade.
+
+Measured before/after counts were identical: 225 sources, 2,149 documents and
+versions, 7,703 claims, 4,197 artifacts. All existing IDs in those tables were
+preserved, including case-local records; these are not public-only crawl counts.
+The two new tables have owner RLS. `navigator_runtime` has SELECT/INSERT/UPDATE
+on memory profiles, SELECT/INSERT on business contexts, and no DELETE on either.
+The 768-dimension partial HNSW memory index exists. No grants were widened.
+
+The focused isolated acceptance suite passed **21 tests** on Windows, including
+real disposable PostgreSQL checkpoints, killed-process recovery, combined
+controlled research, memory, manual plans and PDF/PPTX. The test subprocess
+harness now uses a bounded thread-launched subprocess with an explicit source
+path and Windows selector policy. One pytest loop-policy deprecation warning
+remains. Models/web responses are synthetic; no fixtures entered the shared host.
+
+Elia and Renato's private bundles now include a portable optional-settings helper
+and the unchanged supplied PPTX template (SHA256
+`a2f5e50ff7b986fe6a5a2f38654bf5459142ea9285e844e12aa9392f20f7a262`).
+Prepared settings enable `CASE_MEMORY_ENABLED=true`, minimum score 50
+(uncalibrated), `RUNTIME_RICH_OUTPUTS_ENABLED=true`, template version
+`challenge-pptx-a2f5e50ff7b9`, renderer version `pdf-pptx-df0626b`. All personal
+bindings, tokens, checkpoint/MinIO credentials, model settings and tunnel endpoints
+were preserved. No existing case was opted in or indexed.
+
+Both ordinary user identities passed read-only host-network readiness: schema,
+identity, pinned encoder/local tokenizer, checkpoint reads and S3 bucket HEAD.
+Authenticated ASGI composition on this host returned 200 with PDF/PPTX capabilities
+and existing-case manual/history controls. These checks used actual ordinary
+credentials and explicit host endpoint overrides in memory; they did not test
+the peers' running Mac servers or their tunnels. Earlier artifact write/read
+evidence is separate; this activation did not repeat those writes.
+
+**Per-user activation remains:** apply the private helper to each existing local
+env after pulling current main; restart that user's API/worker with matching code
+and settings; rebuild/restart the frontend; run the supplied read-only readiness
+command through the user's own tunnel. The permitted real-case plan revision,
+review, PDF/PPTX download, old-revision checks, real-case opt-in/out and owner
+isolation acceptance remain operator tasks. Combined real DB/web/Keera acceptance,
+human relevance labels and similarity calibration remain separate open work.
+
+### Historical preparation note (superseded by activation above)
+
 Source now includes 0009_case_memory and 0010_rich_outputs. These were tested on
 disposable PostgreSQL only; this task did not migrate the shared host. Current
 runtime explicitly accepts 0008 core while both optional flags are false. Eric's

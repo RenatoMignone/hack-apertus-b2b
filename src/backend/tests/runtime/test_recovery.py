@@ -86,7 +86,10 @@ async def test_model_configuration_cannot_switch_under_a_queued_run(harness):
 async def test_killed_process_reuses_committed_extraction_and_postgres_checkpoint(harness, tmp_path):
     import asyncio
     import json
+    import os
+    import subprocess
     import sys
+    from pathlib import Path
     from sqlalchemy import select, text
     from backend.data import schema as t
     h = harness
@@ -102,15 +105,15 @@ async def test_killed_process_reuses_committed_extraction_and_postgres_checkpoin
     created = h.store.create(h.access, 'process-restart', {'prompt': 'Synthetic glucose restart acceptance'}, 'request')
     run_id = UUID(created['run_id'])
     async def process(mode):
-        worker = await asyncio.create_subprocess_exec(sys.executable, '-m', 'backend.tests.runtime.process_worker',
-            str(configuration), mode, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-        try:
-            stdout, stderr = await asyncio.wait_for(worker.communicate(), timeout=45)
-        except TimeoutError:
-            worker.kill()
-            await worker.wait()
-            raise
-        return worker.returncode, stderr.decode()[-2000:]
+        # Psycopg requires Windows' selector loop, which has no asyncio subprocess
+        # transport. A bounded blocking subprocess in a thread works on both OSes;
+        # subprocess.run also kills/waits for a child that exceeds the timeout.
+        environment = os.environ.copy()
+        environment['PYTHONPATH'] = str(Path(__file__).resolve().parents[3]) + os.pathsep + environment.get('PYTHONPATH', '')
+        worker = await asyncio.to_thread(subprocess.run,
+            [sys.executable, '-m', 'backend.tests.runtime.process_worker', str(configuration), mode],
+            capture_output=True, timeout=45, env=environment)
+        return worker.returncode, worker.stderr.decode()[-2000:]
     code, diagnostics = await process('crash')
     assert code == 70, diagnostics
     with h.store.engine.begin() as c:

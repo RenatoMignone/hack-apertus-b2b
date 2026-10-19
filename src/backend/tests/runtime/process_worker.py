@@ -18,6 +18,8 @@ from backend.tests.runtime.fakes import FixtureBackbone, FixturePdf, FixtureReas
 
 
 def main():
+    if sys.platform == 'win32':
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     values = json.loads(Path(sys.argv[1]).read_text())
     engine = engine_for(values['database'])
     # Never allow this harness to operate on shared development or production DBs.
