@@ -22,7 +22,7 @@ See `docs/challenge/EVALUATION.md` for negative/ambiguity and field-support audi
 `python -m backend.evaluation.proof_of_concept --env-file PRIVATE_ENV --run-id OWNED_RUN_ID`
 runs the complete fictional demo brief and its three wording variants against an
 existing authorized capture. It uses the production RRF adapter and configured
-real embeddings, enforces read-only database connections, and creates no case,
+real embeddings, permits temporary retrieval tables but no persistent writes, and creates no case,
 capture, claim, grant or migration. Optional `--db-host` / `--db-port` selects an
 explicit connection address for that same authorized database. The private env
 must have exactly one binding and compatible assets; it is never printed.
@@ -42,6 +42,29 @@ in the ignored receipt; only selected exact quotations are republished.
 See [PoC outcome and reproduction](../../../docs/proof-of-concept/README.md).
 This static fallback is distinct from the application's exact-review-gated report
 export and from independent expert Recall@10 evaluation.
+
+## Live SQL performance reproduction
+
+Use an existing owned run and private JSON containing its original request and
+up to five query variants. This performs no case/corpus writes or migrations:
+
+```sh
+python -m backend.evaluation.benchmark_retrieval --env-file PRIVATE_ENV --run-id OWNED_RUN_ID --queries-file PRIVATE_QUERIES.json --repeats 2
+```
+
+It compares one versus all supplied inputs under the same identity and capture,
+with statements bounded by the existing timeout (at most 30 seconds). Eligibility
+is prepared once per measurement, shared by lexical and exact dense ranking.
+Keep the output out of git: queries, passage IDs and plans can reveal authorized
+information. Use `--vectors-file PRIVATE_CACHE.json` only for explicit cached
+`queries`, `vectors` and `config_hash` matching the capture/encoder; otherwise
+the real encoder is called. Encoding time is separate from SQL timings.
+Optional `--plans` adds separate bounded `EXPLAIN (ANALYZE,BUFFERS)` reruns;
+these warm caches and are excluded from measured branch durations. No cold-cache
+or unloaded-host guarantee is made. `--db-host`/`--db-port` select an explicit
+address without changing the operator's credentials.
+
+See [measured fix and rollout](../../../docs/data/LIVE_RETRIEVAL_PERFORMANCE.md).
 
 Read the [focused specification](../../../docs/challenge/EVALUATION.md) and [module map](../../../docs/plans/MODULE_HANDOFFS.md).
 Coordinate shared DTO/schema/configuration changes with their consumers and run

@@ -6,6 +6,12 @@ constraints and supported concept/alias expansions. The first plan can use the
 original query plus bounded variants; gap revisions add at most five novel variants.
 Exact DTO limits live in `contracts/data.py` and `contracts/services.py`.
 
+19 October 2026 implementation: shared eligibility is staged once under caller
+RLS with measured membership statistics; lexical matching precedes temporary GIN
+staging and dense ranking remains exact. Schema 0013 batches equivalent read
+authorization checks. [Measured acceptance and rollout](LIVE_RETRIEVAL_PERFORMANCE.md)
+records actual restricted-role timings, cache/load limits and security checks.
+
 ## Search sequence
 
 1. Resolve access, snapshot membership and exact embedding configuration.

@@ -7,6 +7,8 @@ import pytest
 from backend.data.database import transaction
 from backend.data.fixtures import FixtureEmbedder
 from backend.data.retrieval.hybrid import HybridSearch
+from backend.data.retrieval.prepared import prepare
+from uuid import UUID
 from backend.tests.runtime.benchmark_capture import seed
 from backend.tests.runtime.test_live_corpus import live_users, start
 
@@ -22,6 +24,13 @@ def test_restricted_live_retrieval_at_twenty_thousand_chunks(harness, live_users
         assert count==20004
         explain='\n'.join(c.execute(text('EXPLAIN SELECT chunk_id FROM retrieval.snapshot_chunks WHERE snapshot_id=:id'), {'id':context.snapshot_id}).scalars())
         assert 'hashed SubPlan' in explain
+        parameters={'snapshot':plan.snapshot_id,'namespace':access.namespace,'run':context.run_id,
+            'case':context.case_id,'all_languages':True,'languages':['und'],
+            'all_documents':True,'excluded':[UUID(int=0)],'all_families':True,'families':[UUID(int=0)]}
+        original=c.execute(text('SHOW enable_nestloop')).scalar_one()
+        prepare(c,None,parameters,vectors=True)
+        assert c.execute(text('SELECT count(*) FROM pg_temp.navigator_retrieval_eligible')).scalar_one()==count
+        assert c.execute(text('SHOW enable_nestloop')).scalar_one()==original
     started=perf_counter()
     result=HybridSearch(store.engine,FixtureEmbedder()).search(access,plan)
     assert len(result.hits)==30

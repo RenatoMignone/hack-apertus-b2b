@@ -1,4 +1,4 @@
-"""Read-only retrieval PoC on an existing owned capture using fictional demo queries."""
+"""Retrieval PoC with no persistent writes on an existing owned capture."""
 import argparse
 import hashlib
 import json
@@ -50,7 +50,6 @@ def main():
         previous = connection.autocommit
         connection.autocommit = True
         with connection.cursor() as cursor:
-            cursor.execute("SET default_transaction_read_only=on")
             cursor.execute("SET statement_timeout='30s'")
             cursor.execute("SET lock_timeout='5s'")
         connection.autocommit = previous
@@ -58,9 +57,20 @@ def main():
     output = {"started_at": datetime.now(timezone.utc).isoformat(),
               "mode": "real_corpus_real_hosted_embeddings_no_frontend",
               "strategy": "rrf", "reranker_enabled": False,
-              "reasoning_model_called": False, "database_read_only": True,
+              "reasoning_model_called": False, "database_read_only": False, "persistent_data_read_only": True,
+              "temporary_retrieval_relations": True,
               "cases_created": 0, "queries": []}
     args.output.parent.mkdir(parents=True, exist_ok=True)
+
+    @event.listens_for(engine, "before_cursor_execute")
+    def prevent_persistent_writes(_connection, _cursor, statement, _parameters, _context, _many):
+        normalized = " ".join(statement.upper().split())
+        allowed = normalized.startswith(("SELECT ", "SET ", "SHOW ", "SAVEPOINT ", "RELEASE SAVEPOINT ",
+            "ROLLBACK TO SAVEPOINT ", "CREATE TEMP TABLE NAVIGATOR_RETRIEVAL_"))
+        allowed = allowed or (normalized.startswith(("CREATE INDEX ON PG_TEMP.NAVIGATOR_RETRIEVAL_",
+            "CREATE UNIQUE INDEX ON PG_TEMP.NAVIGATOR_RETRIEVAL_", "ANALYZE PG_TEMP.NAVIGATOR_RETRIEVAL_")))
+        if not allowed and not normalized.startswith("WITH "):
+            raise RuntimeError("PoC harness refuses persistent write statements")
 
     def save():
         args.output.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
