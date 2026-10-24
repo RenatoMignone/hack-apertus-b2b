@@ -23,6 +23,12 @@ Built for the Bern Economic Development Agency challenge at Hack Apertus.
 **Standalone evidence:** the [retrieval proof of concept](docs/proof-of-concept/README.md) contains a three-page PDF and real-source rankings for fictional HelioSense.
 It records retrieval and traceability; newer pipeline and performance checks are linked separately.
 
+## Demo
+
+[![B2Bern application demo](docs/demo/demo.gif)](docs/demo/demo.gif)
+
+<!-- Demo asset copied unchanged from eliainnocenti/hackapertus-b2bern at fb5c1d7fb93aa736c9150ef52f9b6b5dec0845d6, docs/demo/demo.gif. -->
+
 ## Why B2Bern
 
 - **Understands intent:** Apertus v1.5 maps everyday wording to a reviewed domain vocabulary while preserving the company's full needs and constraints.
